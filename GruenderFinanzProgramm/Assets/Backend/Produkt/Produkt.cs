@@ -50,12 +50,38 @@ public class Produkt
     {
         return stueckKosten;
     }
+
+        public float GetFixKosten()
+    {
+        return fixKosten;
+    }
+
+    public float GetVarKosten()
+    {
+        return varKosten;
+    }
+
+    public float GetVarKostenGesamt()
+    {
+        return varKostenGesamt;
+    }
+
+    public float GetVarKostenProEinheit()
+    {
+        return varKostenProEinheit;
+    }
+
+    public int GetMenge()
+    {
+        return menge;
+    }
+
+    // Setter-Methoden
       public void SetId(int id)
     {
         this.id = id;
     }
 
-    //Setter-Methoden
     public void SetGesamtKosten(float gesamtKosten)
     {
         this.gesamtKosten = gesamtKosten;
