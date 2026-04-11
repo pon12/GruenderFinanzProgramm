@@ -443,6 +443,7 @@ GameObject:
   - component: {fileID: 989147638}
   - component: {fileID: 989147637}
   - component: {fileID: 989147636}
+  - component: {fileID: 989147640}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -543,6 +544,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &989147640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989147635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67097a47279d93fde8880c6991003264, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CodeTest
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -550,3 +563,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 989147639}
+  - {fileID: 2243317}
