@@ -14,7 +14,7 @@ public class Produkt
     public float durchschnittlicheVarKosten;
     public float stueckKosten;
     public float verkaufsPreis;
-
+    
     public Produkt(int id)
     {
         this.id = id;
@@ -49,5 +49,55 @@ public class Produkt
     public float GetStueckKosten()
     {
         return stueckKosten;
+    }
+      public void SetId(int id)
+    {
+        this.id = id;
+    }
+
+    //Setter-Methoden
+    public void SetGesamtKosten(float gesamtKosten)
+    {
+        this.gesamtKosten = gesamtKosten;
+    }
+
+    public void SetFixKosten(float fixKosten)
+    {
+        this.fixKosten = fixKosten;
+    }
+
+    public void SetVarKosten(float varKosten)
+    {
+        this.varKosten = varKosten;
+    }
+
+    public void SetVarKostenProEinheit(float varKostenProEinheit)
+    {
+        this.varKostenProEinheit = varKostenProEinheit;
+    }
+
+    public void SetMenge(int menge)
+    {
+        this.menge = menge;
+    }
+
+    public void SetDurchschnittlicheFixKosten(float durchschnittlicheFixKosten)
+    {
+        this.durchschnittlicheFixKosten = durchschnittlicheFixKosten;
+    }
+
+    public void SetDurchschnittlicheVarKosten(float durchschnittlicheVarKosten)
+    {
+        this.durchschnittlicheVarKosten = durchschnittlicheVarKosten;
+    }
+
+    public void SetStueckKosten(float stueckKosten)
+    {
+        this.stueckKosten = stueckKosten;
+    }
+
+    public void SetVerkaufsPreis(float verkaufsPreis)
+    {
+        this.verkaufsPreis = verkaufsPreis;
     }
 }
