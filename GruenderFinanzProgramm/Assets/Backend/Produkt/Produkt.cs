@@ -3,25 +3,29 @@ using UnityEngine;
 
 public class Produkt
 {
-    public int id;
-    public  float gesamtKosten;
-    public float fixKosten;
-    public float varKosten;
-    public float varKostenGesamt;
-    public float varKostenProEinheit;
-    public int menge;
-    public float durchschnittlicheFixKosten;
-    public float durchschnittlicheVarKosten;
-    public float stueckKosten;
-    public float verkaufsPreis;
+    //meta
+    private int id;
+    //Kostenrechnung
+    private float gesamtKosten;
+    private float fixKosten;
+    private float varKosten;
+    private float varKostenGesamt;
+    private float varKostenProEinheit;
+    private int menge;
+    private float durchschnittlicheFixKosten;
+    private float durchschnittlicheVarKosten;
+    private float stueckKosten;
+    //Ab hier für weitere Berechnungen
+    private float verkaufsPreis;
     
     public Produkt(int id)
     {
         this.id = id;
-        Berechnen();
+        ProduktManager.produktManager.addToList(this);
+        //berechnen();
     }
     // Methode um die Infos aus Kostenrechnung zu holen
-     private void Berechnen()
+    public void berechnen()
     {
         gesamtKosten = Kostenrechnung.gesamtKosten(fixKosten, varKosten);
         varKosten = Kostenrechnung.varKosten(varKostenProEinheit, menge);
@@ -31,99 +35,104 @@ public class Produkt
     }
 
     // Getter-Methoden für die Kosteninformationen
-    public float GetGesamtKosten()
+    public float getGesamtKosten()
     {
         return gesamtKosten;
     }
 
-    public float GetDurchschnittlicheFixKosten()
+    public float getDurchschnittlicheFixKosten()
     {
         return durchschnittlicheFixKosten;
     }
 
-    public float GetDurchschnittlicheVarKosten()
+    public float getDurchschnittlicheVarKosten()
     {
         return durchschnittlicheVarKosten;
     }
 
-    public float GetStueckKosten()
+    public float getStueckKosten()
     {
         return stueckKosten;
     }
 
-        public float GetFixKosten()
+        public float getFixKosten()
     {
         return fixKosten;
     }
 
-    public float GetVarKosten()
+    public float getVarKosten()
     {
         return varKosten;
     }
 
-    public float GetVarKostenGesamt()
+    public float getVarKostenGesamt()
     {
         return varKostenGesamt;
     }
 
-    public float GetVarKostenProEinheit()
+    public float getVarKostenProEinheit()
     {
         return varKostenProEinheit;
     }
 
-    public int GetMenge()
+    public int getMenge()
     {
         return menge;
     }
 
     // Setter-Methoden
-      public void SetId(int id)
+      public void getId(int id)
     {
         this.id = id;
     }
 
-    public void SetGesamtKosten(float gesamtKosten)
+    public void getGesamtKosten(float gesamtKosten)
     {
         this.gesamtKosten = gesamtKosten;
     }
 
-    public void SetFixKosten(float fixKosten)
+    public void getFixKosten(float fixKosten)
     {
         this.fixKosten = fixKosten;
     }
 
-    public void SetVarKosten(float varKosten)
+    public void setVarKosten(float varKosten)
     {
         this.varKosten = varKosten;
     }
+    public void setFixKosten(float fixKosten)
+    {
+        this.fixKosten = fixKosten;
+    }
 
-    public void SetVarKostenProEinheit(float varKostenProEinheit)
+    public void setVarKostenProEinheit(float varKostenProEinheit)
     {
         this.varKostenProEinheit = varKostenProEinheit;
     }
 
-    public void SetMenge(int menge)
+    public void setMenge(int menge)
     {
         this.menge = menge;
     }
 
-    public void SetDurchschnittlicheFixKosten(float durchschnittlicheFixKosten)
+    public void setDurchschnittlicheFixKosten(float durchschnittlicheFixKosten)
     {
         this.durchschnittlicheFixKosten = durchschnittlicheFixKosten;
     }
 
-    public void SetDurchschnittlicheVarKosten(float durchschnittlicheVarKosten)
+    public void setDurchschnittlicheVarKosten(float durchschnittlicheVarKosten)
     {
         this.durchschnittlicheVarKosten = durchschnittlicheVarKosten;
     }
 
-    public void SetStueckKosten(float stueckKosten)
+    public void setStueckKosten(float stueckKosten)
     {
         this.stueckKosten = stueckKosten;
     }
 
-    public void SetVerkaufsPreis(float verkaufsPreis)
+    public void setVerkaufsPreis(float verkaufsPreis)
     {
         this.verkaufsPreis = verkaufsPreis;
     }
+
 }
