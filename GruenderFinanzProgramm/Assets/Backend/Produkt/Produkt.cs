@@ -34,6 +34,11 @@ public class Produkt
         stueckKosten = Kostenrechnung.stueckKosten(gesamtKosten, menge);
     }
 
+    public int getId()
+    {
+        return id;
+    }
+
     // Getter-Methoden für die Kosteninformationen
     public float getGesamtKosten()
     {
@@ -81,17 +86,17 @@ public class Produkt
     }
 
     // Setter-Methoden
-      public void getId(int id)
+      public void setId(int id)
     {
         this.id = id;
     }
 
-    public void getGesamtKosten(float gesamtKosten)
+    public void setGesamtKosten(float gesamtKosten)
     {
         this.gesamtKosten = gesamtKosten;
     }
 
-    public void getFixKosten(float fixKosten)
+    public void setFixKosten(float fixKosten)
     {
         this.fixKosten = fixKosten;
     }
@@ -99,10 +104,6 @@ public class Produkt
     public void setVarKosten(float varKosten)
     {
         this.varKosten = varKosten;
-    }
-    public void setFixKosten(float fixKosten)
-    {
-        this.fixKosten = fixKosten;
     }
 
     public void setVarKostenProEinheit(float varKostenProEinheit)
