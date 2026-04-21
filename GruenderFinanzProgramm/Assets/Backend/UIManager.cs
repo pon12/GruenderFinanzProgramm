@@ -35,10 +35,12 @@ public class UIManager : MonoBehaviour
         userMenuPanel.SetActive(true);
     }
 
+    /*
     public void showZukuenftigeErweiterungen()
     {
         hideAllMenus();
         zukuenftigeErweiterungenPanel.SetActive(true);
     }
+    */
 
 }
