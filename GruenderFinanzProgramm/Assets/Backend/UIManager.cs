@@ -31,10 +31,8 @@ public class UIManager : MonoBehaviour
 
     public void showUserMenu()
     {
-        //Alle User Panel anzeigen
         hideAllMenus();
         userMenuPanel.SetActive(true);
-
     }
 
     public void showZukuenftigeErweiterungen()
