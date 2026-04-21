@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
 
     //Variable für showUserPanel() -> Panel erstellen
     [SerializeField] private GameObject userMenuPanel;
-    [SerializeField] private GameObject zukuenftigeErweiterungenPanel;
+    // [SerializeField] private GameObject zukuenftigeErweiterungenPanel;
 
     private void Start()
     {
@@ -19,7 +19,7 @@ public class UIManager : MonoBehaviour
     {
         mainMenuPanel.SetActive(false);
         userMenuPanel.SetActive(false);
-        zukuenftigeErweiterungenPanel.SetActive(false);
+        // zukuenftigeErweiterungenPanel.SetActive(false);
 
     }
 
