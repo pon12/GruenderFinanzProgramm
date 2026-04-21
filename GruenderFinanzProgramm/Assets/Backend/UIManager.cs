@@ -1,12 +1,14 @@
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
 
-    private GameObject mainMenuPanel;
-    private GameObject[] userMenuPanels;
-    private GameObject zukünftigeErweiterungenPanel;
+    [SerializeField] private GameObject mainMenuPanel;
+
+    //Variable für showUserPanel() -> Panel erstellen
+    [SerializeField] private GameObject userMenuPanel;
+    [SerializeField] private GameObject zukuenftigeErweiterungenPanel;
 
     private void Start()
     {
@@ -16,14 +18,8 @@ public class UIManager : MonoBehaviour
     public void hideAllMenus()
     {
         mainMenuPanel.SetActive(false);
-
-        // userMenuPanel.setActive(false);
-        foreach (GameObject panel in userMenuPanels)
-        {
-            panel.SetActive(false);
-        }
-
-        zukünftigeErweiterungenPanel.SetActive(false);
+        userMenuPanel.SetActive(false);
+        zukuenftigeErweiterungenPanel.SetActive(false);
 
     }
 
@@ -35,13 +31,16 @@ public class UIManager : MonoBehaviour
 
     public void showUserMenu()
     {
+        //Alle User Panel anzeigen
         hideAllMenus();
+        userMenuPanel.SetActive(true);
 
     }
 
-    public void ShowZukünftigeErweiterungen()
+    public void showZukuenftigeErweiterungen()
     {
-
+        hideAllMenus();
+        zukuenftigeErweiterungenPanel.SetActive(true);
     }
 
 }
