@@ -22,4 +22,16 @@ public class ProduktManager
         produktListe.Add(produkt);
     }
 
+    public float getAllGewinn()
+    {
+        float totalGewinn = 0;
+        
+        foreach (Produkt p in produktListe)
+        {
+             totalGewinn += p.getGewinn();
+        }
+
+        return totalGewinn;
+    }
+
 }
