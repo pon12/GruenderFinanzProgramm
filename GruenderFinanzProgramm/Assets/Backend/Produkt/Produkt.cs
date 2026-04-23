@@ -17,7 +17,15 @@ public class Produkt
     private float stueckKosten;
     //Ab hier für weitere Berechnungen
     private float verkaufsPreis;
-    
+
+    private int verkaufteMenge;
+
+    private float umsatz;
+
+    private float gewinn;
+
+    private int mehrWertSteuer;
+
     public Produkt(int id)
     {
         this.id = id;
@@ -85,6 +93,31 @@ public class Produkt
         return menge;
     }
 
+    public float getVerkaufsPreis()
+    {
+        return verkaufsPreis;
+    }
+
+    public int getVerkaufteMenge()
+    {
+        return verkaufteMenge;
+    }
+
+    public float getUmsatz()
+    {
+        return umsatz;
+    }
+
+    public float getGewinn()
+    {
+        return gewinn;
+    }
+
+    public int getMehrWertSteuer()
+    {
+        return mehrWertSteuer;
+    }
+
     // Setter-Methoden
       public void setId(int id)
     {
@@ -134,6 +167,26 @@ public class Produkt
     public void setVerkaufsPreis(float verkaufsPreis)
     {
         this.verkaufsPreis = verkaufsPreis;
+    }
+
+    public void setVerkaufteMenge(int verkaufteMenge)
+    {
+        this.verkaufteMenge = verkaufteMenge;
+    }
+
+    public void setUmsatz(float umsatz)
+    {
+        this.umsatz = umsatz;
+    }
+
+    public void setGewinn(float gewinn)
+    {
+        this.gewinn = gewinn;
+    }
+    
+    public void setMehrWertSteuer(int mehrWertSteuer)
+    {
+        this.mehrWertSteuer = mehrWertSteuer;
     }
 
 }
