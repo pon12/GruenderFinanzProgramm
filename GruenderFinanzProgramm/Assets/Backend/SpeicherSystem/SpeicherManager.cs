@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class SpeicherManager
 {   
-   // private const string connectionString =  zugiff auf die Datenbank ka was da rein muss.
-   // Create TABLE Tabelle (Id INT PRIMARY KEY NOT NULL, Gewinn Int);  Befehl dür Tabelle in SQL für die Tabelle.
-    // Daten eintragen
+    // Verbindung zur Datenbank. 
+    private const string connectionString = "Server=localhost;Database=Daten;Trusted_Connection=True;";      
+   // Daten eintragen
     public void writeData(int id, int value)
     {
         using (SqlConnection connection = new SqlConnection(connectionString))
