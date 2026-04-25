@@ -1,12 +1,12 @@
 -- SQL Code beispiel.
 
 --Befehl zum erstellen einer Datenbank
-create Database Daten;
+CREATE DATABASE Daten;
 --Befehl zum verwenden einer Datenbank
-use Daten;
+USE Daten;
 
 --Befehl zum erstellen einer Tabelle in der Datenbank.
-create table Tabelle(
+CREATE TABLE Tabelle(
     Id INT PRIMARY KEY NOT NULL,
     Gewinn INT
 );
