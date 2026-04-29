@@ -27,10 +27,10 @@ public class LoginManager : MonoBehaviour
             Debug.LogError("Fülle alle Felder aus");
             return;
         }
-        if (await MySQLManager.RegisterUser(Reg_Email.text, Reg_Password.text, Reg_Username.text))
-        {
-           print("User registriert");
-        }
+        //if (await MySQLManager.RegisterUser(Reg_Email.text, Reg_Password.text, Reg_Username.text))
+        //{
+        //   print("User registriert");
+        //}
         else
         {
             print("User konnte nicht registriert werden");
