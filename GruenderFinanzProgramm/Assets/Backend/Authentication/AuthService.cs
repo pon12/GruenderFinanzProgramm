@@ -16,6 +16,9 @@ public class AuthService
 {
     private readonly IUserRepository userRepository;
 
+    private string temporaryPassKey;
+    private string temporaryRecoveryKey;
+
     public AuthService(IUserRepository userRepository)
     {
         this.userRepository = userRepository;
@@ -98,4 +101,52 @@ public class AuthService
             return builder.ToString();
         }
     }
+
+    public string generatePassKey()
+    {
+        int passKey = UnityEngine.Random.Range(1000, 10000);
+        temporaryPassKey = passKey.ToString();
+        return temporaryPassKey;
+    }
+
+    public string generateRecoveryKey()
+    {
+        const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < 16; i++)
+        {
+            int index = UnityEngine.Random.Range(0, characters.Length);
+            builder.Append(characters[index]);
+        }
+
+        temporaryRecoveryKey = builder.ToString();
+        return temporaryRecoveryKey;
+    }
+
+    public string getPassKey()
+    {
+        return temporaryPassKey;
+    }
+
+    public string getRecoveryKey()
+    {
+        return temporaryRecoveryKey;
+    }
+
+    public bool loginWithPassKey(string enteredPassKey)
+    {
+        if (string.IsNullOrWhiteSpace(enteredPassKey))
+        {
+            return false;
+        }
+
+        if (enteredPassKey == temporaryPassKey)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 }

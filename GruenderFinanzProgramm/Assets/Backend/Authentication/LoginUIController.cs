@@ -14,6 +14,8 @@ public class LoginUIController : MonoBehaviour
     [SerializeField] private GameObject errorText;
     [SerializeField] private string mainSceneName = "MainScene";
 
+    [SerializeField] private TMP_InputField passKeyInput;
+
     private AuthService authService;
 
     private void Start()
@@ -25,6 +27,13 @@ public class LoginUIController : MonoBehaviour
 
         // MARK: Test für Dummy Login
         authService.register("test@dummy.de", "1234", "1234");
+
+        // MARK: Temporäre Test-Keys generieren
+        string passKey = authService.generatePassKey();
+        string recoveryKey = authService.generateRecoveryKey();
+
+        Debug.Log("Temporary PassKey: " + passKey);
+        Debug.Log("Temporary RecoveryKey: " + recoveryKey);
     }
 
     public void onLoginButtonClicked()
@@ -45,4 +54,29 @@ public class LoginUIController : MonoBehaviour
 
         SceneManager.LoadScene(mainSceneName);
     }
+
+    public void onPassKeyLoginButtonClicked()
+    {
+        string enteredPassKey = passKeyInput.text;
+
+        bool isValid = authService.loginWithPassKey(enteredPassKey);
+
+        if (!isValid)
+        {
+            errorText.SetActive(true);
+            return;
+        }
+
+        errorText.SetActive(false);
+
+        // Dummy-User für temporären Passkey-Login
+        User passKeyUser = new User(0, "passkey-user@local.test", "");
+
+        StateManager.Instance.login(passKeyUser);
+
+        SceneManager.LoadScene(mainSceneName);
+    }
+
+
+
 }
