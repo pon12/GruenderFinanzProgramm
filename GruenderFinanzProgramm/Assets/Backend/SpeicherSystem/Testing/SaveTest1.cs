@@ -9,10 +9,10 @@ public class SaveTest1 : MonoBehaviour
     {
         // Initialize the database
         gameDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("GameData");
-        //gameDatabase.setupDatabase();
+        gameDatabase.setupDatabase();
 
         // Create sample data
-        //createSampleData();
+        createSampleData();
         
         // Retrieve and display data
         retrieveAndDisplayData();
@@ -22,7 +22,7 @@ public class SaveTest1 : MonoBehaviour
     {
         // Create users
         gameDatabase.createUser("Max Musterman", 1234, 5678, true);
-        gameDatabase.createUser("Pontus", 9999, 8888, false);
+        gameDatabase.createUser("Pontus", 9999, 88888, false);
 
         // Create companies
         gameDatabase.createCompany("Zaibatsu", 1);
@@ -32,16 +32,16 @@ public class SaveTest1 : MonoBehaviour
     private void retrieveAndDisplayData()
     {
         // Get all users
-        List<User> allUsers = gameDatabase.getAllUsers();
+        List<UserDB> allUsers = gameDatabase.getAllUsers();
         Debug.Log($"Total users: {allUsers.Count}");
 
-        foreach (User user in allUsers)
+        foreach (UserDB user in allUsers)
         {
             Debug.Log($"User: {user.name}, Logged In: {user.isLoggedIn}");
         }
 
         // Get logged-in users
-        List<User> loggedInUsers = gameDatabase.getLoggedInUsers();
+        List<UserDB> loggedInUsers = gameDatabase.getLoggedInUsers();
         Debug.Log($"Logged-in users: {loggedInUsers.Count}");
 
         // Get all companies
@@ -54,8 +54,8 @@ public class SaveTest1 : MonoBehaviour
         }
 
         // Find by name
-        List<User> aliceUsers = gameDatabase.findUsersByName("Alice");
-        Debug.Log($"Found users matching 'Alice': {aliceUsers.Count}");
+        List<UserDB> PontusUsers = gameDatabase.findUsersByName("Pontus");
+        Debug.Log($"Found users matching 'Pontus': {PontusUsers.Count}");
     }
 
     private void OnDestroy()

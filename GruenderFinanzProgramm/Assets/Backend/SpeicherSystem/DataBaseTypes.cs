@@ -3,7 +3,7 @@ using SQLite4Unity3d;
 
 
 [System.Serializable]
-public class User
+public class UserDB
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }

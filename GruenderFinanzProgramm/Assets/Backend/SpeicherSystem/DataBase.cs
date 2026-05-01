@@ -8,27 +8,27 @@ public class DataBase : DatabaseManager
 
     public void setupDatabase()
     {
-        createTable<User>();
+        createTable<UserDB>();
         createTable<Company>();
     }
 
 
 //User
-    public User getUserById(int userId)
+    public UserDB getUserById(int userId)
     {
-        return getById<User>(userId);
+        return getById<UserDB>(userId);
     }
 
 
-    public List<User> getAllUsers()
+    public List<UserDB> getAllUsers()
     {
-        return getAll<User>();
+        return getAll<UserDB>();
     }
 
 
     public int createUser(string name, int passKey, int recoveryKey, bool isLoggedIn = false)
     {
-        User newUser = new User
+        UserDB newUser = new UserDB
         {
             name = name,
             passKey = passKey,
@@ -39,7 +39,7 @@ public class DataBase : DatabaseManager
     }
 
 
-    public int updateUser(User user)
+    public int updateUser(UserDB user)
     {
         return update(user);
     }
@@ -47,7 +47,7 @@ public class DataBase : DatabaseManager
 
     public int deleteUser(int userId)
     {
-        return delete<User>(userId);
+        return delete<UserDB>(userId);
     }
 
 
@@ -96,9 +96,9 @@ public class DataBase : DatabaseManager
 
 //Login/Auth
 
-    public List<User> findUsersByName(string name)
+    public List<UserDB> findUsersByName(string name)
     {
-        return query<User>($"SELECT * FROM User WHERE name LIKE '%{name}%'");
+        return query<UserDB>($"SELECT * FROM UserDB WHERE name LIKE '%{name}%'");
     }
 
 
@@ -108,15 +108,15 @@ public class DataBase : DatabaseManager
     }
 
 
-    public List<User> getLoggedInUsers()
+    public List<UserDB> getLoggedInUsers()
     {
-        return query<User>("SELECT * FROM User WHERE isLoggedIn = 1");
+        return query<UserDB>("SELECT * FROM UserDB WHERE isLoggedIn = 1");
     }
 
 
     public int updateUserLoginStatus(int userId, bool isLoggedIn)
     {
-        User user = getUserById(userId);
+        UserDB user = getUserById(userId);
         if (user != null)
         {
             user.isLoggedIn = isLoggedIn;

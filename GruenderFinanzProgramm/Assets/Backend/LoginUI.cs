@@ -1,4 +1,4 @@
-
+/*
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,7 +27,7 @@ public class LoginUI : MonoBehaviour
             return;
         }
 
-        bool isValid = stateManager.validatePassKey(enteredPassKey);
+        //bool isValid = stateManager.validatePassKey(enteredPassKey);
 
         if (isValid)
         {
@@ -43,3 +43,4 @@ public class LoginUI : MonoBehaviour
     }
 
 }
+*/
