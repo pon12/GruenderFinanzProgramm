@@ -32,8 +32,13 @@ public class LoginUIController : MonoBehaviour
         string passKey = authService.generatePassKey();
         string recoveryKey = authService.generateRecoveryKey();
 
+        authService.saveTemporaryKeys();
+
         Debug.Log("Temporary PassKey: " + passKey);
         Debug.Log("Temporary RecoveryKey: " + recoveryKey);
+        Debug.Log("Keys gespeichert unter: " + authService.getPassKeyStoragePath());
+
+
     }
 
     public void onLoginButtonClicked()

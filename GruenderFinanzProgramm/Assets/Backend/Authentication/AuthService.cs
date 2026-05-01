@@ -19,6 +19,8 @@ public class AuthService
     private string temporaryPassKey;
     private string temporaryRecoveryKey;
 
+    private PassKeyStorage passKeyStorage = new PassKeyStorage();
+
     public AuthService(IUserRepository userRepository)
     {
         this.userRepository = userRepository;
@@ -147,6 +149,26 @@ public class AuthService
         }
 
         return false;
+    }
+
+    public void saveTemporaryKeys()
+    {
+        passKeyStorage.saveKeys(temporaryPassKey, temporaryRecoveryKey);
+    }
+
+    public string getStoredPassKey()
+    {
+        return passKeyStorage.getPassKey();
+    }
+
+    public string getStoredRecoveryKey()
+    {
+        return passKeyStorage.getRecoveryKey();
+    }
+
+    public string getPassKeyStoragePath()
+    {
+        return passKeyStorage.getStoragePath();
     }
 
 }
