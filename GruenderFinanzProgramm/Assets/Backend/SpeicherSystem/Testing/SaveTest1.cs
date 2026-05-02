@@ -1,63 +1,58 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+using UnityEngine;
+using System.Collections.Generic;
 public class SaveTest1 : MonoBehaviour
 {
     private DataBase gameDatabase;
-
     private void Start()
     {
-        // Initialize the database
-        gameDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("GameData");
+        // Datenbank initialisieren
+        gameDatabase = GlobalDatabaseManager.Instance
+            .GetOrCreateDatabase<DataBase>("GameData");
         gameDatabase.setupDatabase();
-
-        // Create sample data
-        createSampleData();
-        
-        // Retrieve and display data
-        retrieveAndDisplayData();
+        // Beispieldaten anlegen
+        CreateSampleData();
+        // Daten abrufen und anzeigen
+        RetrieveAndDisplayData();
     }
-
-    private void createSampleData()
+    private void CreateSampleData()
     {
-        // Create users
-        gameDatabase.createUser("Max Musterman", 1234, 5678, true);
+        // Benutzer
+        gameDatabase.createUser("Max Mustermann", 1234, 5678, true);
         gameDatabase.createUser("Pontus", 9999, 88888, false);
-
-        // Create companies
-        gameDatabase.createCompany("Zaibatsu", 1);
-        gameDatabase.createCompany("GeileFirma", 2);
+        // Firmen (neue Signatur mit Branche + Standort)
+        gameDatabase.createCompany("Zaibatsu GmbH", 1, 0, "Berlin");
+        gameDatabase.createCompany("GeileFirma AG", 2, 3, "Hamburg");
+        Debug.Log("Beispielbenutzer und Firmen wurden angelegt.");
     }
-
-    private void retrieveAndDisplayData()
+    private void RetrieveAndDisplayData()
     {
-        // Get all users
+        // Alle Benutzer
         List<UserDB> allUsers = gameDatabase.getAllUsers();
-        Debug.Log($"Total users: {allUsers.Count}");
-
+        Debug.Log($"Gesamtanzahl Benutzer: {allUsers.Count}");
         foreach (UserDB user in allUsers)
-        {
-            Debug.Log($"User: {user.name}, Logged In: {user.isLoggedIn}");
-        }
-
-        // Get logged-in users
-        List<UserDB> loggedInUsers = gameDatabase.getLoggedInUsers();
-        Debug.Log($"Logged-in users: {loggedInUsers.Count}");
-
-        // Get all companies
+            Debug.Log($"Benutzer: {user.name}, Eingeloggt: {user.isLoggedIn}");
+        // Eingeloggte Benutzer
+        List<UserDB> loggedIn = gameDatabase.getLoggedInUsers();
+        Debug.Log($"Eingeloggte Benutzer: {loggedIn.Count}");
+        // Alle Firmen
         List<Company> allCompanies = gameDatabase.getAllCompanies();
-        Debug.Log($"Total companies: {allCompanies.Count}");
-
-        foreach (Company company in allCompanies)
+        Debug.Log($"Gesamtanzahl Firmen: {allCompanies.Count}");
+        foreach (Company c in allCompanies)
         {
-            Debug.Log($"Company: {company.name}, Legal Form: {company.legalForm}");
+            Debug.Log("----------------------------------");
+            Debug.Log($"ID: {c.id}");
+            Debug.Log($"Name: {c.name}");
+            Debug.Log($"Rechtsform: {c.LegalFormName}");
+            Debug.Log($"Branche: {c.IndustryName}");
+            Debug.Log($"Standort: {c.location}");
         }
-
-        // Find by name
-        List<UserDB> PontusUsers = gameDatabase.findUsersByName("Pontus");
-        Debug.Log($"Found users matching 'Pontus': {PontusUsers.Count}");
+        // Suche nach Benutzername
+        List<UserDB> pontusUsers = gameDatabase.findUsersByName("Pontus");
+        Debug.Log($"Gefundene Benutzer mit 'Pontus': {pontusUsers.Count}");
     }
-
     private void OnDestroy()
     {
         GlobalDatabaseManager.Instance.CloseAllDatabases();

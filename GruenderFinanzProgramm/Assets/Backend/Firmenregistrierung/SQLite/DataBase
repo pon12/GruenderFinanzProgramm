@@ -66,17 +66,17 @@ public class DataBase : DatabaseManager
         return getAll<Company>();
     }
 
-   public int createCompany(string name, int legalForm, int industry, string location)
-{
-    Company newCompany = new Company
+
+    public int createCompany(string name, int legalForm)
     {
-        name = name,
-        legalForm = legalForm,
-        industry = industry,
-        location = location
-    };
-    return insert(newCompany);
-}
+        Company newCompany = new Company
+        {
+            name = name,
+            legalForm = legalForm
+        };
+        return insert(newCompany);
+    }
+
 
     public int updateCompany(Company company)
     {
