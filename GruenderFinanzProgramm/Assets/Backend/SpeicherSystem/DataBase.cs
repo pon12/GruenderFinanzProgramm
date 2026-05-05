@@ -26,14 +26,11 @@ public class DataBase : DatabaseManager
     }
 
 
-    public int createUser(string name, int passKey, int recoveryKey, bool isLoggedIn = false)
+    public int createUser(string name)
     {
         UserDB newUser = new UserDB
         {
             name = name,
-            passKey = passKey,
-            recoveryKey = recoveryKey,
-            isLoggedIn = isLoggedIn
         };
         return insert(newUser);
     }
@@ -114,16 +111,7 @@ public class DataBase : DatabaseManager
     }
 
 
-    public int updateUserLoginStatus(int userId, bool isLoggedIn)
-    {
-        UserDB user = getUserById(userId);
-        if (user != null)
-        {
-            user.isLoggedIn = isLoggedIn;
-            return updateUser(user);
-        }
-        return 0;
-    }
+
 
 
     public List<Company> getCompaniesByLegalForm(int legalForm)

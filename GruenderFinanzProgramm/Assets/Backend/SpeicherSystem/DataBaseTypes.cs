@@ -9,9 +9,6 @@ public class UserDB
     public int id { get; set; }
     
     public string name { get; set; }
-    public int passKey { get; set; }
-    public int recoveryKey { get; set; }
-    public bool isLoggedIn { get; set; }
 }
 
 [System.Serializable]

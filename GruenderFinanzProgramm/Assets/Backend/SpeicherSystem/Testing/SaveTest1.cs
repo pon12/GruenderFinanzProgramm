@@ -16,15 +16,15 @@ public class SaveTest1 : MonoBehaviour
         gameDatabase.setupDatabase();
         // Beispieldaten anlegen
         CreateSampleData();
-        
+
         // Daten abrufen und anzeigen
         RetrieveAndDisplayData();
     }
     private void CreateSampleData()
     {
         // Benutzer
-        gameDatabase.createUser("Max Mustermann", 1234, 5678, true);
-        gameDatabase.createUser("Pontus", 9999, 88888, false);
+        gameDatabase.createUser("Max Mustermann");
+        gameDatabase.createUser("Pontus");
         // Firmen (neue Signatur mit Branche + Standort)
         gameDatabase.createCompany("Zaibatsu GmbH", 1, 0, "Berlin");
         gameDatabase.createCompany("GeileFirma AG", 2, 3, "Hamburg");
@@ -36,11 +36,8 @@ public class SaveTest1 : MonoBehaviour
         List<UserDB> allUsers = gameDatabase.getAllUsers();
         Debug.Log($"Gesamtanzahl Benutzer: {allUsers.Count}");
         foreach (UserDB user in allUsers)
-            Debug.Log($"Benutzer: {user.name}, Eingeloggt: {user.isLoggedIn}");
+            Debug.Log($"Benutzer: {user.name}");
         
-        // Eingeloggte Benutzer
-        List<UserDB> loggedIn = gameDatabase.getLoggedInUsers();
-        Debug.Log($"Eingeloggte Benutzer: {loggedIn.Count}");
         
         // Alle Firmen
         List<Company> allCompanies = gameDatabase.getAllCompanies();
