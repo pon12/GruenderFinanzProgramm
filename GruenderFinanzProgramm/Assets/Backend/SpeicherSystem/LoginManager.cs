@@ -10,7 +10,7 @@ public class LoginManager : MonoBehaviour
     [SerializeField] TMP_InputField Reg_Username;
 
     // Funktion die bei Klick auf den Registrieren Button ausgeführt wird.
-    public async void OnRegisterPressed()
+    public void OnRegisterPressed()
     {
         if (string.IsNullOrWhiteSpace(Reg_Email.text))  
         {

@@ -1,19 +1,22 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-using UnityEngine;
-using System.Collections.Generic;
 public class SaveTest1 : MonoBehaviour
 {
     private DataBase gameDatabase;
     private void Start()
     {
         // Datenbank initialisieren
-        gameDatabase = GlobalDatabaseManager.Instance
-            .GetOrCreateDatabase<DataBase>("GameData");
+        gameDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("GameData");
+        
+        //Dataenbank löschen auskommentieren für testzwecke
+        //gameDatabase.deleteDatabase();
+        
+
         gameDatabase.setupDatabase();
         // Beispieldaten anlegen
         CreateSampleData();
+        
         // Daten abrufen und anzeigen
         RetrieveAndDisplayData();
     }
@@ -34,9 +37,11 @@ public class SaveTest1 : MonoBehaviour
         Debug.Log($"Gesamtanzahl Benutzer: {allUsers.Count}");
         foreach (UserDB user in allUsers)
             Debug.Log($"Benutzer: {user.name}, Eingeloggt: {user.isLoggedIn}");
+        
         // Eingeloggte Benutzer
         List<UserDB> loggedIn = gameDatabase.getLoggedInUsers();
         Debug.Log($"Eingeloggte Benutzer: {loggedIn.Count}");
+        
         // Alle Firmen
         List<Company> allCompanies = gameDatabase.getAllCompanies();
         Debug.Log($"Gesamtanzahl Firmen: {allCompanies.Count}");
@@ -49,6 +54,7 @@ public class SaveTest1 : MonoBehaviour
             Debug.Log($"Branche: {c.IndustryName}");
             Debug.Log($"Standort: {c.location}");
         }
+        
         // Suche nach Benutzername
         List<UserDB> pontusUsers = gameDatabase.findUsersByName("Pontus");
         Debug.Log($"Gefundene Benutzer mit 'Pontus': {pontusUsers.Count}");
