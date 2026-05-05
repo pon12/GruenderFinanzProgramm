@@ -1,0 +1,17 @@
+:root {
+}
+
+.button {
+    border-top-width: 64px;
+    border-left-width: 50px;
+}
+
+.unity-radio-button {
+    border-top-width: 0;
+    text-overflow: ellipsis;
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    align-items: auto;
+    align-content: auto;
+}
