@@ -1,0 +1,28 @@
+:root {
+    --primary-color: rgb(128, 207, 149);
+    --secondary-color: rgb(100, 100, 100);
+}
+
+.h1 {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    -unity-font-style: bold;
+    font-size: 32px;
+    color: var(--primary-color);
+    -unity-text-align: upper-left;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.h2 {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.body {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    font-size: 14px;
+    color: var(--primary-color);
+}

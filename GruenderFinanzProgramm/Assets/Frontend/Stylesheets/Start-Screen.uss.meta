@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< Updated upstream
-guid: e629160c0cdac3f429873482da2890ad
-=======
-guid: 64692da0438c8984fa87bed232fde30f
->>>>>>> Stashed changes
+guid: 2f9e27ba86261eb4cbf90b48746143a5
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -11,6 +7,6 @@ ScriptedImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-  script: {fileID: 12388, guid: 0000000000000000e000000000000000, type: 0}
+  script: {fileID: 12385, guid: 0000000000000000e000000000000000, type: 0}
   disableValidation: 0
   unsupportedSelectorAction: 0

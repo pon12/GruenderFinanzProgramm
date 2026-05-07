@@ -1,0 +1,9 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Login-Screen.uss?fileID=7433441132597879392&amp;guid=331eae5bef4fa60439b01da8429e7003&amp;type=3#Login-Screen"/>
+    <ui:Image name="Logo"/>
+    <ui:Button text="Anmelden" name="Anmelden" class="Anmelden-button" style="width: 471px; height: 110px; top: 599px; left: 751px; font-size: 30px;"/>
+    <ui:Button text="Konto erstellen" name="KontoErstellen" class="Konto-button" style="width: 372px; height: 110px; font-size: 30px; top: 743px; left: 800px;"/>
+    <ui:Label text="Wilkommen!" name="Ueberschrift" class="ueberschrift" style="top: 272px; left: 703px; width: 532px; height: 90px;"/>
+    <ui:Label text="Schön, dass du Busiless nutzt!" name="Text" class="text" style="width: 699px; height: 20px; left: 620px; top: 399px;"/>
+    <ui:Label text="Was möchtest du tun?" name="Text2" class="text2" style="top: 440px; left: 751px; width: 436px; height: 49px;"/>
+</ui:UXML>
