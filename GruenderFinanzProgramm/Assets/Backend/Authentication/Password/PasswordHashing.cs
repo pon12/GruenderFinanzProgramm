@@ -6,6 +6,7 @@ using System.IO;
 
 public class PasswordHashing
 {
+    // Funktion zum Hashen eines Passworts mit SHA256
     public static string hashPassword(string password)
     {
         using (SHA256 sha256 = SHA256.Create())
@@ -16,6 +17,7 @@ public class PasswordHashing
         }
     }
 
+    // Funktion zum Schreiben eines gehashten Passworts in eine Datei
     public static void writeHashedPasswordToFile(string fileName, string password)
     {
         string filePath = Path.Combine(Application.dataPath, "Backend/Authentication/Password/Test/" + fileName);
@@ -52,4 +54,30 @@ public class PasswordHashing
             Debug.Log($"Password in folgende Datei angehängt: {fileName}");
         }
     }
+    // Funktion zum Überprüfen, ob ein gehashtes Passwort in der Datei existiert
+    public static bool checkHashedPassword(string fileName, string hashedPassword)
+    {
+    // Pfad zur Datei erstellen
+    string filePath = Path.Combine(Application.dataPath, "Backend/Authentication/Password/Test/" + fileName);
+    // Überprüfen, ob die Datei existiert
+    if (File.Exists(filePath))
+    {
+        // Datei lesen und Zeile für Zeile überprüfen
+        string[] lines = File.ReadAllLines(filePath);
+        foreach (string line in lines)
+        {
+            // Zeile mit gehashtem Passwort vergleichen
+            if (line.Trim() == hashedPassword)
+            {   
+                // Passwort gefunden
+                Debug.Log("Gehashtes Passwort gefunden.");
+                return true;
+            }
+        }
+    }
+    // Passwort nicht gefunden
+    Debug.Log("Gehashtes Passwort nicht gefunden.");
+    return false;
+    }
+
 }
