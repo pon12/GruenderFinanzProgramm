@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 
-public class PasswordHashTest : MonoBehaviour
+public class PasswordHashTestOld : MonoBehaviour
 {
      private string hashedPassword;
 
