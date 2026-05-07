@@ -32,7 +32,7 @@ public class PasswordHashing
                 Directory.CreateDirectory(directoryPath);
             }
             // Passwort hashen
-            string hashedPassword = PasswordHashing.hashPassword(password);
+            string hashedPassword = hashPassword(password);
             // Hashed Passwort in die Datei schreiben
             using (StreamWriter sw = File.CreateText(filePath))
             {
@@ -44,7 +44,7 @@ public class PasswordHashing
         else
         {
             // Passwort hashen
-            string hashedPassword = PasswordHashing.hashPassword(password);
+            string hashedPassword =  hashPassword(password);
             // Hashed Passwort in die exestierende Datei schreiben
             using (StreamWriter sw = File.AppendText(filePath))
             {
@@ -54,6 +54,7 @@ public class PasswordHashing
             Debug.Log($"Password in folgende Datei angehängt: {fileName}");
         }
     }
+    
     // Funktion zum Überprüfen, ob ein gehashtes Passwort in der Datei existiert
     public static bool checkHashedPassword(string fileName, string hashedPassword)
     {
