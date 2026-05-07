@@ -1,84 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ui:UXML
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ui="UnityEngine.UIElements"
-    xmlns:uie="UnityEditor.UIElements"
-    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
->
-	<Style src="sidebar.uss" />
-
-	<ui:VisualElement name="sidebar" class="sidebar expanded"> 
-
-		<ui:VisualElement name="header" class="header">
-			<ui:VisualElement name="logo-icon" class="logo-icon" />
-			<ui:Label name="app-title" text="Gründung" class="app-title" />
-		</ui:VisualElement>
-
-	<ui:Button name="toggle-btn" class="toggle-btn" >
-		<ui:VisualElement class="hamburger.icon" />
-	</ui:Button>
-
-	<ui:ScrollView name="nav-menu" class="nav-menu">
-		
-		<ui:VisualElement name="nav-item-dashboard" class="nav-item active" >
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Dashboard" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-fortschritt" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Fortschritts-Guide" class="nav-label" />  
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-dokumente" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Dokumente" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-finanzplaner" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Finanzplaner" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-kostenrechner" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Kostenrechner" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-statistik" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Statistik" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-rechnung" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Rechnung erstellen" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-angebot" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Angebot erstellen" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-export" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Export" class="nav-label" />
-		</ui:VisualElement>
-		
-		<ui:VisualElement name="nav-item-einstellungen" class="nav-item">
-			<ui:VisualElement class="radio-icon" />
-			<ui:Label text="Einstellungen" class="nav-label" />
-		</ui:VisualElement>
-		
-	</ui:ScrollView>
-
-	<ui:VisualElement name="footer" class="footer">
-		<ui:VisualElement name="avatar" class="avatar" />
-		<ui:VisualElement class="user-info">
-			<ui:Label name="user-name" text="Matthias Vodel" class="user-name" />
-			<ui:Label name="user-status" text="Phase 3 - Planung" class="user-status" />
-		</ui:VisualElement>
-	</ui:VisualElement>
-		
-	</ui:VisualElement>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/sidebar/Sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#Sidebar"/>
+    <ui:VisualElement name="sidebar" class="sidebar-extended" style="flex-grow: 1; position: absolute; height: 100%; width: 390px; background-color: rgb(56, 56, 56); top: 0; left: 0; border-right-color: rgb(145, 145, 145); border-right-width: 2px; overflow: hidden;">
+        <ui:VisualElement name="header" style="position: absolute; height: 130px; width: 100%; top: 0; left: 0; flex-direction: row; align-items: center; border-bottom-color: rgb(145, 145, 145); border-bottom-width: 2px; overflow: hidden; padding-left: 16px; padding-top: 20px; padding-bottom: 20px;">
+            <ui:VisualElement name="logo-icon" style="width: 60px; height: 60px; background-color: rgb(128, 207, 149); border-top-left-radius: 18px; border-top-right-radius: 18px; border-bottom-right-radius: 18px; border-bottom-left-radius: 18px; flex-shrink: 0; left: -5px;"/>
+            <ui:Label name="logo-text" text="Gründung" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=1020e25b429ea8440abbfff09d2eaa66&amp;type=3#Poppins-Bold&quot;); font-size: 38px; color: rgb(255, 255, 255); margin-left: 16px; overflow: hidden; white-space: nowrap;"/>
+        </ui:VisualElement>
+        <ui:ScrollView name="nav-scroll" style="position: absolute; top: 140px; left: 0; right: 0; bottom: 130px; overflow: hidden;">
+            <ui:Button name="toggle-button" text="−" style="width: 48px; height: 48px; background-color: rgb(56, 56, 56); border-top-right-radius: 9px; border-top-left-radius: 9px; border-bottom-right-radius: 9px; border-bottom-left-radius: 9px; color: rgb(255, 255, 255); font-size: 28px; border-left-color: rgb(145, 145, 145); border-right-color: rgb(145, 145, 145); border-top-color: rgb(145, 145, 145); border-bottom-color: rgb(145, 145, 145); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; margin-left: 8px; margin-bottom: 8px; right: 0; left: 7px;"/>
+            <ui:VisualElement name="nav-item-dashboard" class="nav-item nav-item--active" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-dashboard" value="true" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Dashboard" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-guide" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-guide" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Fortschritts-Guide" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-finanz" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-finanz" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Finanzboard" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-kosten" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-kosten" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Kostenrechner" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-statistik" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-statistik" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Statistik" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-rechnung" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-rechnung" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Rechnung erstellen" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-angebot" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-angebot" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Angebot erstellen" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-einstellungen" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-einstellungen" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Einstellungen" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="nav-item-export" class="nav-item" style="height: 52px; flex-direction: row; align-items: center; margin-top: 4px; margin-bottom: 4px; margin-left: 8px; margin-right: 8px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; overflow: hidden; padding-left: 0; padding-right: 0;">
+                <ui:RadioButton name="radio-export" value="false" style="width: 52px; height: 52px; flex-shrink: 0; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; padding-left: 0; left: 5px;"/>
+                <ui:Label text="Export" class="nav-label" style="font-size: 24px; color: rgb(255, 255, 255); white-space: nowrap; overflow: hidden; left: 10px;"/>
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="footer" style="position: absolute; height: 120px; width: 100%; bottom: 0; left: 0; flex-direction: row; align-items: center; border-top-color: rgb(145, 145, 145); border-top-width: 2px; overflow: hidden; padding-left: 16px;">
+            <ui:VisualElement name="Avatar" style="width: 50px; height: 50px; background-color: rgb(128, 207, 149); border-top-left-radius: 100px; border-top-right-radius: 100px; border-bottom-right-radius: 100px; border-bottom-left-radius: 100px; flex-shrink: 0;"/>
+            <ui:Label name="footer-name" text="Max Krause" style="color: rgb(255, 255, 255); font-size: 32px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=1020e25b429ea8440abbfff09d2eaa66&amp;type=3#Poppins-Bold&quot;); margin-left: 16px; white-space: nowrap; overflow: hidden;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>

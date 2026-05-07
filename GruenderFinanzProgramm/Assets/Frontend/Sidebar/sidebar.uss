@@ -1,85 +1,82 @@
-:root {
-	--bg-sidebar: #383838;
-	--bg-hover: #4a4a4a;
-	--accent-mint: #80CF95;
-	--text-primary: #ffffff
-	--text-secondary: #888888
-	--sidebar-expanded: 250px;
-	--sidebar-collapsed: 60px;
-	--transition-duration: 250ms;
-	--font-main: url('/Assets/Fonts/Poppins-Regular.ttf');
-	--font-bold: url('/Assets/Fonts/Poppins-Bold.ttf');
+/* ── NAV ITEMS – Basis ─────────────────────── */
+.nav-item {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 14px;
 }
 
-.sidebar {
-	flex-direction: column;
-	background-color: var(--bg-sidebar);
-	height: 100%;
-	overflow: hidden;
-	transition-property: width;
-	transition-duration: var(--transition-duration);
-	transition-timing-function: ease-in-out;
-	}
+/* ── Hover ─────────────────────────────────── */
+.nav-item:hover {
+    background-color: rgba(128, 207, 149, 0.15);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(128, 207, 149, 0.5);
+    border-right-color: rgba(128, 207, 149, 0.5);
+    border-top-color: rgba(128, 207, 149, 0.5);
+    border-bottom-color: rgba(128, 207, 149, 0.5);
+}
 
-	.sidebar.expanded {
-		width: var(--sidebar-expanded);
-	}
+.nav-item:hover .unity-radio-button__checkmark-background {
+    border-color: rgb(128, 207, 149);
+    background-color: rgba(128, 207, 149, 0.25);
+}
 
-	.sidebar.collapsed {
-		width: var(--sidebar-collapsed);
-	}
+/* ── Aktiv ─────────────────────────────────── */
+.nav-item--active {
+    background-color: rgba(128, 207, 149, 0.18);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}
 
-	.header {
-		flex-direction: row;
-		align-items: center;
-		padding: 20px 15px;
-		border-bottom-width: 1px;
-		border-bottom-color: #333333;
-	}
+/* Grün ausgefüllter Kreis */
+.nav-item--active .unity-radio-button__checkmark-background {
+    background-color: rgb(128, 207, 149);
+    border-color: rgb(80, 180, 110);
+}
 
-	.logo-icon {
-		width: 32px;
-		height: 32px;
-		background-color: var(--accent-mint);
-		border-radius: 6px;
-		flex-shrink: 0;
-	}
+/* Weißer Punkt in der Mitte */
+.nav-item--active .unity-radio-button__checkmark {
+    background-color: rgb(255, 255, 255);
+    width: 10px;
+    height: 10px;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+}
 
-	.app-title {
-		font-size: 22px;
-		color: var(--accent-mint);
-		margin-left: 12px;
-		-unity-font-definition: var(--font-bold);
-		transition-property: opacity;
-		transition-duration: var(--transition-duration);
-	}
+.nav-item--active:hover {
+    background-color: rgba(128, 207, 149, 0.28);
+}
 
-	.sidebar.collapsed .app-title {
-		opacity: 0;
-		display: none;
-	}
+/* ── RadioButton Zentrierung ───────────────── */
 
-	.toggle-btn {
-		position: absolute;
-		top: 70px;
-		right: -15px;
-		width: 30px;
-		height: 30px;
-		background-color: var(--bg-sidebar);
-		border-radius: 50%;
-		border-width: 1px;
-		border-color: #333333;
-		align-items: center;
-		justify-content: center;
-	}
+/* Das äußere RadioButton-Element zentrieren */
+.unity-radio-button {
+    justify-content: center;
+    align-items: center;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
 
-	.toggle-btn:hover {
-		background-color: var(--accent-mint);
-	}
+/* Den Kreis selbst horizontal zentrieren */
+.unity-radio-button__checkmark-background {
+    margin-left: auto;
+    margin-right: auto;
+}
 
-	.hamburger-icon {
-		width: 14px;
-		height: 2px;
-		background-color: var(--text-primary);
-	}
-
+/* Den Label-Teil des RadioButtons ausblenden (wir nutzen eigene Labels) */
+.unity-radio-button > .unity-label {
+    display: none;
+}

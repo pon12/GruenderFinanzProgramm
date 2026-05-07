@@ -7,7 +7,7 @@
     font-size: 28px;
     font-weight: bold;
     color: white;
-    -unity-font: url("/Fonts/Poppins-Bold.ttf");
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
 
 }
 
@@ -15,7 +15,7 @@
     background-color: #B3E2C4;
 }
 
-.green.button:active {
+.green-button:active {
     background-color: #66A577;
 }
 
@@ -33,7 +33,7 @@
     font-size: 28px;
     font-weight: bold;
     color: white;
-    -unity-font: url("/Fonts/Poppins-Bold.ttf");
+    -unity-font: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
     border-width: 2px;
     border-color: #80CF95;
 }
