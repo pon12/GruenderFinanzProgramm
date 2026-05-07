@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Register-Screen.uss?fileID=7433441132597879392&amp;guid=305c4b953cf207248af3018763fed611&amp;type=3#Register-Screen"/>
+    <ui:Image name="Logo"/>
+    <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift" style="top: 246px; left: 690px; width: 573px; height: 91px;"/>
+    <ui:Label text="Profilname" name="Profilname" class="Profilname" style="width: 335px; height: 52px; top: 416px; left: 504px;"/>
+    <ui:TextField label="" placeholder-text="" name="Profileingabe" style="top: 429px; left: 488px; width: 984px; height: 102px;"/>
+    <ui:Label text="Sicher mit Passkey&#10;" name="Ueberschrift2" class="Ueberschrift2"/>
+    <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder las dir eine starke PIN erstellen" name="text" class="text"/>
+    <ui:Button text="Power-Passkey-generieren" name="key-gernerieren" class="Key-button" style="top: 727px; left: 738px; width: 476px; height: 98px;"/>
+    <ui:Toggle label="Toggle" name="Toggle"/>
+    <ui:Label text="Ich akzeptiere die AGB und die Datenschutzrichtlinie" name="text2" class="text2"/>
+</ui:UXML>

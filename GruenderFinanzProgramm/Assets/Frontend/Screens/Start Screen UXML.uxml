@@ -1,0 +1,9 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Start-Screen.uss?fileID=7433441132597879392&amp;guid=2f9e27ba86261eb4cbf90b48746143a5&amp;type=3#Start-Screen"/>
+    <ui:Label text="BUSILESS" name="FirmenName" class="my-text FirmenName" style="top: 579px; left: 653px; -unity-background-image-tint-color: rgb(255, 255, 255); width: 625px; height: 154px;"/>
+    <ui:Label text="weniger für mehr" name="Slogan" class="Slogan" style="top: 729px; left: 765px; width: 389px; height: 62px;"/>
+    <ui:Image name="HSMWLogo" source="project://database/Assets/Frontend/Bilder/HSMW-Logo.png?fileID=2800000&amp;guid=003989fbe3bb3144d8a97056429d1b78&amp;type=3#HSMW-Logo" style="width: 149px; height: 149px; top: 877px; left: 1154px;"/>
+    <ui:Image name="UnityLogo"/>
+    <ui:Image name="Logo"/>
+    <ui:Image name="OenGLLogo"/>
+</ui:UXML>
