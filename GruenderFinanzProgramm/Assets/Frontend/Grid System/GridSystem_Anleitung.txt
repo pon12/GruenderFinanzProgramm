@@ -1,0 +1,204 @@
+GRID SYSTEM ANLEITUNG
+GruenderFinanzProgramm
+Datei: Assets/Frontend/Grid System/GridSystem.uss
+
+
+Schritt 1 - USS einbinden
+
+Jede neue UXML-Datei braucht diese Zeile ganz oben:
+
+<Style src="../Grid System/GridSystem.uss" />        ---> Das eintragen wo der Pfad bei euch liegt, ansonsten siehe unten
+
+Wenn die UXML-Datei im selben Ordner wie die USS liegt:
+<Style src="GridSystem.uss" />
+
+
+Abstands-System (8px Raster)
+
+
+Alle Abstände sind Vielfache von 8px:
+-1 = 8px
+-2 = 16px
+-3 = 24px
+-4 = 32px
+
+Margin Klassen (Aussenabstand)
+
+
+.m-1    margin: 8px     (alle Seiten)
+.m-2    margin: 16px    (alle Seiten)
+.m-3    margin: 24px    (alle Seiten)
+.m-4    margin: 32px    (alle Seiten)
+
+.mt-1   margin-top: 8px
+.mt-2   margin-top: 16px
+.mt-3   margin-top: 24px
+.mt-4   margin-top: 32px
+
+.mb-1   margin-bottom: 8px
+.mb-2   margin-bottom: 16px
+.mb-3   margin-bottom: 24px
+.mb-4   margin-bottom: 32px
+
+.ml-1   margin-left: 8px
+.ml-2   margin-left: 16px
+.ml-3   margin-left: 24px
+.ml-4   margin-left: 32px
+
+.mr-1   margin-right: 8px
+.mr-2   margin-right: 16px
+.mr-3   margin-right: 24px
+.mr-4   margin-right: 32px
+
+
+
+Padding Klassen (Innenabstand)
+
+
+.p-1    padding: 8px    (alle Seiten)
+.p-2    padding: 16px   (alle Seiten)
+.p-3    padding: 24px   (alle Seiten)
+.p-4    padding: 32px   (alle Seiten)
+
+.pt-1   padding-top: 8px
+.pt-2   padding-top: 16px
+.pt-3   padding-top: 24px
+.pt-4   padding-top: 32px
+
+.pb-1   padding-bottom: 8px
+.pb-2   padding-bottom: 16px
+.pb-3   padding-bottom: 24px
+.pb-4   padding-bottom: 32px
+
+.pl-1   padding-left: 8px
+.pl-2   padding-left: 16px
+.pl-3   padding-left: 24px
+.pl-4   padding-left: 32px
+
+.pr-1   padding-right: 8px
+.pr-2   padding-right: 16px
+.pr-3   padding-right: 24px
+.pr-4   padding-right: 32px
+
+
+Grid-Layout Klassen (Spalten)
+
+
+.grid-container
+Wrapper für alle Spalten. Immer als äußerstes Element verwenden.
+
+.grid-item
+Jede Box im grid-container benötigt diese Klasse.
+Setzt automatisch 8px Aussenabstand links/rechts und 16px unten.
+
+.col-3      Breite 25%    (4 Spalten nebeneinander)
+.col-4      Breite 33%    (3 Spalten nebeneinander)
+.col-6      Breite 50%    (2 Spalten nebeneinander)
+.col-8      Breite 66%    (breite Hauptspalte)
+.col-12     Breite 100%   (volle Breite)
+
+
+Responsive Klassen (Fenstergröße)
+
+
+.responsive
+Box passt sich der Fenstergröße an und bewegt sich mit.
+Nutzen wenn ein Element flexibel mit skalieren soll.
+
+.fill
+Füllt den gesamten verfügbaren Platz aus (Breite und Höhe).
+
+.center
+Zentriert das Element im Elternelement.
+
+.anchor-top-left
+Element klebt oben links, auch beim Größen ändern.
+
+.anchor-top-right
+Element klebt oben rechts, auch beim Größen ändern.
+
+.anchor-bottom-left
+Element klebt unten links, auch beim Größen ändern.
+
+.anchor-bottom-right
+Element klebt unten rechts, auch beim Größen ändern.
+
+.fullscreen
+Element füllt den gesamten Bildschirm aus (z.B. für Hintergrund-Panels).
+
+
+
+BEISPIELE
+
+Zwei Spalten nebeneinander:
+
+<ui:VisualElement class="grid-container">
+    <ui:VisualElement class="grid-item col-6 p-2">
+        <ui:Label text="Links" />
+    </ui:VisualElement>
+    <ui:VisualElement class="grid-item col-6 p-2">
+        <ui:Label text="Rechts" />
+    </ui:VisualElement>
+</ui:VisualElement>
+
+
+Drei Spalten nebeneinander:
+
+<ui:VisualElement class="grid-container">
+    <ui:VisualElement class="grid-item col-4 p-2">
+        <ui:Label text="Spalte 1" />
+    </ui:VisualElement>
+    <ui:VisualElement class="grid-item col-4 p-2">
+        <ui:Label text="Spalte 2" />
+    </ui:VisualElement>
+    <ui:VisualElement class="grid-item col-4 p-2">
+        <ui:Label text="Spalte 3" />
+    </ui:VisualElement>
+</ui:VisualElement>
+
+Navigation die oben bleibt:
+
+<ui:VisualElement class="anchor-top-left responsive p-2">
+    <ui:Label text="Navigation" />
+</ui:VisualElement>
+
+
+Box die sich mit dem Fenster mitskaliert:
+
+<ui:VisualElement class="responsive p-3">
+    <ui:Label text="Ich passe mich der Fenstergroesse an" />
+</ui:VisualElement>
+
+
+Klassen kombinieren (geht immer):
+
+<ui:VisualElement class="grid-item col-6 p-2 mt-3 responsive">
+
+
+
+Figma Umsetzung -> Das sollte soweit passen hoffe ich, habs noch nicht konkret probiert, bin etwas krank
+
+Figma 8px   ->  .p-1 oder .m-1
+Figma 16px  ->  .p-2 oder .m-2
+Figma 24px  ->  .p-3 oder .m-3
+Figma 32px  ->  .p-4 oder .m-4
+
+Figma 8px oben      ->  .mt-1
+Figma 16px unten    ->  .mb-2
+Figma 24px links    ->  .pl-3
+
+
+Regeln
+
+1. Keine manuellen Pixelwerte in UXML - immer Grid-Klassen nutzen
+2. Jede neue UXML-Datei muss die GridSystem.uss einbinden
+3. grid-item immer zusammen mit einer col-Klasse verwenden
+4. grid-container nie als grid-item verwenden
+5. Mehrere Klassen können kombiniert werden
+
+
+Dateipfade im Unity Projekt
+
+GridSystem.uss      ->  Assets/Frontend/Grid System/GridSystem.uss
+TestLayout.uxml     ->  Assets/Frontend/Grid System/TestLayout.uxml
+
