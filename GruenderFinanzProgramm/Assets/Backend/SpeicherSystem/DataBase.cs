@@ -118,4 +118,32 @@ public class DataBase : DatabaseManager
     {
         return query<Company>($"SELECT * FROM Company WHERE legalForm = {legalForm}");
     }
+
+// Tabellen anlegen
+public void setupInvoiceAndOfferTables()
+{
+    createTable<Invoice>();
+    createTable<InvoiceItem>();
+    createTable<Offer>();
+    createTable<OfferItem>();
+}
+// --- Rechnungen ---
+public int createInvoice(Invoice invoice) => insert(invoice);
+public int updateInvoice(Invoice invoice) => update(invoice);
+public int deleteInvoice(int id) => delete<Invoice>(id);
+public List<Invoice> getAllInvoices() => getAll<Invoice>();
+public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
+    query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
+public int createInvoiceItem(InvoiceItem item) => insert(item);
+// --- Angebote ---
+public int createOffer(Offer offer) => insert(offer);
+public int updateOffer(Offer offer) => update(offer);
+public int deleteOffer(int id) => delete<Offer>(id);
+public List<Offer> getAllOffers() => getAll<Offer>();
+public List<OfferItem> getItemsByOffer(int offerId) =>
+    query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
+public int createOfferItem(OfferItem item) => insert(item);
+
+
+
 }
