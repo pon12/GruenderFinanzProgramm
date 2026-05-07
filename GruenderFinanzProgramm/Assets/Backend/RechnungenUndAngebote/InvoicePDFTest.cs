@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,27 +6,6 @@ public class InvoicePdfTest : MonoBehaviour
 {
     void Start()
     {
-        // Beispielrechnung erstellen
-        Invoice invoice = new Invoice
-        {
-            invoiceNumber = "R-2026-001",
-            companyId = 1001,
-
-            // WICHTIG:
-            // date ist jetzt string und nicht DateTime
-            date = System.DateTime.Now.ToString("dd.MM.yyyy"),
-
-            dueDate = "20.05.2026",
-            status = "offen",
-
-            subtotal = 2500,
-            tax = 475,
-            total = 2975,
-
-            notes = "Zahlbar innerhalb von 14 Tagen. Vielen Dank für Ihren Auftrag!"
-        };
-
-        // Beispiel-Positionen
         List<InvoiceItem> items = new List<InvoiceItem>
         {
             new InvoiceItem
@@ -43,7 +23,24 @@ public class InvoicePdfTest : MonoBehaviour
             }
         };
 
-        // Export starten
+        Invoice invoice = new Invoice
+        {
+            companyName = "Tolle Firma GmbH",
+            companyAddress = "Musterstraße 1, 12345 Mittweida",
+            customerName = "Max Mustermann",
+            invoiceNumber = "R-2026-001",
+
+            date = DateTime.Now.ToString("dd.MM.yyyy"),
+
+            dueDate = DateTime.Now.AddDays(14).ToString("dd.MM.yyyy"),
+
+            status = "Offen",
+
+            notes = "Zahlbar innerhalb von 14 Tagen."
+        };
+
+        invoice.CalculateTotals(items);
+
         InvoicePdfExporter.ExportInvoiceToPdf(invoice, items);
     }
 }
