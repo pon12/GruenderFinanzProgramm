@@ -53,7 +53,7 @@ public class PasswordHashTest : MonoBehaviour
             }
         }
         // Debug-Ausgabe des Pfads zur aktualisierten Datei
-        Debug.Log($"Passord in folgende exestierende Datei geschrieben: {filePath}");
+        Debug.Log($"Password in folgende exestierende Datei geschrieben: {filePath}");
     }
     }
     public void Start()
