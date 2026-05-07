@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+	<Style src="sidebar.uss" />
+
+	<ui:VisualElement name="sidebar" class="sidebar expanded"> 
+
+		<ui:VisualElement name="header" class="header">
+			<ui:VisualElement name="logo-icon" class="logo-icon" />
+			<ui:Label name="app-title" text="Gründung" class="app-title" />
+		</ui:VisualElement>
+
+	<ui:Button name="toggle-btn" class="toggle-btn" >
+		<ui:VisualElement class="hamburger.icon" />
+	</ui:Button>
+
+	<ui:ScrollView name="nav-menu" class="nav-menu">
+		
+		<ui:VisualElement name="nav-item-dashboard" class="nav-item active" >
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Dashboard" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-fortschritt" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Fortschritts-Guide" class="nav-label" />  
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-dokumente" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Dokumente" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-finanzplaner" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Finanzplaner" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-kostenrechner" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Kostenrechner" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-statistik" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Statistik" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-rechnung" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Rechnung erstellen" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-angebot" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Angebot erstellen" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-export" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Export" class="nav-label" />
+		</ui:VisualElement>
+		
+		<ui:VisualElement name="nav-item-einstellungen" class="nav-item">
+			<ui:VisualElement class="radio-icon" />
+			<ui:Label text="Einstellungen" class="nav-label" />
+		</ui:VisualElement>
+		
+	</ui:ScrollView>
+
+	<ui:VisualElement name="footer" class="footer">
+		<ui:VisualElement name="avatar" class="avatar" />
+		<ui:VisualElement class="user-info">
+			<ui:Label name="user-name" text="Matthias Vodel" class="user-name" />
+			<ui:Label name="user-status" text="Phase 3 - Planung" class="user-status" />
+		</ui:VisualElement>
+	</ui:VisualElement>
+		
+	</ui:VisualElement>
+</ui:UXML>

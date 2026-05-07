@@ -1,0 +1,85 @@
+:root {
+	--bg-sidebar: #383838;
+	--bg-hover: #4a4a4a;
+	--accent-mint: #80CF95;
+	--text-primary: #ffffff
+	--text-secondary: #888888
+	--sidebar-expanded: 250px;
+	--sidebar-collapsed: 60px;
+	--transition-duration: 250ms;
+	--font-main: url('/Assets/Fonts/Poppins-Regular.ttf');
+	--font-bold: url('/Assets/Fonts/Poppins-Bold.ttf');
+}
+
+.sidebar {
+	flex-direction: column;
+	background-color: var(--bg-sidebar);
+	height: 100%;
+	overflow: hidden;
+	transition-property: width;
+	transition-duration: var(--transition-duration);
+	transition-timing-function: ease-in-out;
+	}
+
+	.sidebar.expanded {
+		width: var(--sidebar-expanded);
+	}
+
+	.sidebar.collapsed {
+		width: var(--sidebar-collapsed);
+	}
+
+	.header {
+		flex-direction: row;
+		align-items: center;
+		padding: 20px 15px;
+		border-bottom-width: 1px;
+		border-bottom-color: #333333;
+	}
+
+	.logo-icon {
+		width: 32px;
+		height: 32px;
+		background-color: var(--accent-mint);
+		border-radius: 6px;
+		flex-shrink: 0;
+	}
+
+	.app-title {
+		font-size: 22px;
+		color: var(--accent-mint);
+		margin-left: 12px;
+		-unity-font-definition: var(--font-bold);
+		transition-property: opacity;
+		transition-duration: var(--transition-duration);
+	}
+
+	.sidebar.collapsed .app-title {
+		opacity: 0;
+		display: none;
+	}
+
+	.toggle-btn {
+		position: absolute;
+		top: 70px;
+		right: -15px;
+		width: 30px;
+		height: 30px;
+		background-color: var(--bg-sidebar);
+		border-radius: 50%;
+		border-width: 1px;
+		border-color: #333333;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.toggle-btn:hover {
+		background-color: var(--accent-mint);
+	}
+
+	.hamburger-icon {
+		width: 14px;
+		height: 2px;
+		background-color: var(--text-primary);
+	}
+
