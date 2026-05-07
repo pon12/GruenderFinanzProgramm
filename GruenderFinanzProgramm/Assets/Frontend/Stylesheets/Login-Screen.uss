@@ -26,14 +26,14 @@
 .text2 {
     color: rgb(174, 174, 174);
     -unity-text-align: middle-center;
-    font-size: 49px;
+    font-size: 39px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
 
 .text {
     color: rgb(174, 174, 174);
     -unity-text-align: middle-center;
-    font-size: 59px;
+    font-size: 49px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
 
