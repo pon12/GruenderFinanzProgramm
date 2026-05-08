@@ -20,6 +20,12 @@ public class InvoicePdfTest : MonoBehaviour
                 description = "Hosting (12 Monate)",
                 quantity = 1,
                 unitPrice = 500
+            },
+            new InvoiceItem
+            {
+                description = "Pons Tech-Support",
+                quantity = 3,
+                unitPrice = 500
             }
         };
 
@@ -28,7 +34,7 @@ public class InvoicePdfTest : MonoBehaviour
             companyName = "Tolle Firma GmbH",
             companyAddress = "Musterstraße 1, 12345 Mittweida",
             customerName = "Max Mustermann",
-            invoiceNumber = "R-2026-001",
+            invoiceNumber = "R-2026-002",
 
             date = DateTime.Now.ToString("dd.MM.yyyy"),
 
