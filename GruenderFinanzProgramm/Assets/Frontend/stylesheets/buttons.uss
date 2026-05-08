@@ -1,0 +1,51 @@
+.green-button {
+	background-color: #80CF95;
+    border-radius: 20px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
+
+}
+
+.green-button:hover {
+    background-color: #B3E2C4;
+}
+
+.green-button:active {
+    background-color: #66A577;
+}
+
+.green-button:disabled {
+    opacity: 0.4;
+}
+
+
+.grey-button {
+    background-color: #5C5A5A;
+    border-radius: 20px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    -unity-font: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
+    border-width: 2px;
+    border-color: #80CF95;
+}
+
+.grey-button:hover {
+    background-color: #8E8D8D;
+}
+
+.grey-button:active {
+    background-color: #383636;
+}
+
+.grey-button:disabled {
+    opacity: 0.4;
+}
