@@ -1,6 +1,5 @@
 
-
-/* GRID CONTAINER */
+/* grid container */
 .grid-container {
     flex-direction: row;
     flex-wrap: wrap;
@@ -10,7 +9,7 @@
     overflow: hidden;
 }
 
-/* GRID ITEM -> Basis für alle Boxen */
+/* GRID ITEM - Basis für alle Boxen */
 .grid-item {
     margin-left: 8px;
     margin-right: 8px;
@@ -21,7 +20,7 @@
     min-height: 40px;
 }
 
-/* SPALTEN */
+/* Spalten */
 .col-3  { width: 23%; flex-shrink: 0; flex-grow: 0; }
 .col-4  { width: 30%; flex-shrink: 0; flex-grow: 0; }
 .col-6  { width: 45%; flex-shrink: 0; flex-grow: 0; }
@@ -34,71 +33,7 @@
     overflow: hidden;
 }
 
-/* Volle Breite, wächst mit dem Fenster */
-.responsive {
-    width: 100%;
-    flex-grow: 1;
-    flex-shrink: 1;
-    position: relative;
-}
-
-/* Füllt den gesamten verfügbaren Platz */
-.fill {
-    flex-grow: 1;
-    flex-shrink: 1;
-    width: 100%;
-    height: 100%;
-}
-
-/* Zentriert sich automatisch im Fenster */
-.center {
-    align-self: center;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Klebt oben links */
-.anchor-top-left {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-/* Klebt oben rechts */
-.anchor-top-right {
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
-/* Klebt unten links */
-.anchor-bottom-left {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-}
-
-/* Klebt unten rechts */
-.anchor-bottom-right {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-}
-
-/* Volle Breite & Höhe -> z.B. für Hintergrund-Panels */
-.fullscreen {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/*
-   MARGIN UTILITIES
-*/
+/* MARGIN UTILITIES  */
 .m-1  { margin: 8px; }
 .m-2  { margin: 16px; }
 .m-3  { margin: 24px; }
@@ -124,9 +59,7 @@
 .mr-3 { margin-right: 24px; }
 .mr-4 { margin-right: 32px; }
 
-/* 
-   PADDING UTILITIES
- */
+/* PADDING UTILITIES  */ 
 .p-1  { padding: 8px; }
 .p-2  { padding: 16px; }
 .p-3  { padding: 24px; }

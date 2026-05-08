@@ -1,8 +1,0 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
-    <ui:VisualElement name="Screen" style="flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Black.ttf?fileID=12800000&amp;guid=a606fb0df3846b343bfcfc7fd9d2903c&amp;type=3#Poppins-Black&quot;); -unity-font-style: normal; background-color: rgb(100, 100, 100);">
-        <ui:Label text="Überschrift 1" name="H1" class="h1" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-BoldItalic.ttf?fileID=12800000&amp;guid=9cf621b8ed4794a4ba6150bab80cecb3&amp;type=3#Poppins-BoldItalic&quot;); height: 8px;"/>
-        <ui:Label text="Überschrift 2&#10;" name="H2" class="h2" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-        <ui:Label text="Textbereich&#10;" name="text" class="body" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-    </ui:VisualElement>
-</ui:UXML>

@@ -1,10 +1,10 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/Sidebar.uss?fileID=7433441132597879392&amp;guid=f5bf8bdd135fda34c9c60512fe43d0e8&amp;type=3#Sidebar"/>
-    <ui:VisualElement style="flex-grow: 1; flex-direction: column; width: 400px; background-color: rgb(56, 56, 56); height: 1080px; position: absolute; top: 0; left: 0; right: 400px; bottom: 1080px;">
-        <ui:VisualElement name="TopBar" style="height: 160px; width: 400px;"/>
-        <ui:VisualElement name="MiddleBar" style="border-top-width: 0; width: 400px; align-self: center; align-items: center; justify-content: flex-start; height: 820px; flex-direction: column;">
-            <ui:RadioButtonGroup name="RadioButtonGroup" choices="Dashboard,Lernfortschritt,Dokumente,Finanzplaner,Kostenrechner,Statistik,Rechnung erstellen,Angebot erstellen,Export,Einstellungen" style="flex-grow: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; justify-content: space-between; width: 400px; height: 820px;"/>
+    <ui:VisualElement style="flex-grow: 1; flex-direction: column; width: 400px; background-color: rgb(56, 56, 56);">
+        <ui:VisualElement name="TopBar" style="flex-grow: 1;"/>
+        <ui:VisualElement name="MiddleBar" style="flex-grow: 1; border-top-width: 190px; width: auto; flex-direction: row;">
+            <ui:RadioButtonGroup name="RadioButtonGroup" choices="Dashboard,Lernfortschritt,Dokumente,Finanzplaner,Kostenrechner,Statistik,Rechnung erstellen,Angebot erstellen,Export,Einstellungen" style="align-items: center; align-content: auto; align-self: auto; justify-content: flex-start; max-width: 400px; max-height: 700px; flex-grow: 1; flex-direction: column; flex-shrink: 1;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="DownBar" style="width: 400px; height: 100px;"/>
+        <ui:VisualElement name="DownBar" style="flex-grow: 1;"/>
     </ui:VisualElement>
 </ui:UXML>
