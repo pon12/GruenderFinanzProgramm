@@ -1,5 +1,6 @@
 // Das selbe wie LoginUIController nur für die Registrierung
 
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -48,3 +49,4 @@ public class RegisterUIController : MonoBehaviour
         SceneManager.LoadScene(loginSceneName);
     }
 }
+
