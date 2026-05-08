@@ -11,7 +11,10 @@ public class PassKeyAuthController : MonoBehaviour
 
     [SerializeField] private TMP_Text registerResultText;
     [SerializeField] private TMP_Text recoveryResultText;
-    [SerializeField] private TMP_Text errorText;
+
+    [SerializeField] private TMP_Text loginErrorText;
+    [SerializeField] private TMP_Text registerErrorText;
+    [SerializeField] private TMP_Text recoveryErrorText;
 
     [SerializeField] private string mainSceneName = "MainScene";
 
@@ -21,20 +24,7 @@ public class PassKeyAuthController : MonoBehaviour
     {
         authService = new AuthService();
 
-        if (registerResultText != null)
-        {
-            registerResultText.text = "";
-        }
-
-        if (recoveryResultText != null)
-        {
-            recoveryResultText.text = "";
-        }
-
-        if (errorText != null)
-        {
-            errorText.text = "";
-        }
+        clearAllMessages();
 
         Debug.Log("PassKeyAuthController gestartet.");
         Debug.Log("Speicherort: " + authService.getStoragePath());
@@ -42,13 +32,13 @@ public class PassKeyAuthController : MonoBehaviour
 
     public void registerUser()
     {
-        clearMessages();
+        clearAllMessages();
 
         PassKeyRecord record = authService.registerUser(usernameInput.text, companyNameInput.text);
 
         if (record == null)
         {
-            showError("Registrierung fehlgeschlagen. Prüfe Nutzername und Firmenname.");
+            showRegisterError("Registrierung fehlgeschlagen. Prüfe Nutzername und Firmenname.");
             return;
         }
 
@@ -66,13 +56,13 @@ public class PassKeyAuthController : MonoBehaviour
 
     public void loginWithPassKey()
     {
-        clearMessages();
+        clearAllMessages();
 
         PassKeyRecord user = authService.loginWithPassKey(passKeyInput.text);
 
         if (user == null)
         {
-            showError("Login fehlgeschlagen. PassKey ist falsch oder leer.");
+            showLoginError("Login fehlgeschlagen. PassKey ist falsch oder leer.");
             return;
         }
 
@@ -82,13 +72,13 @@ public class PassKeyAuthController : MonoBehaviour
 
     public void resetPassKey()
     {
-        clearMessages();
+        clearAllMessages();
 
         string newPassKey = authService.resetPassKeyWithRecoveryKey(recoveryKeyInput.text);
 
         if (string.IsNullOrWhiteSpace(newPassKey))
         {
-            showError("Reset fehlgeschlagen. RecoveryKey ist falsch oder leer.");
+            showRecoveryError("Reset fehlgeschlagen. RecoveryKey ist falsch oder leer.");
             return;
         }
 
@@ -106,30 +96,44 @@ public class PassKeyAuthController : MonoBehaviour
         StateManager.Instance.logout();
     }
 
-    private void clearMessages()
+    private void clearAllMessages()
     {
         if (registerResultText != null)
-        {
             registerResultText.text = "";
-        }
 
         if (recoveryResultText != null)
-        {
             recoveryResultText.text = "";
-        }
 
-        if (errorText != null)
-        {
-            errorText.text = "";
-        }
+        if (loginErrorText != null)
+            loginErrorText.text = "";
+
+        if (registerErrorText != null)
+            registerErrorText.text = "";
+
+        if (recoveryErrorText != null)
+            recoveryErrorText.text = "";
     }
 
-    private void showError(string message)
+    private void showLoginError(string message)
     {
-        if (errorText != null)
-        {
-            errorText.text = message;
-        }
+        if (loginErrorText != null)
+            loginErrorText.text = message;
+
+        Debug.LogError(message);
+    }
+
+    private void showRegisterError(string message)
+    {
+        if (registerErrorText != null)
+            registerErrorText.text = message;
+
+        Debug.LogError(message);
+    }
+
+    private void showRecoveryError(string message)
+    {
+        if (recoveryErrorText != null)
+            recoveryErrorText.text = message;
 
         Debug.LogError(message);
     }
