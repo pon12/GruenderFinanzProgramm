@@ -4,6 +4,7 @@
 .button {
     border-top-width: 64px;
     border-left-width: 50px;
+    margin-top: 15px;
 }
 
 .unity-radio-button {
@@ -12,6 +13,8 @@
     font-size: 30px;
     -unity-font-style: bold;
     color: rgb(255, 255, 255);
-    align-items: auto;
+    align-items: center;
     align-content: auto;
+    align-self: flex-start;
+    justify-content: flex-start;
 }

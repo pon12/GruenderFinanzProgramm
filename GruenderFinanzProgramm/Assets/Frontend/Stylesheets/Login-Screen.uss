@@ -1,0 +1,45 @@
+:root {
+}
+
+.Anmelden-button {
+    background-color: rgb(128, 207, 149);
+    font-size: 30px;
+    color: white;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    border-radius: 8px;
+    border-width: 0;
+    padding: 10px 20px;
+}
+
+.Konto-button {
+    background-color: rgb(92, 90, 90);
+    font-size: 30px;
+    color: white;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    border-radius: 8px;
+    border-width: 0;
+    padding: 10px 20px;
+}
+
+.text2 {
+    color: rgb(174, 174, 174);
+    -unity-text-align: middle-center;
+    font-size: 39px;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
+
+.text {
+    color: rgb(174, 174, 174);
+    -unity-text-align: middle-center;
+    font-size: 49px;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
+
+.ueberschrift {
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    font-size: 90px;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
