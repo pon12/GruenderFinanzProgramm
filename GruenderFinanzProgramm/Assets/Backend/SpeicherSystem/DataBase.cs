@@ -4,16 +4,19 @@ using UnityEngine;
 public class DataBase : DatabaseManager
 {
 
-    //Diese funktion ist hauptsächlich für testzwecke ihr könnt wenn ihr tables habt die nicht zur runtime erstellt werden hier einbauen.
-
     public void setupDatabase()
     {
-        createTable<UserDB>();
+        //createTable<UserDB>();
         createTable<Company>();
     }
 
+    public void setupAuthDB()
+    {
+        createTable<UserDB>();
+    }
 
-//User
+
+//User Auth DB
     public UserDB getUserById(int userId)
     {
         return getById<UserDB>(userId);
@@ -26,11 +29,13 @@ public class DataBase : DatabaseManager
     }
 
 
-    public int createUser(string name)
+    public int createUser(string name, string passKeyHash, string recoveryPassKeyHash)
     {
         UserDB newUser = new UserDB
         {
             name = name,
+            passKeyHash = passKeyHash,
+            recoveryPassKeyHash = recoveryPassKeyHash
         };
         return insert(newUser);
     }

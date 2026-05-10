@@ -9,7 +9,10 @@ public class UserDB
     public int id { get; set; }
     
     public string name { get; set; }
+    public string passKeyHash { get; set; }
+    public string recoveryPassKeyHash { get; set; }
 }
+
 
 [System.Serializable]
 public class Company
