@@ -149,6 +149,27 @@ public List<OfferItem> getItemsByOffer(int offerId) =>
     query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
 public int createOfferItem(OfferItem item) => insert(item);
 
+// --- Dienstleistungen  ---
 
+public void setupServiceTable()
+{
+    createTable<Service>();
+}
+public int createService(Service service)
+{
+    return insert(service);
+}
+public List<Service> getAllServices()
+{
+    return getAll<Service>();
+}
+public int updateService(Service service)
+{
+    return update(service);
+}
+public int deleteService(int id)
+{
+    return delete<Service>(id);
+}
 
 }
