@@ -2,16 +2,14 @@ public class PassKeyRecord
 {
     public string userId;
     public string username;
-    public string companyName;
-    public string passKey;
-    public string recoveryKey;
+    public string passKeyHash;
+    public string recoveryKeyHash;
 
-    public PassKeyRecord(string userId, string username, string companyName, string passKey, string recoveryKey)
+    public PassKeyRecord(string userId, string username, string passKeyHash, string recoveryKeyHash)
     {
         this.userId = userId;
         this.username = username;
-        this.companyName = companyName;
-        this.passKey = passKey;
-        this.recoveryKey = recoveryKey;
+        this.passKeyHash = passKeyHash;
+        this.recoveryKeyHash = recoveryKeyHash;
     }
 }

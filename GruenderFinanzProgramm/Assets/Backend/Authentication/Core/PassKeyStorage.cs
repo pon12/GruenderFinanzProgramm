@@ -43,9 +43,9 @@ public class PassKeyStorage
 
             string[] parts = line.Split(';');
 
-            if (parts.Length == 5)
+            if (parts.Length == 4)
             {
-                records.Add(new PassKeyRecord(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                records.Add(new PassKeyRecord(parts[0], parts[1], parts[2], parts[3]));
             }
         }
 
@@ -54,7 +54,7 @@ public class PassKeyStorage
 
     public void saveRecord(PassKeyRecord record)
     {
-        string line = record.userId + ";" + record.username + ";" + record.companyName + ";" + record.passKey + ";" + record.recoveryKey;
+        string line = record.userId + ";" + record.username + ";" + record.passKeyHash + ";" + record.recoveryKeyHash;
         File.AppendAllText(filePath, line + "\n");
     }
 
@@ -64,7 +64,7 @@ public class PassKeyStorage
 
         foreach (PassKeyRecord record in records)
         {
-            lines.Add(record.userId + ";" + record.username + ";" + record.companyName + ";" + record.passKey + ";" + record.recoveryKey);
+            lines.Add(record.userId + ";" + record.username + ";" + record.passKeyHash + ";" + record.recoveryKeyHash);
         }
 
         File.WriteAllLines(filePath, lines);

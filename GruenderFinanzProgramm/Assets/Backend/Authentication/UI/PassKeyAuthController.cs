@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class PassKeyAuthController : MonoBehaviour
 {
     [SerializeField] private TMP_InputField usernameInput;
-    [SerializeField] private TMP_InputField companyNameInput;
     [SerializeField] private TMP_InputField passKeyInput;
     [SerializeField] private TMP_InputField recoveryKeyInput;
 
@@ -16,14 +15,13 @@ public class PassKeyAuthController : MonoBehaviour
     [SerializeField] private TMP_Text registerErrorText;
     [SerializeField] private TMP_Text recoveryErrorText;
 
-    [SerializeField] private string mainSceneName = "MainScene";
+    [SerializeField] private string mainSceneName = "SampleScene";
 
     private AuthService authService;
 
     private void Start()
     {
         authService = new AuthService();
-
         clearAllMessages();
 
         Debug.Log("PassKeyAuthController gestartet.");
@@ -34,23 +32,22 @@ public class PassKeyAuthController : MonoBehaviour
     {
         clearAllMessages();
 
-        PassKeyRecord record = authService.registerUser(usernameInput.text, companyNameInput.text);
+        PassKeyRecord record = authService.registerUser(usernameInput.text);
 
         if (record == null)
         {
-            showRegisterError("Registrierung fehlgeschlagen. Prüfe Nutzername und Firmenname.");
+            showRegisterError("Registrierung fehlgeschlagen. Prüfe den Nutzernamen.");
             return;
         }
 
         if (registerResultText != null)
         {
+            registerResultText.gameObject.SetActive(true);
             registerResultText.text =
                 "Registrierung erfolgreich!\n" +
-                "Nutzer: " + record.username + "\n" +
-                "Firma: " + record.companyName + "\n" +
-                "PassKey: " + record.passKey + "\n" +
-                "RecoveryKey: " + record.recoveryKey + "\n\n" +
-                "Bitte diese Daten sicher notieren.";
+                "Nutzer: " + usernameInput.text + "\n" +
+                "PassKey und RecoveryKey wurden in der Konsole ausgegeben.\n" +
+                "Bitte sicher notieren.";
         }
     }
 
@@ -84,10 +81,11 @@ public class PassKeyAuthController : MonoBehaviour
 
         if (recoveryResultText != null)
         {
+            recoveryResultText.gameObject.SetActive(true);
             recoveryResultText.text =
                 "PassKey erfolgreich zurückgesetzt!\n" +
-                "Neuer PassKey: " + newPassKey + "\n\n" +
-                "Bitte den neuen PassKey sicher notieren.";
+                "Neuer PassKey wurde in der Konsole ausgegeben.\n" +
+                "Bitte sicher notieren.";
         }
     }
 
@@ -96,28 +94,51 @@ public class PassKeyAuthController : MonoBehaviour
         StateManager.Instance.logout();
     }
 
+    public void clearMessagesFromOutside()
+    {
+        clearAllMessages();
+    }
+
     private void clearAllMessages()
     {
         if (registerResultText != null)
+        {
             registerResultText.text = "";
+            registerResultText.gameObject.SetActive(false);
+        }
 
         if (recoveryResultText != null)
+        {
             recoveryResultText.text = "";
+            recoveryResultText.gameObject.SetActive(false);
+        }
 
         if (loginErrorText != null)
+        {
             loginErrorText.text = "";
+            loginErrorText.gameObject.SetActive(false);
+        }
 
         if (registerErrorText != null)
+        {
             registerErrorText.text = "";
+            registerErrorText.gameObject.SetActive(false);
+        }
 
         if (recoveryErrorText != null)
+        {
             recoveryErrorText.text = "";
+            recoveryErrorText.gameObject.SetActive(false);
+        }
     }
 
     private void showLoginError(string message)
     {
         if (loginErrorText != null)
+        {
             loginErrorText.text = message;
+            loginErrorText.gameObject.SetActive(true);
+        }
 
         Debug.LogError(message);
     }
@@ -125,7 +146,10 @@ public class PassKeyAuthController : MonoBehaviour
     private void showRegisterError(string message)
     {
         if (registerErrorText != null)
+        {
             registerErrorText.text = message;
+            registerErrorText.gameObject.SetActive(true);
+        }
 
         Debug.LogError(message);
     }
@@ -133,7 +157,10 @@ public class PassKeyAuthController : MonoBehaviour
     private void showRecoveryError(string message)
     {
         if (recoveryErrorText != null)
+        {
             recoveryErrorText.text = message;
+            recoveryErrorText.gameObject.SetActive(true);
+        }
 
         Debug.LogError(message);
     }
