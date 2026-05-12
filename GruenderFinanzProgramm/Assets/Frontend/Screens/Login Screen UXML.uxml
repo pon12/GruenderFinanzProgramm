@@ -1,10 +1,13 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/Login-Screen.uss?fileID=7433441132597879392&amp;guid=331eae5bef4fa60439b01da8429e7003&amp;type=3#Login-Screen"/>
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
-    <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/Logo%20(1).png?fileID=2800000&amp;guid=837dfaf282eedcd41a4edd7df7aeb541&amp;type=3#Logo (1)" style="width: 200px; height: 144px; top: 144px; left: 860px;"/>
-    <ui:Label text="Wilkommen!" name="Ueberschrift" class="ueberschrift" style="top: 160px; left: 703px; width: 532px; height: 90px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-    <ui:Label text="Schön, dass du Busiless nutzt!" name="Text" class="text" style="width: 699px; height: 20px; left: 620px; top: 200px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-    <ui:Label text="Was möchtest du tun?" name="Text2" class="text2" style="top: 230px; left: 751px; width: 436px; height: 49px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-    <ui:Button text="Anmelden" name="Anmelden" class="Anmelden-button" style="width: 471px; height: 110px; top: 350px; left: 751px; font-size: 30px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-    <ui:Button text="Konto erstellen" name="KontoErstellen" class="Konto-button" style="width: 372px; height: 110px; font-size: 30px; top: 400px; left: 800px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <ui:VisualElement class="fullscreen-bg" style="flex-grow: 1; background-color: rgb(56, 56, 56); width: 100%; height: 100%;">
+        <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/Logo%20(1).png?fileID=2800000&amp;guid=837dfaf282eedcd41a4edd7df7aeb541&amp;type=3#Logo (1)" style="width: 200px; height: 144px; top: 144px; left: 860px;"/>
+        <ui:Label text="Wilkommen!" name="Ueberschrift" class="ueberschrift" style="top: 160px; left: 703px; width: 532px; height: 90px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:Label text="Schön, dass du Busiless nutzt!" name="Text" class="text" style="width: 699px; height: 20px; left: 620px; top: 200px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:Label text="Was möchtest du tun?" name="Text2" class="text2" style="top: 230px; left: 751px; width: 436px; height: 49px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:Button text="Anmelden" name="Anmelden" class="Anmelden-button" style="width: 471px; height: 110px; top: 350px; left: 751px; font-size: 30px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:Button text="Konto erstellen" name="KontoErstellen" class="Konto-button" style="width: 372px; height: 110px; font-size: 30px; top: 400px; left: 800px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+    </ui:VisualElement>
 </ui:UXML>
