@@ -1,12 +1,15 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/Register-Screen.uss?fileID=7433441132597879392&amp;guid=305c4b953cf207248af3018763fed611&amp;type=3#Register-Screen"/>
-    <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/Logo%20(1).png?fileID=2800000&amp;guid=837dfaf282eedcd41a4edd7df7aeb541&amp;type=3#Logo (1)" style="top: 70px; left: 885px; width: 200px; height: 144px;"/>
-    <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift" style="top: 100px; left: 690px; width: 573px; height: 91px;"/>
-    <ui:Label text="Profilname" name="Profilname" class="Profilname" style="width: 335px; height: 52px; top: 200px; left: 420px; font-size: 32px;"/>
-    <ui:TextField label="" placeholder-text="" name="Profileingabe" style="top: 200px; left: 488px; width: 984px; height: 102px;"/>
-    <ui:Label text="Sicher mit Passkey&#10;" name="Ueberschrift2" class="Ueberschrift2" style="top: 220px; left: 0;"/>
-    <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder las dir eine starke PIN erstellen" name="text" class="text" style="top: 220px; left: 0;"/>
-    <ui:Button text="Power-Passkey-generieren" name="key-gernerieren" class="Key-button" style="top: 250px; left: 738px; width: 476px; height: 98px;"/>
-    <ui:Toggle label="" name="Toggle" style="top: 307px; left: 480px; width: 50px; height: 50px;"/>
-    <ui:Label text="Ich akzeptiere die AGB und die Datenschutzrichtlinie" name="text2" class="text2" style="top: 250px; left: 0;"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <ui:VisualElement name="Background" class="fullscreen-bg" style="flex-grow: 1;">
+        <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/Logo%20(1).png?fileID=2800000&amp;guid=837dfaf282eedcd41a4edd7df7aeb541&amp;type=3#Logo (1)" style="top: 70px; left: 885px; width: 200px; height: 144px;"/>
+        <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift" style="top: 100px; left: 690px; width: 573px; height: 91px;"/>
+        <ui:Label text="Profilname" name="Profilname" class="Profilname" style="width: 335px; height: 52px; top: 200px; left: 420px; font-size: 32px;"/>
+        <ui:TextField label="" placeholder-text="" name="Profileingabe" style="top: 200px; left: 488px; width: 984px; height: 102px;"/>
+        <ui:Label text="Sicher mit Passkey&#10;" name="Ueberschrift2" class="Ueberschrift2" style="top: 220px; left: 0;"/>
+        <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder las dir eine starke PIN erstellen" name="text" class="text" style="top: 220px; left: 0;"/>
+        <ui:Button text="Power-Passkey-generieren" name="key-gernerieren" class="Key-button" style="top: 250px; left: 738px; width: 476px; height: 98px;"/>
+        <ui:Toggle label="" name="Toggle" style="top: 307px; left: 480px; width: 50px; height: 50px;"/>
+        <ui:Label text="Ich akzeptiere die AGB und die Datenschutzrichtlinie" name="text2" class="text2" style="top: 250px; left: 0;"/>
+    </ui:VisualElement>
 </ui:UXML>
