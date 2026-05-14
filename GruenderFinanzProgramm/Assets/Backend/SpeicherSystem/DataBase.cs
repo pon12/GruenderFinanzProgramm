@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public class DataBase : DatabaseManager
 {
 
@@ -145,26 +144,40 @@ public List<OfferItem> getItemsByOffer(int offerId) =>
     query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
 public int createOfferItem(OfferItem item) => insert(item);
 
-// ========================================
-// Kunden (Customer)
-// ========================================
-public void setupCustomerTable()
-{
-    createTable<Customer>();
-}
-public int createCustomer(Customer customer) => insert(customer);
-public List<Customer> getAllCustomers() => getAll<Customer>();
-public int updateCustomer(Customer customer) => update(customer);
-public int deleteCustomer(int id) => delete<Customer>(id);
-// ========================================
-// Dienstleistungen (Service)
-// ========================================
-public void setupServiceTable()
-{
-    createTable<Service>();
-}
-public int createService(Service service) => insert(service);
-public List<Service> getAllServices() => getAll<Service>();
-public int updateService(Service service) => update(service);
-public int deleteService(int id) => delete<Service>(id);
+
+ // ---Customer---
+
+ 
+
+    public void setupCustomerTable()
+    {
+        createTable<Customer>();
+    }
+
+    public int createCustomer(Customer customer)
+    {
+        return insert(customer);
+    }
+
+    public List<Customer> getAllCustomers()
+    {
+        return getAll<Customer>();
+    }
+
+    // ---Services---
+
+    public void setupServiceTable()
+    {
+        createTable<Service>();
+    }
+
+    public int createService(Service service)
+    {
+        return insert(service);
+    }
+
+    public List<Service> getAllServices()
+    {
+        return getAll<Service>();
+    }
 }
