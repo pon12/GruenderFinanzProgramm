@@ -14,7 +14,7 @@ public class Versionsnummer
         string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);
         {
             // Versionsnummer in die  Datei schreiben
-            using (StreamWriter sw = File.AppendText(filePath))
+            using (StreamWriter sw = File.CreateText(filePath))
             {
                 sw.WriteLine(version + "\n");
             }
