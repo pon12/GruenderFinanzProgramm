@@ -91,11 +91,6 @@ public class DataBase : DatabaseManager
         return delete<Company>(companyId);
     }
 
-
-
-
-
-
 //Login/Auth
 
     public List<UserDB> findUsersByName(string name)
@@ -140,6 +135,7 @@ public List<Invoice> getAllInvoices() => getAll<Invoice>();
 public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
     query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
 public int createInvoiceItem(InvoiceItem item) => insert(item);
+
 // --- Angebote ---
 public int createOffer(Offer offer) => insert(offer);
 public int updateOffer(Offer offer) => update(offer);
@@ -149,27 +145,26 @@ public List<OfferItem> getItemsByOffer(int offerId) =>
     query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
 public int createOfferItem(OfferItem item) => insert(item);
 
-// --- Dienstleistungen  ---
-
+// ========================================
+// Kunden (Customer)
+// ========================================
+public void setupCustomerTable()
+{
+    createTable<Customer>();
+}
+public int createCustomer(Customer customer) => insert(customer);
+public List<Customer> getAllCustomers() => getAll<Customer>();
+public int updateCustomer(Customer customer) => update(customer);
+public int deleteCustomer(int id) => delete<Customer>(id);
+// ========================================
+// Dienstleistungen (Service)
+// ========================================
 public void setupServiceTable()
 {
     createTable<Service>();
 }
-public int createService(Service service)
-{
-    return insert(service);
-}
-public List<Service> getAllServices()
-{
-    return getAll<Service>();
-}
-public int updateService(Service service)
-{
-    return update(service);
-}
-public int deleteService(int id)
-{
-    return delete<Service>(id);
-}
-
+public int createService(Service service) => insert(service);
+public List<Service> getAllServices() => getAll<Service>();
+public int updateService(Service service) => update(service);
+public int deleteService(int id) => delete<Service>(id);
 }
