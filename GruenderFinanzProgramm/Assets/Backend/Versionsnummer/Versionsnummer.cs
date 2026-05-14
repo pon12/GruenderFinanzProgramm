@@ -24,7 +24,7 @@ public class Versionsnummer
     }
 
     // Funktion zum Lesen der Versionsnummer aus einer Datei
-    public static string readVersionFromFile(string fileName)
+    public static string getVersion(string fileName)
     {
         // Pfad zur Datei erstellen
         string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);

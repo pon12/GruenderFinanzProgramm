@@ -21,13 +21,13 @@ public class TestVersionsnummer : MonoBehaviour
     }
 
     // Funktion zum Testen der lesen einer Versionsnummer aus einer Datei
-    public void readTestVersionen()
+    public void getVersion()
     {
         // Testdaten
         string testFileName = "test_version.txt";
 
         // Versionsnummer aus der Datei lesen
-        string version = Versionsnummer.readVersionFromFile(testFileName);
+        string version = Versionsnummer.getVersion(testFileName);
         if (version != null)
         {
             Debug.Log($"Gelesene Versionsnummer: {version}");
@@ -37,6 +37,6 @@ public class TestVersionsnummer : MonoBehaviour
     public void Start()
     {
         writeTestVersionen();
-        readTestVersionen();
+        getVersion();
     }
 }

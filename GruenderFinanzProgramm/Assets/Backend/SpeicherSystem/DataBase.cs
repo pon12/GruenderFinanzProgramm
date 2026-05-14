@@ -34,8 +34,8 @@ public class DataBase : DatabaseManager
         UserDB newUser = new UserDB
         {
             name = name,
-            passKeyHash = passKeyHash,
-            recoveryPassKeyHash = recoveryPassKeyHash
+            passKeyHash = PasswordHashing.hashPassword(passKeyHash),
+            recoveryPassKeyHash = PasswordHashing.hashPassword(recoveryPassKeyHash)
         };
         return insert(newUser);
     }
