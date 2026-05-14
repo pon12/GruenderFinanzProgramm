@@ -8,8 +8,11 @@ using System.IO;
 
 public class Versionsnummer
 {
+
+
+    static string fileName = "version.txt";
     // Funktion zum Schreiben der Versionsnummer in eine Datei
-    public static void writeVersionToFile(string fileName, string version)
+    public static void writeVersionToFile(string version)
     {
         string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);
         {
@@ -24,7 +27,7 @@ public class Versionsnummer
     }
 
     // Funktion zum Lesen der Versionsnummer aus einer Datei
-    public static string getVersion(string fileName)
+    public static string getVersion()
     {
         // Pfad zur Datei erstellen
         string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);

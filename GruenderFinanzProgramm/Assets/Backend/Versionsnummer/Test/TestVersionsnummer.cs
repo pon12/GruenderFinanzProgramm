@@ -13,21 +13,17 @@ public class TestVersionsnummer : MonoBehaviour
     public void writeTestVersionen()
     {
         // Testdaten
-        string testFileName = "test_version.txt";
         string testVersion = "Version:1.0.0";
 
         // Versionsnummer in die Datei schreiben
-        Versionsnummer.writeVersionToFile(testFileName, testVersion);
+        Versionsnummer.writeVersionToFile(testVersion);
     }
 
     // Funktion zum Testen der lesen einer Versionsnummer aus einer Datei
     public void getVersion()
     {
-        // Testdaten
-        string testFileName = "test_version.txt";
-
         // Versionsnummer aus der Datei lesen
-        string version = Versionsnummer.getVersion(testFileName);
+        string version = Versionsnummer.getVersion();
         if (version != null)
         {
             Debug.Log($"Gelesene Versionsnummer: {version}");
