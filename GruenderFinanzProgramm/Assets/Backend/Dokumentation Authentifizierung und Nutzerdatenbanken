@@ -1,0 +1,253 @@
+Dokumentation: Authentifizierung und Nutzerdatenbanken
+
+Grundidee:
+Das Frontend arbeitet nicht direkt mit Datenbanken.
+Die Authentifizierung und die Datenbankauswahl laufen über das Backend.
+
+Es gibt zwei Datenbank-Arten:
+
+1. userData.db
+Diese Datenbank ist die zentrale Authentifizierungsdatenbank.
+Dort werden alle Nutzer und die Hashes der PassKeys gespeichert.
+
+2. Nutzername.db
+Für jeden Nutzer wird zusätzlich eine eigene Datenbank erstellt.
+Beispiel: Wenn der Nutzer Micha heißt, wird automatisch Micha.db erstellt.
+
+
+Was wird in userData.db gespeichert?
+
+In userData.db gibt es die Tabelle AuthUserDB.
+
+Dort werden gespeichert:
+- userId
+- username
+- passKeyHash
+- recoveryKeyHash
+- databaseName
+
+Wichtig:
+Der echte PassKey wird nicht im Klartext gespeichert.
+Der echte RecoveryKey wird nicht im Klartext gespeichert.
+Es werden nur Hashwerte gespeichert.
+
+databaseName gibt an, welche persönliche Datenbank zu dem Nutzer gehört.
+Beispiel:
+username = Micha
+databaseName = Micha
+
+
+Registrierung:
+
+Bei der Registrierung gibt der Nutzer nur einen Nutzernamen ein.
+
+Frontend-Aufruf:
+PassKeyAuthController.registerUser()
+
+Ablauf:
+1. Nutzername wird aus dem Eingabefeld gelesen.
+2. Das Backend erzeugt automatisch einen 4-stelligen PassKey.
+3. Das Backend erzeugt automatisch einen 16-stelligen RecoveryKey.
+4. PassKey und RecoveryKey werden gehasht.
+5. Die Hashwerte werden in userData.db gespeichert.
+6. Zusätzlich wird eine eigene Nutzerdatenbank erstellt.
+
+Beispiel:
+Nutzername: Micha
+-> userData.db speichert Micha mit den Hashwerten
+-> Micha.db wird automatisch erstellt
+
+
+Login:
+
+Der Login läuft nur über den PassKey.
+
+Frontend-Aufruf:
+PassKeyAuthController.loginWithPassKey()
+
+Ablauf:
+1. Nutzer gibt den PassKey ein.
+2. Der PassKey wird im Backend gehasht.
+3. Der Hash wird in userData.db gesucht.
+4. Wenn ein passender Nutzer gefunden wird, wird dieser eingeloggt.
+5. Der StateManager speichert den aktuellen Nutzer.
+6. Danach weiß das Backend automatisch, welche Nutzerdatenbank verwendet werden muss.
+
+Beispiel:
+PassKey gehört zu Micha
+-> Micha wird im StateManager gespeichert
+-> aktive Nutzerdatenbank ist Micha.db
+
+
+Recovery / PassKey zurücksetzen:
+
+Falls der Nutzer seinen PassKey vergessen hat, kann der RecoveryKey genutzt werden.
+
+Frontend-Aufruf:
+PassKeyAuthController.resetPassKey()
+
+Ablauf:
+1. Nutzer gibt den RecoveryKey ein.
+2. Der RecoveryKey wird gehasht.
+3. Der Hash wird in userData.db gesucht.
+4. Wenn ein passender Nutzer gefunden wird, wird ein neuer PassKey erzeugt.
+5. Der neue PassKey wird wieder nur als Hash gespeichert.
+6. Der neue PassKey wird ausgegeben und muss neu notiert werden.
+
+
+Logout:
+
+Frontend-Aufruf:
+MainLogoutController.logout()
+
+Ablauf:
+1. Der aktuelle Nutzer wird im StateManager gelöscht.
+2. loggedIn wird auf false gesetzt.
+3. Die LoginScene wird geladen.
+
+
+Wichtige Klassen:
+
+PassKeyAuthController
+Verbindet die Unity-UI mit dem AuthService.
+Diese Klasse wird hauptsächlich über Buttons im Frontend aufgerufen.
+
+Wichtige Funktionen:
+- registerUser()
+- loginWithPassKey()
+- resetPassKey()
+
+
+AuthService
+Enthält die eigentliche Authentifizierungslogik.
+
+Aufgaben:
+- PassKey erzeugen
+- RecoveryKey erzeugen
+- Hashing
+- Registrierung
+- Login
+- Recovery
+
+
+AuthDatabaseService
+Verbindet den AuthService mit dem Datenbanksystem.
+
+Aufgaben:
+- userData.db öffnen oder erstellen
+- AuthUserDB-Tabelle verwenden
+- Nutzer speichern
+- Nutzer über PassKeyHash finden
+- Nutzer über RecoveryKeyHash finden
+- persönliche Nutzerdatenbank erstellen
+
+
+StateManager
+Speichert den aktuell eingeloggten Nutzer.
+
+Wichtige Funktionen:
+- StateManager.Instance.isLoggedIn()
+- StateManager.Instance.getCurrentUser()
+- StateManager.Instance.logout()
+
+Über getCurrentUser() kann das Backend erkennen, welcher Nutzer aktuell aktiv ist.
+
+
+AuthUserDB
+Datenbankmodell für die Authentifizierungsdaten in userData.db.
+
+Gespeicherte Werte:
+- userId
+- username
+- passKeyHash
+- recoveryKeyHash
+- databaseName
+
+
+Wichtig für das Frontend:
+
+Das Frontend soll nicht:
+- Datenbanken direkt öffnen
+- Datenbanknamen übergeben
+- SQLite direkt verwenden
+- PassKeys selbst hashen
+- Nutzer selbst in Datenbanken speichern
+
+Das Frontend soll nur die vorhandenen Controller-Funktionen aufrufen.
+
+
+Button-Verknüpfungen:
+
+Registrieren-Button:
+PassKeyAuthController.registerUser()
+
+Login-Button:
+PassKeyAuthController.loginWithPassKey()
+
+Recovery-Button:
+PassKeyAuthController.resetPassKey()
+
+Logout-Button:
+MainLogoutController.logout()
+
+
+Input-Regeln:
+
+PassKey:
+- 4-stellig
+- nur Zahlen
+- Eingabe über Zahlenbuttons
+- keine normale Tastatureingabe
+
+RecoveryKey:
+- 16-stellig
+- nur Zahlen
+- Copy/Paste kann erlaubt sein
+
+
+Beispiel-Ablauf:
+
+Registrierung:
+Nutzer gibt Micha ein.
+Frontend ruft registerUser() auf.
+Backend erstellt PassKey und RecoveryKey.
+Backend speichert die Hashwerte in userData.db.
+Backend erstellt Micha.db.
+
+Login:
+Nutzer gibt seinen PassKey ein.
+Frontend ruft loginWithPassKey() auf.
+Backend findet Micha in userData.db.
+StateManager speichert Micha als aktiven Nutzer.
+Danach kann das Backend automatisch Micha.db verwenden.
+
+
+Wichtig für spätere Funktionen:
+
+Wenn später Rechnungen, Angebote, Firmen oder Finanzdaten gespeichert werden,
+soll das Frontend nicht selbst entscheiden, welche Datenbank genutzt wird.
+
+Stattdessen sollten spätere Backend-Services erstellt werden, z. B.:
+- InvoiceService.createInvoice(...)
+- InvoiceService.getInvoices()
+- CompanyService.createCompany(...)
+- CompanyService.getCompanies()
+
+Diese Services sollen intern über den StateManager erkennen, welcher Nutzer eingeloggt ist,
+und dann automatisch die passende Nutzerdatenbank verwenden.
+
+Beispiel:
+Micha ist eingeloggt -> Daten werden in Micha.db gespeichert.
+Alex ist eingeloggt -> Daten werden in Alex.db gespeichert.
+
+
+Kurzfassung:
+
+Das Frontend nutzt nur Controller-Funktionen.
+Das Frontend arbeitet nicht direkt mit Datenbanken.
+Die Registrierung läuft nur über den Nutzernamen.
+Der Login läuft nur über den PassKey.
+Auth-Daten liegen in userData.db.
+Jeder Nutzer bekommt automatisch eine eigene Datenbank.
+Der aktuelle Nutzer wird im StateManager gespeichert.
+Die Datenbankauswahl passiert automatisch im Backend.
