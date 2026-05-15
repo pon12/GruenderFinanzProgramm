@@ -1,0 +1,44 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Sidebar.uss?fileID=7433441132597879392&amp;guid=f5bf8bdd135fda34c9c60512fe43d0e8&amp;type=3#Sidebar"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <ui:VisualElement name="root" class="root fullscreen-bg" style="flex-direction: row;">
+        <ui:VisualElement name="sidebar" class="sidebar grid-container" style="flex-direction: column; width: 444px;">
+            <ui:VisualElement name="logo" class="logo">
+                <ui:VisualElement class="logo-icon">
+                    <ui:Button text="Button" class="button">
+                        <ui:Label text="Gründung" class="logo-text"/>
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:RadioButton label="" text="Dashboard" value="true" enabled="true" toggle-on-label-click="true" name="Dashboard" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Forschritts-Guide" value="true" enabled="true" toggle-on-label-click="true" name="Fortschritts-Guide" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Dokumente" value="true" enabled="true" toggle-on-label-click="true" name="Dokumente" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Finanzplaner" value="true" enabled="true" toggle-on-label-click="true" name="Finanzplaner" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Kostenrechner" value="true" enabled="true" toggle-on-label-click="true" name="Kostenrechner" class="grid-item"/>
+            <ui:RadioButton label="" text="Kassenbuch" value="true" enabled="true" toggle-on-label-click="true" name="Kassenbuch" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Rechnung erstellen" value="true" enabled="true" toggle-on-label-click="true" name="RechnungErstellen" class="grid-item unity-radio-button"/>
+            <ui:RadioButton label="" text="Angebot erstellen" value="true" enabled="true" toggle-on-label-click="true" name="AngebotErstellen" class="grid-item unity-radio-button"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="main" class="main">
+            <ui:Label text="Kassenbuch" class="page-title"/>
+            <ui:VisualElement class="kontostand-section">
+                <ui:Label text="Kontostand" class="kontostand-label"/>
+                <ui:Label text="8€" name="balanceLabel" class="balance"/>
+                <ui:Label text="Letzte Aktualisierung: 02.02.2222" class="update-label"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="button-row">
+                <ui:Button text="Ausgaben hinzufügen" name="btnAusgaben" class="btn-red"/>
+                <ui:Button text="Einnahmen hinzufügen" name="btnEinnahmen" class="btn-green"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="table-header">
+                <ui:Label text="Name &amp; Verwendungszweck" class="col"/>
+                <ui:Label text="Buchungstag" class="col"/>
+                <ui:Label text="Betrag" class="col"/>
+                <ui:Label text="Einnahme/Ausgabe" class="col"/>
+                <ui:Label text="" class="col-action"/>
+            </ui:VisualElement>
+            <ui:ScrollView name="tableBody" class="table-body"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
