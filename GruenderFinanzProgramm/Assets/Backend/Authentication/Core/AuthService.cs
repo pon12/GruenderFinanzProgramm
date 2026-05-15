@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 
 public class AuthService
 {
-    private PassKeyStorage passKeyStorage = new PassKeyStorage();
+    private AuthDatabaseService authDatabaseService = new AuthDatabaseService();
 
-    public PassKeyRecord registerUser(string username, string companyName)
+    public PassKeyRecord registerUser(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -14,32 +14,39 @@ public class AuthService
             return null;
         }
 
-        if (string.IsNullOrWhiteSpace(companyName))
-        {
-            Debug.LogError("Registrierung fehlgeschlagen: Kein Firmenname eingegeben.");
-            return null;
-        }
-
-        if (usernameExists(username))
+        if (authDatabaseService.usernameExists(username))
         {
             Debug.LogError("Registrierung fehlgeschlagen: Nutzername existiert bereits.");
             return null;
         }
 
         string userId = "user_" + System.DateTime.Now.Ticks;
+
         string passKey = generateUniquePassKey();
         string recoveryKey = generateUniqueRecoveryKey();
 
-        PassKeyRecord record = new PassKeyRecord(userId, username, companyName, passKey, recoveryKey);
+        string passKeyHash = hashValue(passKey);
+        string recoveryKeyHash = hashValue(recoveryKey);
 
-        passKeyStorage.saveRecord(record);
+        string databaseName = authDatabaseService.createUserDatabase(username);
+
+        PassKeyRecord record = new PassKeyRecord(
+            userId,
+            username,
+            passKeyHash,
+            recoveryKeyHash,
+            databaseName
+        );
+
+        authDatabaseService.createAuthUser(record);
 
         Debug.Log("Registrierung erfolgreich.");
         Debug.Log("Nutzer: " + username);
-        Debug.Log("Firma: " + companyName);
         Debug.Log("PassKey: " + passKey);
         Debug.Log("RecoveryKey: " + recoveryKey);
-        Debug.Log("Gespeichert unter: " + passKeyStorage.getStoragePath());
+        Debug.Log("Nutzerdatenbank: " + databaseName);
+        Debug.Log("Hinweis: In der userAuthDB werden nur Hashwerte gespeichert.");
+        Debug.Log("Auth-Datenbank gespeichert unter: " + authDatabaseService.getAuthDatabasePath());
 
         return record;
     }
@@ -48,24 +55,24 @@ public class AuthService
     {
         if (string.IsNullOrWhiteSpace(enteredPassKey))
         {
-            Debug.LogError("Login fehlgeschlagen: Kein Passkey eingegeben.");
+            Debug.LogError("Login fehlgeschlagen: Kein PassKey eingegeben.");
             return null;
         }
 
-        List<PassKeyRecord> records = passKeyStorage.getAllRecords();
+        string enteredPassKeyHash = hashValue(enteredPassKey);
 
-        foreach (PassKeyRecord record in records)
+        PassKeyRecord user = authDatabaseService.getUserByPassKeyHash(enteredPassKeyHash);
+
+        if (user == null)
         {
-            if (record.passKey == enteredPassKey)
-            {
-                Debug.Log("Willkommen zurück, " + record.username + ".");
-                Debug.Log("Login erfolgreich für Firma: " + record.companyName);
-                return record;
-            }
+            Debug.LogError("Login fehlgeschlagen: PassKey ist ungültig.");
+            return null;
         }
 
-        Debug.LogError("Login fehlgeschlagen: Passkey wurde nicht gefunden.");
-        return null;
+        Debug.Log("Willkommen zurück, " + user.username + ".");
+        Debug.Log("Aktive Nutzerdatenbank: " + user.databaseName);
+
+        return user;
     }
 
     public string resetPassKeyWithRecoveryKey(string enteredRecoveryKey)
@@ -76,70 +83,55 @@ public class AuthService
             return null;
         }
 
-        List<PassKeyRecord> records = passKeyStorage.getAllRecords();
+        string enteredRecoveryKeyHash = hashValue(enteredRecoveryKey);
 
-        foreach (PassKeyRecord record in records)
+        PassKeyRecord user = authDatabaseService.getUserByRecoveryKeyHash(enteredRecoveryKeyHash);
+
+        if (user == null)
         {
-            if (record.recoveryKey == enteredRecoveryKey)
-            {
-                string newPassKey = generateUniquePassKey();
-                record.passKey = newPassKey;
-
-                passKeyStorage.overwriteAllRecords(records);
-
-                Debug.Log("Passkey erfolgreich zurückgesetzt.");
-                Debug.Log("Nutzer: " + record.username);
-                Debug.Log("Neuer PassKey: " + newPassKey);
-
-                return newPassKey;
-            }
+            Debug.LogError("Reset fehlgeschlagen: RecoveryKey ist ungültig.");
+            return null;
         }
 
-        Debug.LogError("Reset fehlgeschlagen: RecoveryKey ungültig.");
-        return null;
-    }
+        string newPassKey = generateUniquePassKey();
+        string newPassKeyHash = hashValue(newPassKey);
 
-    private bool usernameExists(string username)
-    {
-        List<PassKeyRecord> records = passKeyStorage.getAllRecords();
+        authDatabaseService.updatePassKeyHash(user, newPassKeyHash);
 
-        foreach (PassKeyRecord record in records)
-        {
-            if (record.username == username)
-            {
-                return true;
-            }
-        }
+        Debug.Log("PassKey erfolgreich zurückgesetzt.");
+        Debug.Log("Nutzer: " + user.username);
+        Debug.Log("Neuer PassKey: " + newPassKey);
+        Debug.Log("Hinweis: Neuer PassKey wurde nur als Hash gespeichert.");
 
-        return false;
+        return newPassKey;
     }
 
     private string generateUniquePassKey()
     {
-        List<PassKeyRecord> records = passKeyStorage.getAllRecords();
-
         string passKey;
+        string passKeyHash;
 
         do
         {
             passKey = Random.Range(1000, 10000).ToString();
+            passKeyHash = hashValue(passKey);
         }
-        while (passKeyExists(passKey, records));
+        while (authDatabaseService.passKeyHashExists(passKeyHash));
 
         return passKey;
     }
 
     private string generateUniqueRecoveryKey()
     {
-        List<PassKeyRecord> records = passKeyStorage.getAllRecords();
-
         string recoveryKey;
+        string recoveryKeyHash;
 
         do
         {
             recoveryKey = generateNumericKey(16);
+            recoveryKeyHash = hashValue(recoveryKey);
         }
-        while (recoveryKeyExists(recoveryKey, records));
+        while (authDatabaseService.recoveryKeyHashExists(recoveryKeyHash));
 
         return recoveryKey;
     }
@@ -157,34 +149,26 @@ public class AuthService
         return builder.ToString();
     }
 
-    private bool passKeyExists(string passKey, List<PassKeyRecord> records)
+    private string hashValue(string value)
     {
-        foreach (PassKeyRecord record in records)
+        using (SHA256 sha256 = SHA256.Create())
         {
-            if (record.passKey == passKey)
+            byte[] inputBytes = Encoding.UTF8.GetBytes(value);
+            byte[] hashBytes = sha256.ComputeHash(inputBytes);
+
+            StringBuilder builder = new StringBuilder();
+
+            foreach (byte b in hashBytes)
             {
-                return true;
+                builder.Append(b.ToString("x2"));
             }
+
+            return builder.ToString();
         }
-
-        return false;
-    }
-
-    private bool recoveryKeyExists(string recoveryKey, List<PassKeyRecord> records)
-    {
-        foreach (PassKeyRecord record in records)
-        {
-            if (record.recoveryKey == recoveryKey)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public string getStoragePath()
     {
-        return passKeyStorage.getStoragePath();
+        return authDatabaseService.getAuthDatabasePath();
     }
 }

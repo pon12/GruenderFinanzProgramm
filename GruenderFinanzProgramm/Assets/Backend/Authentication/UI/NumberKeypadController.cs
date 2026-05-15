@@ -4,10 +4,12 @@ using UnityEngine;
 public class NumberKeypadController : MonoBehaviour
 {
     private TMP_InputField currentTargetInput;
+    private int currentMaxLength = 4;
 
-    public void setTargetInput(TMP_InputField inputField)
+    public void setTargetInput(TMP_InputField inputField, int maxLength)
     {
         currentTargetInput = inputField;
+        currentMaxLength = maxLength;
     }
 
     public void addDigit(string digit)
@@ -15,6 +17,11 @@ public class NumberKeypadController : MonoBehaviour
         if (currentTargetInput == null)
         {
             Debug.LogWarning("Kein Eingabefeld ausgewählt.");
+            return;
+        }
+
+        if (currentTargetInput.text.Length >= currentMaxLength)
+        {
             return;
         }
 
