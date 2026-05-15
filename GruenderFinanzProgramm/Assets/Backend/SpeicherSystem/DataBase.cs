@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public class DataBase : DatabaseManager
 {
 
@@ -91,11 +90,6 @@ public class DataBase : DatabaseManager
         return delete<Company>(companyId);
     }
 
-
-
-
-
-
 //Login/Auth
 
     public List<UserDB> findUsersByName(string name)
@@ -140,6 +134,7 @@ public List<Invoice> getAllInvoices() => getAll<Invoice>();
 public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
     query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
 public int createInvoiceItem(InvoiceItem item) => insert(item);
+
 // --- Angebote ---
 public int createOffer(Offer offer) => insert(offer);
 public int updateOffer(Offer offer) => update(offer);
@@ -150,5 +145,39 @@ public List<OfferItem> getItemsByOffer(int offerId) =>
 public int createOfferItem(OfferItem item) => insert(item);
 
 
+ // ---Customer---
 
+ 
+
+    public void setupCustomerTable()
+    {
+        createTable<Customer>();
+    }
+
+    public int createCustomer(Customer customer)
+    {
+        return insert(customer);
+    }
+
+    public List<Customer> getAllCustomers()
+    {
+        return getAll<Customer>();
+    }
+
+    // ---Services---
+
+    public void setupServiceTable()
+    {
+        createTable<Service>();
+    }
+
+    public int createService(Service service)
+    {
+        return insert(service);
+    }
+
+    public List<Service> getAllServices()
+    {
+        return getAll<Service>();
+    }
 }
