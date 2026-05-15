@@ -6,6 +6,7 @@ public class KeypadInputTarget : MonoBehaviour, IPointerClickHandler, ISelectHan
 {
     [SerializeField] private NumberKeypadController keypadController;
     [SerializeField] private int maxLength = 4;
+    [SerializeField] private bool allowKeyboardInput = false;
 
     private TMP_InputField inputField;
 
@@ -15,8 +16,14 @@ public class KeypadInputTarget : MonoBehaviour, IPointerClickHandler, ISelectHan
 
         if (inputField != null)
         {
-            inputField.readOnly = true;
             inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+
+            if (!allowKeyboardInput)
+            {
+                inputField.readOnly = true;
+            }
+
+            inputField.onValueChanged.AddListener(validateInput);
         }
     }
 
@@ -39,5 +46,33 @@ public class KeypadInputTarget : MonoBehaviour, IPointerClickHandler, ISelectHan
         }
 
         keypadController.setTargetInput(inputField, maxLength);
+    }
+
+    private void validateInput(string value)
+    {
+        if (inputField == null)
+        {
+            return;
+        }
+
+        string cleanedValue = "";
+
+        foreach (char c in value)
+        {
+            if (char.IsDigit(c))
+            {
+                cleanedValue += c;
+            }
+        }
+
+        if (cleanedValue.Length > maxLength)
+        {
+            cleanedValue = cleanedValue.Substring(0, maxLength);
+        }
+
+        if (inputField.text != cleanedValue)
+        {
+            inputField.text = cleanedValue;
+        }
     }
 }

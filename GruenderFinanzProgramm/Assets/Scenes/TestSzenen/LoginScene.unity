@@ -4831,7 +4831,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KeypadInputTarget
   keypadController: {fileID: 1257618693}
-  maxLength: 4
+  maxLength: 16
+  allowKeyboardInput: 1
 --- !u!1 &1257618692
 GameObject:
   m_ObjectHideFlags: 0
@@ -8819,6 +8820,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeypadInputTarget
   keypadController: {fileID: 1257618693}
   maxLength: 4
+  allowKeyboardInput: 0
 --- !u!1 &2069893164
 GameObject:
   m_ObjectHideFlags: 0

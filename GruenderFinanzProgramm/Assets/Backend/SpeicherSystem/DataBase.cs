@@ -5,15 +5,28 @@ public class DataBase : DatabaseManager
 {
 
     //Diese funktion ist hauptsächlich für testzwecke ihr könnt wenn ihr tables habt die nicht zur runtime erstellt werden hier einbauen.
-
+    // setupDatabase bleibt für alte Tests unverändert.
+    // AuthUserDB wird separat über setupAuthDatabase() erstellt.
     public void setupDatabase()
+    {
+        createTable<UserDB>();
+        createTable<Company>();
+
+    }
+
+    public void setupUserDatabase()
     {
         createTable<UserDB>();
         createTable<Company>();
     }
 
+    public void setupAuthDatabase()
+    {
+        createTable<AuthUserDB>();
+    }
 
-//User
+
+    //User
     public UserDB getUserById(int userId)
     {
         return getById<UserDB>(userId);
@@ -49,7 +62,7 @@ public class DataBase : DatabaseManager
 
 
 
-//Company
+    //Company
 
 
     public Company getCompanyById(int companyId)
@@ -63,24 +76,24 @@ public class DataBase : DatabaseManager
         return getAll<Company>();
     }
 
-   public int createCompany(string name, int legalForm, int industry, string location)
-{
-    Company newCompany = new Company
+    public int createCompany(string name, int legalForm, int industry, string location)
     {
-        name = name,
-        legalForm = legalForm,
-        industry = industry,
-        location = location
-    };
-    return insert(newCompany);
-}
+        Company newCompany = new Company
+        {
+            name = name,
+            legalForm = legalForm,
+            industry = industry,
+            location = location
+        };
+        return insert(newCompany);
+    }
 
     public int updateCompany(Company company)
     {
         return update(company);
     }
 
-  
+
     public int deleteCompany(int companyId)
     {
         return delete<Company>(companyId);
@@ -91,7 +104,7 @@ public class DataBase : DatabaseManager
 
 
 
-//Login/Auth
+    //Login/Auth
 
     public List<UserDB> findUsersByName(string name)
     {
@@ -118,4 +131,88 @@ public class DataBase : DatabaseManager
     {
         return query<Company>($"SELECT * FROM Company WHERE legalForm = {legalForm}");
     }
+
+
+    // Erweiterung durch Alex: 
+
+    public int createAuthUser(string userId, string username, string passKeyHash, string recoveryKeyHash, string databaseName)
+    {
+        AuthUserDB newAuthUser = new AuthUserDB
+        {
+            userId = userId,
+            username = username,
+            passKeyHash = passKeyHash,
+            recoveryKeyHash = recoveryKeyHash,
+            databaseName = databaseName
+        };
+
+        return insert(newAuthUser);
+    }
+
+    public List<AuthUserDB> getAllAuthUsers()
+    {
+        return getAll<AuthUserDB>();
+    }
+
+    public bool authUsernameExistsExact(string username)
+    {
+        List<AuthUserDB> users = getAllAuthUsers();
+
+        foreach (AuthUserDB user in users)
+        {
+            if (user.username == username)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public AuthUserDB getAuthUserByPassKeyHash(string passKeyHash)
+    {
+        List<AuthUserDB> users = getAllAuthUsers();
+
+        foreach (AuthUserDB user in users)
+        {
+            if (user.passKeyHash == passKeyHash)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    public AuthUserDB getAuthUserByRecoveryKeyHash(string recoveryKeyHash)
+    {
+        List<AuthUserDB> users = getAllAuthUsers();
+
+        foreach (AuthUserDB user in users)
+        {
+            if (user.recoveryKeyHash == recoveryKeyHash)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    public bool authPassKeyHashExists(string passKeyHash)
+    {
+        return getAuthUserByPassKeyHash(passKeyHash) != null;
+    }
+
+    public bool authRecoveryKeyHashExists(string recoveryKeyHash)
+    {
+        return getAuthUserByRecoveryKeyHash(recoveryKeyHash) != null;
+    }
+
+    public int updateAuthUserPassKeyHash(AuthUserDB user, string newPassKeyHash)
+    {
+        user.passKeyHash = newPassKeyHash;
+        return update(user);
+    }
+
 }

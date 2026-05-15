@@ -7,8 +7,26 @@ public class UserDB
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
-    
+
     public string name { get; set; }
+}
+
+// Erweiterung von Alex:
+[System.Serializable]
+public class AuthUserDB
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+
+    public string userId { get; set; }
+
+    public string username { get; set; }
+
+    public string passKeyHash { get; set; }
+
+    public string recoveryKeyHash { get; set; }
+
+    public string databaseName { get; set; }
 }
 
 [System.Serializable]
