@@ -45,7 +45,7 @@ public class AuthService
         Debug.Log("PassKey: " + passKey);
         Debug.Log("RecoveryKey: " + recoveryKey);
         Debug.Log("Nutzerdatenbank: " + databaseName);
-        Debug.Log("Hinweis: In der userAuthDB werden nur Hashwerte gespeichert.");
+        Debug.Log("Hinweis: In der userData.db werden nur Hashwerte gespeichert.");
         Debug.Log("Auth-Datenbank gespeichert unter: " + authDatabaseService.getAuthDatabasePath());
 
         return record;

@@ -241,10 +241,10 @@ Micha ist eingeloggt -> Daten werden in Micha.db gespeichert.
 Alex ist eingeloggt -> Daten werden in Alex.db gespeichert.
 
 
-Kurzfassung:
+Zusammengefasst:
 
-Das Frontend nutzt nur Controller-Funktionen.
-Das Frontend arbeitet nicht direkt mit Datenbanken.
+Frontend nutzt nur Controller-Funktionen.
+Frontend arbeitet nicht direkt mit Datenbanken.
 Die Registrierung läuft nur über den Nutzernamen.
 Der Login läuft nur über den PassKey.
 Auth-Daten liegen in userData.db.
