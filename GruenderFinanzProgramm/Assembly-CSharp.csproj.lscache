@@ -62,6 +62,12 @@ Assets/Backend/Authentication/DataBase/
  UserDatabaseService.cs
 Assets/Backend/Authentication/
  Interface/IUserRepository.cs
+ Password/
+  PasswordHashing.cs
+  Test/
+   PasswodCheckTest.cs
+   PasswordHashTestNew.cs
+   PasswordHashTestOld.cs
  Test/
   DummyUserRepository.cs
   UserDatabaseTestController.cs
@@ -81,6 +87,10 @@ Assets/Backend/
  Produkt/
   Produkt.cs
   ProduktManager.cs
+ RechnungenUndAngebote/
+  InvoiceAndOffer.cs
+  InvoicePdfExporter.cs
+  InvoicePDFTest.cs
  SpeicherSystem/
   DataBase.cs
   DataBaseManager.cs
@@ -90,6 +100,12 @@ Assets/Backend/
   SQLite.cs
   Testing/SaveTest1.cs
  UIManager.cs
+ Versionsnummer/
+  Test/TestVersionsnummer.cs
+  Versionsnummer.cs
+Assets/Frontend/
+ Interaktionscode/MainMenueManager.cs
+ Sidebar/SidebarController.cs
 Assets/TextMesh Pro/Examples & Extras/Scripts/
  Benchmark01.cs
  Benchmark01_UGUI.cs
@@ -390,6 +406,7 @@ Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 ../../../Program Files/Unity/Hub/Editor/6000.4.0f1/Editor/Data/NetStandard/
  Extensions/2.0.0/System.Runtime.InteropServices.WindowsRuntime.dll
  ref/2.1.0/netstandard.dll
+Assets/Plugins/iTextSharp/itextsharp.dll
 Library/PackageCache/com.unity.collections@538ace9075bc/
  Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll
  Unity.Collections.Tests/

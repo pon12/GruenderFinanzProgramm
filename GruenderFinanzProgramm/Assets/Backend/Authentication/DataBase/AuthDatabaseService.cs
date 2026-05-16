@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AuthDatabaseService
@@ -10,41 +11,51 @@ public class AuthDatabaseService
     public AuthDatabaseService()
     {
         authDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>(authDatabaseName);
-        authDatabase.setupAuthDatabase();
+        authDatabase.setupAuthDB();
 
         Debug.Log("Auth-Datenbank bereit: " + authDatabase.getDatabasePath());
     }
 
-
     public bool usernameExists(string username)
     {
-        return authDatabase.authUsernameExistsExact(username);
+        List<UserDB> users = authDatabase.getAllUsers();
+
+        foreach (UserDB user in users)
+        {
+            if (user.name == username)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public bool passKeyHashExists(string passKeyHash)
     {
-        return authDatabase.authPassKeyHashExists(passKeyHash);
+        return getUserDBByPassKeyHash(passKeyHash) != null;
     }
 
     public bool recoveryKeyHashExists(string recoveryKeyHash)
     {
-        return authDatabase.authRecoveryKeyHashExists(recoveryKeyHash);
+        return getUserDBByRecoveryKeyHash(recoveryKeyHash) != null;
     }
 
     public void createAuthUser(PassKeyRecord record)
     {
-        authDatabase.createAuthUser(
-            record.userId,
-            record.username,
-            record.passKeyHash,
-            record.recoveryKeyHash,
-            record.databaseName
-        );
+        UserDB newUser = new UserDB
+        {
+            name = record.username,
+            passKeyHash = record.passKeyHash,
+            recoveryPassKeyHash = record.recoveryKeyHash
+        };
+
+        authDatabase.insert(newUser);
     }
 
     public PassKeyRecord getUserByPassKeyHash(string passKeyHash)
     {
-        AuthUserDB user = authDatabase.getAuthUserByPassKeyHash(passKeyHash);
+        UserDB user = getUserDBByPassKeyHash(passKeyHash);
 
         if (user == null)
         {
@@ -56,7 +67,7 @@ public class AuthDatabaseService
 
     public PassKeyRecord getUserByRecoveryKeyHash(string recoveryKeyHash)
     {
-        AuthUserDB user = authDatabase.getAuthUserByRecoveryKeyHash(recoveryKeyHash);
+        UserDB user = getUserDBByRecoveryKeyHash(recoveryKeyHash);
 
         if (user == null)
         {
@@ -68,7 +79,7 @@ public class AuthDatabaseService
 
     public void updatePassKeyHash(PassKeyRecord record, string newPassKeyHash)
     {
-        AuthUserDB user = authDatabase.getAuthUserByRecoveryKeyHash(record.recoveryKeyHash);
+        UserDB user = getUserDBByRecoveryKeyHash(record.recoveryKeyHash);
 
         if (user == null)
         {
@@ -76,7 +87,8 @@ public class AuthDatabaseService
             return;
         }
 
-        authDatabase.updateAuthUserPassKeyHash(user, newPassKeyHash);
+        user.passKeyHash = newPassKeyHash;
+        authDatabase.updateUser(user);
     }
 
     public string createUserDatabase(string username)
@@ -84,7 +96,7 @@ public class AuthDatabaseService
         string databaseName = createSafeDatabaseName(username);
 
         DataBase userDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>(databaseName);
-        userDatabase.setupUserDatabase();
+        userDatabase.setupDatabase();
 
         Debug.Log("Nutzerdatenbank erstellt/bereit: " + userDatabase.getDatabasePath());
 
@@ -96,14 +108,44 @@ public class AuthDatabaseService
         return authDatabase.getDatabasePath();
     }
 
-    private PassKeyRecord convertToPassKeyRecord(AuthUserDB user)
+    private UserDB getUserDBByPassKeyHash(string passKeyHash)
+    {
+        List<UserDB> users = authDatabase.getAllUsers();
+
+        foreach (UserDB user in users)
+        {
+            if (user.passKeyHash == passKeyHash)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    private UserDB getUserDBByRecoveryKeyHash(string recoveryKeyHash)
+    {
+        List<UserDB> users = authDatabase.getAllUsers();
+
+        foreach (UserDB user in users)
+        {
+            if (user.recoveryPassKeyHash == recoveryKeyHash)
+            {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    private PassKeyRecord convertToPassKeyRecord(UserDB user)
     {
         return new PassKeyRecord(
-            user.userId,
-            user.username,
+            "user_" + user.id,
+            user.name,
             user.passKeyHash,
-            user.recoveryKeyHash,
-            user.databaseName
+            user.recoveryPassKeyHash,
+            user.name
         );
     }
 
