@@ -36,47 +36,23 @@
     border-top-color: rgb(128, 207, 149);
     border-bottom-color: rgb(128, 207, 149);
 }
-
-/* Grün ausgefüllter Kreis */
-.nav-item--active .unity-radio-button__checkmark-background {
-    background-color: rgb(128, 207, 149);
-    border-color: rgb(80, 180, 110);
-}
-
-/* Weißer Punkt in der Mitte */
-.nav-item--active .unity-radio-button__checkmark {
-    background-color: rgb(255, 255, 255);
-    width: 10px;
-    height: 10px;
-    border-top-left-radius: 50%;
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
-    border-bottom-left-radius: 50%;
-}
-
 .nav-item--active:hover {
     background-color: rgba(128, 207, 149, 0.28);
 }
-
-/* ── RadioButton Zentrierung ───────────────── */
-
-/* Das äußere RadioButton-Element zentrieren */
-.unity-radio-button {
-    justify-content: center;
-    align-items: center;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
+/* ── Icons ─────────────────────────────────── */
+.nav-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-left: 14px;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(180, 180, 180);
 }
-
-/* Den Kreis selbst horizontal zentrieren */
-.unity-radio-button__checkmark-background {
-    margin-left: auto;
-    margin-right: auto;
+/* Aktiver Zustand – Icon wird grün */
+.nav-item--active .nav-icon {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
 }
-
-/* Den Label-Teil des RadioButtons ausblenden (wir nutzen eigene Labels) */
-.unity-radio-button > .unity-label {
-    display: none;
+/* Hover – Icon wird weiß */
+.nav-item:hover .nav-icon {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
 }
