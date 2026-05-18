@@ -46,59 +46,92 @@ public class SaveTest1 : MonoBehaviour
             CreateCompaniesForUser(user.name, userDatabase);
         }
     }
-
-    private void CreateCompaniesForUser(string userName, DataBase userDatabase)
+private void CreateCompaniesForUser(string userName, DataBase userDatabase)
+{
+    if (userName == "Nutzer1")
     {
-        if (userName == "Nutzer1")
+        userDatabase.insert(new Company
         {
-            userDatabase.createCompany("Firma1", 1, 1, "Berlin1");
-            userDatabase.createCompany("Firma2", 2, 2, "Berlin2");
-        }
-        else if (userName == "Nutzer2")
+            name = "Firma1",
+            legalForm = 1, // GmbH
+            industry = 1,  // IT & Software
+            location = "Berlin1"
+        });
+
+        userDatabase.insert(new Company
         {
-            userDatabase.createCompany("Firma1-2", 1, 1, "Berlin1-2");
-            userDatabase.createCompany("Firma2-2", 2, 2, "Berlin2-2");
-        }
-        
-        Debug.Log($"Companies created for user: {userName}");
+            name = "Firma2",
+            legalForm = 3, // AG
+            industry = 2,  // Handel
+            location = "Berlin2"
+        });
     }
+    else if (userName == "Nutzer2")
+    {
+        userDatabase.insert(new Company
+        {
+            name = "Firma1-2",
+            legalForm = 2, // KG
+            industry = 3,  // Produktion
+            location = "Berlin1-2"
+        });
+
+        userDatabase.insert(new Company
+        {
+            name = "Firma2-2",
+            legalForm = 6, // UG
+            industry = 4,  // Dienstleistung
+            location = "Berlin2-2"
+        });
+    }
+
+    Debug.Log($"Companies created for user: {userName}");
+}
 
     private void RetrieveAndDisplayData()
+{
+    // Get all users from central userAuthDB
+    List<UserDB> allUsers = userAuthDB.getAllUsers();
+    Debug.Log($"\n========== TOTAL USERS: {allUsers.Count} ==========");
+
+    // Iterate through each user
+    foreach (UserDB user in allUsers)
     {
-        // Get all users from central userAuthDB
-        List<UserDB> allUsers = userAuthDB.getAllUsers();
-        Debug.Log($"\n========== TOTAL USERS: {allUsers.Count} ==========");
-        
-        // Iterate through each user
-        foreach (UserDB user in allUsers)
+        Debug.Log($"\n========== User: {user.name} ==========");
+
+        // Get the user's associated database
+        DataBase userDatabase = GlobalDatabaseManager.Instance.GetDatabase<DataBase>(user.name);
+
+        if (userDatabase != null)
         {
-            Debug.Log($"\n========== User: {user.name} ==========");
-            
-            // Get the user's associated database
-            DataBase userDatabase = GlobalDatabaseManager.Instance.GetDatabase<DataBase>(user.name);
-            
-            if (userDatabase != null)
+            // Get lookup values
+            string[] legalForms = userDatabase.getLookupValues("LegalForm");
+            string[] industries = userDatabase.getLookupValues("Industry");
+
+            // Get all companies
+            List<Company> userCompanies = userDatabase.getAll<Company>();
+
+            Debug.Log($"Companies count: {userCompanies.Count}");
+
+            foreach (Company company in userCompanies)
             {
-                // Get all companies from that user's database
-                List<Company> userCompanies = userDatabase.getAllCompanies();
-                Debug.Log($"Companies count: {userCompanies.Count}");
-                
-                foreach (Company company in userCompanies)
-                {
-                    Debug.Log("----------------------------------");
-                    Debug.Log($"ID: {company.id}");
-                    Debug.Log($"Name: {company.name}");
-                    Debug.Log($"Rechtsform: {company.LegalFormName}");
-                    Debug.Log($"Branche: {company.IndustryName}");
-                    Debug.Log($"Standort: {company.location}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Database not found for user: {user.name}");
+                Debug.Log("----------------------------------");
+                Debug.Log($"ID: {company.id}");
+                Debug.Log($"Name: {company.name}");
+
+                Debug.Log($"Rechtsform: {legalForms[company.legalForm - 1]}");
+
+                Debug.Log($"Branche: {industries[company.industry - 1]}");
+
+                Debug.Log($"Standort: {company.location}");
             }
         }
+        else
+        {
+            Debug.LogWarning($"Database not found for user: {user.name}");
+        }
     }
+}
 
     private void OnDestroy()
     {

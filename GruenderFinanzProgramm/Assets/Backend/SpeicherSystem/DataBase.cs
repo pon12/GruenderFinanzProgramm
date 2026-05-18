@@ -55,40 +55,8 @@ public class DataBase : DatabaseManager
 
 //Company
 
-
-    public Company getCompanyById(int companyId)
-    {
-        return getById<Company>(companyId);
-    }
-
-
-    public List<Company> getAllCompanies()
-    {
-        return getAll<Company>();
-    }
-
-   public int createCompany(string name, int legalForm, int industry, string location)
-{
-    Company newCompany = new Company
-    {
-        name = name,
-        legalForm = legalForm,
-        industry = industry,
-        location = location
-    };
-    return insert(newCompany);
-}
-
-    public int updateCompany(Company company)
-    {
-        return update(company);
-    }
-
-  
-    public int deleteCompany(int companyId)
-    {
-        return delete<Company>(companyId);
-    }
+public int legalForm { get; set; }
+public int industry { get; set; }
 
 //Login/Auth
 
@@ -108,10 +76,6 @@ public class DataBase : DatabaseManager
     {
         return query<UserDB>("SELECT * FROM UserDB WHERE isLoggedIn = 1");
     }
-
-
-
-
 
     public List<Company> getCompaniesByLegalForm(int legalForm)
     {
@@ -146,9 +110,6 @@ public int createOfferItem(OfferItem item) => insert(item);
 
 
  // ---Customer---
-
- 
-
     public void setupCustomerTable()
     {
         createTable<Customer>();
@@ -180,4 +141,31 @@ public int createOfferItem(OfferItem item) => insert(item);
     {
         return getAll<Service>();
     }
+
+// --- Lookup (Allgemeine Nachschlagetabelle) --- 
+
+public void setupLookupTable()
+{
+    createTable<LookupEntry>();
+}
+public int createLookupEntry(string category, string value)
+{
+    return insert(new LookupEntry { category = category, value = value });
+}
+public string[] getLookupValues(string category)
+{
+    var results = query<LookupEntry>(
+        $"SELECT * FROM LookupEntry WHERE category = '{category}'"
+    );
+    string[] output = new string[results.Count];
+    for (int i = 0; i < results.Count; i++)
+        output[i] = results[i].value;
+    return output;
+}
+public int deleteLookupEntry(int id)
+{
+    return delete<LookupEntry>(id);
+}
+
+
 }
