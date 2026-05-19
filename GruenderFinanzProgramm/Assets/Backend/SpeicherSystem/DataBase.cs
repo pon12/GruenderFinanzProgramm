@@ -50,13 +50,34 @@ public class DataBase : DatabaseManager
     {
         return delete<UserDB>(userId);
     }
-
-
-
 //Company
-
-public int legalForm { get; set; }
-public int industry { get; set; }
+public Company getCompanyById(int companyId)
+{
+    return getById<Company>(companyId);
+}
+public List<Company> getAllCompanies()
+{
+    return getAll<Company>();
+}
+public int createCompany(string name, int legalForm, int industry, string location)
+{
+    Company newCompany = new Company
+    {
+        name = name,
+        legalForm = legalForm,
+        industry = industry,
+        location = location
+    };
+    return insert(newCompany);
+}
+public int updateCompany(Company company)
+{
+    return update(company);
+}
+public int deleteCompany(int companyId)
+{
+    return delete<Company>(companyId);
+}
 
 //Login/Auth
 
