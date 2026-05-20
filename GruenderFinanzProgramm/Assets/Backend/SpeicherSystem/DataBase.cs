@@ -7,6 +7,8 @@ public class DataBase : DatabaseManager
     {
         //createTable<UserDB>();
         createTable<Company>();
+        createTable<Customer>();
+        createTable<Service>();
     }
 
     public void setupAuthDB()
@@ -15,7 +17,7 @@ public class DataBase : DatabaseManager
     }
 
 
-//User Auth DB
+    //User Auth DB
     public UserDB getUserById(int userId)
     {
         return getById<UserDB>(userId);
@@ -53,7 +55,7 @@ public class DataBase : DatabaseManager
 
 
 
-//Company
+    //Company
 
 
     public Company getCompanyById(int companyId)
@@ -67,30 +69,30 @@ public class DataBase : DatabaseManager
         return getAll<Company>();
     }
 
-   public int createCompany(string name, int legalForm, int industry, string location)
-{
-    Company newCompany = new Company
+    public int createCompany(string name, int legalForm, int industry, string location)
     {
-        name = name,
-        legalForm = legalForm,
-        industry = industry,
-        location = location
-    };
-    return insert(newCompany);
-}
+        Company newCompany = new Company
+        {
+            name = name,
+            legalForm = legalForm,
+            industry = industry,
+            location = location
+        };
+        return insert(newCompany);
+    }
 
     public int updateCompany(Company company)
     {
         return update(company);
     }
 
-  
+
     public int deleteCompany(int companyId)
     {
         return delete<Company>(companyId);
     }
 
-//Login/Auth
+    //Login/Auth
 
     public List<UserDB> findUsersByName(string name)
     {
@@ -118,36 +120,36 @@ public class DataBase : DatabaseManager
         return query<Company>($"SELECT * FROM Company WHERE legalForm = {legalForm}");
     }
 
-// Tabellen anlegen
-public void setupInvoiceAndOfferTables()
-{
-    createTable<Invoice>();
-    createTable<InvoiceItem>();
-    createTable<Offer>();
-    createTable<OfferItem>();
-}
-// --- Rechnungen ---
-public int createInvoice(Invoice invoice) => insert(invoice);
-public int updateInvoice(Invoice invoice) => update(invoice);
-public int deleteInvoice(int id) => delete<Invoice>(id);
-public List<Invoice> getAllInvoices() => getAll<Invoice>();
-public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
-    query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
-public int createInvoiceItem(InvoiceItem item) => insert(item);
+    // Tabellen anlegen
+    public void setupInvoiceAndOfferTables()
+    {
+        createTable<Invoice>();
+        createTable<InvoiceItem>();
+        createTable<Offer>();
+        createTable<OfferItem>();
+    }
+    // --- Rechnungen ---
+    public int createInvoice(Invoice invoice) => insert(invoice);
+    public int updateInvoice(Invoice invoice) => update(invoice);
+    public int deleteInvoice(int id) => delete<Invoice>(id);
+    public List<Invoice> getAllInvoices() => getAll<Invoice>();
+    public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
+        query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
+    public int createInvoiceItem(InvoiceItem item) => insert(item);
 
-// --- Angebote ---
-public int createOffer(Offer offer) => insert(offer);
-public int updateOffer(Offer offer) => update(offer);
-public int deleteOffer(int id) => delete<Offer>(id);
-public List<Offer> getAllOffers() => getAll<Offer>();
-public List<OfferItem> getItemsByOffer(int offerId) =>
-    query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
-public int createOfferItem(OfferItem item) => insert(item);
+    // --- Angebote ---
+    public int createOffer(Offer offer) => insert(offer);
+    public int updateOffer(Offer offer) => update(offer);
+    public int deleteOffer(int id) => delete<Offer>(id);
+    public List<Offer> getAllOffers() => getAll<Offer>();
+    public List<OfferItem> getItemsByOffer(int offerId) =>
+        query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
+    public int createOfferItem(OfferItem item) => insert(item);
 
 
- // ---Customer---
+    // ---Customer---
 
- 
+
 
     public void setupCustomerTable()
     {
