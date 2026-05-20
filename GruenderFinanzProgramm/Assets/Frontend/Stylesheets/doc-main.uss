@@ -1,0 +1,119 @@
+/* ==========================================================================
+   HEADER AREA (Top Bar)
+   ========================================================================= */
+
+/* Der Hauptcontainer, der den Text links und den Button rechts trennt */
+.header-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px 20px 40px; /* Großzügiger Abstand nach oben und den Seiten */
+    width: 100%;
+}
+
+/* Container nur für die beiden Labels auf der linken Seite */
+.left-text-group {
+    flex-direction: column;
+}
+
+/* Das große Haupt-Label "Dokumente" */
+.header-title {
+    color: #ffffff;
+    font-size: 32px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+/* Das kleinere Sub-Label für die Beschreibung */
+.header-subtitle {
+    color: #888888; /* Schönes Hellgrau/Dunkelgrau für den Untertext */
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   CREATE BUTTON (Grüner Aktions-Button)
+   ========================================================================= */
+
+.create-button {
+    background-color: #5ccb82; /* Das frische Grün aus deinem Design */
+    color: #ffffff;
+    font-size: 16px;
+    -unity-font-style: bold;
+    padding: 12px 24px; /* Macht den Button schön griffig */
+    border-radius: 12px; /* Abgerundete Ecken wie im Mockup */
+    border-width: 0; /* Entfernt den hässlichen Standard-Unity-Rand */
+    transition-property: background-color, scale;
+    transition-duration: 0.1s;
+}
+
+/* Hover-Effekt: Wird leicht dunkler, wenn man mit der Maus drüberfährt */
+.create-button:hover {
+    background-color: #4bba71;
+    cursor: link;
+}
+
+/* Active-Effekt: Drückt sich ganz leicht ein beim Klicken */
+.create-button:active {
+    scale: 0.96;
+}
+
+/* ==========================================================================
+   MAIN DASHBOARD LAYOUT
+   ========================================================================== */
+
+/* Der Container, der die dynamischen Karten hält */
+.grid-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   CATEGORY CARD TEMPLATE (Die Master-Kacheln)
+   ========================================================================== */
+
+/* Die große Dokumenten-Hauptkarte */
+.category-card {
+    width: 31%; 
+    background-color: #0b0b0c; 
+    border-radius: 16px;
+    padding: 16px; /* Außenrand */
+    margin-bottom: 24px;
+    
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+    /* Unity versteht gap zum Glück perfekt! */
+    gap: 16px; /* 16px Lücke genau wie der Außenrand */
+}
+
+/* Die 4 inneren Kacheln */
+.sub-tile {
+    /* DER TRICK: Keine feste Prozentbreite mehr! */
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 40%; /* Sorgt dafür, dass trotzdem nur 2 nebeneinander passen */
+    
+    aspect-ratio: 1; 
+    background-color: #383838; 
+    border-radius: 12px;
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Spezielles Styling für das große Plus-Label unten rechts */
+.plus-button-text {
+    font-size: 36px;
+    color: #ffffff;
+    -unity-font-style: bold;
+    opacity: 0.7;
+}
+
+/* Optional: Ein cooler Hover-Effekt für den Plus-Button */
+.sub-tile:hover .plus-button-text {
+    opacity: 1;
+    scale: 1.1;
+}

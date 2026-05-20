@@ -1,0 +1,6 @@
+#cards-grid {
+    flex-direction: row;
+    flex-wrap: wrap; /* Erlaubt das Umbrechen in die nächste Zeile */
+    justify-content: space-between; /* Verteilt die 3 Kacheln gleichmäßig */
+    margin-top: 30px;
+}
