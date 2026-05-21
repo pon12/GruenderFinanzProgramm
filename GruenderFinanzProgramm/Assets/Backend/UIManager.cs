@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject userMenuPanel;
     // [SerializeField] private GameObject zukuenftigeErweiterungenPanel;
 
+    [SerializeField] private GameObject CompanyTestPanel;
+
     private void Start()
     {
         showMainMenu();
@@ -20,6 +22,7 @@ public class UIManager : MonoBehaviour
         mainMenuPanel.SetActive(false);
         userMenuPanel.SetActive(false);
         // zukuenftigeErweiterungenPanel.SetActive(false);
+        CompanyTestPanel.SetActive(false);
 
     }
 
@@ -33,6 +36,12 @@ public class UIManager : MonoBehaviour
     {
         hideAllMenus();
         userMenuPanel.SetActive(true);
+    }
+
+    public void showCompanyTestPanel()
+    {
+        hideAllMenus();
+        CompanyTestPanel.SetActive(true);
     }
 
     /*

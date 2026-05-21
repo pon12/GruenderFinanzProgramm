@@ -54,10 +54,12 @@ Assets/Backend/Authentication/Core/
  AuthService.cs
  MainLogoutController.cs
  PassKeyRecord.cs
+ StartUpChecker.cs
  StateManager.cs
  User.cs
 Assets/Backend/Authentication/DataBase/
  AuthDatabaseService.cs
+ UserDatabaseAccess.cs
  UserDatabaseRouter.cs
  UserDatabaseService.cs
 Assets/Backend/Authentication/
@@ -70,6 +72,7 @@ Assets/Backend/Authentication/
    PasswordHashTestOld.cs
  Test/
   DummyUserRepository.cs
+  UserDatabaseAccessTest.cs
   UserDatabaseTestController.cs
  UI/
   AuthPanelController.cs
@@ -80,6 +83,7 @@ Assets/Backend/
  CodeTest.cs
  Firmenregistrierung/Firmenregistrierung.cs
  Formeln/Kostenrechnung.cs
+ FrontendAccess/CompanyFrontendController.cs
  Klassen/
   Finanzen.cs
   Unternehmen.cs
