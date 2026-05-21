@@ -26,3 +26,18 @@
     font-size: 14px;
     color: var(--primary-color);
 }
+
+.table-header{
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    width: 100%;
+}
+
+.table-row {
+    flex-direction: row;
+    align-items: center;
+    border-bottom-width: 1px;
+    border-color: rgb(80, 80, 80);
+}

@@ -62,19 +62,34 @@
                 <ui:Label text="8€" name="balanceLabel" class="balance" style="color: rgb(128, 207, 149); font-size: 48px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: upper-center;"/>
                 <ui:Label text="Letzte Aktualisierung: 02.02.2222" class="update-label" style="color: rgb(255, 255, 255); font-size: 24px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: upper-center;"/>
             </ui:VisualElement>
-            <ui:VisualElement class="grid-container" style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement class="table-header grid-item col-8" style="width: 276px; align-self: stretch;">
-                    <ui:Label text="Name &amp; Verwendungszweck" class="col"/>
-                    <ui:Label text="Buchungstag" class="col"/>
-                    <ui:Label text="Betrag" class="col"/>
-                    <ui:Label text="Einnahme/Ausgabe" class="col"/>
-                    <ui:Label text="" class="col-action"/>
+            <ui:VisualElement class="button-row grid-item col-3" style="width: auto; align-self: center; flex-direction: row;">
+                <ui:Button text="Ausgaben hinzufügen" name="btnAusgaben" class="btn-red" style="background-color: rgb(250, 0, 0); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                <ui:Button text="Einnahmen hinzufügen" name="btnEinnahmen" class="btn-green" style="background-color: rgb(128, 207, 149); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="table-wrapper" style="flex-grow: 1; flex-direction: column; border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;">
+                <ui:VisualElement name="Table-Header" class="table-header-text" style="flex-direction: row; width: 100%; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; background-color: rgb(91, 91, 91); border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                    <ui:Label text="Name &amp; Verwendungszweck" name="" class="col col-name" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;"/>
+                    <ui:Label text="Buchungstag" class="col col-datum" style="color: rgb(255, 255, 255); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                    <ui:Label text="Betrag" class="col col-betrag" style="color: rgb(255, 255, 255); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                    <ui:Label text="Einnahme/Ausgabe" class="col col-typ" style="color: rgb(255, 255, 255); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                    <ui:Label text="" class="col col-action" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 7px; padding-right: 7px; padding-bottom: 7px; padding-left: 7px;"/>
                 </ui:VisualElement>
-                <ui:ScrollView name="tableBody" class="table-body"/>
-                <ui:VisualElement class="button-row grid-item col-3" style="width: auto; align-self: stretch;">
-                    <ui:Button text="Ausgaben hinzufügen" name="btnAusgaben" class="btn-red"/>
-                    <ui:Button text="Einnahmen hinzufügen" name="btnEinnahmen" class="btn-green"/>
-                </ui:VisualElement>
+                <ui:ScrollView name="tableBody" class="table-body" style="flex-grow: 1;">
+                    <ui:VisualElement class="table-row" style="flex-direction: row; align-items: center; height: 60px; border-bottom-width: 1px; border-color: rgb(80, 80, 80); background-color: rgb(0, 0, 0);">
+                        <ui:Label text="Beispiel 1" class="col col-name" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="02.02.2020" class="col col-datum" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="+200 €" class="col col-betrag" style="color: rgb(128, 207, 149); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="Einnahme" class="col col-typ" style="color: rgb(255, 255, 255); padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                        <ui:Button text="Bearbeiten" class="col col-action btn-edit"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="" class="table-row" style="flex-direction: row; align-items: center; height: 60px; background-color: rgb(0, 0, 0);">
+                        <ui:Label text="Beispiel 2" class="col col-name" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="02.02.2020" class="col col-datum" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="-150 €" class="col col-betrag" style="color: rgb(207, 74, 74); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Label text="Ausgabe" class="col col-typ" style="color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+                        <ui:Button text="Bearbeiten" class="col col-action btn-edit"/>
+                    </ui:VisualElement>
+                </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
