@@ -13,7 +13,7 @@ public class TestKassenbuch : MonoBehaviour
 
         Debug.Log("Totales Einkommen: " + kassenbuch.berechneTotalesEinkommen());
         Debug.Log("Totale Ausgaben: " + kassenbuch.berechneTotaleAusgaben());
-        Debug.Log("Differenz: " + kassenbuch.berechneDifferenz());
+        Debug.Log("Differenz: " + kassenbuch.berechneDifferenz(kassenbuch.berechneTotalesEinkommen(), kassenbuch.berechneTotaleAusgaben()));
 
     // Teste die Beschreibungen der Einträge
     Dictionary<string, string> descriptions = new Dictionary<string, string>();

@@ -188,5 +188,41 @@ public int deleteLookupEntry(int id)
     return delete<LookupEntry>(id);
 }
 
+  
+    //Kassenbuch
+
+    public void setupKassenbuchTable()
+    {
+        createTable<Einkommen>();
+        createTable<Ausgaben>();
+    }
+
+    public int createEinkommen(float amount, string description)
+    {
+        return insert(new Einkommen { Amount = amount, Description = description });
+    }
+
+    public int createAusgaben(float amount, string description)
+    {
+        return insert(new Ausgaben { Amount = amount, Description = description });
+    }
+
+    public List<Einkommen> getAllEinkommenEntries()
+    {
+        return getAll<Einkommen>();
+    }
+    public List<Ausgaben> getAllAusgabenEntries()
+    {
+        return getAll<Ausgaben>();
+    }
+    
+    public int deleteEinkommen(int id)
+    {
+        return delete<Einkommen>(id);
+    }
+    public int deleteAusgaben(int id)
+    {
+        return delete<Ausgaben>(id);
+    }
 
 }

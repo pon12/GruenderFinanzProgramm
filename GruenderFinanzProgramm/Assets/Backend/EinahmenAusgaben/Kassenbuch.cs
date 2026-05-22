@@ -1,57 +1,66 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using SQLite4Unity3d;
 
 public class Kassenbuch
 {
-    public List<EinkommenEntry> einkommenEntries;
-    public List<AusgabenEntry> ausgabenEntries;
+    public List<Einkommen> einkommenEntries;
+    public List<Ausgaben> ausgabenEntries;
 
     public Kassenbuch()
     {
-        einkommenEntries = new List<EinkommenEntry>();
-        ausgabenEntries = new List<AusgabenEntry>();
+        einkommenEntries = new List<Einkommen>();
+        ausgabenEntries = new List<Ausgaben>();
     }
 
     // Methode zum Hinzufügen einer Einnahme
     public void addEinkommen(float amount, string description)
     {
-        var einkommenEntry = new EinkommenEntry { Amount = amount, Description = description };
+        var einkommenEntry = new Einkommen   { Amount = amount, Description = description };
         einkommenEntries.Add(einkommenEntry);
     }
 
     // Methode zum Hinzufügen einer Ausgabe
     public void addAusgabe(float amount, string description)
     {
-        var ausgabenEntry = new AusgabenEntry { Amount = amount, Description = description };
+        var ausgabenEntry = new Ausgaben { Amount = amount, Description = description };
         ausgabenEntries.Add(ausgabenEntry);
     }
 
     // Methode zum Berechnen der Gesamteinnahmen, Gesamtausgaben und Differenz
     public float berechneTotalesEinkommen()
     {
-        return einkommenEntries.Sum(e => e.Amount);
+        float totalEinkommen = einkommenEntries.Sum(e => e.Amount);
+        return totalEinkommen;
     }
 
     public float berechneTotaleAusgaben()
     {
-        return ausgabenEntries.Sum(e => e.Amount);
+        float totalAusgaben = ausgabenEntries.Sum(e => e.Amount);
+        return totalAusgaben;
     }
 
-    public float berechneDifferenz()
+    public float berechneDifferenzAuto()
     {
-        return berechneTotalesEinkommen() - berechneTotaleAusgaben();
+        float totalEinkommen = berechneTotalesEinkommen();
+        float totalAusgaben = berechneTotaleAusgaben();
+        return totalEinkommen - totalAusgaben;
     }
-}
 
-public class EinkommenEntry
-{
-    public float Amount { get; set; }
-    public string Description { get; set; }
-}
+    public float berechneDifferenz(float totalEinkommen, float totalAusgaben)
+    {
+        return totalEinkommen - totalAusgaben;
+    }
 
-public class AusgabenEntry
-{
-    public float Amount { get; set; }
-    public string Description { get; set; }
+    public List<Einkommen> getEinkommenEntries()
+    {
+    return einkommenEntries;
+    }
+
+    public List<Ausgaben> getAusgabenEntries()
+    {
+    return ausgabenEntries;
+    }
+    
 }
