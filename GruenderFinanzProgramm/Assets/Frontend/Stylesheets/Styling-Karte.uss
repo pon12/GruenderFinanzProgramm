@@ -1,0 +1,24 @@
+/* Die Hauptkachel */
+.category-card {
+    width: 32%; /* So passen exakt 3 Kacheln nebeneinander */
+    height: 220px; /* Feste Höhe für die Kachel */
+    background-color: #0c0c0c; /* Sehr dunkles, fast schwarzes Grau */
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 24px;
+    
+    /* Das innere 2x2 System */
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between; /* Verteilt die Reihen nach oben und unten */
+}
+
+/* Die 4 inneren Quadranten-Boxen */
+.card-quadrant {
+    width: 48%;
+    height: 48%;
+    background-color: #1a1a1a; /* Etwas helleres Grau für die inneren Boxen */
+    border-radius: 12px;
+    padding: 8px;
+}
