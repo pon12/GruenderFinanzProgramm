@@ -26,3 +26,74 @@
     font-size: 14px;
     color: var(--primary-color);
 }
+
+.table-header {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    width: 100%;
+}
+
+
+
+.table-row {
+    width: 100%;
+    border-color: #505050;
+    border-bottom-width: 2px;
+}
+
+.col-name {
+    width: 30%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-datum {
+    width: 20%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-betrag {
+    width: 20%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-typ {
+    width: 18%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-action {
+    width: 10%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.unity-scroll-view__horizontal-scroller {
+    display: none;
+}
+
+.unity-scroll-view__vertical-scroller {
+    width: 2%;
+    background-color: rgb(60, 60, 60);
+    border-radius: 4px;
+}
+
+.unity-scroller--vertical .unity-base-slider__dragger {
+    background-color: rgb(128, 207, 149);
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+.unity-scroller--vertical .unity-base-slider__tracker {
+    background-color: rgb(40, 40, 40);
+}
