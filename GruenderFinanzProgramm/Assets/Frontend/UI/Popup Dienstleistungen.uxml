@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="popup-backdrop" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center;">
+
+        <ui:VisualElement name="popup-box" class="p-3" style="width: 700px; background-color: rgb(12, 12, 12); border-radius: 24px; border-width: 1px; border-color: rgb(45, 45, 45);">
+
+            <ui:VisualElement class="mb-2" style="flex-direction: row; align-items: center;">
+                <ui:VisualElement name="popup-icon" style="width: 54px; height: 54px; background-color: rgb(128, 207, 149); border-radius: 16px; flex-shrink: 0;"></ui:VisualElement>
+                <ui:Label name="popup-titel" text="Beratung" class="ml-2" style="font-size: 34px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold');"></ui:Label>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="mb-2" style="height: 1px; background-color: rgb(50, 50, 50);"></ui:VisualElement>
+
+            <ui:Label text="Beschreibung" class="mb-1" style="font-size: 18px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold');"></ui:Label>
+            <ui:TextField name="feld-beschreibung" multiline="true" class="mb-2" style="background-color: rgb(36, 36, 36); border-radius: 12px; color: rgb(255, 255, 255); font-size: 15px; height: 75px; padding: 12px; border-width: 0; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:TextField>
+
+            <ui:VisualElement class="mb-2" style="height: 1px; background-color: rgb(50, 50, 50);"></ui:VisualElement>
+
+            <ui:Label text="Detailbeschreibung" class="mb-1" style="font-size: 18px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold');"></ui:Label>
+            <ui:TextField name="feld-detailbeschreibung" multiline="true" class="mb-3" style="background-color: rgb(36, 36, 36); border-radius: 12px; color: rgb(255, 255, 255); font-size: 15px; height: 110px; padding: 12px; border-width: 0; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:TextField>
+
+            <ui:VisualElement class="mb-2" style="height: 1px; background-color: rgb(50, 50, 50);"></ui:VisualElement>
+
+            <ui:VisualElement class="grid-container" style="justify-content: space-between; align-items: center; flex-direction: row;">
+                
+                <ui:VisualElement class="col-6">
+                    <ui:Label text="Preismodell" class="mb-1" style="font-size: 14px; color: rgb(185, 185, 185); -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:Label>
+                    <ui:DropdownField name="feld-preismodell" choices="Festpreis,Stundensatz,Pauschal" index="0" class="mb-2" style="background-color: rgb(48, 48, 48); border-radius: 12px; color: rgb(255, 255, 255); font-size: 15px; height: 42px; border-width: 0;"></ui:DropdownField>
+
+                    <ui:Label text="Betrag" class="mb-1" style="font-size: 14px; color: rgb(185, 185, 185); -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:Label>
+                    <ui:TextField name="feld-betrag" class="mb-2" style="background-color: rgb(48, 48, 48); border-radius: 12px; color: rgb(255, 255, 255); font-size: 15px; height: 42px; padding-left: 12px; border-width: 0; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:TextField>
+
+                    <ui:Label text="Anzahl" class="mb-1" style="font-size: 14px; color: rgb(185, 185, 185); -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:Label>
+                    <ui:TextField name="feld-anzahl" style="background-color: rgb(48, 48, 48); border-radius: 12px; color: rgb(255, 255, 255); font-size: 15px; height: 42px; padding-left: 12px; border-width: 0; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular');"></ui:TextField>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="col-6" style="align-items: flex-end; justify-content: center; padding-top: 20px;">
+                    <ui:Button name="btn-fertig" text="Fertig" style="background-color: rgb(128, 207, 149); border-radius: 16px; height: 56px; width: 85%; color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; border-width: 0; -unity-font-definition: url('project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold');"></ui:Button>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
