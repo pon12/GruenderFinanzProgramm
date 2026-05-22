@@ -5488,7 +5488,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PassKeyAuthController
   usernameInput: {fileID: 1655898211}
-  companyNameInput: {fileID: 1598363809}
   passKeyInput: {fileID: 2069059970}
   recoveryKeyInput: {fileID: 1253040988}
   registerResultText: {fileID: 1871543648}
