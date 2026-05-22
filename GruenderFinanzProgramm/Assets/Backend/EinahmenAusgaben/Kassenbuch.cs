@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class EiAu
+public class Kassenbuch
 {
     public List<EinkommenEntry> einkommenEntries;
     public List<AusgabenEntry> ausgabenEntries;
 
-    public EiAu()
+    public Kassenbuch()
     {
         einkommenEntries = new List<EinkommenEntry>();
         ausgabenEntries = new List<AusgabenEntry>();
