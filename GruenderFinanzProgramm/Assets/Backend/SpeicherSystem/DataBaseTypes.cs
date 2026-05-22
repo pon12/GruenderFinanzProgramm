@@ -1,5 +1,6 @@
 using SQLite4Unity3d;
 using System.Collections.Generic;
+using System;
 
 
 [System.Serializable]
@@ -7,7 +8,7 @@ public class UserDB
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
-    
+
     public string name { get; set; }
     public string passKeyHash { get; set; }
     public string recoveryPassKeyHash { get; set; }
@@ -46,4 +47,17 @@ public class Company
         (industry >= 0 && industry < Industries.Count)
             ? Industries[industry]
             : "Unbekannt";
+}
+
+[System.Serializable]
+public class UserDocument
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+
+    public int documentType { get; set; }
+
+    public string title { get; set; }
+
+    public string text { get; set; }
 }

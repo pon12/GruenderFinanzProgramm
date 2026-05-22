@@ -9,6 +9,7 @@ public class DataBase : DatabaseManager
         createTable<Company>();
         createTable<Customer>();
         createTable<Service>();
+        createTable<UserDocument>();
     }
 
     public void setupAuthDB()
@@ -182,4 +183,22 @@ public class DataBase : DatabaseManager
     {
         return getAll<Service>();
     }
+
+    public int createUserDocument(int documentType, string title, string text)
+    {
+        UserDocument document = new UserDocument
+        {
+            documentType = documentType,
+            title = title,
+            text = text
+        };
+
+        return insert(document);
+    }
+
+    public List<UserDocument> getAllUserDocuments()
+    {
+        return getAll<UserDocument>();
+    }
+
 }
