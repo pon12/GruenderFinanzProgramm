@@ -7,6 +7,9 @@ public class DataBase : DatabaseManager
     {
         //createTable<UserDB>();
         createTable<Company>();
+        createTable<Customer>();
+        createTable<Service>();
+        createTable<UserDocument>();
     }
 
     public void setupAuthDB()
@@ -223,6 +226,27 @@ public int deleteLookupEntry(int id)
     public int deleteAusgaben(int id)
     {
         return delete<Ausgaben>(id);
+    }
+
+
+
+
+    //Documents
+    public int createUserDocument(int documentType, string title, string text)
+    {
+        UserDocument document = new UserDocument
+        {
+            documentType = documentType,
+            title = title,
+            text = text
+        };
+
+        return insert(document);
+    }
+
+    public List<UserDocument> getAllUserDocuments()
+    {
+        return getAll<UserDocument>();
     }
 
 }
