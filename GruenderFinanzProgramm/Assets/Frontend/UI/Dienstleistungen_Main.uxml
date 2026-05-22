@@ -140,5 +140,8 @@
                 <ui:Label text="+" style="font-size: 80px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-text-align: middle-center; height: 241px;"/>
             </ui:Button>
         </ui:VisualElement>
+
+        <ui:VisualElement name="popup-root" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;"/>
+
     </ui:VisualElement>
 </ui:UXML>
