@@ -224,3 +224,7 @@
 
 .unity-label {
 }
+
+.pr-all {
+    padding: 16px;
+}

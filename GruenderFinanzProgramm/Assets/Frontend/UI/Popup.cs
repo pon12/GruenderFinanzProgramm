@@ -38,44 +38,37 @@ public class DienstleistungenScreenController : MonoBehaviour
     }
 
     private void OeffnePopup(string titel, string beschreibung,
-                              string detail, string preismodell,
-                              string betrag, string anzahl)
+                          string detail, string preismodell,
+                          string betrag, string anzahl)
+{
+    popupRoot.Clear();
+
+    var popup = popupAsset.Instantiate();
+
+    // Felder befüllen
+    popup.Q<Label>("popup-titel").text                  = titel;
+    popup.Q<TextField>("feld-beschreibung").value       = beschreibung;
+    popup.Q<TextField>("feld-detailbeschreibung").value = detail;
+    popup.Q<TextField>("feld-betrag").value             = betrag;
+    popup.Q<TextField>("feld-anzahl").value             = anzahl;
+    popup.Q<DropdownField>("feld-preismodell").value    = preismodell;
+
+    // Fertig-Button
+    popup.Q<Button>("btn-fertig").clicked += SchliessPopup;
+
+    // Klick auf Backdrop (außerhalb der Box) schließt Popup
+    popupRoot.RegisterCallback<ClickEvent>(evt =>
     {
-        // Alten Inhalt leeren und neu laden
-        popupRoot.Clear();
+        if (evt.target == popupRoot) SchliessPopup();
+    });
 
-        var popup = popupAsset.Instantiate();
-        var backdrop = popup.Q("popup-backdrop");
+    popupRoot.Add(popup);
+    popupRoot.style.display = DisplayStyle.Flex;
+}
 
-        // Felder befüllen
-        popup.Q<Label>("popup-titel").text                    = titel;
-        popup.Q<TextField>("feld-beschreibung").value         = beschreibung;
-        popup.Q<TextField>("feld-detailbeschreibung").value   = detail;
-        popup.Q<TextField>("feld-betrag").value               = betrag;
-        popup.Q<TextField>("feld-anzahl").value               = anzahl;
-
-        var dropdown = popup.Q<DropdownField>("feld-preismodell");
-        dropdown.value = preismodell;
-
-        // Fertig-Button
-        popup.Q<Button>("btn-fertig").clicked += () => SchliessPopup();
-
-        // Backdrop-Klick schließt Popup
-        backdrop.RegisterCallback<ClickEvent>(evt =>
-        {
-            if (evt.target == backdrop) SchliessPopup();
-        });
-
-        popupRoot.Add(popup);
-
-        // Anzeigen
-        popupRoot.style.display  = DisplayStyle.Flex;
-        backdrop.style.display   = DisplayStyle.Flex;
-    }
-
-    private void SchliessPopup()
-    {
-        popupRoot.style.display = DisplayStyle.None;
-        popupRoot.Clear();
-    }
+private void SchliessPopup()
+{
+    popupRoot.style.display = DisplayStyle.None;
+    popupRoot.Clear();
+}
 }

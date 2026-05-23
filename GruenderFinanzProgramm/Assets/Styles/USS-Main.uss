@@ -35,8 +35,6 @@
     width: 100%;
 }
 
-
-
 .table-row {
     width: 100%;
     border-color: #505050;
