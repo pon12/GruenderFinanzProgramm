@@ -133,7 +133,7 @@ public int deleteCompany(int companyId)
     public int createOfferItem(OfferItem item) => insert(item);
 
 
-    // --- Customer ---
+
 
  // ---Customer---
     public void setupCustomerTable()
