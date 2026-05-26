@@ -106,32 +106,34 @@ public int deleteCompany(int companyId)
         return query<Company>($"SELECT * FROM Company WHERE legalForm = {legalForm}");
     }
 
-// Tabellen anlegen
-public void setupInvoiceAndOfferTables()
-{
-    createTable<Invoice>();
-    createTable<InvoiceItem>();
-    createTable<Offer>();
-    createTable<OfferItem>();
-}
-// --- Rechnungen ---
-public int createInvoice(Invoice invoice) => insert(invoice);
-public int updateInvoice(Invoice invoice) => update(invoice);
-public int deleteInvoice(int id) => delete<Invoice>(id);
-public List<Invoice> getAllInvoices() => getAll<Invoice>();
-public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
-    query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
-public int createInvoiceItem(InvoiceItem item) => insert(item);
+    // Tabellen anlegen
+    public void setupInvoiceAndOfferTables()
+    {
+        createTable<Invoice>();
+        createTable<InvoiceItem>();
+        createTable<Offer>();
+        createTable<OfferItem>();
+    }
+    // --- Rechnungen ---
+    public int createInvoice(Invoice invoice) => insert(invoice);
+    public int updateInvoice(Invoice invoice) => update(invoice);
+    public int deleteInvoice(int id) => delete<Invoice>(id);
+    public List<Invoice> getAllInvoices() => getAll<Invoice>();
+    public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
+        query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
+    public int createInvoiceItem(InvoiceItem item) => insert(item);
 
-// --- Angebote ---
-public int createOffer(Offer offer) => insert(offer);
-public int updateOffer(Offer offer) => update(offer);
-public int deleteOffer(int id) => delete<Offer>(id);
-public List<Offer> getAllOffers() => getAll<Offer>();
-public List<OfferItem> getItemsByOffer(int offerId) =>
-    query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
-public int createOfferItem(OfferItem item) => insert(item);
+    // --- Angebote ---
+    public int createOffer(Offer offer) => insert(offer);
+    public int updateOffer(Offer offer) => update(offer);
+    public int deleteOffer(int id) => delete<Offer>(id);
+    public List<Offer> getAllOffers() => getAll<Offer>();
+    public List<OfferItem> getItemsByOffer(int offerId) =>
+        query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
+    public int createOfferItem(OfferItem item) => insert(item);
 
+
+    // --- Customer ---
 
  // ---Customer---
     public void setupCustomerTable()
@@ -141,6 +143,7 @@ public int createOfferItem(OfferItem item) => insert(item);
 
     public int createCustomer(Customer customer)
     {
+        customer.lastUpdated = System.DateTime.Now;
         return insert(customer);
     }
 
@@ -149,7 +152,24 @@ public int createOfferItem(OfferItem item) => insert(item);
         return getAll<Customer>();
     }
 
-    // ---Services---
+    public Customer getCustomerById(int customerId)
+    {
+        return getById<Customer>(customerId);
+    }
+
+    public int updateCustomer(Customer customer)
+    {
+        customer.lastUpdated = System.DateTime.Now;
+        return update(customer);
+    }
+
+    public int deleteCustomer(int customerId)
+    {
+        return delete<Customer>(customerId);
+    }
+
+
+    // --- Service ---
 
     public void setupServiceTable()
     {
@@ -158,6 +178,7 @@ public int createOfferItem(OfferItem item) => insert(item);
 
     public int createService(Service service)
     {
+        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -166,30 +187,48 @@ public int createOfferItem(OfferItem item) => insert(item);
         return getAll<Service>();
     }
 
-// --- Lookup (Allgemeine Nachschlagetabelle) --- 
+    public Service getServiceById(int serviceId)
+    {
+        return getById<Service>(serviceId);
+    }
 
-public void setupLookupTable()
-{
-    createTable<LookupEntry>();
-}
-public int createLookupEntry(string category, string value)
-{
-    return insert(new LookupEntry { category = category, value = value });
-}
-public string[] getLookupValues(string category)
-{
-    var results = query<LookupEntry>(
-        $"SELECT * FROM LookupEntry WHERE category = '{category}'"
-    );
-    string[] output = new string[results.Count];
-    for (int i = 0; i < results.Count; i++)
-        output[i] = results[i].value;
-    return output;
-}
-public int deleteLookupEntry(int id)
-{
-    return delete<LookupEntry>(id);
-}
+    public int updateService(Service service)
+    {
+        service.lastUpdated = System.DateTime.Now;
+        return update(service);
+    }
+
+    public int deleteService(int serviceId)
+    {
+        return delete<Service>(serviceId);
+    }
+
+
+
+    // --- Lookup (Allgemeine Nachschlagetabelle) --- 
+
+    public void setupLookupTable()
+    {
+        createTable<LookupEntry>();
+    }
+    public int createLookupEntry(string category, string value)
+    {
+        return insert(new LookupEntry { category = category, value = value });
+    }
+    public string[] getLookupValues(string category)
+    {
+        var results = query<LookupEntry>(
+            $"SELECT * FROM LookupEntry WHERE category = '{category}'"
+        );
+        string[] output = new string[results.Count];
+        for (int i = 0; i < results.Count; i++)
+            output[i] = results[i].value;
+        return output;
+    }
+    public int deleteLookupEntry(int id)
+    {
+        return delete<LookupEntry>(id);
+    }
 
   
     //Kassenbuch
