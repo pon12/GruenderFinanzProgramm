@@ -18,6 +18,10 @@ public class TestKassenbuchPon : MonoBehaviour
 
         deleteEntries();
 
+        calculatetotalEinkommen();
+
+        calculatetotalAusgaben();
+
         calculateDifference();
     }
 
@@ -58,12 +62,22 @@ public class TestKassenbuchPon : MonoBehaviour
     
     }
 
+    public void calculatetotalEinkommen()
+    {
+    float totalEinkommen = UserDatabaseAccess.getCurrentUserDatabase().getTotalEinkommen();
+    Debug.Log($"Das Gesamteinkommen beträgt: {totalEinkommen}");
+    }
+
+    public void calculatetotalAusgaben()
+    {
+    float totalAusgaben = UserDatabaseAccess.getCurrentUserDatabase().getTotalAusgaben();
+    Debug.Log($"Die Gesamtausgaben betragen: {totalAusgaben}");
+    }
+
+
     public float calculateDifference()
     {
-    float totalEinkommen = UserDatabaseAccess.getCurrentUserDatabase().getAllEinkommenEntries().Sum(e => e.Amount);
-    float totalAusgaben = UserDatabaseAccess.getCurrentUserDatabase().getAllAusgabenEntries().Sum(a => a.Amount);
-    float difference = totalEinkommen - totalAusgaben;
-
+    float difference = UserDatabaseAccess.getCurrentUserDatabase().getDifferenz();
     Debug.Log($"Die Differenz zwischen Gesamteinkommen und Gesamtausgaben beträgt: {difference}");
     return difference;
     }

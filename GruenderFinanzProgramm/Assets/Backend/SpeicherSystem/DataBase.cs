@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 public class DataBase : DatabaseManager
 {
 
@@ -267,6 +269,21 @@ public int deleteCompany(int companyId)
         return delete<Ausgaben>(id);
     }
 
+    public float getTotalEinkommen()
+    {
+        return getAllEinkommenEntries().Sum(e => e.Amount);
+    }
+
+    public float getTotalAusgaben()
+    {
+        return getAllAusgabenEntries().Sum(a => a.Amount);
+    }
+    public float getDifferenz()
+    {
+        return getTotalEinkommen() - getTotalAusgaben();
+    }
+
+
 
 
 
@@ -287,5 +304,8 @@ public int deleteCompany(int companyId)
     {
         return getAll<UserDocument>();
     }
+
+    
+    
 
 }
