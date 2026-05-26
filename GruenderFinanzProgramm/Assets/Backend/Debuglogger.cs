@@ -52,7 +52,7 @@ public class DebugLogger : MonoBehaviour
             File.WriteAllText(logFilePath, $"=== DebugLog gestartet: {DateTime.Now} ===\n\n");
             // Unity Log-Handler registrieren
             Application.logMessageReceived += HandleLog;
-            Debug.Log("✅ DebugLogger aktiv.");
+            Debug.Log("DebugLogger aktiv.");
         }
         else
         {
