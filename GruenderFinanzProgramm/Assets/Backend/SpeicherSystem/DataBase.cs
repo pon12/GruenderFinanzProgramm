@@ -148,9 +148,7 @@ public class DataBase : DatabaseManager
     public int createOfferItem(OfferItem item) => insert(item);
 
 
-    // ---Customer---
-
-
+    // --- Customer ---
 
     public void setupCustomerTable()
     {
@@ -159,6 +157,7 @@ public class DataBase : DatabaseManager
 
     public int createCustomer(Customer customer)
     {
+        customer.lastUpdated = System.DateTime.Now;
         return insert(customer);
     }
 
@@ -167,7 +166,24 @@ public class DataBase : DatabaseManager
         return getAll<Customer>();
     }
 
-    // ---Services---
+    public Customer getCustomerById(int customerId)
+    {
+        return getById<Customer>(customerId);
+    }
+
+    public int updateCustomer(Customer customer)
+    {
+        customer.lastUpdated = System.DateTime.Now;
+        return update(customer);
+    }
+
+    public int deleteCustomer(int customerId)
+    {
+        return delete<Customer>(customerId);
+    }
+
+
+    // --- Service ---
 
     public void setupServiceTable()
     {
@@ -176,6 +192,7 @@ public class DataBase : DatabaseManager
 
     public int createService(Service service)
     {
+        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -184,21 +201,19 @@ public class DataBase : DatabaseManager
         return getAll<Service>();
     }
 
-    public int createUserDocument(int documentType, string title, string text)
+    public Service getServiceById(int serviceId)
     {
-        UserDocument document = new UserDocument
-        {
-            documentType = documentType,
-            title = title,
-            text = text
-        };
-
-        return insert(document);
+        return getById<Service>(serviceId);
     }
 
-    public List<UserDocument> getAllUserDocuments()
+    public int updateService(Service service)
     {
-        return getAll<UserDocument>();
+        service.lastUpdated = System.DateTime.Now;
+        return update(service);
     }
 
+    public int deleteService(int serviceId)
+    {
+        return delete<Service>(serviceId);
+    }
 }
