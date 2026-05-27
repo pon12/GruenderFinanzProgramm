@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 public class DataBase : DatabaseManager
 {
 
@@ -7,6 +9,9 @@ public class DataBase : DatabaseManager
     {
         //createTable<UserDB>();
         createTable<Company>();
+        createTable<Customer>();
+        createTable<Service>();
+        createTable<UserDocument>();
     }
 
     public void setupAuthDB()
@@ -50,24 +55,16 @@ public class DataBase : DatabaseManager
     {
         return delete<UserDB>(userId);
     }
-
-
-
 //Company
-
-
-    public Company getCompanyById(int companyId)
-    {
-        return getById<Company>(companyId);
-    }
-
-
-    public List<Company> getAllCompanies()
-    {
-        return getAll<Company>();
-    }
-
-   public int createCompany(string name, int legalForm, int industry, string location)
+public Company getCompanyById(int companyId)
+{
+    return getById<Company>(companyId);
+}
+public List<Company> getAllCompanies()
+{
+    return getAll<Company>();
+}
+public int createCompany(string name, int legalForm, int industry, string location)
 {
     Company newCompany = new Company
     {
@@ -78,17 +75,14 @@ public class DataBase : DatabaseManager
     };
     return insert(newCompany);
 }
-
-    public int updateCompany(Company company)
-    {
-        return update(company);
-    }
-
-  
-    public int deleteCompany(int companyId)
-    {
-        return delete<Company>(companyId);
-    }
+public int updateCompany(Company company)
+{
+    return update(company);
+}
+public int deleteCompany(int companyId)
+{
+    return delete<Company>(companyId);
+}
 
 //Login/Auth
 
@@ -109,46 +103,41 @@ public class DataBase : DatabaseManager
         return query<UserDB>("SELECT * FROM UserDB WHERE isLoggedIn = 1");
     }
 
-
-
-
-
     public List<Company> getCompaniesByLegalForm(int legalForm)
     {
         return query<Company>($"SELECT * FROM Company WHERE legalForm = {legalForm}");
     }
 
-// Tabellen anlegen
-public void setupInvoiceAndOfferTables()
-{
-    createTable<Invoice>();
-    createTable<InvoiceItem>();
-    createTable<Offer>();
-    createTable<OfferItem>();
-}
-// --- Rechnungen ---
-public int createInvoice(Invoice invoice) => insert(invoice);
-public int updateInvoice(Invoice invoice) => update(invoice);
-public int deleteInvoice(int id) => delete<Invoice>(id);
-public List<Invoice> getAllInvoices() => getAll<Invoice>();
-public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
-    query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
-public int createInvoiceItem(InvoiceItem item) => insert(item);
+    // Tabellen anlegen
+    public void setupInvoiceAndOfferTables()
+    {
+        createTable<Invoice>();
+        createTable<InvoiceItem>();
+        createTable<Offer>();
+        createTable<OfferItem>();
+    }
+    // --- Rechnungen ---
+    public int createInvoice(Invoice invoice) => insert(invoice);
+    public int updateInvoice(Invoice invoice) => update(invoice);
+    public int deleteInvoice(int id) => delete<Invoice>(id);
+    public List<Invoice> getAllInvoices() => getAll<Invoice>();
+    public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
+        query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
+    public int createInvoiceItem(InvoiceItem item) => insert(item);
 
-// --- Angebote ---
-public int createOffer(Offer offer) => insert(offer);
-public int updateOffer(Offer offer) => update(offer);
-public int deleteOffer(int id) => delete<Offer>(id);
-public List<Offer> getAllOffers() => getAll<Offer>();
-public List<OfferItem> getItemsByOffer(int offerId) =>
-    query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
-public int createOfferItem(OfferItem item) => insert(item);
+    // --- Angebote ---
+    public int createOffer(Offer offer) => insert(offer);
+    public int updateOffer(Offer offer) => update(offer);
+    public int deleteOffer(int id) => delete<Offer>(id);
+    public List<Offer> getAllOffers() => getAll<Offer>();
+    public List<OfferItem> getItemsByOffer(int offerId) =>
+        query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
+    public int createOfferItem(OfferItem item) => insert(item);
+
+
 
 
  // ---Customer---
-
- 
-
     public void setupCustomerTable()
     {
         createTable<Customer>();
@@ -156,6 +145,7 @@ public int createOfferItem(OfferItem item) => insert(item);
 
     public int createCustomer(Customer customer)
     {
+        customer.lastUpdated = System.DateTime.Now;
         return insert(customer);
     }
 
@@ -164,7 +154,24 @@ public int createOfferItem(OfferItem item) => insert(item);
         return getAll<Customer>();
     }
 
-    // ---Services---
+    public Customer getCustomerById(int customerId)
+    {
+        return getById<Customer>(customerId);
+    }
+
+    public int updateCustomer(Customer customer)
+    {
+        customer.lastUpdated = System.DateTime.Now;
+        return update(customer);
+    }
+
+    public int deleteCustomer(int customerId)
+    {
+        return delete<Customer>(customerId);
+    }
+
+
+    // --- Service ---
 
     public void setupServiceTable()
     {
@@ -173,6 +180,7 @@ public int createOfferItem(OfferItem item) => insert(item);
 
     public int createService(Service service)
     {
+        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -180,4 +188,124 @@ public int createOfferItem(OfferItem item) => insert(item);
     {
         return getAll<Service>();
     }
+
+    public Service getServiceById(int serviceId)
+    {
+        return getById<Service>(serviceId);
+    }
+
+    public int updateService(Service service)
+    {
+        service.lastUpdated = System.DateTime.Now;
+        return update(service);
+    }
+
+    public int deleteService(int serviceId)
+    {
+        return delete<Service>(serviceId);
+    }
+
+
+
+    // --- Lookup (Allgemeine Nachschlagetabelle) --- 
+
+    public void setupLookupTable()
+    {
+        createTable<LookupEntry>();
+    }
+    public int createLookupEntry(string category, string value)
+    {
+        return insert(new LookupEntry { category = category, value = value });
+    }
+    public string[] getLookupValues(string category)
+    {
+        var results = query<LookupEntry>(
+            $"SELECT * FROM LookupEntry WHERE category = '{category}'"
+        );
+        string[] output = new string[results.Count];
+        for (int i = 0; i < results.Count; i++)
+            output[i] = results[i].value;
+        return output;
+    }
+    public int deleteLookupEntry(int id)
+    {
+        return delete<LookupEntry>(id);
+    }
+
+  
+    //Kassenbuch
+
+    public void setupKassenbuchTable()
+    {
+        createTable<Einkommen>();
+        createTable<Ausgaben>();
+    }
+
+    public int createEinkommen(float amount, string description)
+    {
+        return insert(new Einkommen { Amount = amount, Description = description });
+    }
+
+    public int createAusgaben(float amount, string description)
+    {
+        return insert(new Ausgaben { Amount = amount, Description = description });
+    }
+
+    public List<Einkommen> getAllEinkommenEntries()
+    {
+        return getAll<Einkommen>();
+    }
+    public List<Ausgaben> getAllAusgabenEntries()
+    {
+        return getAll<Ausgaben>();
+    }
+    
+    public int deleteEinkommen(int id)
+    {
+        return delete<Einkommen>(id);
+    }
+    public int deleteAusgaben(int id)
+    {
+        return delete<Ausgaben>(id);
+    }
+
+    public float getTotalEinkommen()
+    {
+        return getAllEinkommenEntries().Sum(e => e.Amount);
+    }
+
+    public float getTotalAusgaben()
+    {
+        return getAllAusgabenEntries().Sum(a => a.Amount);
+    }
+    public float getDifferenz()
+    {
+        return getTotalEinkommen() - getTotalAusgaben();
+    }
+
+
+
+
+
+    //Documents
+    public int createUserDocument(int documentType, string title, string text)
+    {
+        UserDocument document = new UserDocument
+        {
+            documentType = documentType,
+            title = title,
+            text = text
+        };
+
+        return insert(document);
+    }
+
+    public List<UserDocument> getAllUserDocuments()
+    {
+        return getAll<UserDocument>();
+    }
+
+    
+    
+
 }
