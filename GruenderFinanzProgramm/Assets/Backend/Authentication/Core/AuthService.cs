@@ -6,6 +6,9 @@ public class AuthService
 {
     private AuthDatabaseService authDatabaseService = new AuthDatabaseService();
 
+    public string passkeyGlobal;
+    public string recoveryPassKeyGlobal;
+
     public PassKeyRecord registerUser(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -23,7 +26,9 @@ public class AuthService
         string userId = "user_" + System.DateTime.Now.Ticks;
 
         string passKey = generateUniquePassKey();
+        passkeyGlobal = passKey;
         string recoveryKey = generateUniqueRecoveryKey();
+        recoveryPassKeyGlobal = recoveryKey;
 
         string passKeyHash = hashValue(passKey);
         string recoveryKeyHash = hashValue(recoveryKey);
@@ -58,6 +63,9 @@ public class AuthService
             Debug.LogError("Login fehlgeschlagen: Kein PassKey eingegeben.");
             return null;
         }
+
+        passkeyGlobal = "Kein Passkey Gespeichert";
+        recoveryPassKeyGlobal = "Kein Recovery Key Gespeichert";
 
         string enteredPassKeyHash = hashValue(enteredPassKey);
 

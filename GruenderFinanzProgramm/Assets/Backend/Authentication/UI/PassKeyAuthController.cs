@@ -46,7 +46,8 @@ public class PassKeyAuthController : MonoBehaviour
             registerResultText.text =
                 "Registrierung erfolgreich!\n" +
                 "Nutzer: " + usernameInput.text + "\n" +
-                "PassKey und RecoveryKey wurden in der Konsole ausgegeben.\n" +
+                "PassKey:" + authService.passkeyGlobal + "\n" +
+                "RecoveryKey:" + authService.recoveryPassKeyGlobal + "\n" +
                 "Bitte sicher notieren.";
         }
     }
