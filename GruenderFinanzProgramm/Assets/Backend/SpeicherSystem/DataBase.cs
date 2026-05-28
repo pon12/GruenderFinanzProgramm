@@ -305,7 +305,44 @@ public int deleteCompany(int companyId)
         return getAll<UserDocument>();
     }
 
-    
+
+
     
 
+    // --- Buissnesplan ---
+
+    public void setupBusinessPlanTable()
+    {
+        createTable<Antworten>();
+    }
+
+    public int createAntwort(int antwort)
+    {
+        Antworten newAntwort = new Antworten
+        {
+            Antwort = antwort
+        };
+        return insert(newAntwort);
+    }
+
+    public List<Antworten> getAllAntworten()
+    {
+        return getAll<Antworten>();
+    }
+
+    public int deleteAntwort(int id)
+    {
+        return delete<Antworten>(id);
+    }
+
+    public int deleteAllAntworten()
+    {
+        List<Antworten> allAntworten = getAllAntworten();
+        int count = 0;
+        foreach (var antwort in allAntworten)
+        {
+            count += deleteAntwort(antwort.Id);
+        }
+        return count;
+    }
 }

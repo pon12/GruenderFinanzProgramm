@@ -1,0 +1,11 @@
+using System.Collections.Generic;
+using UnityEngine;
+using System.Linq;
+using SQLite4Unity3d;
+
+public class Antworten
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public int Antwort { get; set; }
+}
