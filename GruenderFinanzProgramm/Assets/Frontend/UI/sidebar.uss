@@ -71,11 +71,21 @@
 
 /* Sanfter Übergang für alle Breitenänderungen */
 .sidebar-extended {
+    width: 390px;
     transition-property: width;
     transition-duration: 0.3s;
     transition-timing-function: ease-in-out;
 }
-.nav-label {
-    overflow: hidden; /* Verhindert, dass Text aus der Sidebar ragt */
-    white-space: nowrap; /* Verhindert Zeilenumbruch beim Zusammenschieben */
+
+.sidebar--collapsed .nav-label {
+    display: none; /* Blendet den Text komplett aus, statt ihn nur zusammenzuschieben */
+}
+
+.sidebar--collapsed .nav-item {
+    justify-content: center; /* Zentriert das Icon in der schmalen Bar */
+    padding-left: 0;
+}
+
+.sidebar--collapsed .nav-icon {
+    margin-left: 0; /* Entfernt den linken Abstand des Icons */
 }

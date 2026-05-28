@@ -1,11 +1,6 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-<<<<<<< Updated upstream
-    <ui:Template name="sidebar" src="project://database/Assets/Frontend/Vorlagen/sidebar.uxml?fileID=9197481963319205126&amp;guid=af223027516a1064db5a61e51e999b90&amp;type=3#sidebar"/>
     <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
-    <ui:Instance template="sidebar" name="sidebar" style="flex-grow: 1;"/>
-=======
-    <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
-    <ui:VisualElement name="sidebar" class="sidebar-extended" style="flex-grow: 1; position: absolute; height: 100%; width: 390px; background-color: rgb(56, 56, 56); top: 0; left: 0; border-right-color: rgb(145, 145, 145); border-right-width: 0; overflow: hidden;">
+    <ui:VisualElement name="sidebar" class="sidebar-extended" style="flex-grow: 1; position: absolute; height: 100%; width: 390px; background-color: rgb(56, 56, 56); top: 0; left: 0; border-right-color: rgb(145, 145, 145); border-right-width: 0; overflow: visible;">
         <ui:VisualElement name="header" style="position: absolute; height: 130px; width: 100%; top: 0; left: 0; flex-direction: row; align-items: center; border-bottom-color: rgb(145, 145, 145); border-bottom-width: 0; overflow: hidden; padding-left: 16px; padding-top: 20px; padding-bottom: 20px; border-left-color: rgb(145, 145, 145); border-right-color: rgb(145, 145, 145); border-top-color: rgb(145, 145, 145);">
             <ui:VisualElement name="logo-icon" style="width: 60px; height: 60px; background-color: rgb(128, 207, 149); border-top-left-radius: 18px; border-top-right-radius: 18px; border-bottom-right-radius: 18px; border-bottom-left-radius: 18px; flex-shrink: 0; left: -5px;"/>
             <ui:Label name="logo-text" text="Gründung" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 38px; color: rgb(255, 255, 255); margin-left: 16px; overflow: hidden; white-space: nowrap;"/>
@@ -54,5 +49,4 @@
             </ui:VisualElement>
         </ui:ScrollView>
     </ui:VisualElement>
->>>>>>> Stashed changes
 </ui:UXML>

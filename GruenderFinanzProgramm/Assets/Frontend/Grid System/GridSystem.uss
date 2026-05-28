@@ -1,60 +1,45 @@
 .grid-container {
     flex-direction: row;
     flex-wrap: wrap;
-    width: 100%;
+    width: auto; /* Geändert von 100% auf auto, damit marginLeft Platz wegnimmt */
+    flex-grow: 1; 
     align-items: flex-start;
     align-content: flex-start;
     overflow: hidden;
+    transition-property: margin-left; /* Optional für weichere Bewegung */
+    transition-duration: 0.2s;
 }
 
+/* Gemeinsame Basis für alle Grid-Items */
 .grid-item {
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-bottom: 16px;
+    margin: 8px;
     overflow: hidden;
-    flex-shrink: 1;
-    flex-grow: 0;
-    min-height: 40px;
+    flex-grow: 1;    /* WICHTIG: Erlaubt das Auffüllen des Platzes */
+    flex-shrink: 1;  /* Erlaubt das Verkleinern */
 }
 
+/* 4 Spalten Layout (ca. 25%) */
 .col-3 {
-    width: 23%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 0;
-    padding: 0;
+    flex-basis: 22%; 
+    min-width: 200px; /* Verhindert, dass Karten zu winzig werden */
 }
 
+/* 3 Spalten Layout (ca. 33%) */
 .col-4 {
-    width: 30%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 0;
-    padding: 0;
+    flex-basis: 30%;
+    min-width: 250px;
 }
 
+/* 2 Spalten Layout (50%) */
 .col-6 {
-    width: 45%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 0;
-    padding: 0;
+    flex-basis: 45%;
+    min-width: 300px;
 }
 
-.col-8 {
-    width: 63%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 0;
-    padding: 0;
-}
-
+/* Volle Breite */
 .col-12 {
-    width: 96%;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 0;
-    padding: 0;
+    flex-basis: 96%;
+    margin-right: 2%;
 }
 
 .grid-item Label {
