@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class SidebarController : MonoBehaviour
 {
+    public static event System.Action<bool> OnToggled;
+    
     [System.Serializable]
     public struct SceneMapping
     {
@@ -83,5 +85,6 @@ public class SidebarController : MonoBehaviour
         _animTarget = _isCollapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED;
         _animTime = 0f;
         _isAnimating = true;
+        OnToggled?.Invoke(_isCollapsed);
     }
 }
