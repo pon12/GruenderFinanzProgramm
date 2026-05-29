@@ -1,0 +1,14 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Row-Template.uss?fileID=7433441132597879392&amp;guid=9678bb8acbf77654590b8c70e51f738c&amp;type=3#Row-Template"/>
+    <ui:VisualElement name="row-item" class="row-item" style="flex-grow: 0; background-size: 80px 100%; flex-shrink: 0;">
+        <ui:Label text="Label" name="row-bezeichnung" class="row-text-sub col-bezeichnung" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+        <ui:Label text="Label" name="row-art" class="row-text-main col-bezeichnung col-art" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+        <ui:VisualElement name="format-container" class="col-format" style="flex-grow: 1;">
+            <ui:DropdownField label="" name="format-dropdown" choices="PDF" class="format-dropdown"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="actions-container" class="col-pfad" style="flex-grow: 1; flex-direction: row; align-items: center;">
+            <ui:Button text="" name="btn-open-folder" class="btn-folder"/>
+            <ui:Button text="Exportieren" name="btn-export" class="btn-export" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
