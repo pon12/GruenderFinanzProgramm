@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestSzenen/Dienstleistungen.unity
     guid: bedc143777864e94582d010be6e83b36
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Dokument-Screen.unity
     guid: 59495f7d97fecd14bac99d2e58b113c5
   m_configObjects: {}
