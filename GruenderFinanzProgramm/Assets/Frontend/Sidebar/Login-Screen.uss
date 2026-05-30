@@ -43,3 +43,129 @@
     font-size: 90px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
+
+/* ── Grüner Button (Anmelden) ─────────────────────── */
+
+.Anmelden-button {
+    transition-property: background-color, border-width;
+    transition-duration: 0.12s;
+    transition-timing-function: ease;
+    border-width: 0;
+}
+
+.Anmelden-button:hover {
+    background-color: rgb(160, 225, 175);
+    border-color: rgb(255, 255, 255);
+    border-width: 2px;
+}
+
+.Anmelden-button:active {
+    background-color: rgb(95, 170, 115);
+    border-width: 0;
+    translate: 0 2px;
+}
+
+
+/* ── Grauer Button (Konto erstellen) ──────────────── */
+
+.Konto-button {
+    transition-property: background-color, border-color, border-width;
+    transition-duration: 0.12s;
+    transition-timing-function: ease;
+    border-width: 0;
+}
+
+.Konto-button:hover {
+    background-color: rgb(80, 80, 80);
+    border-color: rgb(128, 207, 149);
+    border-width: 3px;
+}
+
+.Konto-button:active {
+    background-color: rgb(55, 55, 55);
+    border-color: rgb(100, 180, 125);
+    border-width: 3px;
+    translate: 0 2px;
+}
+
+
+/* ── Zahlenpad Buttons (Passkey Popup) ────────────── */
+
+.passkey-num-btn {
+    transition-property: background-color, border-width;
+    transition-duration: 0.08s;
+    transition-timing-function: ease;
+    border-width: 0;
+}
+
+.passkey-num-btn:hover {
+    background-color: rgb(55, 55, 55);
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+}
+
+.passkey-num-btn:active {
+    background-color: rgb(128, 207, 149);
+    border-width: 0;
+    translate: 0 2px;
+}
+
+/* ── Grüner Button im Popup (Erstellen / Anmelden) ─── */
+
+.popup-btn-green {
+    transition-property: background-color, border-width;
+    transition-duration: 0.12s;
+    transition-timing-function: ease;
+}
+
+.popup-btn-green:hover {
+    background-color: rgb(160, 225, 175);
+    border-color: rgb(255, 255, 255);
+    border-width: 2px;
+}
+
+.popup-btn-green:active {
+    background-color: rgb(95, 170, 115);
+    border-width: 0;
+    translate: 0 2px;
+}
+
+
+/* ── Zahlenpad Buttons ──────────────────────────────── */
+
+.passkey-num-btn {
+    transition-property: background-color, border-color, border-width;
+    transition-duration: 0.08s;
+    transition-timing-function: ease;
+}
+
+.passkey-num-btn:hover {
+    background-color: rgb(55, 55, 55);
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+}
+
+.passkey-num-btn:active {
+    background-color: rgb(128, 207, 149);
+    color: rgb(0, 0, 0);
+    border-width: 0;
+    translate: 0 2px;
+}
+
+
+/* ── X Schließen Button ─────────────────────────────── */
+
+.popup-close-btn {
+    transition-property: color, background-color;
+    transition-duration: 0.1s;
+}
+
+.popup-close-btn:hover {
+    color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.popup-close-btn:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
