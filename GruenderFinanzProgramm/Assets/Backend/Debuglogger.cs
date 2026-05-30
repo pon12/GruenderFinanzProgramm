@@ -40,7 +40,7 @@ public class DebugLogger : MonoBehaviour
             logFilePath = Path.Combine(debugFolder, $"DebugLog_{timestamp}.txt");
             File.WriteAllText(logFilePath, $"=== DebugLog gestartet: {DateTime.Now} ===\n\n");
             Application.logMessageReceived += HandleLog;
-            Debug.Log("✅ DebugLogger aktiv.");
+            Debug.Log("DebugLogger aktiv.");
         }
         else
         {
