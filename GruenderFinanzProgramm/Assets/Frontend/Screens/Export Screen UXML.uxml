@@ -1,9 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="sidebar" src="project://database/Assets/Frontend/Vorlagen/sidebar.uxml?fileID=9197481963319205126&amp;guid=af223027516a1064db5a61e51e999b90&amp;type=3#sidebar"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Export.uss?fileID=7433441132597879392&amp;guid=e53311dd580cb0946819483f8bd7dc3b&amp;type=3#Export"/>
     <ui:VisualElement name="root" style="flex-grow: 1; width: 100%; height: 100%; flex-direction: row;">
-        <ui:Instance template="sidebar" style="width: 390px; height: 100%;"/>
-        <ui:VisualElement name="content-area" class="content-area" style="flex-grow: 1; width: 1530px; height: 100%; padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 40px; background-color: rgb(27, 27, 27);">
+        <ui:VisualElement name="main-content" class="content-area" style="flex-grow: 1; height: 100%; padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 430px; background-color: rgb(27, 27, 27);">
             <ui:Label text="Export Screen" name="screen-title" class="screen-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 36px; color: rgb(255, 255, 255);"/>
             <ui:VisualElement name="table-header" class="table-header" style="flex-grow: 1; flex-direction: row; margin-top: 20px;">
                 <ui:Label text="Bezeichnung" name="header-name" class="header-label col-bezeichnung" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>

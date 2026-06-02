@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 public class SidebarController : MonoBehaviour
 {
+
+    private VisualElement _finanzSubmenu;
+    private Button        _finanzToggleBtn;
+    private bool          _finanzOpen = false;
     public static event System.Action<bool> OnToggled;
     
     [System.Serializable]
@@ -60,7 +64,37 @@ public class SidebarController : MonoBehaviour
                 btn.RegisterCallback<ClickEvent>(evt => SceneManager.LoadScene(mapping.sceneName));
             }
         }
+    
+    {
+    _finanzSubmenu   = root.Q<VisualElement>("finanz-submenu");
+    _finanzToggleBtn = root.Q<Button>("btn-finanz-toggle");
+
+    if (_finanzToggleBtn != null)
+        _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
     }
+    }
+
+    private void ToggleFinanzSubmenu()
+{
+    _finanzOpen = !_finanzOpen;
+
+    if (_finanzSubmenu != null)
+        _finanzSubmenu.style.display = _finanzOpen
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
+
+    if (_finanzToggleBtn != null)
+        _finanzToggleBtn.text = _finanzOpen ? "▼" : "▶";
+}
+
+    void OnDisable()
+{
+    if (_toggleButton != null)
+        _toggleButton.clicked -= ToggleSidebar;
+    
+    // Statisches Event komplett leeren beim Deaktivieren
+    OnToggled = null;
+}
 
     void Update()
     {
@@ -87,4 +121,7 @@ public class SidebarController : MonoBehaviour
         _isAnimating = true;
         OnToggled?.Invoke(_isCollapsed);
     }
+
+    
 }
+
