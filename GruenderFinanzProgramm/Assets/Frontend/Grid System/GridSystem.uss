@@ -1,45 +1,109 @@
 .grid-container {
     flex-direction: row;
     flex-wrap: wrap;
-    width: auto; /* Geändert von 100% auf auto, damit marginLeft Platz wegnimmt */
-    flex-grow: 1; 
+    width: 100%;
     align-items: flex-start;
     align-content: flex-start;
     overflow: hidden;
-    transition-property: margin-left; /* Optional für weichere Bewegung */
-    transition-duration: 0.2s;
 }
 
-/* Gemeinsame Basis für alle Grid-Items */
 .grid-item {
-    margin: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 16px;
     overflow: hidden;
-    flex-grow: 1;    /* WICHTIG: Erlaubt das Auffüllen des Platzes */
-    flex-shrink: 1;  /* Erlaubt das Verkleinern */
+    flex-shrink: 1;
+    flex-grow: 0;
+    min-height: 40px;
 }
 
-/* 4 Spalten Layout (ca. 25%) */
 .col-3 {
-    flex-basis: 22%; 
-    min-width: 200px; /* Verhindert, dass Karten zu winzig werden */
+    width: 23%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
 }
 
-/* 3 Spalten Layout (ca. 33%) */
 .col-4 {
-    flex-basis: 30%;
-    min-width: 250px;
+    width: 30%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
 }
 
-/* 2 Spalten Layout (50%) */
 .col-6 {
-    flex-basis: 45%;
-    min-width: 300px;
+    width: 45%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
 }
 
-/* Volle Breite */
+.col-8 {
+    width: 63%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
+}
+
 .col-12 {
-    flex-basis: 96%;
-    margin-right: 2%;
+    width: 96%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.table-row {
+    flex-direction: row;
+    flex: 1;
+    width: 100%;
+    border-bottom-width: 3px;
+    border-color: rgb(51, 51, 51);
+}
+
+.col-name {
+    width: 30%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-datum {
+    width: 20%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-betrag {
+    width: 20%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-typ {
+    width: 20%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.col-action {
+    width: 10%;
+    flex: none;
+    -unity-text-align: upper-center;
+    overflow: hidden;
+}
+
+.table-row {
+    width: 100%;
+    border-bottom-width: 3px;
+    border-color: rgb(51, 51, 51);
 }
 
 .grid-item Label {
@@ -208,8 +272,4 @@
 }
 
 .unity-label {
-}
-
-.pr-all {
-    padding: 16px;
 }

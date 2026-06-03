@@ -9,6 +9,7 @@ public class Einkommen
     public int Id { get; set; }
     public float Amount { get; set; }
     public string Description { get; set; }
+    public string Datum { get; set; }
 }
 
 public class Ausgaben
@@ -17,4 +18,5 @@ public class Ausgaben
     public int Id { get; set; }
     public float Amount { get; set; }
     public string Description { get; set; }
+    public string Datum { get; set; }
 }
