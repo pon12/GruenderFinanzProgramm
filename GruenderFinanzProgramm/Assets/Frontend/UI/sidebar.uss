@@ -1,0 +1,91 @@
+/* ── NAV ITEMS – Basis ─────────────────────── */
+.nav-item {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+
+/* ── Hover ─────────────────────────────────── */
+.nav-item:hover {
+    background-color: rgba(128, 207, 149, 0.15);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(128, 207, 149, 0.5);
+    border-right-color: rgba(128, 207, 149, 0.5);
+    border-top-color: rgba(128, 207, 149, 0.5);
+    border-bottom-color: rgba(128, 207, 149, 0.5);
+}
+
+.nav-item:hover .unity-radio-button__checkmark-background {
+    border-color: rgb(128, 207, 149);
+    background-color: rgba(128, 207, 149, 0.25);
+}
+
+/* ── Aktiv ─────────────────────────────────── */
+.nav-item--active {
+    background-color: rgba(128, 207, 149, 0.18);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}
+.nav-item--active:hover {
+    background-color: rgba(128, 207, 149, 0.28);
+}
+/* ── Icons ─────────────────────────────────── */
+.nav-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-left: 14px;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(180, 180, 180);
+}
+/* Aktiver Zustand – Icon wird grün */
+.nav-item--active .nav-icon {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+/* Hover – Icon wird weiß */
+.nav-item:hover .nav-icon {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+/* Der Zustand, wenn die Sidebar schmal ist */
+.sidebar--collapsed {
+    width: 80px; /* Nur breit genug für die Icons */
+    min-width: 80px;
+}
+
+/* Wir verstecken die Texte, wenn es eng wird */
+.sidebar--collapsed .nav-label, 
+.sidebar--collapsed #logo-text {
+    display: none;
+}
+
+/* Sanfter Übergang für alle Breitenänderungen */
+.sidebar-extended {
+    width: 390px;
+    transition-property: width;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+
+.sidebar--collapsed .nav-label {
+    display: none; /* Blendet den Text komplett aus, statt ihn nur zusammenzuschieben */
+}
+
+.sidebar--collapsed .nav-item {
+    justify-content: center; /* Zentriert das Icon in der schmalen Bar */
+    padding-left: 0;
+}
+
+.sidebar--collapsed .nav-icon {
+    margin-left: 0; /* Entfernt den linken Abstand des Icons */
+}

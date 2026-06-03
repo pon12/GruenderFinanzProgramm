@@ -56,3 +56,26 @@
 .nav-item:hover .nav-icon {
     -unity-background-image-tint-color: rgb(255, 255, 255);
 }
+
+/* Der Zustand, wenn die Sidebar schmal ist */
+.sidebar--collapsed {
+    width: 80px; /* Nur breit genug für die Icons */
+    min-width: 80px;
+}
+
+/* Wir verstecken die Texte, wenn es eng wird */
+.sidebar--collapsed .nav-label, 
+.sidebar--collapsed #logo-text {
+    display: none;
+}
+
+/* Sanfter Übergang für alle Breitenänderungen */
+.sidebar-extended {
+    transition-property: width;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+.nav-label {
+    overflow: hidden; /* Verhindert, dass Text aus der Sidebar ragt */
+    white-space: nowrap; /* Verhindert Zeilenumbruch beim Zusammenschieben */
+}

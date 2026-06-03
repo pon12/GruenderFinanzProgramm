@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 457497952}
   - component: {fileID: 457497951}
+  - component: {fileID: 457497953}
   m_Layer: 5
   m_Name: Start Screen
   m_TagString: Untagged
@@ -174,6 +175,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &457497953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457497950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10da350bd7fb3cb49bce63ad18966bf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
+  startScreenObj: {fileID: 457497950}
+  loginScreenObj: {fileID: 1136899310}
+  registrationScreenObj: {fileID: 1318028743}
 --- !u!1 &679455461
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,6 +337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1136899312}
   - component: {fileID: 1136899311}
+  - component: {fileID: 1136899313}
   m_Layer: 5
   m_Name: Login Screen
   m_TagString: Untagged
@@ -366,6 +383,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1136899313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136899310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10da350bd7fb3cb49bce63ad18966bf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
+  startScreenObj: {fileID: 457497950}
+  loginScreenObj: {fileID: 1136899310}
+  registrationScreenObj: {fileID: 1318028743}
 --- !u!1 &1318028743
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,6 +408,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1318028745}
   - component: {fileID: 1318028744}
+  - component: {fileID: 1318028746}
   m_Layer: 5
   m_Name: Regestrierung Screen
   m_TagString: Untagged
@@ -421,6 +454,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1318028746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1318028743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f739123d8550684a9eabd98cfa8e89e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeyGeneratorController
+  passKeyGlobal: 
+  recoveryPassKeyGlobal: 
 --- !u!1 &1634313190
 GameObject:
   m_ObjectHideFlags: 0

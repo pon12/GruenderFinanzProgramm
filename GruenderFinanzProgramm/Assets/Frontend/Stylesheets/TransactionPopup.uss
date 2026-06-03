@@ -1,0 +1,121 @@
+/* TransactionPopup.uss */
+
+/* Overlay: muss auf root-ebene liegen, ueberdeckt alles */
+.popup-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    background-color: rgba(0, 0, 0, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Popup-Container */
+.popup-container {
+    width: 380px;
+    padding-top: 28px;
+    padding-bottom: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    background-color: rgb(38, 38, 38);
+    flex-direction: column;
+}
+
+/* Titel */
+.popup-title {
+    color: rgb(255, 255, 255);
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+/* Feldgruppe */
+.field-group {
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+/* Label */
+.field-label {
+    font-size: 18px;
+    color: rgb(200, 200, 200);
+    margin-bottom: 6px;
+}
+
+/* Text-Inputs */
+.field-input {
+    height: 40px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    background-color: rgb(58, 58, 58);
+    padding-left: 14px;
+    padding-right: 14px;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+}
+
+.field-input .unity-base-field__input {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    background-color: rgb(58, 58, 58);
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    padding-left: 14px;
+}
+
+/* Aktionsleiste */
+.popup-actions {
+    flex-direction: row;
+    margin-top: 8px;
+}
+
+/* Buttons */
+.btn {
+    flex: 1;
+    height: 40px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(28, 28, 28);
+    margin-right: 8px;
+}
+
+.btn-primary:hover {
+    background-color: rgb(107, 191, 130);
+}
+
+.btn-secondary {
+    background-color: rgb(80, 80, 80);
+    color: rgb(255, 255, 255);
+}
+
+.btn-secondary:hover {
+    background-color: rgb(100, 100, 100);
+}

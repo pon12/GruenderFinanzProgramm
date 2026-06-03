@@ -1,0 +1,25 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
+    <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
+    <ui:VisualElement name="popup-overlay" class="popup-overlay">
+        <ui:VisualElement name="popup-container" class="popup-container card">
+            <ui:VisualElement name="field-betrag" class="field-group">
+                <ui:Label name="label-betrag" text="Betrag" class="field-label"/>
+                <ui:TextField name="input-betrag" class="field-input"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="field-verwendungzweck" class="field-group">
+                <ui:Label name="label-verwendungzweck" text="Verwendungzweck" class="field-label"/>
+                <ui:TextField name="input-verwendungzweck" class="field-input"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="field-datum" class="field-group">
+                <ui:Label name="label-datum" text="Datum" class="field-label"/>
+                <ui:TextField name="input-datum" class="field-input"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="popup-actions" class="popup-actions row" style="flex-direction: row; justify-content: center; align-self: center; align-items: center;">
+                <ui:Button name="btn-speichern" text="Speichern" class="btn btn-primary"/>
+                <ui:Button name="btn-abbrechen" text="Abbrechen" class="btn btn-secondary"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
