@@ -49,6 +49,8 @@ MonoBehaviour:
   navigationConfig:
   - buttonName: nav-item-dashboard
     sceneName: Dokument-Screen
+  - buttonName: nav-item-kassenbuch
+    sceneName: Kassenbuch
 --- !u!1 &9082331523415967194
 GameObject:
   m_ObjectHideFlags: 0
