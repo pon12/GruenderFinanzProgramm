@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Dokument-Screen.unity
     guid: 59495f7d97fecd14bac99d2e58b113c5
+  - enabled: 1
+    path: Assets/Scenes/TestSzenen/Kassenbuch.unity
+    guid: b195a52d9bf0abc40bf82f095633095b
+  - enabled: 1
+    path: Assets/Scenes/KundenDB.unity
+    guid: aa7fb2a9d696a60439e616781ef3928f
   m_configObjects: {}
