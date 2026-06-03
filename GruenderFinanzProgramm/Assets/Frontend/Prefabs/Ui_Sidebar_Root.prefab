@@ -51,6 +51,8 @@ MonoBehaviour:
     sceneName: Dokument-Screen
   - buttonName: nav-item-kassenbuch
     sceneName: Kassenbuch
+  - buttonName: nav-item-kunden
+    sceneName: KundenDB
 --- !u!1 &9082331523415967194
 GameObject:
   m_ObjectHideFlags: 0
