@@ -1,6 +1,5 @@
 // LoginFlowController.cs
 // Auf UIManager in der Login-Scene
-// Nutzt die echten Button-Namen aus dem UXML
 
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,9 +7,9 @@ using UnityEngine.SceneManagement;
 
 public class LoginFlowController : MonoBehaviour
 {
-    [SerializeField] private UIDocument uiDocument;
+    [SerializeField] private UIDocument          uiDocument;
+    [SerializeField] private PassKeyAuthController passKeyAuthController;
 
-    private const string REGISTER_SCENE  = "Registry";
     private const string DASHBOARD_SCENE = "Dashboard";
 
     private VisualElement _root;
@@ -24,7 +23,15 @@ public class LoginFlowController : MonoBehaviour
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _root = uiDocument.rootVisualElement;
+        // Falls nicht im Inspector zugewiesen, in der Scene suchen
+        if (passKeyAuthController == null)
+            passKeyAuthController = FindFirstObjectByType<PassKeyAuthController>();
+
+        if (passKeyAuthController == null)
+            Debug.LogError("[LoginFlow] PassKeyAuthController nicht gefunden. " +
+                           "Bitte Prefab in die Scene ziehen oder im Inspector zuweisen.");
+
+        _root                = uiDocument.rootVisualElement;
         _popupOverlay        = _root.Q("popup-overlay");
         _popupPasskeyLogin   = _root.Q("popup-passkey-login");
         _loginPasskeyDisplay = _root.Q<Label>("login-passkey-display");
@@ -32,25 +39,39 @@ public class LoginFlowController : MonoBehaviour
         RegisterAllButtons();
     }
 
+    // ─────────────────────────────────────────────────
+    // BUTTON REGISTRIERUNG
+    // ─────────────────────────────────────────────────
+
     private void RegisterAllButtons()
     {
-        // Welcome Screen
-        Bind("Anmelden",       () => ShowPopup(_popupPasskeyLogin));
-        Bind("KontoErstellen", () => SceneManager.LoadScene(REGISTER_SCENE));
+        // "Anmelden" → Passkey-Popup öffnen
+        Bind("Anmelden", () => ShowPopup(_popupPasskeyLogin));
 
-        // Passkey-Login Popup
+        // X Button → Popup schließen und Input zurücksetzen
         Bind("btn-close-login-popup", CloseAllPopups);
-        Bind("login-btn-delete",      OnPasskeyDelete);
-        Bind("btn-login-submit",      OnLoginSubmit);
 
+        // Zahlenpad 0–9 (Passkey: 4-stellig, nur Zahlen laut Doku)
         for (int i = 0; i <= 9; i++)
         {
             int digit = i;
             var btn = _root.Q<Button>($"login-btn-{digit}");
             if (btn != null)
                 btn.clicked += () => OnPasskeyDigit(digit.ToString());
+            else
+                Debug.LogWarning($"[LoginFlow] login-btn-{digit} nicht gefunden.");
         }
+
+        // Löschen
+        Bind("login-btn-delete", OnPasskeyDelete);
+
+        // Anmelden absenden → Backend
+        Bind("btn-login-submit", OnLoginSubmit);
     }
+
+    // ─────────────────────────────────────────────────
+    // PASSKEY EINGABE
+    // ─────────────────────────────────────────────────
 
     private void OnPasskeyDigit(string digit)
     {
@@ -75,17 +96,41 @@ public class LoginFlowController : MonoBehaviour
         _loginPasskeyDisplay.text = s.TrimEnd();
     }
 
+    // ─────────────────────────────────────────────────
+    // LOGIN – BACKEND VERKNÜPFUNG
+    // ─────────────────────────────────────────────────
+
     private void OnLoginSubmit()
     {
-        if (_loginPasskeyInput.Length < 4) { Debug.Log("[Login] Passkey unvollstaendig"); return; }
-        Debug.Log("[Login] Weiter zum Dashboard");
+        if (_loginPasskeyInput.Length < 4)
+        {
+            Debug.LogWarning("[Login] Passkey unvollständig – bitte alle 4 Ziffern eingeben.");
+            return;
+        }
+
+        if (passKeyAuthController == null)
+        {
+            Debug.LogError("[Login] PassKeyAuthController fehlt – Login nicht möglich.");
+            return;
+        }
+
+        // Backend: Nutzer mit PassKey einloggen
+        // Nach erfolgreichem Aufruf ist die passende NutzerDB automatisch aktiv
+        // Alle weiteren Screens nutzen dann UserDatabaseAccess.getCurrentUserDatabase()
+        passKeyAuthController.loginWithPassKey();
+
+        Debug.Log("[Login] loginWithPassKey aufgerufen – lade Dashboard.");
         SceneManager.LoadScene(DASHBOARD_SCENE);
     }
 
+    // ─────────────────────────────────────────────────
+    // POPUP STEUERUNG
+    // ─────────────────────────────────────────────────
+
     private void ShowPopup(VisualElement popup)
     {
-        if (_popupOverlay    != null) _popupOverlay.style.display    = DisplayStyle.Flex;
-        if (popup            != null) popup.style.display             = DisplayStyle.Flex;
+        if (_popupOverlay != null) _popupOverlay.style.display  = DisplayStyle.Flex;
+        if (popup         != null) popup.style.display           = DisplayStyle.Flex;
     }
 
     private void CloseAllPopups()
@@ -96,10 +141,16 @@ public class LoginFlowController : MonoBehaviour
         UpdateDisplay();
     }
 
+    // ─────────────────────────────────────────────────
+    // HILFSFUNKTION
+    // ─────────────────────────────────────────────────
+
     private void Bind(string name, System.Action action)
     {
         var btn = _root.Q<Button>(name);
-        if (btn != null) btn.clicked += action;
-        else Debug.LogWarning($"[LoginFlow] '{name}' nicht gefunden.");
+        if (btn != null)
+            btn.clicked += action;
+        else
+            Debug.LogWarning($"[LoginFlow] Button '{name}' nicht gefunden im UXML.");
     }
 }
