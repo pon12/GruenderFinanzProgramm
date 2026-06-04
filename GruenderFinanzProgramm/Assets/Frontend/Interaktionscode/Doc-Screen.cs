@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO; 
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,91 +19,170 @@ public class DocumentDashboard : MonoBehaviour
     // Pop-up Elemente
     private VisualElement popupOverlay;
     private Button popupCancelButton;
-    private Button popupSubmitButton;
-    private TextField documentNameInput;
+    private Button popupSubmitButton; 
+    
+    // Eingabefelder
+    private DropdownField categoryDropdown; 
+    private TextField docNameInput; 
+
+    // Typ-Buttons
+    private Button btnTypeStandard;
+    private Button btnTypeDiagramm;
+    private Button btnTypeChecklist;
+
+    private string selectedType = "Standard";
+    private List<string> dropdownKategorien = new List<string> { 
+        "Gründung", "Finanzen", "Marketing", "Steuern", "Personal", "Recht" 
+    };
+
+    // Datenstruktur
+    [System.Serializable]
+    public class DocumentData
+    {
+        public string category;
+        public string title;
+        public string type;
+    }
+
+    [System.Serializable]
+    public class DocumentSaveData
+    {
+        public List<DocumentData> savedDocs = new List<DocumentData>();
+    }
+
+    private DocumentSaveData speicherDaten = new DocumentSaveData();
+    private string saveFilePath;
 
     void OnEnable()
     {
+        saveFilePath = Application.persistentDataPath + "/MyDashboardSave.json";
+
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
+        if (uiDocument == null) return;
+
         root = uiDocument.rootVisualElement;
 
-        // Dashboard Elemente greifen
         createButton = root.Q<Button>("Create-Button");
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
-        // Pop-up Elemente greifen
         popupOverlay = root.Q<VisualElement>("Popup-Overlay");
-        popupCancelButton = root.Q<Button>("Btn-Cancel"); // Heißt so dein Abbrechen-Button?
-        popupSubmitButton = root.Q<Button>("Btn-Submit"); // Heißt so dein Erstellen-Button?
-        documentNameInput = root.Q<TextField>("Doc-Name-Input"); // Falls du ein Eingabefeld hast
+        popupCancelButton = root.Q<Button>("Btn-Cancel"); 
+        popupSubmitButton = root.Q<Button>("Btn-Submit"); 
+        
+        categoryDropdown = root.Q<DropdownField>("dropKategorie"); 
+        docNameInput = root.Q<TextField>("Doc-Name-Input"); 
 
-        // Events zuweisen
+        btnTypeStandard = root.Q<Button>("Btn-Type-Standard");
+        btnTypeDiagramm = root.Q<Button>("Btn-Type-Diagramm");
+        btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
+
+        if (categoryDropdown != null)
+        {
+            categoryDropdown.choices = dropdownKategorien;
+            if (dropdownKategorien.Count > 0) categoryDropdown.value = dropdownKategorien[0]; 
+        }
+
         if (createButton != null) createButton.clicked += OpenPopup;
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
-        if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocument;
 
-        SpawnTestCards();
+        if (btnTypeStandard != null) btnTypeStandard.clicked += () => ApplyTemplate("Standard");
+        if (btnTypeDiagramm != null) btnTypeDiagramm.clicked += () => ApplyTemplate("Diagramm");
+        if (btnTypeChecklist != null) btnTypeChecklist.clicked += () => ApplyTemplate("Checklist");
+
+        if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
+
+        LoadDataLocally();
+        SpawnAllCardsAtStart();
     }
 
-    // Pop-up anzeigen
-    private void OpenPopup()
+    private void OpenPopup() { if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; }
+    private void ClosePopup() { if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.None; }
+
+    private void ApplyTemplate(string typeName)
     {
-        if (popupOverlay != null)
+        selectedType = typeName;
+        string templateName = (typeName == "Standard") ? "Businessplan" : (typeName == "Diagramm") ? "Diagramm" : "Checkliste";
+        if (docNameInput != null) docNameInput.value = templateName;
+    }
+
+    private void CreateNewDocumentEntry()
+    {
+        string selectedCategory = categoryDropdown != null ? categoryDropdown.value : "";
+        string docText = docNameInput != null ? docNameInput.value : "Unbenannt";
+
+        if (string.IsNullOrEmpty(selectedCategory)) return;
+
+        // 1. Liste filtern
+        List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == selectedCategory);
+
+        // 2. Älteste löschen, wenn wir schon 2 haben (immer nur max 2 behalten)
+        while (kategorieDocs.Count >= 2)
         {
-            popupOverlay.style.display = DisplayStyle.Flex;
+            DocumentData altesDoc = kategorieDocs[0];
+            speicherDaten.savedDocs.Remove(altesDoc);
+            kategorieDocs.Remove(altesDoc);
         }
-    }
 
-    // Pop-up verstecken
-    private void ClosePopup()
-    {
-        if (popupOverlay != null)
-        {
-            popupOverlay.style.display = DisplayStyle.None;
-            if (documentNameInput != null) documentNameInput.value = ""; // Textfeld leeren
-        }
-    }
-
-    // Logik, wenn man im Pop-up auf "Erstellen" drückt
-    private void CreateNewDocument()
-    {
-        string newDocName = documentNameInput != null ? documentNameInput.value : "Neues Dokument";
+        // 3. Neues Dokument hinzufügen
+        DocumentData newDoc = new DocumentData { category = selectedCategory, title = docText, type = selectedType };
+        speicherDaten.savedDocs.Add(newDoc);
         
-        if (string.IsNullOrEmpty(newDocName)) return;
-
-        Debug.Log($"Erstelle neues Dokument mit Name: {newDocName}");
-
-        // Hier kannst du jetzt sogar dynamisch eine NEUE Karte mit deinem Wunschnamen spawnen!
-        if (gridContainer != null && categoryCardTemplate != null)
-        {
-            VisualElement cardInstance = categoryCardTemplate.Instantiate();
-            Label titleLabel = cardInstance.Q<Label>("CardTitle");
-            if (titleLabel != null) titleLabel.text = newDocName;
-            
-            gridContainer.Add(cardInstance);
-        }
-
-        // Pop-up danach wieder schließen
+        SaveDataLocally();
+        SpawnAllCardsAtStart();
         ClosePopup();
     }
 
-    void OnDisable()
-    {
-        if (createButton != null) createButton.clicked -= OpenPopup;
-        if (popupCancelButton != null) popupCancelButton.clicked -= ClosePopup;
-        if (popupSubmitButton != null) popupSubmitButton.clicked -= CreateNewDocument;
-    }
-
-    private void SpawnTestCards()
+    private void SpawnAllCardsAtStart()
     {
         if (gridContainer == null || categoryCardTemplate == null) return;
-        string[] testKategorien = { "Gründung", "Finanzen", "Marketing" };
-        foreach (string name in testKategorien)
+        gridContainer.Clear(); 
+
+        foreach (string kategorieName in dropdownKategorien)
         {
             VisualElement cardInstance = categoryCardTemplate.Instantiate();
-            Label titleLabel = cardInstance.Q<Label>("CardTitle");
-            if (titleLabel != null) titleLabel.text = name;
+            cardInstance.style.width = Length.Percent(30f);
+            cardInstance.style.marginBottom = 20;
+
+            Label titleLabel = cardInstance.Q<Label>("lblName");
+            if (titleLabel != null) titleLabel.text = kategorieName;
+
+            VisualElement feldOben = cardInstance.Q<VisualElement>("Datenfeld-Oben");
+            VisualElement feldUnten = cardInstance.Q<VisualElement>("Datenfeld-Unten");
+
+            if (feldOben != null) feldOben.Clear();
+            if (feldUnten != null) feldUnten.Clear();
+
+            List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == kategorieName);
+
+            for (int i = 0; i < kategorieDocs.Count; i++)
+            {
+                // Gerade = Oben, Ungerade = Unten
+                VisualElement target = (i % 2 == 0) ? feldOben : feldUnten;
+                if (target != null)
+                {
+                    VisualElement docEntry = new VisualElement();
+                    string icon = (kategorieDocs[i].type == "Diagramm") ? "📊" : ((kategorieDocs[i].type == "Checklist") ? "☑️" : "📄");
+                    
+                    Label docLabel = new Label($"{icon} {kategorieDocs[i].title}");
+                    docLabel.style.fontSize = 12;
+                    docEntry.Add(docLabel);
+                    
+                    target.Add(docEntry);
+                }
+            }
             gridContainer.Add(cardInstance);
         }
+    }
+
+    private void SaveDataLocally()
+    {
+        string json = JsonUtility.ToJson(speicherDaten, true);
+        File.WriteAllText(saveFilePath, json);
+    }
+
+    private void LoadDataLocally()
+    {
+        if (File.Exists(saveFilePath))
+            speicherDaten = JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(saveFilePath));
     }
 }
