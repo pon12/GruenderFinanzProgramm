@@ -1,35 +1,14 @@
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
 
 public static class PDFManager
 {
-    public static List<PDFEntry> GetAllPDFs()
+    public static List<UserPDFDocument> GetPDFsForUser(int userId, DataBase db)
     {
-        List<PDFEntry> result = new();
+        return db.getPDFDocumentsByUser(userId);
+    }
 
-        string root =
-            Path.Combine(Application.persistentDataPath, "PDFs");
-
-        if (!Directory.Exists(root))
-            return result;
-
-        foreach (string file in Directory.GetFiles(
-                     root,
-                     "*.pdf",
-                     SearchOption.AllDirectories))
-        {
-            FileInfo info = new(file);
-
-            result.Add(new PDFEntry
-            {
-                fileName = info.Name,
-                filePath = file,
-                fileSize = info.Length,
-                uploadedAt = info.CreationTime
-            });
-        }
-
-        return result;
+    public static UserPDFDocument GetPDFById(int pdfId, int userId, DataBase db)
+    {
+        return db.getUserPDFDocumentById(pdfId, userId);
     }
 }

@@ -4,78 +4,115 @@ using UnityEngine;
 
 public static class PDFStorage
 {
-    private static string BaseFolder =>
-        Path.Combine(Application.persistentDataPath, "PDFs");
-
-    static PDFStorage()
+    public static UserPDFDocument SavePDF(
+        string sourcePath,
+        int userId,
+        DataBase db,
+        string category = "Uploads"
+    )
     {
-        Directory.CreateDirectory(BaseFolder);
-    }
+        if (sourcePath.StartsWith("file:///"))
+            sourcePath = sourcePath.Replace("file:///", "");
 
-    public static PDFEntry SavePDF(string sourcePath, string category = "Upload")
-    {
         if (!File.Exists(sourcePath))
         {
-            Debug.LogError($"Datei nicht gefunden: {sourcePath}");
+            Debug.LogError("Datei nicht gefunden: " + sourcePath);
             return null;
         }
 
-        string categoryFolder = Path.Combine(BaseFolder, category);
-        Directory.CreateDirectory(categoryFolder);
+        string userFolder = PDFUserFolderSetup.GetUserCategoryFolder(userId, category);
 
-        string fileName = Path.GetFileName(sourcePath);
-        string targetPath = Path.Combine(categoryFolder, fileName);
+        string originalName = Path.GetFileName(sourcePath);
+        string extension = Path.GetExtension(originalName);
+        string storedName = Guid.NewGuid().ToString() + extension;
+        string targetPath = Path.Combine(userFolder, storedName);
 
-        if (File.Exists(targetPath))
+        File.Copy(sourcePath, targetPath, false);
+
+        UserPDFDocument document = new UserPDFDocument
         {
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string name = Path.GetFileNameWithoutExtension(fileName);
-
-            fileName = $"{name}_{timestamp}.pdf";
-            targetPath = Path.Combine(categoryFolder, fileName);
-        }
-
-        File.Copy(sourcePath, targetPath);
-
-        return new PDFEntry
-        {
-            fileName = fileName,
+            userId = userId,
+            originalFileName = originalName,
+            storedFileName = storedName,
             filePath = targetPath,
             category = category,
-            uploadedAt = DateTime.Now,
-            fileSize = new FileInfo(targetPath).Length
+            uploadedAt = DateTime.Now
         };
+
+        db.createUserPDFDocument(document);
+
+        return document;
     }
 
-    public static bool DeletePDF(PDFEntry entry)
+    public static bool DeletePDFById(int pdfId, int userId, DataBase db)
     {
-        return DeletePDF(entry.filePath);
-    }
+        UserPDFDocument document = db.getUserPDFDocumentById(pdfId, userId);
 
-    public static bool DeletePDF(string path)
-    {
-        if (!File.Exists(path))
+        if (document == null)
+        {
+            Debug.LogError("PDF nicht gefunden oder gehört nicht diesem Nutzer.");
             return false;
+        }
 
-        File.Delete(path);
+        if (File.Exists(document.filePath))
+            File.Delete(document.filePath);
+
+        db.deleteUserPDFDocument(pdfId, userId);
         return true;
     }
 
-    public static byte[] GetPDFBytes(PDFEntry entry)
+    public static bool ExportPDFById(
+        int pdfId,
+        int userId,
+        DataBase db,
+        string destinationPath
+    )
     {
-        if (!File.Exists(entry.filePath))
-            return null;
+        UserPDFDocument document = db.getUserPDFDocumentById(pdfId, userId);
 
-        return File.ReadAllBytes(entry.filePath);
+        if (document == null)
+        {
+            Debug.LogError("PDF nicht gefunden oder gehört nicht diesem Nutzer.");
+            return false;
+        }
+
+        if (!File.Exists(document.filePath))
+        {
+            Debug.LogError("Datei existiert nicht: " + document.filePath);
+            return false;
+        }
+
+        File.Copy(document.filePath, destinationPath, true);
+        return true;
     }
 
-    public static string ExportPDF(PDFEntry entry, string destinationPath)
+    public static UserPDFDocument RegisterExistingPDF(
+        string existingPath,
+        int userId,
+        DataBase db,
+        string category = "Rechnungen"
+    )
     {
-        if (!File.Exists(entry.filePath))
+        if (!File.Exists(existingPath))
+        {
+            Debug.LogError("PDF existiert nicht: " + existingPath);
             return null;
+        }
 
-        File.Copy(entry.filePath, destinationPath, true);
+        string originalName = Path.GetFileName(existingPath);
 
-        return destinationPath;
+        UserPDFDocument document = new UserPDFDocument
+        {
+            userId = userId,
+            originalFileName = originalName,
+            storedFileName = originalName,
+            filePath = existingPath,
+            category = category,
+            uploadedAt = DateTime.Now
+        };
+
+        db.createUserPDFDocument(document);
+
+        return document;
     }
 }

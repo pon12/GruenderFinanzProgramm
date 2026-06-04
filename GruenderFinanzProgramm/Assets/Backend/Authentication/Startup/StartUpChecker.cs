@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class StartUpChecker : MonoBehaviour
@@ -36,7 +37,29 @@ public class StartUpChecker : MonoBehaviour
             DataBase userDatabase = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>(user.name);
             userDatabase.setupDatabase();
 
+            checkUserPDFFolder(user);
+
             Debug.Log("NutzerDB erkannt/erstellt: " + user.name + ".db");
+        }
+    }
+
+    private void checkUserPDFFolder(UserDB user)
+    {
+        string pdfFolder = Path.Combine(
+            Application.persistentDataPath,
+            "Ventoriq",
+            "PDFs",
+            $"User_{user.id}"
+        );
+
+        if (!Directory.Exists(pdfFolder))
+        {
+            Directory.CreateDirectory(pdfFolder);
+            Debug.Log("PDF-Ordner erstellt: " + pdfFolder);
+        }
+        else
+        {
+            Debug.Log("PDF-Ordner erkannt: " + pdfFolder);
         }
     }
 }
