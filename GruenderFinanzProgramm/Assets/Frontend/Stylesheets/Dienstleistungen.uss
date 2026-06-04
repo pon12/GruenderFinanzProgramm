@@ -3,6 +3,9 @@
     padding: 8px;
     border-radius: 8px;
     background-color: rgb(0, 0, 0);
+    width: 33%;
+    shrink: 1;
+    grow: o;
 }
 
 .Label1 {
@@ -14,4 +17,9 @@
 .preis {
     flex-grow: 1;
     flex-direction: row;
+}
+
+.buttons {
+    flex-grow: 1;
+    height: 38px;
 }
