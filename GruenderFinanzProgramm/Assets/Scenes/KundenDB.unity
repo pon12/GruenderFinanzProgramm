@@ -210,6 +210,18 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[2].sceneName
+      value: KundenDB
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[2].buttonName
+      value: nav-item-kunden
+      objectReference: {fileID: 0}
     - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 934.71747
@@ -271,6 +283,7 @@ GameObject:
   - component: {fileID: 612004511}
   - component: {fileID: 612004513}
   - component: {fileID: 612004514}
+  - component: {fileID: 612004515}
   m_Layer: 5
   m_Name: KundenDB
   m_TagString: Untagged
@@ -341,6 +354,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
   uiDocument: {fileID: 0}
+--- !u!114 &612004515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612004509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93ccbf9b92e02394eb374e08e2aeb252, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KundendatenbankController
+  kundenZeileTemplate: {fileID: 9197481963319205126, guid: e40b8a430a8e98d45a1f9aaa9dacae82, type: 3}
 --- !u!1 &1596303726
 GameObject:
   m_ObjectHideFlags: 0
