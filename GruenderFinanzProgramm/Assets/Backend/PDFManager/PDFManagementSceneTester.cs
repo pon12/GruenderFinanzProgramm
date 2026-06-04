@@ -25,11 +25,7 @@ public class PDFManagementSceneTester : MonoBehaviour
     private void SetupDropdowns()
     {
         userDropdown.ClearOptions();
-        userDropdown.AddOptions(new List<string>
-        {
-            "User 1",
-            "User 2"
-        });
+        userDropdown.AddOptions(new List<string> { "User 1", "User 2" });
 
         categoryDropdown.ClearOptions();
         categoryDropdown.AddOptions(new List<string>
@@ -51,42 +47,73 @@ public class PDFManagementSceneTester : MonoBehaviour
     {
         currentUserId = userDropdown.value + 1;
 
-        string dbName = currentUserId == 1
-            ? "Nutzer1"
-            : "Nutzer2";
-
         currentDb = GlobalDatabaseManager.Instance
-            .GetOrCreateDatabase<DataBase>(dbName);
+            .GetOrCreateDatabase<DataBase>("TestUserDB");
 
         currentDb.setupDatabase();
 
         Debug.Log("Aktueller Nutzer: " + currentUserId);
     }
 
-    public void SavePDF()
+    public void ImportPDFPath()
+{
+    string importPath = pdfPathInput.text.Trim();
+    importPath = importPath.Trim('"');
+
+    if (importPath.StartsWith("file:///"))
+        importPath = importPath.Replace("file:///", "");
+
+    importPath = System.Uri.UnescapeDataString(importPath);
+
+    if (!File.Exists(importPath))
     {
-        string path = pdfPathInput.text;
+        Debug.LogError("Import-Datei existiert nicht: " + importPath);
+        return;
+    }
 
-        string category =
-            categoryDropdown.options[categoryDropdown.value].text;
+    string category = categoryDropdown.options[categoryDropdown.value].text;
 
-        UserPDFDocument saved = PDFStorage.SavePDF(
-            path,
-            currentUserId,
-            currentDb,
-            category
+    UserPDFDocument imported = PDFStorage.SavePDF(
+        importPath,
+        currentUserId,
+        currentDb,
+        category
+    );
+
+    if (imported != null)
+    {
+        Debug.Log($"Importiert: ID {imported.id} | {imported.originalFileName} | {imported.category}");
+        pdfPathInput.text = "";
+        RefreshPDFDropdown();
+    }
+}
+
+  public void SaveSelectedPDF()
+{
+    UserPDFDocument selected = GetSelectedPDF();
+
+    if (selected == null)
+    {
+        Debug.LogError("Keine PDF ausgewählt.");
+        return;
+    }
+
+    UserPDFDocument duplicated = PDFStorage.SavePDF(
+        selected.filePath,
+        currentUserId,
+        currentDb,
+        selected.category
+    );
+
+    if (duplicated != null)
+    {
+        Debug.Log(
+            $"PDF dupliziert: Alt-ID {selected.id} → Neu-ID {duplicated.id} | {duplicated.originalFileName}"
         );
-
-        if (saved != null)
-        {
-            Debug.Log(
-                $"Gespeichert: ID {saved.id} | {saved.originalFileName} | {saved.category}"
-            );
-        }
 
         RefreshPDFDropdown();
     }
-
+}
     public void RefreshPDFDropdown()
     {
         currentPDFs = currentDb.getPDFDocumentsByUser(currentUserId);
@@ -97,15 +124,11 @@ public class PDFManagementSceneTester : MonoBehaviour
 
         foreach (UserPDFDocument pdf in currentPDFs)
         {
-            options.Add(
-                $"ID {pdf.id} | {pdf.originalFileName} | {pdf.category}"
-            );
+            options.Add($"ID {pdf.id} | {pdf.originalFileName} | {pdf.category}");
         }
 
         if (options.Count == 0)
-        {
             options.Add("Keine PDFs gefunden");
-        }
 
         pdfDropdown.AddOptions(options);
 
@@ -126,10 +149,7 @@ public class PDFManagementSceneTester : MonoBehaviour
             System.Environment.SpecialFolder.Desktop
         );
 
-        string destinationPath = Path.Combine(
-            desktop,
-            selected.originalFileName
-        );
+        string destinationPath = Path.Combine(desktop, selected.originalFileName);
 
         bool success = PDFStorage.ExportPDFById(
             selected.id,
@@ -138,11 +158,9 @@ public class PDFManagementSceneTester : MonoBehaviour
             destinationPath
         );
 
-        Debug.Log(
-            success
-                ? "Exportiert nach: " + destinationPath
-                : "Export fehlgeschlagen."
-        );
+        Debug.Log(success
+            ? "Exportiert nach: " + destinationPath
+            : "Export fehlgeschlagen.");
     }
 
     public void DeleteSelectedPDF()
@@ -161,11 +179,9 @@ public class PDFManagementSceneTester : MonoBehaviour
             currentDb
         );
 
-        Debug.Log(
-            success
-                ? "Gelöscht: " + selected.originalFileName
-                : "Löschen fehlgeschlagen."
-        );
+        Debug.Log(success
+            ? "Gelöscht: " + selected.originalFileName
+            : "Löschen fehlgeschlagen.");
 
         RefreshPDFDropdown();
     }

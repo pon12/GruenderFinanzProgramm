@@ -5,38 +5,37 @@ public class PDFMultiUserTester : MonoBehaviour
 {
     public string testPdfPath;
 
-    private DataBase user1Db;
-    private DataBase user2Db;
+    private DataBase testDb;
 
     private int user1Id = 1;
     private int user2Id = 2;
 
     private void Start()
     {
-        user1Db = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("Nutzer1");
-        user2Db = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("Nutzer2");
+        testDb = GlobalDatabaseManager.Instance
+            .GetOrCreateDatabase<DataBase>("TestUserDB");
 
-        user1Db.setupDatabase();
-        user2Db.setupDatabase();
+        testDb.setupDatabase();
 
         Debug.Log("Multi-User PDF Test bereit.");
     }
 
     public void SaveForUser1()
     {
-        PDFStorage.SavePDF(testPdfPath, user1Id, user1Db, "Rechnungen");
+        PDFStorage.SavePDF(testPdfPath, user1Id, testDb, "Rechnungen");
         Debug.Log("PDF für Nutzer 1 gespeichert.");
     }
 
     public void SaveForUser2()
     {
-        PDFStorage.SavePDF(testPdfPath, user2Id, user2Db, "Angebote");
+        PDFStorage.SavePDF(testPdfPath, user2Id, testDb, "Angebote");
         Debug.Log("PDF für Nutzer 2 gespeichert.");
     }
 
     public void ListUser1PDFs()
     {
-        List<UserPDFDocument> pdfs = user1Db.getPDFDocumentsByUser(user1Id);
+        List<UserPDFDocument> pdfs =
+            testDb.getPDFDocumentsByUser(user1Id);
 
         Debug.Log("===== PDFs Nutzer 1 =====");
 
@@ -48,7 +47,8 @@ public class PDFMultiUserTester : MonoBehaviour
 
     public void ListUser2PDFs()
     {
-        List<UserPDFDocument> pdfs = user2Db.getPDFDocumentsByUser(user2Id);
+        List<UserPDFDocument> pdfs =
+            testDb.getPDFDocumentsByUser(user2Id);
 
         Debug.Log("===== PDFs Nutzer 2 =====");
 
