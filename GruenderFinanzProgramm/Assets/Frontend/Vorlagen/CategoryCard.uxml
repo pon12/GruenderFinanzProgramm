@@ -1,14 +1,14 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/doc-main.uss?fileID=7433441132597879392&amp;guid=a0d03a3f5149e1d448b98d3e66e7b5de&amp;type=3#doc-main"/>
-    <ui:VisualElement class="category-card" style="flex-grow: 1; aspect-ratio: auto;">
+    <ui:VisualElement class="category-card" style="flex-grow: 1; aspect-ratio: auto; width: 90%;">
         <ui:VisualElement class="sub-tile main-info-tile" style="flex-grow: 1;">
             <ui:Image source="project://database/Assets/Frontend/Bilder/category%201.png?fileID=2800000&amp;guid=d244de2ad7c4e684ab776e2d07940759&amp;type=3#category 1" class="main-info-tile"/>
-            <ui:Label text="Card Name" class="main-info-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
+            <ui:Label text="Card Name" name="lblName" class="main-info-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
         </ui:VisualElement>
-        <ui:VisualElement class="sub-tile" style="flex-grow: 1;">
+        <ui:VisualElement name="Datenfeld-Oben" class="sub-tile" style="flex-grow: 1;">
             <ui:Label text="Dokumenttext" class="sub-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
         </ui:VisualElement>
-        <ui:VisualElement class="sub-tile" style="flex-grow: 1;">
+        <ui:VisualElement name="Datenfeld-Unten" class="sub-tile" style="flex-grow: 1;">
             <ui:Label text="Dokumenttext" class="sub-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
         </ui:VisualElement>
         <ui:VisualElement class="sub-tile" style="flex-grow: 1;">
