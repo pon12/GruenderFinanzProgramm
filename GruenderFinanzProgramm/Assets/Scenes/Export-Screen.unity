@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 1090033295}
   - component: {fileID: 1090033294}
   - component: {fileID: 1090033296}
+  - component: {fileID: 1090033297}
   m_Layer: 5
   m_Name: Export-Screen
   m_TagString: Untagged
@@ -279,7 +280,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e960dea1e74b345b8cc853b126c453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
-  uiDocument: {fileID: 0}
+  uiDocument: {fileID: 1090033294}
+--- !u!114 &1090033297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090033293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6bd4066b4c04a3428f6998e93140eec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExportScreenController
+  exportZeileTemplate: {fileID: 9197481963319205126, guid: 0f1f26f582fb87d4a84f530f367606d9, type: 3}
 --- !u!1001 &2114524966
 PrefabInstance:
   m_ObjectHideFlags: 0

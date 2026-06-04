@@ -60,3 +60,14 @@ public class UserDocument
 
     public string text { get; set; }
 }
+
+public class ExportEintrag
+{
+    // Primärschlüssel für SQLite (wie in der Doku gefordert)
+    public int id { get; set; } 
+    public string bezeichnung { get; set; }
+    public string art { get; set; }
+    public string format { get; set; }
+    public string pfad { get; set; }
+    public DateTime lastUpdated { get; set; }
+}
