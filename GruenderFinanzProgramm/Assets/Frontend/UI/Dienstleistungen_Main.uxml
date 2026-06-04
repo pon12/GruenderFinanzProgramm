@@ -2,122 +2,88 @@
     <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/doc-main.uss?fileID=7433441132597879392&amp;guid=a0d03a3f5149e1d448b98d3e66e7b5de&amp;type=3#doc-main"/>
-
-    <!-- Aeusserer wrapper behaelt den Namen screen-content-area -->
+    <Style src="project://database/Assets/Frontend/Stylesheets/Dienstleistungen.uss?fileID=7433441132597879392&amp;guid=01fec56cd8896774fab0da40d32297db&amp;type=3#Dienstleistungen"/>
     <ui:VisualElement name="screen-content-area" style="width: 100%; height: 100%; background-color: rgb(44, 44, 44); position: relative;">
-
-        <!-- Innerer container heisst jetzt main-content (war doppelt screen-content-area)
-             padding-left 430 = 390 sidebar + 40 abstand
-             C# aendert diesen Wert wenn Sidebar ein oder ausgeklappt wird -->
         <ui:VisualElement name="main-content" style="width: 100%; height: 100%; flex-direction: column; padding-left: 430px; padding-right: 40px; padding-top: 40px; padding-bottom: 40px;">
-
             <ui:Label text="Dienstleistungen" class="mb-4" style="font-size: 42px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); padding: 10px; margin: 10px;"/>
-
-            <!-- grid-container ersetzt die zwei expliziten flex-row Zeilen
-                 flex-wrap: wrap + col-4 ergibt automatisch 3 Spalten
-                 beim Sidebar-Toggle verschiebt sich alles mit dem padding-left oben -->
-            <ui:VisualElement class="grid-container">
-
-                <!-- Karte 1 Beratung -->
-                <ui:VisualElement name="card-1" class="service-card grid-item col-4" style="background-color: rgb(0, 0, 0);">
-                    <ui:VisualElement class="card-header">
-                        <ui:VisualElement class="card-icon-sq"/>
-                        <ui:Label name="title-1" text="Beratung" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+            <ui:VisualElement class="grid-container" style="height: 100%;">
+                <ui:VisualElement name="service-cards-1" style="flex-grow: 1; flex-direction: row; height: 50%;">
+                    <ui:VisualElement name="card-1" class="cards" style="flex-grow: 0;">
+                        <ui:Label text="Beratung" class="Label1"/>
+                        <ui:Label name="desc-1" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement name="Preis" class="preis">
+                            <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); flex-shrink: 0; flex-grow: 1; width: auto; height: auto;"/>
+                            <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); width: auto; -unity-text-align: upper-right;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex-grow: 1; height: 38px;">
+                            <ui:Button name="btn-edit-1" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 20px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px; background-size: 100% 50%;"/>
+                            <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 20px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); background-size: 100% 50%;"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="desc-1" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                    <ui:VisualElement class="card-divider"/>
-                    <ui:VisualElement class="card-price-row">
-                        <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                    <ui:VisualElement name="card-2" class="cards" style="flex-grow: 0;">
+                        <ui:Label text="Webdesign" class="Label1"/>
+                        <ui:Label name="desc-1" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement style="flex-grow: 1;">
+                            <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex-grow: 1;">
+                            <ui:Button name="btn-edit-1" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
+                            <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement class="card-btn-row">
-                        <ui:Button name="btn-edit-1" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- Karte 2 Web-Design -->
-                <ui:VisualElement name="card-2" class="service-card grid-item col-4" style="background-color: rgb(0, 0, 0);">
-                    <ui:VisualElement class="card-header">
-                        <ui:VisualElement class="card-icon-sq"/>
-                        <ui:Label name="title-2" text="Web-Design" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:Label name="desc-2" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                    <ui:VisualElement class="card-divider"/>
-                    <ui:VisualElement class="card-price-row">
-                        <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Label name="price-2" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="card-btn-row">
-                        <ui:Button name="btn-edit-2" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Button name="btn-del-2" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                    <ui:VisualElement name="card-3" class="cards" style="flex-grow: 0;">
+                        <ui:Label text="Programmierung" class="Label1"/>
+                        <ui:Label name="desc-1" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement class="preis" style="flex-grow: 1;">
+                            <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex-grow: 1;">
+                            <ui:Button name="btn-edit-1" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
+                            <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-
-                <!-- Karte 3 Programmierung -->
-                <ui:VisualElement name="card-3" class="service-card grid-item col-4" style="background-color: rgb(0, 0, 0);">
-                    <ui:VisualElement class="card-header">
-                        <ui:VisualElement class="card-icon-sq"/>
-                        <ui:Label name="title-3" text="Programmierung" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                <ui:VisualElement name="service-cards-2" style="flex-grow: 1; flex-direction: row; height: 50%;">
+                    <ui:VisualElement name="card-4" class="service-card grid-item cards" style="background-color: rgb(0, 0, 0);">
+                        <ui:VisualElement class="card-header">
+                            <ui:VisualElement class="card-icon-sq"/>
+                            <ui:Label name="title-4" text="Logo" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:Label name="desc-4" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement class="card-divider"/>
+                        <ui:VisualElement class="card-price-row">
+                            <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-4" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="card-btn-row">
+                            <ui:Button name="btn-edit-4" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
+                            <ui:Button name="btn-del-4" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:Label name="desc-3" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                    <ui:VisualElement class="card-divider"/>
-                    <ui:VisualElement class="card-price-row">
-                        <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Label name="price-3" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                    <ui:VisualElement name="card-5" class="service-card grid-item cards" style="background-color: rgb(0, 0, 0);">
+                        <ui:VisualElement class="card-header">
+                            <ui:VisualElement class="card-icon-sq"/>
+                            <ui:Label name="title-5" text="Lizenskey" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:Label name="desc-5" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement class="card-divider"/>
+                        <ui:VisualElement class="card-price-row">
+                            <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-5" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="card-btn-row">
+                            <ui:Button name="btn-edit-5" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Button name="btn-del-5" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement class="card-btn-row">
-                        <ui:Button name="btn-edit-3" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Button name="btn-del-3" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
+                    <ui:Button name="btn-neue-dienstleistung" class="add-card grid-item" style="height: auto; background-color: rgb(0, 0, 0); flex-direction: column; align-items: center; justify-content: center; margin-top: 16px; flex-grow: 1;">
+                        <ui:Label text="+" style="font-size: 80px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-text-align: middle-center;"/>
+                    </ui:Button>
                 </ui:VisualElement>
-
-                <!-- Karte 4 Logo -->
-                <ui:VisualElement name="card-4" class="service-card grid-item col-4" style="background-color: rgb(0, 0, 0);">
-                    <ui:VisualElement class="card-header">
-                        <ui:VisualElement class="card-icon-sq"/>
-                        <ui:Label name="title-4" text="Logo" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:Label name="desc-4" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                    <ui:VisualElement class="card-divider"/>
-                    <ui:VisualElement class="card-price-row">
-                        <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Label name="price-4" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="card-btn-row">
-                        <ui:Button name="btn-edit-4" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Button name="btn-del-4" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- Karte 5 Lizenskey -->
-                <ui:VisualElement name="card-5" class="service-card grid-item col-4" style="background-color: rgb(0, 0, 0);">
-                    <ui:VisualElement class="card-header">
-                        <ui:VisualElement class="card-icon-sq"/>
-                        <ui:Label name="title-5" text="Lizenskey" style="font-size: 26px; color: rgb(255, 255, 255); -unity-font-style: bold; white-space: normal; overflow: hidden; flex-shrink: 1; flex-grow: 1; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:Label name="desc-5" text="Hier würde jetzt irgend eine Scheiße stehen so als Bsp Text. Weis doch auch net was ich dazu schreiben soll lol XD Ps Pontus ist der Garbage Collector" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                    <ui:VisualElement class="card-divider"/>
-                    <ui:VisualElement class="card-price-row">
-                        <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Label name="price-5" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="card-btn-row">
-                        <ui:Button name="btn-edit-5" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                        <ui:Button name="btn-del-5" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-
-                <!-- Plus karte neue dienstleistung -->
-                <ui:Button name="btn-neue-dienstleistung" class="add-card grid-item col-4" style="height: 259px; background-color: rgb(0, 0, 0); flex-direction: column; align-items: center; justify-content: center;">
-                    <ui:Label text="+" style="font-size: 80px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-text-align: middle-center;"/>
-                </ui:Button>
-
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <!-- Popup root unveraendert -->
         <ui:VisualElement name="popup-root" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; display: none;"/>
-
     </ui:VisualElement>
 </ui:UXML>
