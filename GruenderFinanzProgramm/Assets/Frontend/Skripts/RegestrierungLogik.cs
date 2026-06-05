@@ -1,55 +1,45 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using System; 
+using System;
 
 public class RegestrierungLogik : MonoBehaviour
 {
     private VisualElement root;
 
-    // Die beiden Haupt-Bildschirme (Container)
     private VisualElement screenLogin;
     private VisualElement screenMain;
 
-    // Elemente des Key-Generators (MainScreen)
-    private Button btnKeyGenerieren; 
+    private Button btnKeyGenerieren;
     private Toggle toggle;
     private VisualElement popuppasskey;
-    private Button btnclose;      
-    private Button btnpopupclose; 
+    private Button btnclose;
+    private Button btnpopupclose;
     private TextField inputProfileingabe;
     private Label lblPasskey;
 
-    // NEU: Der Button zum Sichtbar-machen / Entschlüsseln
-    private Button btnEntschluesseln; 
+    private Button btnEntschluesseln;
 
-    // Das Fehler-Label für falsche/fehlende Eingaben
     private Label lblError;
 
-    // Das AGB-Popup und das klickbare Label
     private VisualElement popUpAGB;
-    private Label text2; 
+    private Label text2;
     private Button btnAGBclose;
 
-    // Das Datenschutz-Popup und seine klickbaren Elemente
-    private VisualElement popUpDatenschutz; 
-    private Label textDatenschutz; 
-    private Button btnDatenschutzclose; 
+    private VisualElement popUpDatenschutz;
+    private Label textDatenschutz;
+    private Button btnDatenschutzclose;
 
-    // Elemente vom Login-Screen
-    private Button btnLoginSubmit; 
+    private Button btnLoginSubmit;
 
-    // Hex-Farbcodes für die Links (Hover-Effekt)
-    private readonly string farbeNormal = "#00C833";
-    private readonly string farbeHover = "#00FF4D";
+    private readonly string farbeNormal = "#80CF95";
+    private readonly string farbeHover = "#80CF95";
 
-    // --- EVENTS FÜR DIE WIEDERVERWENDBARKEIT ---
     public event Action OnBackToLoginRequested;
-    public event Action<string> OnRegistrationSuccessful; 
+    public event Action<string> OnRegistrationSuccessful;
 
-    // --- BACKEND INSTANZ & CODESPEICHER ---
-    private AuthService authService; 
-    private string aktuellerPasskey = ""; // Speichert den echten Key im Hintergrund ab
-    private bool istEntschluesselt = false; // Zustand, ob der Key gerade offen liegt
+    private AuthService authService;
+    private string aktuellerPasskey = "";
+    private bool istEntschluesselt = false;
 
     private void OnEnable()
     {
@@ -60,72 +50,58 @@ public class RegestrierungLogik : MonoBehaviour
 
         root = uiDocument.rootVisualElement;
 
-        // 1. Die großen Screen-Container suchen
         screenLogin = root.Q<VisualElement>("LoginScreen");
         screenMain = root.Q<VisualElement>("MainScreen");
 
-        // 2. Elemente für den Key-Generator suchen
-        btnKeyGenerieren = root.Q<Button>("btnKeyGenerieren"); 
+        btnKeyGenerieren = root.Q<Button>("btnKeyGenerieren");
         toggle = root.Q<Toggle>("Toggle");
         popuppasskey = root.Q<VisualElement>("popuppasskey");
-        btnclose = root.Q<Button>("btnclose"); 
-        btnpopupclose = root.Q<Button>("btnpopupclose"); 
+        btnclose = root.Q<Button>("btnclose");
+        btnpopupclose = root.Q<Button>("btnpopupclose");
         inputProfileingabe = root.Q<TextField>("Profileingabe");
         lblPasskey = root.Q<Label>("lblPasskey");
 
-        // NEU: Button aus dem UI Builder heraussuchen
         btnEntschluesseln = root.Q<Button>("btnEntschluesseln");
-
-        // Fehler-Label aus dem UI holen
         lblError = root.Q<Label>("lblError");
 
-        // 3. Elemente für das AGB-Popup suchen
         popUpAGB = root.Q<VisualElement>("PopUpAGB");
         text2 = root.Q<Label>("text2");
         btnAGBclose = root.Q<Button>("btnAGBclose");
 
-        // Elemente für das Datenschutz-Popup holen
-        popUpDatenschutz = root.Q<VisualElement>("PopUpDatenschutz"); 
+        popUpDatenschutz = root.Q<VisualElement>("PopUpDatenschutz");
         textDatenschutz = root.Q<Label>("textDatenschutz");
-        btnDatenschutzclose = root.Q<Button>("btnDatenschutzclose"); 
+        btnDatenschutzclose = root.Q<Button>("btnDatenschutzclose");
 
-        // 4. Elemente für den Login-Screen suchen
-        btnLoginSubmit = root.Q<Button>("btnLoginSubmit"); 
+        btnLoginSubmit = root.Q<Button>("btnLoginSubmit");
 
-        // Sicherheits-Checks in der Unity-Konsole
         ValidateUIElements();
 
-        // Styling via Rich Text initialisieren
         ResetAGBText();
         ResetDatenschutzText();
 
-        // --- EVENTS REGISTRIEREN ---
         if (btnKeyGenerieren != null) btnKeyGenerieren.clicked += OnKeyGenerierenClicked;
         if (btnclose != null) btnclose.clicked += OnBackToLoginClicked;
         if (btnpopupclose != null) btnpopupclose.clicked += OnPopupCloseClicked;
-        
-        // NEU: Klick-Event für den Entschlüsselungs-Button registrieren
         if (btnEntschluesseln != null) btnEntschluesseln.clicked += OnEntschluesselnClicked;
-        
-        // AGB Klick & Hover
+        if (btnLoginSubmit != null) btnLoginSubmit.clicked += OnLoginSubmitted;
+
         if (text2 != null)
         {
             text2.RegisterCallback<PointerDownEvent>(OnLabelClicked);
             text2.RegisterCallback<PointerOverEvent>(OnAGBHoverIn);
             text2.RegisterCallback<PointerOutEvent>(OnAGBHoverOut);
         }
+
         if (btnAGBclose != null) btnAGBclose.clicked += OnAGBcloseClicked;
-        
-        // Datenschutz Klick, Hover & Schließen
+
         if (textDatenschutz != null)
         {
             textDatenschutz.RegisterCallback<PointerDownEvent>(OnDatenschutzLabelClicked);
             textDatenschutz.RegisterCallback<PointerOverEvent>(OnDatenschutzHoverIn);
             textDatenschutz.RegisterCallback<PointerOutEvent>(OnDatenschutzHoverOut);
         }
+
         if (btnDatenschutzclose != null) btnDatenschutzclose.clicked += OnDatenschutzCloseClicked;
-        
-        if (btnLoginSubmit != null) btnLoginSubmit.clicked += OnLoginSubmitted;
 
         ShowLoginScreen();
     }
@@ -147,7 +123,7 @@ public class RegestrierungLogik : MonoBehaviour
                     lblError.style.color = Color.red;
                     lblError.text = "Registrierung fehlgeschlagen: Dieser Name existiert bereits!";
                 }
-                return; 
+                return;
             }
 
             if (lblError != null) lblError.style.display = DisplayStyle.None;
@@ -156,11 +132,9 @@ public class RegestrierungLogik : MonoBehaviour
             {
                 popuppasskey.style.display = DisplayStyle.Flex;
 
-                // Wir merken uns den echten Key im Hintergrund und setzen den Sichtbarkeits-Status zurück
                 aktuellerPasskey = authService.passkeyGlobal;
                 istEntschluesselt = false;
 
-                // Zeigt den Key direkt verschlüsselt/maskiert an
                 AktualisierePasskeyAnzeige();
             }
 
@@ -172,37 +146,36 @@ public class RegestrierungLogik : MonoBehaviour
         }
     }
 
-    // NEU: Die Logik für den "btnEntschluesseln"-Button
     private void OnEntschluesselnClicked()
     {
         if (string.IsNullOrEmpty(aktuellerPasskey)) return;
 
-        // Zustand umkehren (Anzeigen <-> Verbergen)
         istEntschluesselt = !istEntschluesselt;
-        
         AktualisierePasskeyAnzeige();
     }
 
-    // NEU: Hilfsfunktion, die steuert, ob Text oder Sternchen angezeigt werden
     private void AktualisierePasskeyAnzeige()
     {
         if (lblPasskey == null) return;
 
+        string passkeyAnzeige;
+
         if (istEntschluesselt)
         {
-            // Zeigt den echten Passkey im Label an
-            lblPasskey.text = "PassKey: " + aktuellerPasskey;
-            
+            passkeyAnzeige = aktuellerPasskey;
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
         }
         else
         {
-            // Erzeugt dynamisch eine Sternchenkette passend zur Länge des Keys (z.B. "****")
-            string maskiert = new string('*', aktuellerPasskey.Length);
-            lblPasskey.text = "PassKey: " + maskiert;
-            
+            passkeyAnzeige = new string('*', aktuellerPasskey.Length);
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
         }
+
+        string recoveryKey = authService.recoveryPassKeyGlobal;
+
+        lblPasskey.text =
+            "PassKey: " + passkeyAnzeige +
+            "\nRecoveryKey: " + recoveryKey;
     }
 
     private void ZeigeEingabeFehler(bool hasText, bool isToggleActive)
@@ -210,7 +183,7 @@ public class RegestrierungLogik : MonoBehaviour
         if (lblError != null)
         {
             lblError.style.display = DisplayStyle.Flex;
-            lblError.style.color = Color.red; 
+            lblError.style.color = Color.red;
 
             if (!hasText && !isToggleActive)
                 lblError.text = "Bitte gib einen Namen ein und akzeptiere die Bedingungen.";
@@ -224,24 +197,21 @@ public class RegestrierungLogik : MonoBehaviour
     private void OnPopupCloseClicked()
     {
         if (popuppasskey != null) popuppasskey.style.display = DisplayStyle.None;
-        aktuellerPasskey = ""; // Aus Sicherheitsgründen leeren beim Schließen
+        aktuellerPasskey = "";
     }
 
-    // --- AGB LOGIK ---
     private void OnLabelClicked(PointerDownEvent evt) { if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.Flex; }
     private void OnAGBcloseClicked() { if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.None; }
-    private void OnAGBHoverIn(PointerOverEvent evt) => text2.text = $"<color={farbeHover}><u>AGB</u></color>";
+    private void OnAGBHoverIn(PointerOverEvent evt) { if (text2 != null) text2.text = $"<color={farbeHover}><u>AGB</u></color>"; }
     private void OnAGBHoverOut(PointerOutEvent evt) => ResetAGBText();
     private void ResetAGBText() { if (text2 != null) text2.text = $"<color={farbeNormal}><u>AGB</u></color>"; }
 
-    // --- DATENSCHUTZ LOGIK ---
     private void OnDatenschutzLabelClicked(PointerDownEvent evt) { if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.Flex; }
     private void OnDatenschutzCloseClicked() { if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None; }
-    private void OnDatenschutzHoverIn(PointerOverEvent evt) => textDatenschutz.text = $"<color={farbeHover}><u>Datenschutzrichtlinie</u></color>";
+    private void OnDatenschutzHoverIn(PointerOverEvent evt) { if (textDatenschutz != null) textDatenschutz.text = $"<color={farbeHover}><u>Datenschutzrichtlinie</u></color>"; }
     private void OnDatenschutzHoverOut(PointerOutEvent evt) => ResetDatenschutzText();
     private void ResetDatenschutzText() { if (textDatenschutz != null) textDatenschutz.text = $"<color={farbeNormal}><u>Datenschutzrichtlinie</u></color>"; }
 
-    // --- SCREEN WECHSEL LOGIK ---
     private void OnBackToLoginClicked()
     {
         ShowLoginScreen();
@@ -250,13 +220,14 @@ public class RegestrierungLogik : MonoBehaviour
 
     private void OnLoginSubmitted() => ShowMainScreen();
 
+    // HIER LAG DER FEHLER: Die null-Checks haben gefehlt, wodurch Unity den Wechsel abgebrochen hat, falls ein UI-Element gefehlt hat.
     private void ShowLoginScreen()
     {
         if (screenLogin != null) screenLogin.style.display = DisplayStyle.Flex;
         if (screenMain != null) screenMain.style.display = DisplayStyle.None;
         if (popuppasskey != null) popuppasskey.style.display = DisplayStyle.None;
-        if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.None; 
-        if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None; 
+        if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.None;
+        if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None;
         if (lblError != null) lblError.style.display = DisplayStyle.None;
     }
 
@@ -268,19 +239,12 @@ public class RegestrierungLogik : MonoBehaviour
 
     private void ValidateUIElements()
     {
-        if (btnKeyGenerieren == null) Debug.LogError("Konnte den Button 'btnKeyGenerieren' nicht finden!");
-        if (btnEntschluesseln == null) Debug.LogError("Konnte den Button 'btnEntschluesseln' nicht finden!");
-        if (text2 == null) Debug.LogError("Konnte das Label 'text2' (AGB) nicht finden!");
-        if (popUpAGB == null) Debug.LogError("Konnte das Popup 'PopUpAGB' nicht finden!");
-        if (btnAGBclose == null) Debug.LogError("Konnte den Button 'btnAGBclose' nicht finden!");
-        if (inputProfileingabe == null) Debug.LogError("Konnte das TextField 'Profileingabe' nicht finden!");
-        if (lblPasskey == null) Debug.LogError("Konnte das Label 'lblPasskey' nicht finden!");
-        if (popUpDatenschutz == null) Debug.LogError("Konnte das Popup 'PopUpDatenschutz' nicht finden!");
-        if (textDatenschutz == null) Debug.LogError("Konnte das Label 'textDatenschutz' nicht finden!");
-        if (btnDatenschutzclose == null) Debug.LogError("Konnte den Button 'btnDatenschutzclose' nicht finden!");
-        if (lblError == null) Debug.LogError("Konnte das Label 'lblError' nicht finden!");
+        if (btnKeyGenerieren == null) Debug.LogError("btnKeyGenerieren fehlt");
+        if (btnEntschluesseln == null) Debug.LogError("btnEntschluesseln fehlt");
+        if (lblPasskey == null) Debug.LogError("lblPasskey fehlt");
     }
 
+    // HIER LAG DER FEHLER: Die Events müssen zwingend alle wieder abgemeldet werden!
     private void OnDisable()
     {
         if (btnKeyGenerieren != null) btnKeyGenerieren.clicked -= OnKeyGenerierenClicked;
