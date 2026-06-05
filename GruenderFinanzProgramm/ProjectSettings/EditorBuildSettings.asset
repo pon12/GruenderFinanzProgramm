@@ -9,18 +9,18 @@ EditorBuildSettings:
     path: Assets/Scenes/TestSzenen/Dienstleistungen.unity
     guid: bedc143777864e94582d010be6e83b36
   - enabled: 1
-    path: Assets/Scenes/Dokument-Screen.unity
-    guid: 59495f7d97fecd14bac99d2e58b113c5
-  - enabled: 1
     path: Assets/Scenes/TestSzenen/Kassenbuch.unity
     guid: b195a52d9bf0abc40bf82f095633095b
+  - enabled: 1
+    path: Assets/Scenes/Dokument-Screen.unity
+    guid: 59495f7d97fecd14bac99d2e58b113c5
   - enabled: 1
     path: Assets/Scenes/KundenDB.unity
     guid: aa7fb2a9d696a60439e616781ef3928f
   - enabled: 1
-    path: Assets/Scenes/TestSzenen/LoginScene.unity
-    guid: 4e374d4427d063d46af0817cfcc913d3
+    path: Assets/Scenes/Login.unity
+    guid: 3524e9242d271eb4ba61baf94dc780c7
   - enabled: 1
-    path: Assets/Scenes/TestSzenen/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Einstellungen.unity
+    guid: c6a59d10920a5bb428adbaddadf7a697
   m_configObjects: {}
