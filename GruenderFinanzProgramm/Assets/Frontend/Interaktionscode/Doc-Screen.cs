@@ -14,7 +14,9 @@ public class DocumentDashboard : MonoBehaviour
     // UI Elemente
     private VisualElement root;
     private Button createButton;
+    private Button deleteButton;
     private VisualElement gridContainer;
+
     
     // Pop-up Elemente
     private VisualElement popupOverlay;
@@ -63,6 +65,7 @@ public class DocumentDashboard : MonoBehaviour
         root = uiDocument.rootVisualElement;
 
         createButton = root.Q<Button>("Create-Button");
+        deleteButton = root.Q<Button>("Delete-Button");
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
         popupOverlay = root.Q<VisualElement>("Popup-Overlay");
@@ -83,6 +86,7 @@ public class DocumentDashboard : MonoBehaviour
         }
 
         if (createButton != null) createButton.clicked += OpenPopup;
+        if (deleteButton != null) deleteButton.clicked += deleteAllDocuments;
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
 
         if (btnTypeStandard != null) btnTypeStandard.clicked += () => ApplyTemplate("Standard");
@@ -93,6 +97,7 @@ public class DocumentDashboard : MonoBehaviour
 
         LoadDataLocally();
         SpawnAllCardsAtStart();
+        getAllData();
     }
 
     private void OpenPopup() { if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; }
@@ -179,6 +184,43 @@ public class DocumentDashboard : MonoBehaviour
         string json = JsonUtility.ToJson(speicherDaten, true);
         File.WriteAllText(saveFilePath, json);
     }
+
+    //Lösche alle Dokumente.
+    private void deleteAllDocuments()
+    {
+        speicherDaten.savedDocs.Clear();
+        SaveDataLocally();
+        SpawnAllCardsAtStart();
+    }
+
+    //Lösche ein bestimmtes Dokument anhand von Kategorie und Titel.
+    private void clearOneDataEntry(string category, string title)
+    {
+        DocumentData entryToRemove = speicherDaten.savedDocs.Find(d => d.category == category && d.title == title);
+        if (entryToRemove != null)
+        {
+            speicherDaten.savedDocs.Remove(entryToRemove);
+            SaveDataLocally();
+            SpawnAllCardsAtStart();
+        }
+    }
+
+
+    // Gibt alle Dokumente
+    private List<DocumentData> getAllData()
+    {
+    //Test um zu sehen ob funktion gecall wird.
+    Debug.Log("GetAllData function called");
+    List<DocumentData> allData = speicherDaten.savedDocs;
+    //Debug nur zum test kannst du wens geht rausnehmen
+    foreach (var doc in allData)
+    {
+        Debug.Log($"Category: {doc.category}, Title: {doc.title}, Type: {doc.type}");
+    }
+    return allData;
+    }
+
+
 
     private void LoadDataLocally()
     {
