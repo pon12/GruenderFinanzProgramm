@@ -7,14 +7,18 @@ using iTextSharp.text.pdf;
 
 public static class InvoicePdfExporter
 {
-    public static string ExportInvoiceToPdf(
+    public static UserPDFDocument ExportInvoiceToPdf(
         Invoice invoice,
-        List<InvoiceItem> items
+        List<InvoiceItem> items,
+        int userId,
+        DataBase db
     )
     {
         string folderPath = Path.Combine(
             Application.persistentDataPath,
-            "Rechnungen"
+            "PDFs",
+            "Rechnungen",
+            "User" + userId
         );
 
         Directory.CreateDirectory(folderPath);
@@ -26,26 +30,44 @@ public static class InvoicePdfExporter
 
         try
         {
-            Document doc = new Document(PageSize.A4, 50, 50, 50, 50);
+            Document doc = new Document(
+                PageSize.A4,
+                50,
+                50,
+                50,
+                50
+            );
 
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
             {
                 PdfWriter.GetInstance(doc, fs);
 
-                doc.AddAuthor("Deine Firma");
+                doc.AddAuthor("Ventoriq");
                 doc.AddTitle("Rechnung " + invoice.invoiceNumber);
 
                 doc.Open();
 
-                // Fonts
+                // =========================
+                // FONTS
+                // =========================
+
                 iTextSharp.text.Font titleFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                    FontFactory.GetFont(
+                        FontFactory.HELVETICA_BOLD,
+                        18
+                    );
 
                 iTextSharp.text.Font headerFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+                    FontFactory.GetFont(
+                        FontFactory.HELVETICA_BOLD,
+                        12
+                    );
 
                 iTextSharp.text.Font normalFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA, 12);
+                    FontFactory.GetFont(
+                        FontFactory.HELVETICA,
+                        12
+                    );
 
                 iTextSharp.text.Font grayFont =
                     FontFactory.GetFont(
@@ -55,12 +77,14 @@ public static class InvoicePdfExporter
                     );
 
                 // =========================
-                // RECHNUNGSNUMMER (GANZ OBEN)
+                // TITEL
                 // =========================
+
                 Paragraph invoiceTitle = new Paragraph(
                     "RECHNUNG " + invoice.invoiceNumber,
                     titleFont
                 );
+
                 invoiceTitle.Alignment = Element.ALIGN_LEFT;
 
                 doc.Add(invoiceTitle);
@@ -69,27 +93,55 @@ public static class InvoicePdfExporter
                 // =========================
                 // FIRMA
                 // =========================
-                doc.Add(new Paragraph(invoice.companyName, headerFont));
-                doc.Add(new Paragraph(invoice.companyAddress, normalFont));
+
+                doc.Add(new Paragraph(
+                    invoice.companyName,
+                    headerFont
+                ));
+
+                doc.Add(new Paragraph(
+                    invoice.companyAddress,
+                    normalFont
+                ));
+
                 doc.Add(new Paragraph(" "));
 
                 // =========================
                 // RECHNUNGSDATEN
                 // =========================
-                doc.Add(new Paragraph("Datum: " + invoice.date, normalFont));
-                doc.Add(new Paragraph("Fällig bis: " + invoice.dueDate, normalFont));
-                doc.Add(new Paragraph("Status: " + invoice.status, normalFont));
+
+                doc.Add(new Paragraph(
+                    "Datum: " + invoice.date,
+                    normalFont
+                ));
+
+                doc.Add(new Paragraph(
+                    "Fällig bis: " + invoice.dueDate,
+                    normalFont
+                ));
+
+                doc.Add(new Paragraph(
+                    "Status: " + invoice.status,
+                    normalFont
+                ));
 
                 doc.Add(new Paragraph(" "));
 
                 // =========================
                 // KUNDE
                 // =========================
-                doc.Add(new Paragraph("Kunde: " + invoice.customerName, headerFont));
+
+                doc.Add(new Paragraph(
+                    "Kunde: " + invoice.customerName,
+                    headerFont
+                ));
 
                 if (!string.IsNullOrEmpty(invoice.customerAddress))
                 {
-                    doc.Add(new Paragraph(invoice.customerAddress, normalFont));
+                    doc.Add(new Paragraph(
+                        invoice.customerAddress,
+                        normalFont
+                    ));
                 }
 
                 doc.Add(new Paragraph(" "));
@@ -97,9 +149,20 @@ public static class InvoicePdfExporter
                 // =========================
                 // TABELLE
                 // =========================
+
                 PdfPTable table = new PdfPTable(4);
+
                 table.WidthPercentage = 100f;
-                table.SetWidths(new float[] { 3.5f, 1f, 1.2f, 1.2f });
+
+                table.SetWidths(
+                    new float[]
+                    {
+                        3.5f,
+                        1f,
+                        1.2f,
+                        1.2f
+                    }
+                );
 
                 AddHeaderCell(table, "Beschreibung", headerFont);
                 AddHeaderCell(table, "Menge", headerFont);
@@ -108,10 +171,32 @@ public static class InvoicePdfExporter
 
                 foreach (InvoiceItem item in items)
                 {
-                    AddBodyCell(table, item.description, normalFont);
-                    AddBodyCell(table, item.quantity.ToString(), normalFont, Element.ALIGN_CENTER);
-                    AddBodyCell(table, item.unitPrice.ToString("0.00"), normalFont, Element.ALIGN_RIGHT);
-                    AddBodyCell(table, item.calculatedTotal.ToString("0.00"), normalFont, Element.ALIGN_RIGHT);
+                    AddBodyCell(
+                        table,
+                        item.description,
+                        normalFont
+                    );
+
+                    AddBodyCell(
+                        table,
+                        item.quantity.ToString(),
+                        normalFont,
+                        Element.ALIGN_CENTER
+                    );
+
+                    AddBodyCell(
+                        table,
+                        item.unitPrice.ToString("0.00"),
+                        normalFont,
+                        Element.ALIGN_RIGHT
+                    );
+
+                    AddBodyCell(
+                        table,
+                        item.calculatedTotal.ToString("0.00"),
+                        normalFont,
+                        Element.ALIGN_RIGHT
+                    );
                 }
 
                 doc.Add(table);
@@ -120,65 +205,134 @@ public static class InvoicePdfExporter
                 // =========================
                 // SUMMEN
                 // =========================
+
                 PdfPTable totals = new PdfPTable(2);
+
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
 
-                AddBodyCell(totals, "Zwischensumme:", normalFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, invoice.subtotal.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    "Zwischensumme:",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                );
 
-                AddBodyCell(totals, "MwSt:", normalFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, invoice.tax.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    invoice.subtotal.ToString("0.00") + " €",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                );
 
-                AddBodyCell(totals, "Gesamt:", headerFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, invoice.total.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    "MwSt:",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                );
+
+                AddBodyCell(
+                    totals,
+                    invoice.tax.ToString("0.00") + " €",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                );
+
+                AddBodyCell(
+                    totals,
+                    "Gesamt:",
+                    headerFont,
+                    Element.ALIGN_RIGHT
+                );
+
+                AddBodyCell(
+                    totals,
+                    invoice.total.ToString("0.00") + " €",
+                    headerFont,
+                    Element.ALIGN_RIGHT
+                );
 
                 doc.Add(totals);
 
                 // =========================
                 // NOTIZEN
                 // =========================
+
                 if (!string.IsNullOrEmpty(invoice.notes))
                 {
                     doc.Add(new Paragraph(" "));
-                    doc.Add(new Paragraph("Anmerkungen:", headerFont));
-                    doc.Add(new Paragraph(invoice.notes, normalFont));
+
+                    doc.Add(new Paragraph(
+                        "Anmerkungen:",
+                        headerFont
+                    ));
+
+                    doc.Add(new Paragraph(
+                        invoice.notes,
+                        normalFont
+                    ));
                 }
 
                 // =========================
                 // FOOTER
                 // =========================
+
                 doc.Add(new Paragraph(" "));
                 doc.Add(new Paragraph(" "));
 
                 Paragraph footer = new Paragraph(
-                    "Erstellt am " + DateTime.Now.ToString("dd.MM.yyyy"),
+                    "Erstellt am " +
+                    DateTime.Now.ToString("dd.MM.yyyy"),
                     grayFont
                 );
 
                 footer.Alignment = Element.ALIGN_CENTER;
+
                 doc.Add(footer);
 
                 doc.Close();
             }
 
             Debug.Log("PDF gespeichert: " + filePath);
+
+            UserPDFDocument document =
+                PDFStorage.RegisterExistingPDF(
+                    filePath,
+                    userId,
+                    db
+                );
+
             Application.OpenURL("file://" + filePath);
 
-            return filePath;
+            return document;
         }
         catch (Exception ex)
         {
-            Debug.LogError("Fehler beim PDF-Export: " + ex);
+            Debug.LogError(
+                "Fehler beim PDF-Export: " + ex
+            );
+
             return null;
         }
     }
 
-    private static void AddHeaderCell(PdfPTable table, string text, iTextSharp.text.Font font)
+    private static void AddHeaderCell(
+        PdfPTable table,
+        string text,
+        iTextSharp.text.Font font
+    )
     {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.HorizontalAlignment = Element.ALIGN_CENTER;
-        cell.BackgroundColor = new iTextSharp.text.Color(230, 230, 230);
+        PdfPCell cell = new PdfPCell(
+            new Phrase(text, font)
+        );
+
+        cell.HorizontalAlignment =
+            Element.ALIGN_CENTER;
+
+        cell.BackgroundColor =
+            new iTextSharp.text.Color(230, 230, 230);
+
         table.AddCell(cell);
     }
 
@@ -186,20 +340,16 @@ public static class InvoicePdfExporter
         PdfPTable table,
         string text,
         iTextSharp.text.Font font,
-        int alignment
+        int alignment = Element.ALIGN_LEFT
     )
     {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        PdfPCell cell = new PdfPCell(
+            new Phrase(text, font)
+        );
+
         cell.HorizontalAlignment = alignment;
+
         table.AddCell(cell);
     }
-
-    private static void AddBodyCell(
-        PdfPTable table,
-        string text,
-        iTextSharp.text.Font font
-    )
-    {
-        AddBodyCell(table, text, font, Element.ALIGN_LEFT);
-    }
 }
+

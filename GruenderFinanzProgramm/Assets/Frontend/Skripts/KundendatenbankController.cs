@@ -16,7 +16,7 @@ public class KundendatenbankController : MonoBehaviour
     private Label lblCounter; 
 
     [Header("Lokaler Nutzer")]
-    private Button btnEditLocal; // Der Button für den lokalen Nutzer oben
+    private Button btnEditLocal; 
 
     [Header("Popups")]
     private VisualElement popupErstellen;
@@ -38,32 +38,23 @@ public class KundendatenbankController : MonoBehaviour
         uiDocument = GetComponent<UIDocument>();
         var root = uiDocument.rootVisualElement;
 
-        // 1. Haupt-UI Elemente greifen
         kundenContainer = root.Q<ScrollView>("kunden-container");
         kundenListeHolder = root.Q<VisualElement>("kunden-liste-holder"); 
         btnKundeHinzufuegen = root.Q<Button>("btn-add-coustomer"); 
         lblCounter = root.Q<Label>("lbl-counter"); 
-
-        // 2. Lokalen Nutzer-Button greifen
         btnEditLocal = root.Q<Button>("btn-edit-local");
 
-        // 3. Popups greifen (Mit dem korrekten "n" im Namen)
         popupErstellen = root.Q<VisualElement>("PopUpKundeerstellen");
         popupBearbeiten = root.Q<VisualElement>("PopUpKundenbearbeiten");
 
-        // 4. Popup-Inhalte zuweisen
         AssignPopupElements(root);
 
-        // Standardmäßig verstecken
         SetElementVisible(popupErstellen, false);
         SetElementVisible(popupBearbeiten, false);
 
-        // 5. Events binden
         RegisterEvents();
 
-        // 6. Testdaten generieren & Liste anzeigen
-        GeneriereTestDaten();
-        RefreshKundenListe();
+        LadeKundenAusDatenbank();
     }
 
     private void AssignPopupElements(VisualElement root)
@@ -107,13 +98,10 @@ public class KundendatenbankController : MonoBehaviour
         if (btnEditAbbrechen != null) btnEditAbbrechen.clicked += () => SetElementVisible(popupBearbeiten, false);
         if (btnEditSpeichern != null) btnEditSpeichern.clicked += SpeichereBearbeitetenKunden;
 
-        // Event für den lokalen Nutzer-Button
         if (btnEditLocal != null)
         {
             btnEditLocal.clicked += () =>
             {
-                // Da der lokale Nutzer keine echten Listendaten hat, öffnen wir das Popup 
-                // testweise mit einem leeren Dummy-Kunden oder blenden einfach die Maske ein.
                 aktuellBearbeiteterKunde = null; 
                 ClearEditInputs();
                 SetElementVisible(popupBearbeiten, true);
@@ -130,10 +118,63 @@ public class KundendatenbankController : MonoBehaviour
         }
     }
 
+    private void LadeKundenAusDatenbank()
+    {
+        kundenListe.Clear();
+        bool datenbankErfolgreich = false;
+
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db != null)
+            {
+                var backendKunden = db.getAllCustomers();
+                if (backendKunden != null)
+                {
+                    foreach (var bKunde in backendKunden)
+                    {
+                        KundeData kData = new KundeData();
+                        kData.backendObjekt = bKunde;
+                        kData.id = bKunde.id.ToString();
+                        
+                        string vollerName = bKunde.name ?? "";
+                        string[] namensTeile = vollerName.Split(' ');
+                        if (namensTeile.Length > 0) kData.vorname = namensTeile[0];
+                        if (namensTeile.Length > 1) kData.nachname = string.Join(" ", namensTeile, 1, namensTeile.Length - 1);
+
+                        kData.firma = "Kunde"; 
+                        kData.strasse = bKunde.street ?? "";
+                        kData.plz = bKunde.postalCode ?? "";
+                        kData.ort = bKunde.city ?? "";
+                        kData.email = bKunde.email ?? "";
+                        kData.telefon = bKunde.phone ?? "";
+                        
+                        kundenListe.Add(kData);
+                    }
+                    datenbankErfolgreich = true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("Echte DB nicht erreichbar. Nutze lokalen Editor-Modus. Info: " + e.Message);
+        }
+
+        if (!datenbankErfolgreich)
+        {
+            GeneriereTestDaten();
+        }
+
+        RefreshKundenListe();
+    }
+
     private void GeneriereTestDaten()
     {
-        kundenListe.Add(new KundeData { id = Guid.NewGuid().ToString(), vorname = "Max", nachname = "Mustermann", firma = "Mustert GmbH", strasse = "Musterstr. 8", plz = "12345", ort = "Musterstadt", email = "muster@email.de", telefon = "0162-12345" });
-        kundenListe.Add(new KundeData { id = Guid.NewGuid().ToString(), vorname = "Erika", nachname = "Musterfrau", firma = "Fraunhofer AG", strasse = "Technikweg 4", plz = "54321", ort = "Techcity", email = "erika@fraunhofer.de", telefon = "0175-98765" });
+        if (kundenListe.Count == 0)
+        {
+            kundenListe.Add(new KundeData { id = "1", vorname = "Max", nachname = "Mustermann", firma = "Mustert GmbH", strasse = "Musterstr. 8", plz = "12345", ort = "Musterstadt", email = "muster@email.de", telefon = "0162-12345" });
+            kundenListe.Add(new KundeData { id = "2", vorname = "Erika", nachname = "Musterfrau", firma = "Fraunhofer AG", strasse = "Technikweg 4", plz = "54321", ort = "Techcity", email = "erika@fraunhofer.de", telefon = "0175-98765" });
+        }
     }
 
     private void RefreshKundenListe()
@@ -164,11 +205,11 @@ public class KundendatenbankController : MonoBehaviour
             var btnAendern = neueKarte.Q<Button>("btn-edit");
             var btnLoeschen = neueKarte.Q<Button>("btn-delete");
 
-            if (nameLabel != null) nameLabel.text = $"{kunde.vorname} {kunde.nachname}";
+            if (nameLabel != null) nameLabel.text = $"{kunde.vorname} {kunde.nachname}".Trim();
             if (firmaLabel != null) firmaLabel.text = kunde.firma;
             if (emailLabel != null) emailLabel.text = kunde.email;
             if (telefonLabel != null) telefonLabel.text = kunde.telefon;
-            if (adresseLabel != null) adresseLabel.text = $"{kunde.strasse}, {kunde.plz} {kunde.ort}";
+            if (adresseLabel != null) adresseLabel.text = $"{kunde.strasse}, {kunde.plz} {kunde.ort}".Trim();
 
             if (btnAendern != null) btnAendern.clicked += () => OeffneBearbeitenPopup(kunde);
             if (btnLoeschen != null) btnLoeschen.clicked += () => LoescheKunde(kunde);
@@ -179,7 +220,7 @@ public class KundendatenbankController : MonoBehaviour
 
     private void SpeichereNeuenKunden()
     {
-        KundeData neuerKunde = new KundeData
+        KundeData uiKunde = new KundeData
         {
             id = Guid.NewGuid().ToString(),
             vorname = inputCreateVorname != null ? inputCreateVorname.value : "",
@@ -192,11 +233,43 @@ public class KundendatenbankController : MonoBehaviour
             telefon = inputCreateTelefon != null ? inputCreateTelefon.value : ""
         };
 
-        kundenListe.Add(neuerKunde);
+        bool inDatenbankGespeichert = false;
+
+        try 
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db != null)
+            {
+                Customer backendKunde = new Customer();
+                backendKunde.name = $"{uiKunde.vorname} {uiKunde.nachname}".Trim();
+                backendKunde.street = uiKunde.strasse;
+                backendKunde.postalCode = uiKunde.plz;
+                backendKunde.city = uiKunde.ort;
+                backendKunde.email = uiKunde.email;
+                backendKunde.phone = uiKunde.telefon;
+                backendKunde.lastUpdated = DateTime.Now;
+
+                db.createCustomer(backendKunde);
+                inDatenbankGespeichert = true;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("Konnte nicht in DB speichern, wechsle auf lokal: " + e.Message);
+        }
+
+        // FALLBACK: Wenn die DB offline ist, fügen wir es lokal hinzu, damit es auf dem Screen erscheint!
+        if (!inDatenbankGespeichert)
+        {
+            kundenListe.Add(uiKunde);
+        }
+
         SetElementVisible(popupErstellen, false);
-        
-        RefreshKundenListe(); 
         ClearCreateInputs();
+        
+        // Aktualisiert die Anzeige auf dem Bildschirm
+        if (inDatenbankGespeichert) LadeKundenAusDatenbank(); 
+        else RefreshKundenListe();
     }
 
     private void OeffneBearbeitenPopup(KundeData kunde)
@@ -217,31 +290,77 @@ public class KundendatenbankController : MonoBehaviour
 
     private void SpeichereBearbeitetenKunden()
     {
-        // Falls aktuellBearbeiteterKunde null ist (weil wir über den lokalen Nutzer kamen), 
-        // schließen wir einfach nur das Popup ohne die Liste zu verändern.
         if (aktuellBearbeiteterKunde == null)
         {
             SetElementVisible(popupBearbeiten, false);
             return;
         }
 
-        if (inputEditVorname != null) aktuellBearbeiteterKunde.vorname = inputEditVorname.value;
-        if (inputEditNachname != null) aktuellBearbeiteterKunde.nachname = inputEditNachname.value;
-        if (inputEditFirma != null) aktuellBearbeiteterKunde.firma = inputEditFirma.value;
-        if (inputEditStrasse != null) aktuellBearbeiteterKunde.strasse = inputEditStrasse.value;
-        if (inputEditPlz != null) aktuellBearbeiteterKunde.plz = inputEditPlz.value;
-        if (inputEditOrt != null) aktuellBearbeiteterKunde.ort = inputEditOrt.value;
-        if (inputEditEmail != null) aktuellBearbeiteterKunde.email = inputEditEmail.value;
-        if (inputEditTelefon != null) aktuellBearbeiteterKunde.telefon = inputEditTelefon.value;
+        // Werte lokal im UI-Objekt aktualisieren
+        aktuellBearbeiteterKunde.vorname = inputEditVorname != null ? inputEditVorname.value : aktuellBearbeiteterKunde.vorname;
+        aktuellBearbeiteterKunde.nachname = inputEditNachname != null ? inputEditNachname.value : aktuellBearbeiteterKunde.nachname;
+        aktuellBearbeiteterKunde.firma = inputEditFirma != null ? inputEditFirma.value : aktuellBearbeiteterKunde.firma;
+        aktuellBearbeiteterKunde.strasse = inputEditStrasse != null ? inputEditStrasse.value : aktuellBearbeiteterKunde.strasse;
+        aktuellBearbeiteterKunde.plz = inputEditPlz != null ? inputEditPlz.value : aktuellBearbeiteterKunde.plz;
+        aktuellBearbeiteterKunde.ort = inputEditOrt != null ? inputEditOrt.value : aktuellBearbeiteterKunde.ort;
+        aktuellBearbeiteterKunde.email = inputEditEmail != null ? inputEditEmail.value : aktuellBearbeiteterKunde.email;
+        aktuellBearbeiteterKunde.telefon = inputEditTelefon != null ? inputEditTelefon.value : aktuellBearbeiteterKunde.telefon;
+
+        bool inDatenbankAktualisiert = false;
+
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db != null && aktuellBearbeiteterKunde.backendObjekt != null)
+            {
+                var bKunde = aktuellBearbeiteterKunde.backendObjekt;
+                bKunde.name = $"{aktuellBearbeiteterKunde.vorname} {aktuellBearbeiteterKunde.nachname}".Trim();
+                bKunde.street = aktuellBearbeiteterKunde.strasse;
+                bKunde.postalCode = aktuellBearbeiteterKunde.plz;
+                bKunde.city = aktuellBearbeiteterKunde.ort;
+                bKunde.email = aktuellBearbeiteterKunde.email;
+                bKunde.phone = aktuellBearbeiteterKunde.telefon;
+                bKunde.lastUpdated = DateTime.Now;
+
+                db.updateCustomer(bKunde);
+                inDatenbankAktualisiert = true;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("Konnte Änderung nicht in DB speichern: " + e.Message);
+        }
 
         SetElementVisible(popupBearbeiten, false);
-        RefreshKundenListe();
+
+        if (inDatenbankAktualisiert) LadeKundenAusDatenbank(); 
+        else RefreshKundenListe();
     }
 
     private void LoescheKunde(KundeData kunde)
     {
+        bool ausDatenbankGeloescht = false;
+
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db != null)
+            {
+                int dbId = int.Parse(kunde.id);
+                db.deleteCustomer(dbId);
+                ausDatenbankGeloescht = true;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("Konnte nicht aus DB löschen, lösche nur lokal: " + e.Message);
+        }
+
+        // Löscht den Kunden in jedem Fall aus der Liste für den Screen
         kundenListe.Remove(kunde);
-        RefreshKundenListe();
+
+        if (ausDatenbankGeloescht) LadeKundenAusDatenbank(); 
+        else RefreshKundenListe();
     }
 
     private void ClearCreateInputs()
@@ -272,6 +391,7 @@ public class KundendatenbankController : MonoBehaviour
 [System.Serializable]
 public class KundeData
 {
+    public Customer backendObjekt; 
     public string id;
     public string vorname;
     public string nachname;

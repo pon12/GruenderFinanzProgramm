@@ -1,51 +1,41 @@
 // ContentAreaController.cs
-// Liegt auf demselben GameObject wie das UIDocument des Screens
-// (z.B. "Dienstleistungen UI" oder "UIManager")
-//
-// Reagiert auf SidebarController.OnToggled und verschiebt
-// den Hauptinhalt synchron zur Sidebar-Animation.
-//
-// VORAUSSETZUNG: SidebarController.cs braucht diese zwei Zeilen:
-//
-//   // Direkt unter "public class SidebarController : MonoBehaviour {"
-//   public static event System.Action<bool> OnToggled;
-//
-//   // Am Ende von ToggleSidebar(), nach _isAnimating = true:
-//   OnToggled?.Invoke(_isCollapsed);
+// Auf UIManager jeder App-Scene
 
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections;
 
 public class ContentAreaController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
 
-    // Padding-Werte: sidebar-breite + 40px content-abstand
-    // Expanded:  390 + 40 = 430
-    // Collapsed:  80 + 40 = 120
     private const float PADDING_EXPANDED  = 430f;
     private const float PADDING_COLLAPSED = 120f;
-    private const float ANIM_DURATION     = 0.2f;  // Gleich wie in SidebarController
+    private const float ANIM_DURATION     = 0.2f;
+    private const string PREF_COLLAPSED   = "sidebar_collapsed";
 
     private VisualElement _mainContent;
-    private bool  _isAnimating  = false;
-    private float _animTime     = 0f;
-    private float _animFrom     = PADDING_EXPANDED;
-    private float _animTarget   = PADDING_COLLAPSED;
 
     void OnEnable()
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _mainContent = uiDocument?.rootVisualElement.Q<VisualElement>("main-content");
+        _mainContent = uiDocument.rootVisualElement.Q<VisualElement>("main-content");
 
         if (_mainContent == null)
-            Debug.LogWarning("[ContentAreaController] 'main-content' nicht gefunden. " +
-                             "Pruefen ob name=\"main-content\" im UXML gesetzt ist.");
+        {
+            Debug.LogWarning("[ContentArea] 'main-content' nicht gefunden im UXML.");
+            return;
+        }
 
-        // Auf Sidebar-Toggle reagieren
+        // Event abonnieren fuer zukuenftige Toggles in dieser Scene
         SidebarController.OnToggled += OnSidebarToggled;
+
+        // State direkt aus PlayerPrefs lesen – kein Event abwarten noetig
+        bool isCollapsed = PlayerPrefs.GetInt(PREF_COLLAPSED, 0) == 1;
+        float padding    = isCollapsed ? PADDING_COLLAPSED : PADDING_EXPANDED;
+        _mainContent.style.paddingLeft = padding;
     }
 
     void OnDisable()
@@ -53,29 +43,27 @@ public class ContentAreaController : MonoBehaviour
         SidebarController.OnToggled -= OnSidebarToggled;
     }
 
-    void Update()
-    {
-        if (!_isAnimating || _mainContent == null) return;
-
-        _animTime += Time.deltaTime;
-        float t    = Mathf.Clamp01(_animTime / ANIM_DURATION);
-        float ease = 1f - Mathf.Pow(1f - t, 3f); // Gleiche Kurve wie SidebarController
-        _mainContent.style.paddingLeft = Mathf.Lerp(_animFrom, _animTarget, ease);
-
-        if (t >= 1f)
-        {
-            _isAnimating = false;
-            _mainContent.style.paddingLeft = _animTarget;
-        }
-    }
-
     private void OnSidebarToggled(bool isCollapsed)
     {
         if (_mainContent == null) return;
+        float targetPadding = isCollapsed ? PADDING_COLLAPSED : PADDING_EXPANDED;
+        StartCoroutine(AnimatePadding(targetPadding));
+    }
 
-        _animFrom   = isCollapsed ? PADDING_EXPANDED  : PADDING_COLLAPSED;
-        _animTarget = isCollapsed ? PADDING_COLLAPSED : PADDING_EXPANDED;
-        _animTime   = 0f;
-        _isAnimating = true;
+    private IEnumerator AnimatePadding(float targetPadding)
+    {
+        float startPadding = _mainContent.resolvedStyle.paddingLeft;
+        float elapsed      = 0f;
+
+        while (elapsed < ANIM_DURATION)
+        {
+            elapsed += Time.deltaTime;
+            float t     = Mathf.Clamp01(elapsed / ANIM_DURATION);
+            float eased = t * t * (3f - 2f * t);
+            _mainContent.style.paddingLeft = Mathf.Lerp(startPadding, targetPadding, eased);
+            yield return null;
+        }
+
+        _mainContent.style.paddingLeft = targetPadding;
     }
 }

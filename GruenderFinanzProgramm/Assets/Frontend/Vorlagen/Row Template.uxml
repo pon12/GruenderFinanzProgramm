@@ -7,8 +7,8 @@
             <ui:DropdownField label="" name="format-dropdown" choices="PDF" class="format-dropdown"/>
         </ui:VisualElement>
         <ui:VisualElement name="actions-container" class="col-pfad" style="flex-grow: 1; flex-direction: row; align-items: center;">
-            <ui:Button text="" name="btn-open-folder" class="btn-folder"/>
-            <ui:Button text="Exportieren" name="btn-export" class="btn-export" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+            <ui:Button text="" name="btn-open-folder" class="btn-folder" style="background-image: resource(&quot;Icons/folder&quot;); background-size: 60% 60%;"/>
+            <ui:Button text="Exportieren" name="btn-export" class="btn-export" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); background-color: rgb(129, 207, 149);"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

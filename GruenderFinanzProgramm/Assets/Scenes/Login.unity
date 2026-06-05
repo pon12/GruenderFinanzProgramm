@@ -119,6 +119,75 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &731536974
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 731536977}
+  - component: {fileID: 731536976}
+  - component: {fileID: 731536975}
+  m_Layer: 0
+  m_Name: Auth Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &731536975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731536974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de7d211121fd7f244b565fb8f6b91d83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PassKeyAuthController
+  usernameInput: {fileID: 0}
+  passKeyInput: {fileID: 0}
+  recoveryKeyInput: {fileID: 0}
+  registerResultText: {fileID: 0}
+  recoveryResultText: {fileID: 0}
+  loginErrorText: {fileID: 0}
+  registerErrorText: {fileID: 0}
+  recoveryErrorText: {fileID: 0}
+  mainSceneName: SampleScene
+--- !u!114 &731536976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731536974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9538aa7d5df7244ca8145b64b8fb630, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AuthPanelController
+  loginPanel: {fileID: 1930654280}
+  registerPanel: {fileID: 1858203227}
+  recoveryPanel: {fileID: 0}
+--- !u!4 &731536977
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731536974}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 934.71747, y: 523.86115, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &964093180
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,6 +325,94 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1729369377
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4496606251158229298, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_Name
+      value: StartUpChecker
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 934.71747
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 523.86115
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8632164018397040114, guid: 761149c963ed67441828e6804af114ac, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 761149c963ed67441828e6804af114ac, type: 3}
+--- !u!1 &1858203227
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1858203228}
+  m_Layer: 0
+  m_Name: RegisterPanel_Panelholder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1858203228
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858203227}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 934.71747, y: 523.86115, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1930654280
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +425,7 @@ GameObject:
   - component: {fileID: 1930654281}
   - component: {fileID: 1930654283}
   m_Layer: 0
-  m_Name: Ui Manager
+  m_Name: Ui Manager Login
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -325,9 +482,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoginFlowController
   uiDocument: {fileID: 1930654281}
+  passKeyAuthController: {fileID: 731536975}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 964093184}
   - {fileID: 1930654282}
+  - {fileID: 731536977}
+  - {fileID: 1729369377}
+  - {fileID: 1858203228}

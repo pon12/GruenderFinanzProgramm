@@ -3,19 +3,20 @@
     <Style src="project://database/Assets/Frontend/Stylesheets/Popup-Doc.uss?fileID=7433441132597879392&amp;guid=e656db98336718542b51da1d22a7e1e2&amp;type=3#Popup-Doc"/>
     <ui:VisualElement name="root" style="flex-grow: 1; flex-direction: row; background-color: rgb(45, 45, 45); width: 100%; height: 100%;">
         <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgb(45, 45, 45); height: 100%; width: auto; padding-left: 430px;">
-            <ui:VisualElement name="Header-Container" class="header-container" style="flex-grow: 1; flex-direction: row; justify-content: space-between;">
-                <ui:VisualElement name="Left-Text-Group" class="left-text-group" style="flex-grow: 1;">
+            <ui:VisualElement name="Header-Container" class="header-container" style="flex-grow: 1; flex-direction: row; justify-content: space-between; align-items: stretch; align-self: center;">
+                <ui:VisualElement name="Left-Text-Group" class="left-text-group" style="flex-grow: 1; align-items: stretch;">
                     <ui:Label text="Dokument&#10;" class="header-title" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:Label text="Dokumentaböage&#10;" class="header-subtitle" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
-                <ui:Button text="Dokument erstellen&#10;" name="Create-Button" class="create-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                <ui:Button text="Dokument erstellen&#10;" name="Create-Button" class="create-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 85px;"/>
+                <ui:Button text="Dokumente Löschen&#10;" name="Delete-Button" class="create-button delete-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 86px; width: 52px; bottom: auto; align-self: flex-end; align-content: auto; align-items: auto; flex-direction: column;"/>
             </ui:VisualElement>
             <ui:VisualElement name="Main-Scroll-View" style="flex-grow: 1;">
-                <ui:VisualElement name="Grid-Container" class="grid-container" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; justify-content: space-between;"/>
+                <ui:VisualElement name="Grid-Container" class="grid-container" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; background-size: 100% 100%; padding-top: 0; padding-bottom: 0; padding-left: 20px; padding-right: 20px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="Popup-Overlay" class="popup-overlay" style="flex-grow: 1; display: none;">
-            <ui:VisualElement name="Popup-Window" class="popup-window" style="flex-grow: 1;">
+            <ui:VisualElement name="Popup-Window" class="popup-window" style="flex-grow: 1; display: flex;">
                 <ui:VisualElement name="Popup-Header" style="flex-grow: 1;">
                     <ui:VisualElement name="Header-Left" style="flex-grow: 1;">
                         <ui:Label text="Neus Dokument" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
@@ -25,11 +26,11 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="Form-Group-1" style="flex-grow: 1;">
                     <ui:Label text="Dokumentname" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                    <ui:TextField label="Text Field" placeholder-text="z.B. Buisnessplan Q3" name="Doc-Name-Input" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:TextField label="" placeholder-text="z.B. Buisnessplan Q3" name="Doc-Name-Input" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Form-Group-2" style="flex-grow: 1;">
                     <ui:Label text="Kategorie" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                    <ui:DropdownField label="Finanzen" name="Cattegory-Dropdown" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:DropdownField label="" name="dropKategorie" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Form-Group-3" style="flex-grow: 1;">
                     <ui:Label text="Vorlage wählen" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
@@ -43,6 +44,12 @@
                     <ui:Button text="Abbrechen" name="Btn-Cancel" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:Button text="erstellen" name="Btn-Submit" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Archive-Overlay" style="flex-grow: 1; width: 100%; height: 100%; position: absolute; display: none;">
+            <ui:VisualElement name="VisualElement" style="flex-grow: 1; position: absolute; width: 682px; height: 911px; top: 77px; left: 626px; background-color: rgb(26, 26, 26); flex-direction: column; justify-content: space-between;">
+                <ui:Button text="Button"/>
+                <ui:ScrollView name="ScrollView" style="height: 868px; width: 677px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

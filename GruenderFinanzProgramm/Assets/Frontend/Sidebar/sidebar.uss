@@ -1,4 +1,3 @@
-/* ── NAV ITEMS – Basis ─────────────────────── */
 .nav-item {
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
@@ -6,7 +5,6 @@
     border-bottom-left-radius: 14px;
 }
 
-/* ── Hover ─────────────────────────────────── */
 .nav-item:hover {
     background-color: rgba(128, 207, 149, 0.15);
     border-top-width: 1px;
@@ -24,7 +22,6 @@
     background-color: rgba(128, 207, 149, 0.25);
 }
 
-/* ── Aktiv ─────────────────────────────────── */
 .nav-item--active {
     background-color: rgba(128, 207, 149, 0.18);
     border-top-width: 1px;
@@ -36,10 +33,11 @@
     border-top-color: rgb(128, 207, 149);
     border-bottom-color: rgb(128, 207, 149);
 }
+
 .nav-item--active:hover {
     background-color: rgba(128, 207, 149, 0.28);
 }
-/* ── Icons ─────────────────────────────────── */
+
 .nav-icon {
     width: 32px;
     height: 32px;
@@ -48,34 +46,38 @@
     -unity-background-scale-mode: scale-to-fit;
     -unity-background-image-tint-color: rgb(180, 180, 180);
 }
-/* Aktiver Zustand – Icon wird grün */
+
 .nav-item--active .nav-icon {
     -unity-background-image-tint-color: rgb(255, 255, 255);
 }
-/* Hover – Icon wird weiß */
+
 .nav-item:hover .nav-icon {
     -unity-background-image-tint-color: rgb(255, 255, 255);
 }
 
-/* Der Zustand, wenn die Sidebar schmal ist */
 .sidebar--collapsed {
-    width: 80px; /* Nur breit genug für die Icons */
+    width: 80px;
     min-width: 80px;
 }
 
-/* Wir verstecken die Texte, wenn es eng wird */
-.sidebar--collapsed .nav-label, 
+.sidebar--collapsed .nav-label,
 .sidebar--collapsed #logo-text {
     display: none;
 }
 
-/* Sanfter Übergang für alle Breitenänderungen */
 .sidebar-extended {
     transition-property: width;
     transition-duration: 0.3s;
     transition-timing-function: ease-in-out;
 }
+
 .nav-label {
-    overflow: hidden; /* Verhindert, dass Text aus der Sidebar ragt */
-    white-space: nowrap; /* Verhindert Zeilenumbruch beim Zusammenschieben */
+    overflow: hidden;
+    white-space: nowrap;
 }
+
+
+
+
+
+
