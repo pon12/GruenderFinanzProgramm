@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class LoginFlowController : MonoBehaviour
 {
-    [SerializeField] private UIDocument          uiDocument;
+    [SerializeField] private UIDocument uiDocument;
     [SerializeField] private PassKeyAuthController passKeyAuthController;
 
     private const string DASHBOARD_SCENE = "Dashboard";
@@ -15,28 +15,47 @@ public class LoginFlowController : MonoBehaviour
     private VisualElement _root;
     private VisualElement _popupOverlay;
     private VisualElement _popupPasskeyLogin;
-    private Label         _loginPasskeyDisplay;
-    private string        _loginPasskeyInput = "";
+    private Label _loginPasskeyDisplay;
+    private string _loginPasskeyInput = "";
 
     void OnEnable()
     {
         if (uiDocument == null)
+        {
             uiDocument = GetComponent<UIDocument>();
+        }
+
+        if (uiDocument == null)
+        {
+            Debug.LogError("[LoginFlow] UIDocument fehlt.");
+            return;
+        }
 
         // Falls nicht im Inspector zugewiesen, in der Scene suchen
         if (passKeyAuthController == null)
-            passKeyAuthController = FindFirstObjectByType<PassKeyAuthController>();
+        {
+            passKeyAuthController = FindAnyObjectByType<PassKeyAuthController>();
+        }
 
         if (passKeyAuthController == null)
-            Debug.LogError("[LoginFlow] PassKeyAuthController nicht gefunden. " +
-                           "Bitte Prefab in die Scene ziehen oder im Inspector zuweisen.");
+        {
+            Debug.LogError("[LoginFlow] PassKeyAuthController nicht gefunden. Bitte in der Scene anlegen oder im Inspector zuweisen.");
+        }
 
-        _root                = uiDocument.rootVisualElement;
-        _popupOverlay        = _root.Q("popup-overlay");
-        _popupPasskeyLogin   = _root.Q("popup-passkey-login");
+        _root = uiDocument.rootVisualElement;
+
+        if (_root == null)
+        {
+            Debug.LogError("[LoginFlow] RootVisualElement wurde nicht gefunden.");
+            return;
+        }
+
+        _popupOverlay = _root.Q("popup-overlay");
+        _popupPasskeyLogin = _root.Q("popup-passkey-login");
         _loginPasskeyDisplay = _root.Q<Label>("login-passkey-display");
 
         RegisterAllButtons();
+        UpdateDisplay();
     }
 
     // ─────────────────────────────────────────────────
@@ -51,15 +70,20 @@ public class LoginFlowController : MonoBehaviour
         // X Button → Popup schließen und Input zurücksetzen
         Bind("btn-close-login-popup", CloseAllPopups);
 
-        // Zahlenpad 0–9 (Passkey: 4-stellig, nur Zahlen laut Doku)
+        // Zahlenpad 0–9
         for (int i = 0; i <= 9; i++)
         {
             int digit = i;
             var btn = _root.Q<Button>($"login-btn-{digit}");
+
             if (btn != null)
+            {
                 btn.clicked += () => OnPasskeyDigit(digit.ToString());
+            }
             else
+            {
                 Debug.LogWarning($"[LoginFlow] login-btn-{digit} nicht gefunden.");
+            }
         }
 
         // Löschen
@@ -75,25 +99,41 @@ public class LoginFlowController : MonoBehaviour
 
     private void OnPasskeyDigit(string digit)
     {
-        if (_loginPasskeyInput.Length >= 4) return;
+        if (_loginPasskeyInput.Length >= 4)
+        {
+            return;
+        }
+
         _loginPasskeyInput += digit;
         UpdateDisplay();
     }
 
     private void OnPasskeyDelete()
     {
-        if (_loginPasskeyInput.Length == 0) return;
+        if (_loginPasskeyInput.Length == 0)
+        {
+            return;
+        }
+
         _loginPasskeyInput = _loginPasskeyInput.Substring(0, _loginPasskeyInput.Length - 1);
         UpdateDisplay();
     }
 
     private void UpdateDisplay()
     {
-        if (_loginPasskeyDisplay == null) return;
-        string s = "";
+        if (_loginPasskeyDisplay == null)
+        {
+            return;
+        }
+
+        string displayText = "";
+
         for (int i = 0; i < 4; i++)
-            s += i < _loginPasskeyInput.Length ? "● " : "_ ";
-        _loginPasskeyDisplay.text = s.TrimEnd();
+        {
+            displayText += i < _loginPasskeyInput.Length ? "● " : "_ ";
+        }
+
+        _loginPasskeyDisplay.text = displayText.TrimEnd();
     }
 
     // ─────────────────────────────────────────────────
@@ -104,7 +144,7 @@ public class LoginFlowController : MonoBehaviour
     {
         if (_loginPasskeyInput.Length < 4)
         {
-            Debug.LogWarning("[Login] Passkey unvollständig – bitte alle 4 Ziffern eingeben.");
+            Debug.LogWarning("[Login] PassKey unvollständig – bitte alle 4 Ziffern eingeben.");
             return;
         }
 
@@ -114,12 +154,15 @@ public class LoginFlowController : MonoBehaviour
             return;
         }
 
-        // Backend: Nutzer mit PassKey einloggen
-        // Nach erfolgreichem Aufruf ist die passende NutzerDB automatisch aktiv
-        // Alle weiteren Screens nutzen dann UserDatabaseAccess.getCurrentUserDatabase()
-        passKeyAuthController.loginWithPassKey();
+        bool loginSuccessful = passKeyAuthController.loginWithPassKeyValue(_loginPasskeyInput);
 
-        Debug.Log("[Login] loginWithPassKey aufgerufen – lade Dashboard.");
+        if (!loginSuccessful)
+        {
+            Debug.LogWarning("[Login] Login fehlgeschlagen – Dashboard wird nicht geladen.");
+            return;
+        }
+
+        Debug.Log("[Login] Login erfolgreich – lade Dashboard.");
         SceneManager.LoadScene(DASHBOARD_SCENE);
     }
 
@@ -129,14 +172,29 @@ public class LoginFlowController : MonoBehaviour
 
     private void ShowPopup(VisualElement popup)
     {
-        if (_popupOverlay != null) _popupOverlay.style.display  = DisplayStyle.Flex;
-        if (popup         != null) popup.style.display           = DisplayStyle.Flex;
+        if (_popupOverlay != null)
+        {
+            _popupOverlay.style.display = DisplayStyle.Flex;
+        }
+
+        if (popup != null)
+        {
+            popup.style.display = DisplayStyle.Flex;
+        }
     }
 
     private void CloseAllPopups()
     {
-        if (_popupOverlay      != null) _popupOverlay.style.display      = DisplayStyle.None;
-        if (_popupPasskeyLogin != null) _popupPasskeyLogin.style.display = DisplayStyle.None;
+        if (_popupOverlay != null)
+        {
+            _popupOverlay.style.display = DisplayStyle.None;
+        }
+
+        if (_popupPasskeyLogin != null)
+        {
+            _popupPasskeyLogin.style.display = DisplayStyle.None;
+        }
+
         _loginPasskeyInput = "";
         UpdateDisplay();
     }
@@ -148,9 +206,14 @@ public class LoginFlowController : MonoBehaviour
     private void Bind(string name, System.Action action)
     {
         var btn = _root.Q<Button>(name);
+
         if (btn != null)
+        {
             btn.clicked += action;
+        }
         else
+        {
             Debug.LogWarning($"[LoginFlow] Button '{name}' nicht gefunden im UXML.");
+        }
     }
 }
