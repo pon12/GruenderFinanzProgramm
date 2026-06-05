@@ -46,7 +46,19 @@ public class InvoicePdfTest : MonoBehaviour
         };
 
         invoice.CalculateTotals(items);
+DataBase db =
+    GlobalDatabaseManager.Instance
+        .GetOrCreateDatabase<DataBase>("TestUserDB");
 
-        InvoicePdfExporter.ExportInvoiceToPdf(invoice, items);
-    }
+db.setupDatabase();
+
+int userId = 1;
+
+InvoicePdfExporter.ExportInvoiceToPdf(
+    invoice,
+    items,
+    userId,
+    db
+);    
+}
 }
