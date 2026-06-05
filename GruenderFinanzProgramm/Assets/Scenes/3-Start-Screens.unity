@@ -242,7 +242,7 @@ MonoBehaviour:
   loginErrorText: {fileID: 0}
   registerErrorText: {fileID: 0}
   recoveryErrorText: {fileID: 0}
-  mainSceneName: MainUI
+  mainSceneName: Einstellungen
 --- !u!1 &679455461
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,6 +466,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LoginFlowController
   uiDocument: {fileID: 0}
   passKeyAuthController: {fileID: 610038137}
+  DASHBOARD_SCENE: Einstellungen
 --- !u!1 &1318028743
 GameObject:
   m_ObjectHideFlags: 0

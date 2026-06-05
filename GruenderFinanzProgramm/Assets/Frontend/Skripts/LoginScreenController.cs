@@ -4,13 +4,14 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using System;
 
 public class LoginFlowController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
     [SerializeField] private PassKeyAuthController passKeyAuthController;
 
-    private const string DASHBOARD_SCENE = "Dashboard";
+    [SerializeField] private string DASHBOARD_SCENE = "Dashboard";
 
     private VisualElement _root;
     private VisualElement _popupOverlay;
