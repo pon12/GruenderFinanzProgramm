@@ -49,13 +49,13 @@ public class TestKassenbuchPon : MonoBehaviour
     List<Einkommen> einkommenEntries = UserDatabaseAccess.getCurrentUserDatabase().getAllEinkommenEntries();
     foreach (Einkommen entry in einkommenEntries)
     {
-        Debug.Log($"Einkommen: {entry.Amount} {entry.Description}");
+        Debug.Log($"Einkommen: {entry.Amount} {entry.Description} {entry.Datum}");
     }
 
     List<Ausgaben> ausgabenEntries = UserDatabaseAccess.getCurrentUserDatabase().getAllAusgabenEntries();
     foreach (Ausgaben entry in ausgabenEntries)
     {
-        Debug.Log($"Ausgaben: {entry.Amount} {entry.Description}");
+        Debug.Log($"Ausgaben: {entry.Amount} {entry.Description} {entry.Datum}");
     }
     }
 
