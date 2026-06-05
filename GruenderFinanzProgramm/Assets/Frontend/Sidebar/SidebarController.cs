@@ -23,23 +23,23 @@ public class SidebarController : MonoBehaviour
     [Header("Zuweisungen")]
     [SerializeField] private List<SceneMapping> navigationConfig;
 
-    private const float WIDTH_EXPANDED  = 390f;
+    private const float WIDTH_EXPANDED = 390f;
     private const float WIDTH_COLLAPSED = 80f;
-    private const float ANIM_DURATION   = 0.2f;
+    private const float ANIM_DURATION = 0.2f;
 
     // PlayerPrefs Keys fuer State-Persistenz
-    private const string PREF_COLLAPSED   = "sidebar_collapsed";
+    private const string PREF_COLLAPSED = "sidebar_collapsed";
     private const string PREF_FINANZ_OPEN = "sidebar_finanz_open";
 
     private VisualElement _root;
     private VisualElement _sidebar;
-    private Button        _toggleButton;
-    private bool          _isCollapsed = false;
+    private Button _toggleButton;
+    private bool _isCollapsed = false;
 
     // Finanzboard Dropdown
     private VisualElement _finanzSubmenu;
-    private Button        _finanzToggleBtn;
-    private bool          _finanzOpen = false;
+    private Button _finanzToggleBtn;
+    private bool _finanzOpen = false;
 
     // Nav-Item Name → Scene Name
     private static readonly Dictionary<string, string> NavToScene = new()
@@ -70,14 +70,14 @@ public class SidebarController : MonoBehaviour
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _root         = uiDocument.rootVisualElement;
-        _sidebar      = _root.Q<VisualElement>("sidebar");
+        _root = uiDocument.rootVisualElement;
+        _sidebar = _root.Q<VisualElement>("sidebar");
         _toggleButton = _root.Q<Button>("toggle-button");
 
-        _finanzSubmenu   = _root.Q<VisualElement>("finanz-submenu");
+        _finanzSubmenu = _root.Q<VisualElement>("finanz-submenu");
         _finanzToggleBtn = _root.Q<Button>("btn-finanz-toggle");
 
-        if (_toggleButton    != null) _toggleButton.clicked    += ToggleSidebar;
+        if (_toggleButton != null) _toggleButton.clicked += ToggleSidebar;
         if (_finanzToggleBtn != null) _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
 
         RegisterNavigation();
@@ -92,7 +92,7 @@ public class SidebarController : MonoBehaviour
 
     void OnDisable()
     {
-        if (_toggleButton    != null) _toggleButton.clicked    -= ToggleSidebar;
+        if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
         if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
     }
 
@@ -116,8 +116,8 @@ public class SidebarController : MonoBehaviour
         // Finanzboard Dropdown State
         _finanzOpen = PlayerPrefs.GetInt(PREF_FINANZ_OPEN, 0) == 1;
 
-        if (_finanzSubmenu   != null) _finanzSubmenu.style.display  = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.text          = _finanzOpen ? "▼" : "▶";
+        if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_finanzToggleBtn != null) _finanzToggleBtn.text = _finanzOpen ? "▼" : "▶";
 
         // ContentAreaController informieren
         OnToggled?.Invoke(_isCollapsed);
@@ -125,8 +125,8 @@ public class SidebarController : MonoBehaviour
 
     private void SaveState()
     {
-        PlayerPrefs.SetInt(PREF_COLLAPSED,   _isCollapsed ? 1 : 0);
-        PlayerPrefs.SetInt(PREF_FINANZ_OPEN, _finanzOpen  ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_COLLAPSED, _isCollapsed ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_FINANZ_OPEN, _finanzOpen ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -160,12 +160,12 @@ public class SidebarController : MonoBehaviour
         if (_sidebar == null) yield break;
 
         float startWidth = _sidebar.resolvedStyle.width;
-        float elapsed    = 0f;
+        float elapsed = 0f;
 
         while (elapsed < ANIM_DURATION)
         {
             elapsed += Time.deltaTime;
-            float t     = Mathf.Clamp01(elapsed / ANIM_DURATION);
+            float t = Mathf.Clamp01(elapsed / ANIM_DURATION);
             float eased = t * t * (3f - 2f * t);
             _sidebar.style.width = Mathf.Lerp(startWidth, targetWidth, eased);
             yield return null;
@@ -182,8 +182,8 @@ public class SidebarController : MonoBehaviour
     {
         _finanzOpen = !_finanzOpen;
 
-        if (_finanzSubmenu   != null) _finanzSubmenu.style.display  = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.text          = _finanzOpen ? "▼" : "▶";
+        if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_finanzToggleBtn != null) _finanzToggleBtn.text = _finanzOpen ? "▼" : "▶";
 
         SaveState();
     }
@@ -217,8 +217,8 @@ public class SidebarController : MonoBehaviour
             if (FinanzSubItems.Contains(kvp.Key) && !_finanzOpen)
             {
                 _finanzOpen = true;
-                if (_finanzSubmenu   != null) _finanzSubmenu.style.display  = DisplayStyle.Flex;
-                if (_finanzToggleBtn != null) _finanzToggleBtn.text          = "▼";
+                if (_finanzSubmenu != null) _finanzSubmenu.style.display = DisplayStyle.Flex;
+                if (_finanzToggleBtn != null) _finanzToggleBtn.text = "▼";
             }
 
             break;
@@ -254,7 +254,7 @@ public class SidebarController : MonoBehaviour
         logoutItem.RegisterCallback<ClickEvent>(_ =>
         {
             // Backend: Nutzer ausloggen – NutzerDB wird deaktiviert
-            var logoutController = FindFirstObjectByType<MainLogoutController>();
+            var logoutController = FindAnyObjectByType<MainLogoutController>();
             if (logoutController != null)
                 logoutController.logout();
             else
