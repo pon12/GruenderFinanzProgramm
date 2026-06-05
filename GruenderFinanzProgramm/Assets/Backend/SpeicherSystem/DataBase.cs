@@ -241,14 +241,14 @@ public int deleteCompany(int companyId)
         createTable<Ausgaben>();
     }
 
-    public int createEinkommen(float amount, string description)
+    public int createEinkommen(float amount, string description, string datum)
     {
-        return insert(new Einkommen { Amount = amount, Description = description });
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum });
     }
 
-    public int createAusgaben(float amount, string description)
+    public int createAusgaben(float amount, string description, string datum)
     {
-        return insert(new Ausgaben { Amount = amount, Description = description });
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum });
     }
 
     public List<Einkommen> getAllEinkommenEntries()
@@ -283,6 +283,16 @@ public int deleteCompany(int companyId)
         return getTotalEinkommen() - getTotalAusgaben();
     }
 
+    public List<Ausgaben> getAusgabebyDatum(string datum)
+    {
+    return query<Ausgaben>($"SELECT * FROM Ausgaben WHERE Datum = '{datum}'");
+    }
+    public List<Einkommen> getEinkommenbyDatum(string datum)
+    {
+        return query<Einkommen>($"SELECT * FROM Einkommen WHERE Datum = '{datum}'");
+    }
+
+    
 
 
 
