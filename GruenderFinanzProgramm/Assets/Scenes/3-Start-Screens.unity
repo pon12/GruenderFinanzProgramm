@@ -200,6 +200,7 @@ GameObject:
   m_Component:
   - component: {fileID: 610038136}
   - component: {fileID: 610038137}
+  - component: {fileID: 610038138}
   m_Layer: 0
   m_Name: PassKeyAuthController
   m_TagString: Untagged
@@ -243,6 +244,19 @@ MonoBehaviour:
   registerErrorText: {fileID: 0}
   recoveryErrorText: {fileID: 0}
   mainSceneName: Einstellungen
+--- !u!114 &610038138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 610038135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b48de93ec9359eb88d87440a6e34ca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  targetFPS: 60
 --- !u!1 &679455461
 GameObject:
   m_ObjectHideFlags: 0
