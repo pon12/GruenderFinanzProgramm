@@ -11,23 +11,28 @@ public class DocumentDashboard : MonoBehaviour
     [Header("Templates")]
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
 
+    [Header("Font Settings")]
+    [Tooltip("Ziehe hier dein Poppins-Bold Font Asset (oder Font Definition Asset) aus dem Projektordner rein!")]
+    [SerializeField] private Font poppinsBoldFont;
+
     // UI Elemente
     private VisualElement root;
-    private Button createButton;
-    private Button deleteButton;
     private VisualElement gridContainer;
 
-    // Pop-up Elemente
+    // Erstell-Pop-up Elemente
     private VisualElement popupOverlay;
     private Button popupCancelButton;
-    private Button popupBackButton; // NEU: Für den Pfeil oben rechts/links im Pop-up
+    private Button popupBackButton; 
     private Button popupSubmitButton; 
-    
-    // Eingabefelder
     private DropdownField categoryDropdown; 
     private TextField docNameInput; 
 
-    // Typ-Buttons
+    // Gesamtlisten-Pop-up Elemente
+    private VisualElement detailPopupOverlay;
+    private VisualElement detailListContainer;
+    private Button detailCloseButton;
+
+    // Typ-Buttons im Erstell-Popup
     private Button btnTypeStandard;
     private Button btnTypeDiagramm;
     private Button btnTypeChecklist;
@@ -37,10 +42,11 @@ public class DocumentDashboard : MonoBehaviour
         "Gründung", "Finanzen", "Marketing", "Steuern", "Personal", "Recht" 
     };
 
-    // Lokale Datenstruktur (Sichert Funktionalität ohne fehlerhafte DB-Referenzen)
+    // Lokale Datenstruktur
     [System.Serializable]
     public class DocumentData
     {
+        public string id; // Einzigartige ID für den Minus-Button
         public string category;
         public string title;
         public string type;
@@ -64,55 +70,59 @@ public class DocumentDashboard : MonoBehaviour
 
         root = uiDocument.rootVisualElement;
 
-        // UI-Elemente zuweisen
-        createButton = root.Q<Button>("Create-Button");
-        deleteButton = root.Q<Button>("Delete-Button"); // Oben rechts "Dokumente Löschen"
+        // Haupt-UI holen
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
-        // Pop-up Elemente zuweisen
+        // Erstell-Popup Komponenten holen
         popupOverlay = root.Q<VisualElement>("Popup-Overlay");
-        popupCancelButton = root.Q<Button>("Btn-Cancel"); // "Abbrechen"
-        popupBackButton = root.Q<Button>("Btn-Back");     // "Zurück"-Pfeil oben rechts im Pop-up
-        popupSubmitButton = root.Q<Button>("Btn-Submit"); // "erstellen"
-        
+        popupCancelButton = root.Q<Button>("Btn-Cancel"); 
+        popupBackButton = root.Q<Button>("Btn-Back");     
+        popupSubmitButton = root.Q<Button>("Btn-Submit"); 
         categoryDropdown = root.Q<DropdownField>("dropKategorie"); 
         docNameInput = root.Q<TextField>("Doc-Name-Input"); 
 
+        // Gesamtlisten-Popup Komponenten holen
+        detailPopupOverlay = root.Q<VisualElement>("Detail-Popup-Overlay");
+        detailListContainer = root.Q<VisualElement>("Detail-List-Container");
+        detailCloseButton = root.Q<Button>("Btn-Detail-Close");
+
+        // Typ-Auswahl-Buttons holen
         btnTypeStandard = root.Q<Button>("Btn-Type-Standard");
         btnTypeDiagramm = root.Q<Button>("Btn-Type-Diagramm");
         btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
 
-        // Dropdown befüllen
+        // Dropdown initialisieren
         if (categoryDropdown != null)
         {
             categoryDropdown.choices = dropdownKategorien;
             if (dropdownKategorien.Count > 0) categoryDropdown.value = dropdownKategorien[0]; 
         }
 
-        // Klick-Events verknüpfen
-        if (createButton != null) createButton.clicked += OpenPopup;
-        if (deleteButton != null) deleteButton.clicked += DeleteAllDocuments;
-        
-        // BEIDE Buttons schließen jetzt das Pop-up zuverlässig!
+        // Standard-Popup-Events verdrahten
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
         if (popupBackButton != null) popupBackButton.clicked += ClosePopup;
+        if (detailCloseButton != null) detailCloseButton.clicked += CloseDetailPopup;
 
-        // Typen auswählen (Ändert NUR den Typen-String, überschreibt NICHT mehr dein Textfeld!)
+        // Typen-Auswahl Logik
         if (btnTypeStandard != null) btnTypeStandard.clicked += () => SelectType("Standard");
         if (btnTypeDiagramm != null) btnTypeDiagramm.clicked += () => SelectType("Diagramm");
         if (btnTypeChecklist != null) btnTypeChecklist.clicked += () => SelectType("Checklist");
 
         if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
 
-        // Daten laden und UI aufbauen
         LoadDataLocally();
         SpawnAllCardsAtStart();
     }
 
-    private void OpenPopup() 
+    private void OpenPopup(string preselectedCategory = "") 
     { 
         if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; 
-        if (docNameInput != null) docNameInput.value = ""; // Textfeld leeren, damit du frei tippen kannst!
+        if (docNameInput != null) docNameInput.value = ""; 
+        
+        if (!string.IsNullOrEmpty(preselectedCategory) && categoryDropdown != null)
+        {
+            categoryDropdown.value = preselectedCategory;
+        }
     }
 
     private void ClosePopup() 
@@ -123,23 +133,17 @@ public class DocumentDashboard : MonoBehaviour
     private void SelectType(string typeName)
     {
         selectedType = typeName;
-        Debug.Log($"Typ ausgewählt: {selectedType}");
-        // Hier kannst du optional Code einfügen, um den ausgewählten Button visuell zu markieren
     }
 
     private void CreateNewDocumentEntry()
     {
         string selectedCategory = categoryDropdown != null ? categoryDropdown.value : "";
-        
-        // Nutzt deinen eingetippten Namen. Wenn leer, dann "Unbenannt"
         string docText = (docNameInput != null && !string.IsNullOrEmpty(docNameInput.value)) ? docNameInput.value : "Unbenannt";
 
         if (string.IsNullOrEmpty(selectedCategory)) return;
 
-        // 1. Liste nach aktueller Kategorie filtern
         List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == selectedCategory);
 
-        // 2. Ältestes Dokument kicken, wenn das Kartenlimit (max. 2 Einträge) erreicht ist
         while (kategorieDocs.Count >= 2)
         {
             DocumentData altesDoc = kategorieDocs[0];
@@ -147,8 +151,13 @@ public class DocumentDashboard : MonoBehaviour
             kategorieDocs.Remove(altesDoc);
         }
 
-        // 3. Neues Dokument mit freiem Namen hinzufügen
-        DocumentData newDoc = new DocumentData { category = selectedCategory, title = docText, type = selectedType };
+        DocumentData newDoc = new DocumentData { 
+            id = System.Guid.NewGuid().ToString(), 
+            category = selectedCategory, 
+            title = docText, 
+            type = selectedType 
+        };
+        
         speicherDaten.savedDocs.Add(newDoc);
         
         SaveDataLocally();
@@ -170,6 +179,20 @@ public class DocumentDashboard : MonoBehaviour
             Label titleLabel = cardInstance.Q<Label>("lblName");
             if (titleLabel != null) titleLabel.text = kategorieName;
 
+            // Holt das Bild-Icon DIREKT aus der frisch instanziierten Kachel
+            VisualElement imgShowList = cardInstance.Q("Btn-Show-List");
+            if (imgShowList != null)
+            {
+                imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup());
+            }
+
+            // Holt den Plus-Button aus der Kachel
+            Button plusBtn = cardInstance.Q<Button>("btnPlus");
+            if (plusBtn != null)
+            {
+                plusBtn.clicked += () => OpenPopup(kategorieName);
+            }
+
             VisualElement feldOben = cardInstance.Q<VisualElement>("Datenfeld-Oben");
             VisualElement feldUnten = cardInstance.Q<VisualElement>("Datenfeld-Unten");
 
@@ -180,7 +203,6 @@ public class DocumentDashboard : MonoBehaviour
 
             for (int i = 0; i < kategorieDocs.Count; i++)
             {
-                // Maximal 2 Dokumente anzeigen
                 if (i >= 2) break;
 
                 VisualElement target = (i % 2 == 0) ? feldOben : feldUnten;
@@ -200,6 +222,77 @@ public class DocumentDashboard : MonoBehaviour
         }
     }
 
+    private void OpenDetailPopup()
+    {
+        if (detailPopupOverlay != null) detailPopupOverlay.style.display = DisplayStyle.Flex;
+        RefreshDetailList();
+    }
+
+    private void RefreshDetailList()
+    {
+        if (detailListContainer == null) return;
+        detailListContainer.Clear();
+
+        if (speicherDaten.savedDocs.Count == 0)
+        {
+            Label emptyLabel = new Label("Noch keine Dokumente erstellt.");
+            emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            emptyLabel.style.marginTop = 20;
+            emptyLabel.style.color = Color.white; // Weiße Schrift
+            
+            // Schriftart dynamisch zuweisen falls im Inspector hinterlegt
+            if (poppinsBoldFont != null) emptyLabel.style.unityFont = poppinsBoldFont;
+            
+            detailListContainer.Add(emptyLabel);
+            return;
+        }
+
+        foreach (var doc in speicherDaten.savedDocs)
+        {
+            // 1. Zeilen-Container erstellen
+            VisualElement row = new VisualElement();
+            row.AddToClassList("list-row-item"); 
+
+            string icon = (doc.type == "Diagramm") ? "📊" : ((doc.type == "Checklist") ? "☑️" : "📄");
+            
+            // 2. Label erstellen und per Code stylen (Weiß + Poppins)
+            Label nameLabel = new Label($"[{doc.category}] {icon} {doc.title}");
+            nameLabel.style.fontSize = 13;
+            nameLabel.style.color = Color.white; // Macht den Text sicher weiß!
+            
+            // Wenn du im Inspector deine Poppins-Schriftart reingezogen hast, nutzt er sie jetzt:
+            if (poppinsBoldFont != null)
+            {
+                nameLabel.style.unityFont = poppinsBoldFont;
+                nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            }
+
+            // 3. Minus-Button erstellen
+            Button deleteSingleBtn = new Button();
+            deleteSingleBtn.text = " ➖ "; 
+            deleteSingleBtn.AddToClassList("btn-minus-delete"); 
+            deleteSingleBtn.clicked += () => DeleteSingleDocument(doc.id);
+
+            // Alles zusammenbauen
+            row.Add(nameLabel);
+            row.Add(deleteSingleBtn);
+            detailListContainer.Add(row);
+        }
+    }
+
+    private void DeleteSingleDocument(string docId)
+    {
+        speicherDaten.savedDocs.RemoveAll(d => d.id == docId);
+        SaveDataLocally();
+        RefreshDetailList();    
+        SpawnAllCardsAtStart(); 
+    }
+
+    private void CloseDetailPopup()
+    {
+        if (detailPopupOverlay != null) detailPopupOverlay.style.display = DisplayStyle.None;
+    }
+
     private void SaveDataLocally()
     {
         string json = JsonUtility.ToJson(speicherDaten, true);
@@ -210,14 +303,5 @@ public class DocumentDashboard : MonoBehaviour
     {
         if (File.Exists(saveFilePath))
             speicherDaten = JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(saveFilePath));
-    }
-
-    // "Dokumente Löschen"-Button Logik (Leert die Anzeige und die Speicherdatei)
-    private void DeleteAllDocuments()
-    {
-        speicherDaten.savedDocs.Clear();
-        SaveDataLocally();
-        SpawnAllCardsAtStart();
-        Debug.Log("Alle lokalen Dokumente wurden gelöscht.");
     }
 }
