@@ -378,7 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e960dea1e74b345b8cc853b126c453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
-  uiDocument: {fileID: 0}
+  uiDocument: {fileID: 1923871793}
 --- !u!114 &339280264
 MonoBehaviour:
   m_ObjectHideFlags: 0

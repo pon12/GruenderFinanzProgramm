@@ -1,0 +1,23 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
+
+    <ui:VisualElement name="root" class="root fullscreen-bg" style="flex-grow: 1; width: 100%; height: 100%; background-color: rgb(28, 28, 28);">
+
+        <ui:VisualElement name="main-content" style="flex-grow: 1; padding-left: 430px; height: 100%; align-items: center; justify-content: center;">
+
+            <ui:VisualElement style="align-items: center; justify-content: center; flex-direction: column;">
+
+                <ui:Label text="🚧" style="font-size: 80px; -unity-text-align: upper-center; margin-bottom: 24px;"/>
+
+                <ui:Label text="Dieser Screen ist noch in Arbeit." style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 36px; color: rgb(128, 207, 149); -unity-text-align: upper-center; margin-bottom: 12px;"/>
+
+                <ui:Label text="Bitte schau später wieder vorbei – wir arbeiten daran!" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 22px; color: rgb(160, 160, 160); -unity-text-align: upper-center;"/>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

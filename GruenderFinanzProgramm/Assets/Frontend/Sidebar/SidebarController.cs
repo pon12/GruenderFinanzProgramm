@@ -49,7 +49,7 @@ public class SidebarController : MonoBehaviour
     { "nav-item-finanz",           "Finanzboard"      },
     { "nav-item-angebot",          "Angebot"          },
     { "nav-item-rechnung",         "Rechnung"         },
-    { "nav-item-kunden",           "KundenDB"  },
+    { "nav-item-kunden",           "KundenDB"         },
     { "nav-item-dienstleistungen", "Dienstleistungen" },
     { "nav-item-kassenbuch",       "Kassenbuch"       },
     { "nav-item-export",           "Export-Screen"    },
