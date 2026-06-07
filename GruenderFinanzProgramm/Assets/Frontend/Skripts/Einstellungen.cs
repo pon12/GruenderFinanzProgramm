@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 public class EinstellungenController : MonoBehaviour
 {
+    AuthService authService;
     [SerializeField] private UIDocument            uiDocument;
     [SerializeField] private PassKeyAuthController passKeyAuthController;
     [SerializeField] private MainLogoutController  mainLogoutController;
@@ -130,6 +131,11 @@ public class EinstellungenController : MonoBehaviour
 
     void OnEnable()
     {
+        authService = new AuthService();
+
+    if (passKeyAuthController == null)
+        passKeyAuthController = FindAnyObjectByType<PassKeyAuthController>();
+
         if (uiDocument           == null) uiDocument           = GetComponent<UIDocument>();
         if (passKeyAuthController == null) passKeyAuthController = FindAnyObjectByType<PassKeyAuthController>();
         if (mainLogoutController  == null) mainLogoutController  = FindAnyObjectByType<MainLogoutController>();
@@ -226,6 +232,13 @@ public class EinstellungenController : MonoBehaviour
         if (_btnSave  != null) _btnSave.clicked  += SaveSettings;
         if (_btnReset != null) _btnReset.clicked += LoadSettings;
 
+        // Popup: Neuer Passkey schliessen
+        if (_btnClosePasskeyPopup != null)
+        _btnClosePasskeyPopup.clicked += () =>
+        {
+        if (_popupNewPasskey != null)
+            _popupNewPasskey.style.display = DisplayStyle.None;
+    };
         // Steuersatz Radio-Buttons
         if (_btnSteuer7  != null) _btnSteuer7.clicked  += () => SelectSteuersatz(7);
         if (_btnSteuer10 != null) _btnSteuer10.clicked += () => SelectSteuersatz(10);
@@ -237,31 +250,43 @@ public class EinstellungenController : MonoBehaviour
 
         // Passkey zuruecksetzen – Backend: PassKeyAuthController.resetPassKey()
         // Laut Doku: RecoveryKey wird eingegeben, neuer PassKey wird erzeugt
-        if (_btnResetPasskey != null)
-            _btnResetPasskey.clicked += () =>
-            {
-                if (passKeyAuthController != null)
-                {
-                    passKeyAuthController.resetPassKey();
-                    Debug.Log("[Einstellungen] resetPassKey aufgerufen.");
-                }
-                else
-                    Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
+        // Passkey zuruecksetzen
+// Backend: resetPassKeyWithRecoveryKey(string enteredRecoveryKey) gibt neuen Passkey zurueck
+if (_btnResetPasskey != null)
+    _btnResetPasskey.clicked += () =>
+    {
+        string recoveryKey = _inputSuperkeyReset?.value?.Trim() ?? "";
 
-                // Popup anzeigen
-                // TODO: Sobald Backend neuen Passkey zurueckgibt, ShowNewPasskeyPopup(newPasskey) aufrufen
-                ShowNewPasskeyPopup("????");
+        if (string.IsNullOrEmpty(recoveryKey))
+        {
+            Debug.LogWarning("[Einstellungen] Recovery Key fehlt.");
+            return;
+        }
 
-                if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
-            };
+        if (recoveryKey.Length != 16)
+        {
+            Debug.LogWarning("[Einstellungen] Recovery Key muss 16-stellig sein.");
+            return;
+        }
 
-        // Popup schliessen
-        if (_btnClosePasskeyPopup != null)
-            _btnClosePasskeyPopup.clicked += () =>
-            {
-                if (_popupNewPasskey != null)
-                    _popupNewPasskey.style.display = DisplayStyle.None;
-            };
+        if (passKeyAuthController == null)
+        {
+            Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
+            return;
+        }
+
+        // Backend: neuen Passkey per Recovery Key abrufen
+        string newPasskey = authService.resetPassKeyWithRecoveryKey(recoveryKey);
+
+        if (!string.IsNullOrEmpty(newPasskey))
+        {
+            ShowNewPasskeyPopup(newPasskey);
+            if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
+            Debug.Log("[Einstellungen] Passkey erfolgreich zurueckgesetzt.");
+        }
+        else
+            Debug.LogWarning("[Einstellungen] Kein neuer Passkey zurueckgegeben – Recovery Key korrekt?");
+    };
 
         // Lokalprofil loeschen
         if (_btnDeleteProfile  != null) _btnDeleteProfile.clicked  += ShowDeleteDialog;

@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 public class MainLogoutController : MonoBehaviour
 {
     [SerializeField] private string loginSceneName = "LoginScene";
-
+    [SerializeField] private AuthService authService;
+    
     public void logout()
     {
         if (StateManager.Instance != null)
