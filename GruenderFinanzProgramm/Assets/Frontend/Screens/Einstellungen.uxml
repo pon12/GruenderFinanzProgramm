@@ -207,6 +207,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+     <!-- Popup: Gespeichert -->
+<ui:VisualElement name="popup-gespeichert" style="display: none; position: absolute; width: 300px; height: 150px; background-color: rgb(56, 56, 56); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; top: 276px; left: 521px; justify-content: center; align-items: center;">
+    <ui:Image source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="position: absolute; height: 49px; top: 14px; width: 49px; left: 125px;"/>
+    <ui:Button name="btn-close-gespeichert" text="" icon-image="project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close" style="position: absolute; top: -6px; left: 239px; height: 46px; width: 68px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0);"/>
+    <ui:Label name="label-gespeichert-text" text="... wurde erfolgreich gespeichert" style="color: rgb(255, 255, 255); position: absolute; top: 80px; left: 20px; right: 20px; -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+</ui:VisualElement> 
         <!-- Popup: Neuer Passkey nach Reset -->
     <ui:VisualElement name="popup-new-passkey" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.80); align-items: center; justify-content: center;">
     <ui:VisualElement name="passkey-popup-box" style="background-color: rgb(60, 60, 60); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 48px; width: 560px; align-items: center;">

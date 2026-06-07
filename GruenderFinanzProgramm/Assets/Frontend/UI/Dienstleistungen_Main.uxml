@@ -22,26 +22,26 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="card-2" class="cards">
                         <ui:Label text="Webdesign" class="Label1"/>
-                        <ui:Label name="desc-1" text="Beispieltext" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:Label name="desc-2" text="Beispieltext" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
                         <ui:VisualElement name="Preis" class="preis" style="flex-grow: 1;">
                             <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                            <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-2" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Buttons" class="buttons" style="flex-grow: 1;">
-                            <ui:Button name="btn-edit-1" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
-                            <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Button name="btn-edit-2" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
+                            <ui:Button name="btn-del-2" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="card-3" class="cards">
                         <ui:Label text="Programmierung" class="Label1"/>
-                        <ui:Label name="desc-1" text="Beispieltext" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:Label name="desc-3" text="Beispieltext" class="mb-3" style="font-size: 15px; color: rgb(185, 185, 185); white-space: normal; overflow: hidden; width: 100%; min-width: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
                         <ui:VisualElement name="Preis" class="preis" style="flex-grow: 1;">
                             <ui:Label text="Preis:" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
-                            <ui:Label name="price-1" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="price-3" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Buttons" class="buttons" style="flex-grow: 1;">
-                            <ui:Button name="btn-edit-1" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
-                            <ui:Button name="btn-del-1" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Button name="btn-edit-3" text="Bearbeiten" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
+                            <ui:Button name="btn-del-3" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
@@ -70,7 +70,7 @@
                             <ui:Label name="price-5" text="676767.67€" style="font-size: 15px; color: rgb(255, 255, 255); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Buttons" class="card-btn-row buttons">
-                            <ui:Button name="btn-edit-5" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Button name="btn-edit-5" text="Bearbeiten" class="mr-1" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;); margin-right: 4px;"/>
                             <ui:Button name="btn-del-5" text="Löschen" style="background-color: rgb(128, 207, 149); border-width: 0; border-radius: 8px; color: rgb(0, 0, 0); font-size: 14px; -unity-font-style: bold; height: 38px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=8cf7aafec04adfb46bae3114f5129d41&amp;type=3#Poppins-SemiBold&quot;);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -80,7 +80,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-    </ui:VisualElement>
         <ui:VisualElement name="popup-root" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; display: none;"/>
     </ui:VisualElement>
 </ui:UXML>
