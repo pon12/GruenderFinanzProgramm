@@ -109,8 +109,11 @@ public class KassenbuchController : MonoBehaviour
         }
         else {
             //_db.Delete<Ausgaben>(id);
-            db.deleteEinkommen(id);
+            db.deleteAusgaben(id);
+
         }
+
+        createList();
 
         Debug.Log($"[DB] {typ} mit ID {id} gelöscht.");
     }
