@@ -13,6 +13,8 @@ public class DataBase : DatabaseManager
         createTable<Service>();
         createTable<UserDocument>();
         createTable<UserPDFDocument>();
+        createTable<Ausgaben>();
+        createTable<Einkommen>();
     }
 
     public void setupAuthDB()

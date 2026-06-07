@@ -3,7 +3,7 @@
     padding: 8px;
     border-radius: 8px;
     background-color: rgb(0, 0, 0);
-    width: 33%;
+    width: 30%;
     shrink: 1;
     grow: o;
 }

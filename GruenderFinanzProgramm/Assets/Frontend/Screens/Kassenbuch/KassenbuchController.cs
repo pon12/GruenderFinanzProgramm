@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using SQLite4Unity3d;
 using System.IO;
+using System;
 
 public class KassenbuchController : MonoBehaviour
 {
@@ -9,12 +10,14 @@ public class KassenbuchController : MonoBehaviour
     private string _aktuellerTyp;
     private SQLiteConnection _db;
 
+    private DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
     void OnEnable()
     {
-        string path = Path.Combine(Application.persistentDataPath, "kassenbuch.db");
-        _db = new SQLiteConnection(path, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-        _db.CreateTable<Einkommen>();
-        _db.CreateTable<Ausgaben>();
+        //string path = Path.Combine(Application.persistentDataPath, "kassenbuch.db");
+        //_db = new SQLiteConnection(path, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        //_db.CreateTable<Einkommen>();
+        //_db.CreateTable<Ausgaben>();
 
         var root = GetComponent<UIDocument>().rootVisualElement;
 
@@ -31,7 +34,7 @@ public class KassenbuchController : MonoBehaviour
 
     void OnDisable()
     {
-        _db?.Close();
+        //_db?.Close();
     }
 
     private void OpenPopup(string typ)
@@ -62,6 +65,7 @@ public class KassenbuchController : MonoBehaviour
         }
 
         var eintrag = new KassenbuchEintrag(_aktuellerTyp, betrag, zweck, datum);
+        Debug.Log("Test: " + eintrag.Betrag + eintrag.Beschreibung);
         SpeichereEintrag(eintrag);
         ClosePopup();
     }
@@ -69,17 +73,25 @@ public class KassenbuchController : MonoBehaviour
     private void SpeichereEintrag(KassenbuchEintrag eintrag)
     {
         if (eintrag.Typ == "Einnahme")
-            _db.Insert(new Einkommen { Amount = eintrag.Betrag, Description = eintrag.Beschreibung , Datum = eintrag.Datum });
+            //_db.Insert(new Einkommen { Amount = eintrag.Betrag, Description = eintrag.Beschreibung , Datum = eintrag.Datum });
+            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
         else
-            _db.Insert(new Ausgaben  { Amount = eintrag.Betrag, Description = eintrag.Beschreibung, Datum = eintrag.Datum });
+            //db.Insert(new Ausgaben  { Amount = eintrag.Betrag, Description = eintrag.Beschreibung, Datum = eintrag.Datum });
+            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
 
         Debug.Log($"[DB] {eintrag.Typ} gespeichert: {eintrag.Betrag}€ – {eintrag.Beschreibung} ({eintrag.Datum})");
     }
 
     public void Loeschen(string typ, int id)
     {
-        if (typ == "Einnahme") _db.Delete<Einkommen>(id);
-        else                   _db.Delete<Ausgaben>(id);
+        if (typ == "Einnahme") {
+            //_db.Delete<Einkommen>(id);
+            db.deleteEinkommen(id);
+        }
+        else {
+            //_db.Delete<Ausgaben>(id);
+            db.deleteEinkommen(id);
+        }
 
         Debug.Log($"[DB] {typ} mit ID {id} gelöscht.");
     }
