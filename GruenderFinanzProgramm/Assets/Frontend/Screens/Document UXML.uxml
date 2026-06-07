@@ -46,15 +46,35 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="Detail-Popup-Overlay" class="popup-overlay" style="flex-grow: 1; display: none;">
-            <ui:VisualElement name="Detail-Menu-Container" class="popup-container" style="flex-grow: 1; display: flex; background-color: rgb(17, 17, 17);">
-                <ui:VisualElement name="Detail-Header" class="popup-header" style="flex-grow: 0;">
-                    <ui:Label text="Dokumenten-List" name="Detail-Popup-Title" class="popup-title" style="color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
-                    <ui:Button text="Close" name="Btn-Detail-Close" class="btn-close" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; background-color: rgb(128, 207, 149);"/>
+            <ui:VisualElement name="Detail-Menu-Container" class="popup-container detail-popup-box" style="flex-grow: 1; display: flex; background-color: rgb(17, 17, 17);">
+                <ui:VisualElement name="Detail-Header" class="popup-header popup-header-row" style="flex-grow: 0; flex-direction: row;">
+                    <ui:Label text="Dokumenten-List" name="Detail-Popup-Title" class="popup-title popup-title-text" style="color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); flex-grow: 1;"/>
+                    <ui:Button text="Close" name="Btn-Detail-Close" class="btn-close btn-close-style" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; background-color: rgb(128, 207, 149); justify-content: flex-start; flex-grow: 0; flex-shrink: 0; align-self: auto;"/>
                 </ui:VisualElement>
-                <ui:ScrollView name="Detail-Scroll-View" class="detail-scroll-view">
-                    <ui:VisualElement name="Detail-List-Container" style="flex-grow: 1;"/>
-                </ui:ScrollView>
-                <ui:Button text="+ Neues Dokument erstellen" name="Btn-List-Create-New" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; border-left-color: rgb(129, 207, 149); border-right-color: rgb(129, 207, 149); border-top-color: rgb(129, 207, 149); border-bottom-color: rgb(129, 207, 149); background-color: rgb(129, 207, 149);"/>
+                <ui:VisualElement name="Detail-Split-Body" class="split-body-layout" style="flex-grow: 1;">
+                    <ui:VisualElement name="Detail-Left-Column" class="column-half" style="flex-grow: 1;">
+                        <ui:Label text="Kategorie Dokumente" class="column-header-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+                        <ui:ScrollView name="Detail-List-Container" class="scroll-list-box"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Detail-Right-Column" class="column-half" style="flex-grow: 1;">
+                        <ui:Label text="Globale Dokumenten Liste" class="column-header-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+                        <ui:ScrollView name="Global-List-Container" class="scroll-list-box"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button text="+ Neues Dokument erstellen" name="Btn-List-Create-New" class="btn-create-footer" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; border-left-color: rgb(129, 207, 149); border-right-color: rgb(129, 207, 149); border-top-color: rgb(129, 207, 149); border-bottom-color: rgb(129, 207, 149); background-color: rgb(129, 207, 149);"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Edit-Popup-Overlay" style="flex-grow: 1; display: none;">
+            <ui:VisualElement name="Edit-Popup-Container" class="edit-popup-box" style="flex-grow: 1;">
+                <ui:Label text="Dokument Bearbeiten" class="popup-title-text" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
+                <ui:TextField label="" placeholder-text="" name="Edit-Doc-Name-Input" class="input-field-style" style="flex-grow: 1;"/>
+                <ui:VisualElement name="Edit-Buttons-Type-Group" class="type-button-group" style="flex-grow: 0;">
+                    <ui:Button text="Standard" name="Btn-Edit-Type-Diagramm" class="type-btn"/>
+                    <ui:Button text="Diagramm" name="Btn-Edit-Type-Standard" class="type-btn"/>
+                    <ui:Button text="Checklist" name="Btn-Edit-Type-Checklist" class="type-btn"/>
+                </ui:VisualElement>
+                <ui:Button text="Fertsch" name="Btn-Edit-Submit" class="btn-action-submit"/>
+                <ui:Button text="Abbrechen&#10;" name="Btn-Edit-Cancel" class="btn-action-cancel"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

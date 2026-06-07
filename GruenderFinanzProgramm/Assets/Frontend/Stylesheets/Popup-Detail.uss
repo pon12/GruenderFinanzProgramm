@@ -1,108 +1,263 @@
-/* Das abgedunkelte Overlay über den ganzen Bildschirm */
-.popup-overlay {
+/* =========================================================================
+   1. LAYOUT & BREITE FÜR DAS ZWEISPALTYGE LISTEN-POPUP (DETAIL)
+   ========================================================================= */
+
+/* Verdunkelter Vollbild-Hintergrund */
+#Detail-Popup-Overlay, #Edit-Popup-Overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6); /* Schicker abgedunkelter Hintergrund */
+    background-color: rgba(0, 0, 0, 0.85);
     justify-content: center;
     align-items: center;
-    display: none; /* Wird vom Skript auf Flex gesetzt */
+    display: none; 
 }
 
-/* Das eigentliche Fenster in der Mitte */
-.popup-container {
-    width: 450px;
-    max-height: 80%; /* Verhindert, dass das Popup aus dem Screen fliegt */
-    background-color: #ffffff; /* Nutze hier die Farbe deines Erstellen-Popups */
+/* Hauptfenster: Schön breit für zwei Spalten */
+.detail-popup-box {
+    width: 1050px; 
+    height: 580px;
+    background-color: #1a1a1a;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
+    justify-content: space-between;
     border-width: 1px;
-    border-color: #cccccc;
+    border-color: #2d2d2d;
 }
 
-/* Der Header-Bereich für Titel und Schließen-Button */
-.popup-header {
+/* Header-Zeile */
+.popup-header-row {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
     border-bottom-width: 1px;
-    border-bottom-color: #e0e0e0;
-    padding-bottom: 10px;
+    border-bottom-color: #2d2d2d;
+    padding-bottom: 12px;
 }
 
-/* Der Titel im Popup */
-.popup-title {
-    font-size: 18px;
+.popup-title-text {
+    font-size: 20px;
+    color: #ffffff;
     -unity-font-style: bold;
-    color: #333333;
 }
 
-/* Der Schließen/Zurück-Button oben rechts im Popup */
-.btn-close {
+.btn-close-style {
     background-color: transparent;
-    border-width: 0;
-    font-size: 16px;
     color: #888888;
-    cursor: link;
+    border-width: 0;
+    font-size: 18px;
+    cursor: pointer;
+}
+.btn-close-style:hover {
+    color: #ffffff;
 }
 
-.btn-close:hover {
-    color: #ff3333; /* Wird rot beim Hovern */
-}
-
-/* Bereich für die Scroll-Anzeige */
-.detail-scroll-view {
+/* Das zweispaltige Layout nebeneinander */
+.split-body-layout {
+    flex-direction: row;
     flex-grow: 1;
-    margin-top: 5px;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 
-/* --- DIESE KLASSEN WERDEN DYNAMISCH VOM CODE GENUTZT --- */
+.column-half {
+    width: 50%;
+    padding-left: 12px;
+    padding-right: 12px;
+}
 
-/* Eine Zeile in der Liste (Dokument + Minus-Button) */
+.column-header-title {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-bottom: 10px;
+    -unity-font-style: bold;
+}
+
+/* Die schwarzen Listen-Boxen (Mit automatischem Scrollen) */
+.scroll-list-box {
+    flex-grow: 1;
+    background-color: #111111;
+    border-radius: 8px;
+    padding: 10px;
+    border-width: 1px;
+    border-color: #252525;
+    overflow: scroll; 
+}
+
+/* Grüne Erstell-Schaltfläche ganz unten */
+.btn-create-footer {
+    background-color: #27ae60;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    border-width: 0;
+    -unity-font-style: bold;
+}
+.btn-create-footer:hover {
+    background-color: #2ecc71;
+}
+
+/* =========================================================================
+   2. RECHTE SEITE: "HINZUFÜGEN"-BUTTON (DESIGN-TREU)
+   ========================================================================= */
+
+.btn-add-global {
+    background-color: transparent;
+    color: #2ecc71;             /* Grüner Text */
+    border-color: #2ecc71;       /* Grüner Rahmen */
+    border-width: 1px;
+    border-radius: 15px;        /* Schön rundgelutschte Pillen-Form */
+    padding: 4px 14px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn-add-global:hover {
+    background-color: rgba(46, 204, 113, 0.15); /* Dezentes Aufleuchten beim Hover */
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* =========================================================================
+   3. LINKE SEITE: GRAFIK-BUTTONS (STIFT & MÜLLTONNE)
+   ========================================================================= */
+
 .list-row-item {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 4px;
-    border-bottom-width: 1px;
-    border-bottom-color: #f0f0f0;
+    background-color: #222222;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    height: 45px;               /* Feste Zeilenhöhe für Stabilität */
+}
+.list-row-item:hover {
+    background-color: #2a2a2a;
 }
 
-/* Der kleine rote Minus-Button */
-.btn-minus-delete {
-    background-color: #ff4d4d;
-    color: white;
-    border-radius: 4px;
+.row-btn-group {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* FIX: Echte quadratische Größe für die Icons im UI Toolkit */
+.btn-action-icon {
+    background-color: transparent;
     border-width: 0;
-    padding: 4px 8px;
-    font-size: 11px;
-    -unity-font-style: bold;
-    cursor: link;
+    width: 22px;               
+    height: 22px;
+    margin-left: 12px;
+    padding: 0;
+    cursor: pointer;
+    -unity-background-scale-mode: scale-to-fit; /* Behebt das "Minus-Verzerrungs"-Problem! */
 }
 
+/* Der Stift-Button */
+.btn-edit-pen {
+    background-image: resource("icons/edit"); 
+    -unity-background-image-tint-color: #ffffff;
+}
+.btn-edit-pen:hover {
+    -unity-background-image-tint-color: #f1c40f; 
+}
+
+/* Die rote Mülltonne */
+.btn-minus-delete {
+    background-image: resource("icons/rot müll"); 
+    -unity-background-image-tint-color: #ffffff;
+}
 .btn-minus-delete:hover {
-    background-color: #ff1a1a;
+    -unity-background-image-tint-color: #e74c3c; 
 }
 
-/* Erweitere deine bestehende Klasse für das Label in der Liste */
-.list-row-item Label {
-    color: #ffffff; /* Macht die Schrift reinweiß */
-    font-size: 13px;
-    
-    /* Zuweisung der Schriftart Poppins-Bold */
-    /* Hinweis: Der Pfad muss auf dein Font-Asset (.ttf/.otf) oder das generierte Font Asset verweisen */
-    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf"); 
-    -unity-font-style: bold;
+/* =========================================================================
+   4. LAYOUT FÜR DAS BEARBEITEN-POPUP (EDIT) - EXTRA BREIT
+   ========================================================================= */
+
+.edit-popup-box {
+    width: 900px;              
+    height: 600px;             
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 24px;
+    justify-content: space-between;
+    border-width: 1px;
+    border-color: #333333;
 }
 
-/* Falls du das leere "Noch keine Dokumente erstellt"-Label auch weiß/Poppins haben willst: */
-.list-empty-label {
+/* Das große Textfeld im Zentrum */
+.input-field-style {
+    flex-grow: 1;              
+    margin-top: 16px;
+    margin-bottom: 16px;
+    min-height: 350px;         
+}
+
+/* Das innere Eingabefeld der Textbox stylen */
+.input-field-style .unity-text-field__input {
+    background-color: #0d0d0d; 
+    border-color: #2a2a2a;
+    border-radius: 6px;
+    padding: 12px;
     color: #ffffff;
-    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
+    font-size: 14px;
+    -unity-text-align: upper-left; 
+}
+
+/* Zeile für die drei Vorlagen-Buttons */
+.type-button-group {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.type-btn {
+    flex-grow: 1;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    margin: 0 4px;
+    padding: 8px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: #444444;
     -unity-font-style: bold;
-    text-anchor: middle-center;
-    margin-top: 20px;
+}
+
+/* Untere Button-Zeile für Abbrechen/Speichern */
+.edit-footer-buttons {
+    flex-direction: row;
+    justify-content: flex-end; 
+    margin-top: 12px;
+}
+
+.btn-action-submit {
+    background-color: #27ae60; 
+    color: white;
+    padding: 10px 24px;
+    border-radius: 6px;
+    border-width: 0;
+    -unity-font-style: bold;
+    margin-left: 12px;
+}
+.btn-action-submit:hover {
+    background-color: #2ecc71;
+}
+
+.btn-action-cancel {
+    background-color: #333333; 
+    color: #aaaaaa;
+    padding: 10px 24px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: #444444;
+}
+.btn-action-cancel:hover {
+    color: #ffffff;
+    background-color: #444444;
 }
