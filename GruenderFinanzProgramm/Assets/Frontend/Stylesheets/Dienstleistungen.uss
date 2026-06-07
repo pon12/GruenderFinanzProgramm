@@ -23,3 +23,58 @@
     flex-grow: 1;
     height: 38px;
 }
+
+/* Karten-Grid: 3 Spalten, wrapping */
+.cards-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    align-content: flex-start;
+}
+
+/* Scrollbar Hintergrund */
+.unity-scroll-view__vertical-scroller {
+    width: 8px;
+    background-color: rgb(38, 38, 38);
+    border-radius: 4px;
+    margin-left: 8px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+/* Scrollbar Dragger (der bewegliche Teil) */
+.unity-scroller--vertical .unity-base-slider__dragger {
+    background-color: rgb(128, 207, 149);
+    border-radius: 4px;
+    min-height: 40px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Scrollbar Track */
+.unity-scroller--vertical .unity-base-slider__tracker {
+    background-color: rgb(38, 38, 38);
+    border-radius: 4px;
+}
+
+/* Scrollbar Pfeil-Buttons ausblenden */
+.unity-scroller--vertical .unity-scroller__low-button,
+.unity-scroller--vertical .unity-scroller__high-button {
+    display: none;
+}
+
+/* Horizontalen Scroller komplett ausblenden */
+.unity-scroll-view__horizontal-scroller {
+    display: none;
+}
+
+/* Content-Area der ScrollView braucht keine extra Hoehe */
+.unity-scroll-view__content-and-vertical-scroll-container {
+    flex-grow: 1;
+}
