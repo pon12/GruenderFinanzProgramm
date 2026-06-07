@@ -80,8 +80,8 @@
                             </ui:VisualElement>
                             <ui:Label text="Standardsteuersatz für Dienstleistungen" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 10px;"/>
                             <ui:VisualElement style="flex-direction: row;">
-                                <ui:Button text="7 %" name="btn-steuer-7" style="flex: 1; margin-right: 8px; background-color: rgb(70, 70, 70); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
-                                <ui:Button text="10 %" name="btn-steuer-10" style="flex: 1; margin-right: 8px; background-color: rgb(70, 70, 70); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
+                                <ui:Button text="7 %" name="btn-steuer-7" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
+                                <ui:Button text="10 %" name="btn-steuer-10" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
                                 <ui:Button text="19 %" name="btn-steuer-19" style="flex: 1; background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
@@ -92,7 +92,7 @@
                             </ui:VisualElement>
                             <ui:Label text="Anzeigemodus" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 10px;"/>
                             <ui:VisualElement style="flex-direction: row; margin-bottom: 16px;">
-                                <ui:Button text="Hell" name="btn-light-mode" style="flex: 1; margin-right: 8px; background-color: rgb(70, 70, 70); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
+                                <ui:Button text="Hell" name="btn-light-mode" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px;"/>
                                 <ui:Button text="Dunkel" name="btn-dark-mode" style="flex: 1; background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; border-width: 0; height: 44px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             </ui:VisualElement>
                             <ui:Toggle name="toggle-begleiter" label="Begleiter / Assistent aktiv" style="font-size: 16px;"/>
@@ -166,9 +166,9 @@
                                 <ui:Label text="Konto und Sicherheit" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex-direction: column; margin-bottom: 16px; background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px;">
-                                <ui:Label text="Passkey zurücksetzen" style="font-size: 16px; color: rgb(255, 255, 255); ..."/>
-                                <ui:Label text="Recovery Key eingeben (16-stellig)" style="font-size: 12px; color: rgb(220, 220, 220); margin-bottom: 12px;"/>
-                                <ui:TextField class="dark-input" name="input-superkey-reset" style="height: 40px; margin-bottom: 12px;"/>
+                                <ui:Label text="Passkey zurücksetzen" style="font-size: 16px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); margin-bottom: 4px;"/>
+                                <ui:Label text="Recovery Key eingeben (16-stellig)" style="font-size: 12px; color: rgb(160, 160, 160); margin-bottom: 12px;"/>
+                                <ui:TextField name="input-superkey-reset" class="dark-input" style="height: 40px; margin-bottom: 12px;"/>
                                 <ui:Button text="Zurücksetzen" name="btn-reset-passkey" style="background-color: rgb(255, 165, 60); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; font-size: 14px; align-self: flex-end; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px;">
@@ -196,7 +196,7 @@
         <ui:VisualElement name="dialog-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center;">
             <ui:VisualElement name="dialog-box" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 40px; width: 600px;">
                 <ui:Label text="Lokalprofil wirklich löschen?" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 24px; color: rgb(255, 255, 255); margin-bottom: 12px; -unity-text-align: upper-center;"/>
-                <ui:Label text="Dieser Vorgang löscht alle lokalen Daten unwiderruflich. Gib zweimal deinen Super-Passkey ein um zu bestätigen." style="font-size: 14px; color: rgb(180, 180, 180); margin-bottom: 24px; white-space: normal; -unity-text-align: upper-center;"/>
+                <ui:Label text="Dieser Vorgang löscht alle lokalen Daten unwiderruflich." style="font-size: 14px; color: rgb(180, 180, 180); margin-bottom: 24px; white-space: normal; -unity-text-align: upper-center;"/>
                 <ui:Label text="Super-Passkey (1. Eingabe)" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                 <ui:TextField name="input-superkey-1" password="true" class="dark-input" style="height: 40px; margin-bottom: 14px;"/>
                 <ui:Label text="Super-Passkey (2. Eingabe)" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
@@ -207,37 +207,23 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-     <!-- Popup: Gespeichert -->
-<ui:VisualElement name="popup-gespeichert" style="display: none; position: absolute; width: 300px; height: 150px; background-color: rgb(56, 56, 56); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; top: 276px; left: 521px; justify-content: center; align-items: center;">
-    <ui:Image source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="position: absolute; height: 49px; top: 14px; width: 49px; left: 125px;"/>
-    <ui:Button name="btn-close-gespeichert" text="" icon-image="project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close" style="position: absolute; top: -6px; left: 239px; height: 46px; width: 68px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0);"/>
-    <ui:Label name="label-gespeichert-text" text="... wurde erfolgreich gespeichert" style="color: rgb(255, 255, 255); position: absolute; top: 80px; left: 20px; right: 20px; -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-</ui:VisualElement> 
-        <!-- Popup: Neuer Passkey nach Reset -->
-    <ui:VisualElement name="popup-new-passkey" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.80); align-items: center; justify-content: center;">
-    <ui:VisualElement name="passkey-popup-box" style="background-color: rgb(60, 60, 60); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 48px; width: 560px; align-items: center;">
-
-        <!-- Icon -->
-        <ui:Label text="🔑" style="font-size: 56px; -unity-text-align: upper-center; margin-bottom: 16px;"/>
-
-        <!-- Titel -->
-        <ui:Label text="Dein neuer Passkey" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 28px; color: rgb(255, 255, 255); -unity-text-align: upper-center; margin-bottom: 8px;"/>
-
-        <!-- Hinweis -->
-        <ui:Label text="Bitte notiere deinen neuen Passkey. Er wird nur einmal angezeigt." style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 15px; color: rgb(230, 230, 230); -unity-text-align: upper-center; white-space: normal; margin-bottom: 32px;"/>
-
-        <!-- Passkey Anzeige -->
-        <ui:VisualElement style="background-color: rgb(40, 40, 40); ..."> border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; padding-top: 20px; padding-bottom: 20px; padding-left: 40px; padding-right: 40px; margin-bottom: 12px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;">
-            <ui:Label name="label-new-passkey" text="●  ●  ●  ●" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 48px; color: rgb(128, 207, 149); -unity-text-align: upper-center; letter-spacing: 8px;"/>
+        <ui:VisualElement name="popup-new-passkey" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
+            <ui:VisualElement style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 48px; width: 560px; align-items: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:Label text="Neuer Passkey" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 28px; color: rgb(255, 255, 255); -unity-text-align: upper-center; margin-bottom: 8px;"/>
+                <ui:Label text="Bitte notiere deinen neuen Passkey. Er wird nur einmal angezeigt." style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 15px; color: rgb(160, 160, 160); -unity-text-align: upper-center; white-space: normal; margin-bottom: 32px;"/>
+                <ui:VisualElement style="background-color: rgb(28, 28, 28); border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; padding-top: 20px; padding-bottom: 20px; padding-left: 40px; padding-right: 40px; margin-bottom: 12px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;">
+                    <ui:Label name="label-new-passkey" text="- - - -" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 48px; color: rgb(128, 207, 149); -unity-text-align: upper-center; letter-spacing: 8px;"/>
+                </ui:VisualElement>
+                <ui:Label name="label-new-passkey-plain" text="" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 14px; color: rgb(160, 160, 160); -unity-text-align: upper-center; margin-bottom: 32px;"/>
+                <ui:Button text="Verstanden - Passkey notiert" name="btn-close-passkey-popup" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; padding-top: 14px; padding-bottom: 14px; padding-left: 32px; padding-right: 32px; font-size: 18px; width: 100%; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+            </ui:VisualElement>
         </ui:VisualElement>
-
-        <!-- Passkey als Text darunter (lesbar) -->
-        <ui:Label name="label-new-passkey-plain" text="" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 14px; color: rgb(200, 200, 200); -unity-text-align: upper-center; margin-bottom: 32px;"/>
-
-        <!-- Verstanden Button -->
-        <ui:Button text="Verstanden – Passkey notiert" name="btn-close-passkey-popup" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; padding-top: 14px; padding-bottom: 14px; padding-left: 32px; padding-right: 32px; font-size: 18px; width: 100%; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-
-    </ui:VisualElement>
-    </ui:VisualElement>
+        <ui:VisualElement name="popup-gespeichert" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
+            <ui:VisualElement style="width: 520px; height: 240px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; align-items: center; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:Image source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="width: 70px; height: 70px; margin-bottom: 20px;"/>
+                <ui:Label name="label-gespeichert-text" text="... wurde erfolgreich gespeichert" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 20px;"/>
+                <ui:Button name="btn-close-gespeichert" text="" icon-image="project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close" style="position: absolute; top: -6px; right: 0; height: 46px; width: 46px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0);"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
