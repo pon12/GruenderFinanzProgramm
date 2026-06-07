@@ -11,6 +11,10 @@ public class Einkommen
     public string Description { get; set; }
     public string Datum { get; set; }
 
+    public int getId()
+    {
+        return Id;
+    }
 
     public string getDescription()
     {
@@ -33,6 +37,11 @@ public class Ausgaben
     public float Amount { get; set; }
     public string Description { get; set; }
     public string Datum { get; set; }
+
+    public int getId()
+    {
+        return Id;
+    }
 
     public string getDescription()
     {
