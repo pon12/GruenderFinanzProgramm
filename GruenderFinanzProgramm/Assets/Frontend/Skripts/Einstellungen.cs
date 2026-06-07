@@ -110,6 +110,10 @@ public class EinstellungenController : MonoBehaviour
     private Label         _labelNewPasskeyPlain;
     private Button        _btnClosePasskeyPopup;
 
+    private VisualElement _popupGespeichert;
+    private Label         _labelGespeichertText;
+    private Button        _btnCloseGespeichert;
+
     // Aktuelle Firma aus Backend
     private Company _currentCompany = null;
 
@@ -131,6 +135,14 @@ public class EinstellungenController : MonoBehaviour
 
     void OnEnable()
     {
+
+        // Popup auf Root-Ebene verschieben damit position: absolute korrekt wirkt
+        if (_popupGespeichert != null)
+{
+        _popupGespeichert.RemoveFromHierarchy();
+        _root.Add(_popupGespeichert);
+        _popupGespeichert.style.display = DisplayStyle.None;
+}
         authService = new AuthService();
 
     if (passKeyAuthController == null)
@@ -209,6 +221,10 @@ public class EinstellungenController : MonoBehaviour
         _labelNewPasskeyPlain = _root.Q<Label>("label-new-passkey-plain");
         _btnClosePasskeyPopup = _root.Q<Button>("btn-close-passkey-popup");
 
+        _popupGespeichert     = _root.Q<VisualElement>("popup-gespeichert");
+        _labelGespeichertText = _root.Q<Label>("label-gespeichert-text");
+        _btnCloseGespeichert  = _root.Q<Button>("btn-close-gespeichert");
+
         Debug.Log($"[Einstellungen] popup-new-passkey: {(_popupNewPasskey != null ? "gefunden" : "NULL – in UXML pruefen")}");
     }
 
@@ -229,7 +245,19 @@ public class EinstellungenController : MonoBehaviour
 
     private void RegisterButtons()
     {
-        if (_btnSave  != null) _btnSave.clicked  += SaveSettings;
+     if (_btnSave != null)
+    _btnSave.clicked += () =>
+    {
+        SaveSettings();
+        ShowGespeichertPopup();
+    };
+
+        if (_btnCloseGespeichert != null)
+        _btnCloseGespeichert.clicked += () =>
+    {
+        if (_popupGespeichert != null)
+            _popupGespeichert.style.display = DisplayStyle.None;
+    };
         if (_btnReset != null) _btnReset.clicked += LoadSettings;
 
         // Popup: Neuer Passkey schliessen
@@ -552,6 +580,19 @@ if (_btnResetPasskey != null)
         SceneManager.LoadScene(0);
     }
 
+
+        private void ShowGespeichertPopup()
+{
+    // Szenenname erkennen und Nachricht anpassen
+    string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+    // Szenenname lesbar machen – z.B. "Einstellungen" bleibt "Einstellungen"
+    if (_labelGespeichertText != null)
+        _labelGespeichertText.text = $"{sceneName} wurden gespeichert";
+
+    if (_popupGespeichert != null)
+        _popupGespeichert.style.display = DisplayStyle.Flex;
+}
     // ═══════════════════════════════════════════════════════════
     // HILFSFUNKTIONEN
     // ═══════════════════════════════════════════════════════════
