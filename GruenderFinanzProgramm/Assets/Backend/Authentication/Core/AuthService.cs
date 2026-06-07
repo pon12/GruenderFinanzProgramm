@@ -9,6 +9,22 @@ public class AuthService
     public string passkeyGlobal;
     public string recoveryPassKeyGlobal;
 
+
+    public string getRecoveryPassKey()
+    {
+        var result = new StringBuilder();
+        string tempRecoveryKey = recoveryPassKeyGlobal;
+        for (int i = 0; i < tempRecoveryKey.Length; i++)
+        {
+            result.Append(tempRecoveryKey[i]);
+            if ((i + 1) % 4 == 0 && i != tempRecoveryKey.Length - 1)
+            {
+                result.Append(' ');
+            }
+        }
+        return result.ToString();
+    }
+
     public PassKeyRecord registerUser(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -29,6 +45,8 @@ public class AuthService
         passkeyGlobal = passKey;
         string recoveryKey = generateUniqueRecoveryKey();
         recoveryPassKeyGlobal = recoveryKey;
+
+        Debug.Log(getRecoveryPassKey());
 
         string passKeyHash = hashValue(passKey);
         string recoveryKeyHash = hashValue(recoveryKey);
