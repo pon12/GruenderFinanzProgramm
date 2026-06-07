@@ -8,13 +8,12 @@ using System.Collections.Generic;
 
 public class EinstellungenController : MonoBehaviour
 {
-    
     [SerializeField] private UIDocument            uiDocument;
     [SerializeField] private PassKeyAuthController passKeyAuthController;
     [SerializeField] private MainLogoutController  mainLogoutController;
 
     // ═══════════════════════════════════════════════════════════
-    // PLAYERPREFS KEYS (fuer Einstellungen ohne Backend-Aequivalent)
+    // PLAYERPREFS KEYS
     // ═══════════════════════════════════════════════════════════
     private const string PREF_STEUERSATZ     = "settings_steuersatz";
     private const string PREF_DARK_MODE      = "settings_dark_mode";
@@ -94,20 +93,26 @@ public class EinstellungenController : MonoBehaviour
     private Button        _btnSave;
     private Button        _btnReset;
     private Button        _btnResetPasskey;
+    private TextField     _inputSuperkeyReset;
     private Button        _btnDeleteProfile;
 
-    // Bestaetigungsdialog
+    // Bestaetigungsdialog Profil loeschen
     private VisualElement _dialogOverlay;
     private TextField     _inputSuperkey1;
     private TextField     _inputSuperkey2;
-    private TextField     _inputSuperkeyReset;  
     private Button        _btnDialogCancel;
     private Button        _btnDialogConfirm;
+
+    // Popup: Neuer Passkey
+    private VisualElement _popupNewPasskey;
+    private Label         _labelNewPasskey;
+    private Label         _labelNewPasskeyPlain;
+    private Button        _btnClosePasskeyPopup;
 
     // Aktuelle Firma aus Backend
     private Company _currentCompany = null;
 
-    // Rechtsform Optionen – Reihenfolge entspricht Magic Numbers aus Dokumentation
+    // Rechtsform Magic Numbers laut Dokumentation
     // 0=GmbH, 1=KG, 2=AG, 3=OHG, 4=GbR, 5=UG, 6=Einzelunternehmen, 7=GmbH & Co. KG, 8=eG
     private readonly List<string> _rechtsformOptions = new List<string>
     {
@@ -125,7 +130,7 @@ public class EinstellungenController : MonoBehaviour
 
     void OnEnable()
     {
-        if (uiDocument          == null) uiDocument          = GetComponent<UIDocument>();
+        if (uiDocument           == null) uiDocument           = GetComponent<UIDocument>();
         if (passKeyAuthController == null) passKeyAuthController = FindAnyObjectByType<PassKeyAuthController>();
         if (mainLogoutController  == null) mainLogoutController  = FindAnyObjectByType<MainLogoutController>();
 
@@ -183,14 +188,22 @@ public class EinstellungenController : MonoBehaviour
         _btnSave              = _root.Q<Button>("btn-save");
         _btnReset             = _root.Q<Button>("btn-reset");
         _btnResetPasskey      = _root.Q<Button>("btn-reset-passkey");
+        _inputSuperkeyReset   = _root.Q<TextField>("input-superkey-reset");
         _btnDeleteProfile     = _root.Q<Button>("btn-delete-profile");
 
         _dialogOverlay        = _root.Q<VisualElement>("dialog-overlay");
         _inputSuperkey1       = _root.Q<TextField>("input-superkey-1");
         _inputSuperkey2       = _root.Q<TextField>("input-superkey-2");
-        _inputSuperkeyReset   = _root.Q<TextField>("input-superkey-reset");  
         _btnDialogCancel      = _root.Q<Button>("btn-dialog-cancel");
         _btnDialogConfirm     = _root.Q<Button>("btn-dialog-confirm");
+
+        // Popup: Neuer Passkey
+        _popupNewPasskey      = _root.Q<VisualElement>("popup-new-passkey");
+        _labelNewPasskey      = _root.Q<Label>("label-new-passkey");
+        _labelNewPasskeyPlain = _root.Q<Label>("label-new-passkey-plain");
+        _btnClosePasskeyPopup = _root.Q<Button>("btn-close-passkey-popup");
+
+        Debug.Log($"[Einstellungen] popup-new-passkey: {(_popupNewPasskey != null ? "gefunden" : "NULL – in UXML pruefen")}");
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -222,29 +235,35 @@ public class EinstellungenController : MonoBehaviour
         if (_btnLightMode != null) _btnLightMode.clicked += () => SelectMode(false);
         if (_btnDarkMode  != null) _btnDarkMode.clicked  += () => SelectMode(true);
 
-        // Passkey zuruecksetzen – Backend: resetPassKey()
-      if (_btnResetPasskey != null)
-    _btnResetPasskey.clicked += () =>
-    {
-        string superKey = _inputSuperkeyReset?.value?.Trim() ?? "";
+        // Passkey zuruecksetzen – Backend: PassKeyAuthController.resetPassKey()
+        // Laut Doku: RecoveryKey wird eingegeben, neuer PassKey wird erzeugt
+        if (_btnResetPasskey != null)
+            _btnResetPasskey.clicked += () =>
+            {
+                if (passKeyAuthController != null)
+                {
+                    passKeyAuthController.resetPassKey();
+                    Debug.Log("[Einstellungen] resetPassKey aufgerufen.");
+                }
+                else
+                    Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
 
-        if (string.IsNullOrEmpty(superKey))
-        {
-            Debug.LogWarning("[Einstellungen] Super-Passkey fehlt.");
-            return;
-        }
+                // Popup anzeigen
+                // TODO: Sobald Backend neuen Passkey zurueckgibt, ShowNewPasskeyPopup(newPasskey) aufrufen
+                ShowNewPasskeyPopup("????");
 
-        if (passKeyAuthController != null)
-        {
-            passKeyAuthController.resetPassKey();
-            if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
-            Debug.Log("[Einstellungen] resetPassKey aufgerufen.");
-        }
-        else
-            Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
-    };
+                if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
+            };
 
-        // Lokalprofil loeschen – Dialog oeffnen
+        // Popup schliessen
+        if (_btnClosePasskeyPopup != null)
+            _btnClosePasskeyPopup.clicked += () =>
+            {
+                if (_popupNewPasskey != null)
+                    _popupNewPasskey.style.display = DisplayStyle.None;
+            };
+
+        // Lokalprofil loeschen
         if (_btnDeleteProfile  != null) _btnDeleteProfile.clicked  += ShowDeleteDialog;
         if (_btnDialogCancel   != null) _btnDialogCancel.clicked   += HideDeleteDialog;
         if (_btnDialogConfirm  != null) _btnDialogConfirm.clicked  += ConfirmDeleteProfile;
@@ -263,7 +282,6 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadVersionInfo()
     {
-        // Backend: Versionsnummer abrufen
         var labelVersion = _root.Q<Label>("label-version");
         if (labelVersion != null)
         {
@@ -281,22 +299,12 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadCompanyData()
     {
-        // Backend: Aktive NutzerDB holen
         var db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null)
-        {
-            Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB.");
-            return;
-        }
+        if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
 
         var companies = db.getAllCompanies();
-        if (companies == null || companies.Count == 0)
-        {
-            Debug.Log("[Einstellungen] Keine Firma gefunden – Felder leer.");
-            return;
-        }
+        if (companies == null || companies.Count == 0) { Debug.Log("[Einstellungen] Keine Firma gefunden."); return; }
 
-        // Erste (einzige) Firma laden
         _currentCompany = companies[0];
 
         if (_inputFirmenname    != null) _inputFirmenname.value    = _currentCompany.name     ?? "";
@@ -308,7 +316,6 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadLocalSettings()
     {
-        // Rechnungsformat
         SetField(_inputRechnrPraefix,   PREF_RECHNR_PRAEFIX,  "RE-");
         SetField(_inputStartnummer,     PREF_STARTNUMMER,     "1");
         SetField(_inputZahlungsziel,    PREF_ZAHLUNGSZIEL,    "14");
@@ -319,7 +326,6 @@ public class EinstellungenController : MonoBehaviour
         if (_toggleUstRechnung    != null) _toggleUstRechnung.value    = PlayerPrefs.GetInt(PREF_UST_RECHNUNG, 1) == 1;
         if (_toggleAutoNummer     != null) _toggleAutoNummer.value     = PlayerPrefs.GetInt(PREF_AUTO_NUMMER,  0) == 1;
 
-        // Unternehmensdetails die nicht im Backend-Modell sind
         SetField(_inputSteuernummer,   PREF_STEUERNUMMER,   "");
         SetField(_inputUstidnr,        PREF_USTIDNR,        "");
         SetField(_inputHandelsreg,     PREF_HANDELSREG,     "");
@@ -327,19 +333,16 @@ public class EinstellungenController : MonoBehaviour
         SetField(_inputStrasse,        "settings_strasse",  "");
         SetField(_inputPlz,            "settings_plz",      "");
 
-        // Bank
         SetField(_inputKontoinhaber,   PREF_KONTOINHABER,   "");
         SetField(_inputIban,           PREF_IBAN,           "");
         SetField(_inputBic,            PREF_BIC,            "");
         SetField(_inputKreditinstitut, PREF_KREDITINSTITUT, "");
         if (_toggleIbanRechnung != null) _toggleIbanRechnung.value = PlayerPrefs.GetInt(PREF_IBAN_RECHNUNG, 0) == 1;
 
-        // PDF Export
         if (_toggleLogo       != null) _toggleLogo.value       = PlayerPrefs.GetInt(PREF_LOGO_RECHNUNG, 1) == 1;
         if (_toggleSeitenzahl != null) _toggleSeitenzahl.value = PlayerPrefs.GetInt(PREF_SEITENZAHL,    1) == 1;
         if (_toggleExportpfad != null) _toggleExportpfad.value = PlayerPrefs.GetInt(PREF_EXPORTPFAD,    1) == 1;
 
-        // Steuersatz, Mode, Begleiter
         _selectedSteuersatz = PlayerPrefs.GetInt(PREF_STEUERSATZ, 19);
         UpdateSteuersatzButtons();
 
@@ -362,35 +365,23 @@ public class EinstellungenController : MonoBehaviour
 
     private void SaveCompanyData()
     {
-        // Backend: Aktive NutzerDB
         var db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null)
-        {
-            Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB.");
-            return;
-        }
+        if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
 
         string name      = _inputFirmenname?.value ?? "";
         int    legalForm = _dropdownRechtsform?.index ?? 0;
         string location  = _inputStadt?.value ?? "";
-        // Industry default: Dienstleistung (3) – kann spaeter als Dropdown erweiterbar sein
         int    industry  = 3;
 
         if (_currentCompany == null)
         {
-            // Neue Firma anlegen
-            // Magic Numbers: legalForm 0–8, industry 0–8 (siehe Dokumentation)
             db.createCompany(name, legalForm, industry, location);
             Debug.Log($"[Einstellungen] Neue Firma angelegt: {name}");
-
-            // Frisch angelegte Firma fuer spaetere Updates merken
             var all = db.getAllCompanies();
-            if (all != null && all.Count > 0)
-                _currentCompany = all[all.Count - 1];
+            if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
         }
         else
         {
-            // Bestehende Firma aktualisieren
             _currentCompany.name      = name;
             _currentCompany.legalForm = legalForm;
             _currentCompany.location  = location;
@@ -401,7 +392,6 @@ public class EinstellungenController : MonoBehaviour
 
     private void SaveLocalSettings()
     {
-        // Rechnungsformat
         SaveField(PREF_RECHNR_PRAEFIX,  _inputRechnrPraefix);
         SaveField(PREF_STARTNUMMER,     _inputStartnummer);
         SaveField(PREF_ZAHLUNGSZIEL,    _inputZahlungsziel);
@@ -412,7 +402,6 @@ public class EinstellungenController : MonoBehaviour
         if (_toggleUstRechnung    != null) PlayerPrefs.SetInt(PREF_UST_RECHNUNG, _toggleUstRechnung.value ? 1 : 0);
         if (_toggleAutoNummer     != null) PlayerPrefs.SetInt(PREF_AUTO_NUMMER,  _toggleAutoNummer.value  ? 1 : 0);
 
-        // Unternehmensdetails
         SaveField(PREF_STEUERNUMMER,   _inputSteuernummer);
         SaveField(PREF_USTIDNR,        _inputUstidnr);
         SaveField(PREF_HANDELSREG,     _inputHandelsreg);
@@ -420,19 +409,16 @@ public class EinstellungenController : MonoBehaviour
         SaveField("settings_strasse",  _inputStrasse);
         SaveField("settings_plz",      _inputPlz);
 
-        // Bank
         SaveField(PREF_KONTOINHABER,   _inputKontoinhaber);
         SaveField(PREF_IBAN,           _inputIban);
         SaveField(PREF_BIC,            _inputBic);
         SaveField(PREF_KREDITINSTITUT, _inputKreditinstitut);
         if (_toggleIbanRechnung != null) PlayerPrefs.SetInt(PREF_IBAN_RECHNUNG, _toggleIbanRechnung.value ? 1 : 0);
 
-        // PDF Export
         if (_toggleLogo       != null) PlayerPrefs.SetInt(PREF_LOGO_RECHNUNG, _toggleLogo.value       ? 1 : 0);
         if (_toggleSeitenzahl != null) PlayerPrefs.SetInt(PREF_SEITENZAHL,    _toggleSeitenzahl.value ? 1 : 0);
         if (_toggleExportpfad != null) PlayerPrefs.SetInt(PREF_EXPORTPFAD,    _toggleExportpfad.value ? 1 : 0);
 
-        // Steuersatz und Begleiter
         PlayerPrefs.SetInt(PREF_STEUERSATZ, _selectedSteuersatz);
         if (_toggleBegleiter != null) PlayerPrefs.SetInt(PREF_BEGLEITER, _toggleBegleiter.value ? 1 : 0);
 
@@ -474,6 +460,29 @@ public class EinstellungenController : MonoBehaviour
     }
 
     // ═══════════════════════════════════════════════════════════
+    // POPUP: NEUER PASSKEY
+    // ═══════════════════════════════════════════════════════════
+
+    private void ShowNewPasskeyPopup(string passkey)
+    {
+        if (_labelNewPasskey != null)
+        {
+            string display = "";
+            foreach (char c in passkey)
+                display += c + "  ";
+            _labelNewPasskey.text = display.TrimEnd();
+        }
+
+        if (_labelNewPasskeyPlain != null)
+            _labelNewPasskeyPlain.text = $"Dein neuer Passkey: {passkey}";
+
+        if (_popupNewPasskey != null)
+            _popupNewPasskey.style.display = DisplayStyle.Flex;
+        else
+            Debug.LogWarning("[Einstellungen] popup-new-passkey nicht gefunden – in UXML pruefen.");
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // LOKALPROFIL LOESCHEN
     // ═══════════════════════════════════════════════════════════
 
@@ -506,18 +515,16 @@ public class EinstellungenController : MonoBehaviour
             return;
         }
 
-        // Backend: Nutzer ausloggen – NutzerDB wird deaktiviert
         if (mainLogoutController != null)
             mainLogoutController.logout();
         else
             Debug.LogWarning("[Einstellungen] MainLogoutController nicht gefunden.");
 
-        // Alle lokalen Einstellungen loeschen
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
 
         Debug.Log("[Einstellungen] Lokalprofil geloescht – lade Login-Scene.");
-        SceneManager.LoadScene("Login");
+        SceneManager.LoadScene(0);
     }
 
     // ═══════════════════════════════════════════════════════════
