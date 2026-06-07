@@ -8,12 +8,12 @@
                     <ui:Label text="Dokument&#10;" class="header-title" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:Label text="Dokumentaböage&#10;" class="header-subtitle" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
-                <ui:Button text="Dokument erstellen&#10;" name="Create-Button" class="create-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 85px;"/>
-                <ui:Button text="Dokumente Löschen&#10;" name="Delete-Button" class="create-button delete-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 86px; width: 52px; bottom: auto; align-self: flex-end; align-content: auto; align-items: auto; flex-direction: column;"/>
+                <ui:Button text="Dokument erstellen&#10;" name="Create-Button" class="create-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 85px; flex-grow: 0; align-self: auto; align-items: stretch; flex-direction: column; justify-content: flex-start;"/>
+                <ui:Button text="Dokumente Löschen&#10;" name="Delete-Button" class="create-button delete-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); -unity-text-align: middle-center; height: 85px; width: auto; bottom: auto; align-self: auto; align-content: auto; align-items: stretch; flex-direction: column; flex-grow: 0;"/>
             </ui:VisualElement>
-            <ui:VisualElement name="Main-Scroll-View" style="flex-grow: 1;">
+            <ui:ScrollView name="Main-Scroll-View" style="flex-grow: 1;">
                 <ui:VisualElement name="Grid-Container" class="grid-container" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; background-size: 100% 100%; padding-top: 0; padding-bottom: 0; padding-left: 20px; padding-right: 20px;"/>
-            </ui:VisualElement>
+            </ui:ScrollView>
         </ui:VisualElement>
         <ui:VisualElement name="Popup-Overlay" class="popup-overlay" style="flex-grow: 1; display: none;">
             <ui:VisualElement name="Popup-Window" class="popup-window" style="flex-grow: 1; display: flex;">
