@@ -5,7 +5,7 @@
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
     <ui:VisualElement name="root" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; width: 1946px;">
-        <ui:VisualElement name="main-content" class="main grid-item" style= "flex-grow: 1; padding-left: 430px; padding-right: 46px">
+        <ui:VisualElement name="main-content" class="main grid-item" style="flex-grow: 1; padding-left: 430px; padding-right: 46px;">
             <ui:Label text="Kassenbuch" name="Kassenbuch" class="page-title h1" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 50px; -unity-font-style: normal; color: rgb(255, 255, 255); margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;"/>
             <ui:VisualElement name="Kontostand" class="kontostand-section" style="margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;">
                 <ui:Label text="Kontostand" class="kontostand-label h2" style="font-size: 36px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>

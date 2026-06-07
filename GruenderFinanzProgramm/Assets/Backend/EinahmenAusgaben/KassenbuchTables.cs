@@ -10,6 +10,20 @@ public class Einkommen
     public float Amount { get; set; }
     public string Description { get; set; }
     public string Datum { get; set; }
+
+
+    public string getDescription()
+    {
+        return Description;
+    }
+    public string getAmount()
+    {
+        return Amount.ToString();
+    }
+    public string getDatum()
+    {
+        return Datum;
+    }
 }
 
 public class Ausgaben
@@ -19,4 +33,17 @@ public class Ausgaben
     public float Amount { get; set; }
     public string Description { get; set; }
     public string Datum { get; set; }
+
+    public string getDescription()
+    {
+        return Description;
+    }
+    public string getAmount()
+    {
+        return Amount.ToString();
+    }
+    public string getDatum()
+    {
+        return Datum;
+    }
 }
