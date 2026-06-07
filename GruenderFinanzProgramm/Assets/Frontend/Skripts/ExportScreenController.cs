@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,218 +9,221 @@ public class ExportScreenController : MonoBehaviour
     private UIDocument uiDocument;
 
     [Header("UI Templates & Container")]
-    [SerializeField] private VisualTreeAsset exportZeileTemplate; 
+    [SerializeField] private VisualTreeAsset exportZeileTemplate;
 
-    // Elemente aus dem Hauptlayout
     private ScrollView exportListContainer;
-    private Label lblCounter; // Falls du oben tracken willst, wie viele Dokumente da sind
+    private Label lblCounter;
 
-    // Lokale Liste zur Verwaltung der UI-Daten
-    private List<ExportData> exportListe = new List<ExportData>();
+    private DataBase currentDb;
+    private int currentUserId;
 
-    void OnEnable()
+    private List<UserPDFDocument> pdfListe = new List<UserPDFDocument>();
+
+    private void OnEnable()
     {
         uiDocument = GetComponent<UIDocument>();
-        if (uiDocument == null) return;
 
-        var root = uiDocument.rootVisualElement;
+        if (uiDocument == null)
+        {
+            Debug.LogError("[Export] UIDocument nicht gefunden.");
+            return;
+        }
 
-        // Abfragen der UI-Elemente aus der UXML-Hierarchie
+        VisualElement root = uiDocument.rootVisualElement;
+
         exportListContainer = root.Q<ScrollView>("export-list-container");
-        lblCounter = root.Q<Label>("lbl-counter"); // Optional, falls im Header verbaut
+        lblCounter = root.Q<Label>("lbl-counter");
 
-        // Daten laden & UI aufbauen
-        LadeExporteAusDatenbank();
+        LadePDFsAusDatenbank();
     }
 
-    private void LadeExporteAusDatenbank()
+    private void LadePDFsAusDatenbank()
     {
-        exportListe.Clear();
-        bool datenbankErfolgreich = false;
+        pdfListe.Clear();
 
-        try
-        {
-            // Holt die aktive Nutzerdatenbank (z.B. Alex.db) laut Doku
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db != null)
-            {
-                // HINWEIS: Hier greift der Programmierer auf die entsprechende Get-Funktion der DB zu.
-                // Da diese Funktion in deiner Doku noch gefolgt von Customer/Company aufgebaut ist,
-                // simulieren wir hier den exakten Flow deines Kundendatenbank-Controllers.
-                
-                // Entweder: var backendExporte = db.getAllExports();
-                // Da wir das absichern, falls die Tabelle in der SQLite noch nicht existiert:
-                List<ExportEintrag> backendExporte = null; 
-                
-                // Angenommen das Backend hat die Funktion bereitgestellt:
-                // backendExporte = db.getAllExports(); 
+        currentDb = UserDatabaseAccess.getCurrentUserDatabase();
 
-                if (backendExporte != null)
-                {
-                    foreach (var bExport in backendExporte)
-                    {
-                        ExportData data = new ExportData();
-                        data.backendObjekt = bExport;
-                        data.id = bExport.id.ToString();
-                        data.bezeichnung = bExport.bezeichnung ?? "Unbenannt";
-                        data.art = bExport.art ?? "Dokument";
-                        data.format = bExport.format ?? "PDF";
-                        data.pfad = bExport.pfad ?? "";
-                        
-                        exportListe.Add(data);
-                    }
-                    datenbankErfolgreich = true;
-                }
-            }
-        }
-        catch (Exception e)
+        if (currentDb == null)
         {
-            Debug.LogWarning("Echte Export-DB noch nicht bereit oder erreichbar. Nutze Testdaten im Editor. Info: " + e.Message);
+            Debug.LogError("[Export] Keine aktive NutzerDB gefunden.");
+            RefreshExportListe();
+            return;
         }
 
-        // FALLBACK / REALISTISCHE TESTDATEN (Erfüllt die "Keine Platzfüller"-Regel deines Leads)
-        if (!datenbankErfolgreich || exportListe.Count == 0)
+        if (StateManager.Instance == null || !StateManager.Instance.isLoggedIn())
         {
-            GeneriereExportTestDaten();
+            Debug.LogError("[Export] Kein eingeloggter Nutzer gefunden.");
+            RefreshExportListe();
+            return;
         }
+
+        PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
+
+        if (currentUser == null)
+        {
+            Debug.LogError("[Export] currentUser ist null.");
+            RefreshExportListe();
+            return;
+        }
+
+        string rawUserId = currentUser.userId;
+
+        if (rawUserId.StartsWith("user_"))
+        {
+            rawUserId = rawUserId.Replace("user_", "");
+        }
+
+        if (!int.TryParse(rawUserId, out currentUserId))
+        {
+            Debug.LogError("[Export] UserId ungültig: " + currentUser.userId);
+            RefreshExportListe();
+            return;
+        }
+
+        pdfListe = currentDb.getPDFDocumentsByUser(currentUserId);
+
+        Debug.Log("[Export] Aktuelle UserID: " + currentUser.userId);
+        Debug.Log("[Export] Parsed UserID: " + currentUserId);
+        Debug.Log("[Export] Echte PDFs geladen: " + pdfListe.Count);
 
         RefreshExportListe();
     }
 
-    private void GeneriereExportTestDaten()
-    {
-        // Wir befüllen die Liste exakt so, wie es im Figma-Screen abgesegnet wurde!
-        if (exportListe.Count == 0)
-        {
-            exportListe.Add(new ExportData { id = "1", bezeichnung = "AN01", art = "Angebot", format = "PDF", pfad = "C:/Projekte/Gruendung/Angebote/" });
-            exportListe.Add(new ExportData { id = "2", bezeichnung = "Businessplan", art = "Dokument", format = "PDF", pfad = "C:/Projekte/Gruendung/Dokumente/" });
-            exportListe.Add(new ExportData { id = "3", bezeichnung = "Kalkulation Q1", art = "Tabelle", format = "PDF", pfad = "C:/Projekte/Gruendung/Tabellen/" });
-            exportListe.Add(new ExportData { id = "4", bezeichnung = "Gesellschaftsvertrag", art = "Dokument", format = "PDF", pfad = "C:/Projekte/Gruendung/Vertraege/" });
-        }
-    }
-
     private void RefreshExportListe()
     {
-        if (exportListContainer == null || exportZeileTemplate == null) return;
-
-        // Container leeren (alte UI-Karten löschen)
-        exportListContainer.Clear();
-
-        // Dynamischer Counter im Header (optional)
-        if (lblCounter != null)
+        if (exportListContainer == null)
         {
-            lblCounter.text = exportListe.Count == 1 ? "1 Dokument" : $"{exportListe.Count} Dokumente";
+            Debug.LogError("[Export] export-list-container nicht gefunden.");
+            return;
         }
 
-        // Schleife durch alle Datenzeilen
-        foreach (var eintrag in exportListe)
+        if (exportZeileTemplate == null)
         {
-            // Template instanziieren
+            Debug.LogError("[Export] exportZeileTemplate nicht zugewiesen.");
+            return;
+        }
+
+        exportListContainer.Clear();
+
+        if (lblCounter != null)
+        {
+            lblCounter.text = pdfListe.Count == 1
+                ? "1 Dokument"
+                : pdfListe.Count + " Dokumente";
+        }
+
+        foreach (UserPDFDocument pdf in pdfListe)
+        {
             VisualElement neueZeile = exportZeileTemplate.Instantiate();
 
-            // Elemente über die IDs aus deiner UXML-Hierarchie suchen
-            var lblBezeichnung = neueZeile.Q<Label>("row-bezeichnung");
-            var lblArt = neueZeile.Q<Label>("row-art");
-            var dropdownFormat = neueZeile.Q<DropdownField>("format-dropdown");
-            var btnFolder = neueZeile.Q<Button>("btn-open-folder");
-            var btnExport = neueZeile.Q<Button>("btn-export");
+            Label lblBezeichnung = neueZeile.Q<Label>("row-bezeichnung");
+            Label lblArt = neueZeile.Q<Label>("row-art");
+            DropdownField dropdownFormat = neueZeile.Q<DropdownField>("format-dropdown");
+            Button btnFolder = neueZeile.Q<Button>("btn-open-folder");
+            Button btnExport = neueZeile.Q<Button>("btn-export");
 
-            // UI mit den echten Werten beschriften
-            if (lblBezeichnung != null) lblBezeichnung.text = eintrag.bezeichnung;
-            if (lblArt != null) lblArt.text = eintrag.art;
-            
+            if (lblBezeichnung != null)
+                lblBezeichnung.text = pdf.originalFileName;
+
+            if (lblArt != null)
+                lblArt.text = string.IsNullOrEmpty(pdf.category)
+                    ? "Dokument"
+                    : pdf.category;
+
             if (dropdownFormat != null)
             {
-                // Dropdown-Optionen vorbereiten (PDF ist Standard, erweiterbar für die Zukunft)
-                dropdownFormat.choices = new List<string> { "PDF", "XLSX", "DOCX" };
-                dropdownFormat.value = eintrag.format;
-                
-                // Event abfangen, wenn der Nutzer das Format umschaltet
-                dropdownFormat.RegisterValueChangedCallback(evt => {
-                    eintrag.format = evt.newValue;
-                    UpdateFormatInDatenbank(eintrag);
-                });
+                dropdownFormat.choices = new List<string> { "PDF" };
+                dropdownFormat.value = "PDF";
+                dropdownFormat.SetEnabled(false);
             }
 
-            // Button-Logik 1: Ordner öffnen (Zugriff auf Festplatte)
             if (btnFolder != null)
             {
-                btnFolder.clicked += () => OeffneOrdnerPfad(eintrag.pfad);
+                btnFolder.clicked += () => OeffneOrdnerPfad(pdf.filePath);
             }
 
-            // Button-Logik 2: Exportieren triggern
             if (btnExport != null)
             {
-                btnExport.clicked += () => TriggerExport(eintrag);
+                btnExport.clicked += () => ExportierePDF(pdf);
             }
 
-            // Die fertige Zeile in die ScrollView schieben
             exportListContainer.Add(neueZeile);
         }
     }
 
-    private void OeffneOrdnerPfad(string pfad)
+    private void OeffneOrdnerPfad(string filePath)
     {
-        if (string.IsNullOrEmpty(pfad))
+        if (string.IsNullOrEmpty(filePath))
         {
-            Debug.LogWarning("Kein gültiger Pfad für diesen Eintrag hinterlegt.");
+            Debug.LogWarning("[Export] Kein Dateipfad vorhanden.");
+            return;
+        }
+
+        string folderPath = Path.GetDirectoryName(filePath);
+
+        if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath))
+        {
+            Debug.LogWarning("[Export] Ordner existiert nicht: " + folderPath);
             return;
         }
 
         try
         {
-            // Öffnet den Windows Explorer / Mac Finder exakt an der Stelle des Ordners
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = pfad,
+                FileName = folderPath,
                 UseShellExecute = true,
                 Verb = "open"
             });
-            Debug.Log($"Öffne Ordner: {pfad}");
+
+            Debug.Log("[Export] Öffne Ordner: " + folderPath);
         }
         catch (Exception e)
         {
-            Debug.LogError($"Konnte Pfad nicht öffnen. Eventuell existiert der Ordner lokal noch nicht: {e.Message}");
+            Debug.LogError("[Export] Ordner konnte nicht geöffnet werden: " + e.Message);
         }
     }
 
-    private void TriggerExport(ExportData eintrag)
-    {
-        // Hier wird die eigentliche Export-Funktion ausgeführt (z.B. PDF-Generierung)
-        Debug.Log($"[EXPORT] Starte Export für '{eintrag.bezeichnung}' im Format {eintrag.format} nach {eintrag.pfad}");
-        
-        // Hier kann später eine Erfolgsmeldung oder ein Ladebalken rein.
-    }
-
-    private void UpdateFormatInDatenbank(ExportData eintrag)
-    {
-        try
-        {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db != null && eintrag.backendObjekt != null)
-            {
-                eintrag.backendObjekt.format = eintrag.format;
-                eintrag.backendObjekt.lastUpdated = DateTime.Now;
-                
-                // Entspricht db.updateExport(eintrag.backendObjekt);
-                Debug.Log($"Datenbank aktualisiert: {eintrag.bezeichnung} ist nun auf {eintrag.format} gesetzt.");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("Änderung konnte nicht in DB gespeichert werden (Lokal-Modus): " + e.Message);
-        }
-    }
-}
-
-// Wrapper-Klasse, um die UI-Logik von der reinen SQLite-Entität sauber zu trennen
-[System.Serializable]
-public class ExportData
+private void ExportierePDF(UserPDFDocument pdf)
 {
-    public ExportEintrag backendObjekt; 
-    public string id;
-    public string bezeichnung;
-    public string art;
-    public string format;
-    public string pfad;
+    if (pdf == null)
+    {
+        Debug.LogError("[Export] PDF ist null.");
+        return;
+    }
+
+    if (currentDb == null)
+    {
+        Debug.LogError("[Export] Keine aktive DB.");
+        return;
+    }
+
+    string desktopPath = Environment.GetFolderPath(
+        Environment.SpecialFolder.Desktop
+    );
+
+    string fileNameWithoutExt =
+        Path.GetFileNameWithoutExtension(pdf.originalFileName);
+
+    string extension =
+        Path.GetExtension(pdf.originalFileName);
+
+    string destinationPath = Path.Combine(
+        desktopPath,
+        fileNameWithoutExt + "_Export_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + extension
+    );
+
+    bool success = PDFStorage.ExportPDFById(
+        pdf.id,
+        currentUserId,
+        currentDb,
+        destinationPath
+    );
+
+    Debug.Log(
+        success
+            ? "[Export] PDF exportiert nach: " + destinationPath
+            : "[Export] Export fehlgeschlagen: " + pdf.originalFileName
+    );
+}
 }
