@@ -1,18 +1,15 @@
-/* ==========================================================================
-   HEADER LAYOUT
-   ========================================================================== */
 .header-container {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 30px 40px 20px 40px;
     width: 100%;
 }
 
 .left-text-group {
-    display: flex !important;
-    flex-direction: column !important;
+    display: flex;
+    flex-direction: column;
 }
 
 .header-title {
@@ -48,116 +45,96 @@
     scale: 0.96;
 }
 
-/* ==========================================================================
-   MAIN DASHBOARD LAYOUT
-   ========================================================================== */
 .grid-container {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
     padding: 20px 40px;
     width: 100%;
 }
 
-/* ==========================================================================
-   CATEGORY CARD TEMPLATE (Figma-Look mit festen Pixeln)
-   ========================================================================== */
-
-/* Die äußere Box (Das umschließende schwarze Rechteck) */
 .category-card {
-    display: flex !important;
-    flex-direction: row !important;     /* Zwingt Links und Rechts NEBENEINANDER */
-    flex-wrap: wrap !important;
-    justify-content: space-between !important; 
-    align-items: center !important;
-    align-content: space-between !important;
-    
-    width: 650px !important;            /* Feste Breite für das Figma-Rechteck */
-    height: 400px !important;           /* Feste Höhe */
-    background-color: #000000 !important; 
-    border-radius: 20px !important;     
-    padding: 18px !important; 
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: space-between;
+    width: 650px;
+    height: 400px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 20px;
+    padding: 18px;
+    box-sizing: border-box;
 }
 
-/* DIE LINKE SPALTE: Bereich für Icon & Haupttitel (z.B. Businessplan) */
 .card-left-info {
-    display: flex !important;
-    flex-direction: column !important;  /* Icon oben, Text unten */
-    justify-content: center !important; /* Zentriert den Inhalt vertikal */
-    align-items: center !important;     /* Zentriert Icon und Text horizontal */
-    
-    width: 40% !important;              /* Nimmt knapp die Hälfte der Karte ein */
-    height: 100% !important;        
-    background-color: transparent !important; 
-    padding: 10px !important;
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    height: 100%;
+    background-color: transparent;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
-/* KORREKTUR: Das grüne Icon links, jetzt viel größer (Figma-Spezifikation) */
 .card-left-info Image {
-    width: 100px !important;            /* Massive Vergrößerung auf 100x100 */
-    height: 100px !important;
-    margin-bottom: 20px !important;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
 }
 
-/* Der große Titel links (z.B. "Businessplan") */
 .card-left-info Label {
-    color: #ffffff !important;
-    font-size: 28px !important;
-    -unity-font-style: bold !important;
-    text-align: center !important;
-    white-space: normal !important;     
+    color: rgb(255, 255, 255);
+    font-size: 28px;
+    -unity-font-style: bold;
+    text-align: center;
+    white-space: normal;
 }
 
-/* DIE RECHTE SPALTE: Der Container, der die 4 Kacheln hält */
 .card-right-grid {
-    display: flex !important;
-    flex-direction: row !important;     /* Inhalt nebeneinander */
-    flex-wrap: wrap !important;         /* Erlaubt das 2x2 Raster */
-    justify-content: space-between !important;
-    align-content: space-between !important;
-    
-    width: 58% !important;              /* Nutzt den restlichen Platz perfekt aus */
-    height: 100% !important;
-    background-color: transparent !important;
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    width: 58%;
+    height: 100%;
+    background-color: transparent;
+    box-sizing: border-box;
 }
 
-/* DIE VIER INNEREN KACHELN (Die Dokumente & das Plus) */
-/* KORREKTUR: Zwingt alle Inhalte zur Zentrierung */
 .sub-tile {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;     /* Zentriert Inhalte horizontal */
-    justify-content: center !important;  /* Zentriert Inhalte vertikal */
-    
-    width: 48% !important;              /* Exakt zwei nebeneinander mit kleiner Lücke */
-    height: 47% !important;             /* Exakt zwei untereinander mit kleiner Lücke */
-    background-color: #2c2c2e !important; /* Helles Figma-Grau für die inneren Boxen */
-    border-radius: 16px !important;     
-    padding: 12px !important;
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 48%;
+    height: 47%;
+    background-color: rgb(44, 44, 46);
+    border-radius: 16px;
+    padding: 12px;
+    box-sizing: border-box;
 }
 
-/* Text innerhalb der kleinen Dokumenten-Kacheln */
-/* KORREKTUR: Zwingt den Text zur Zentrierung */
 .sub-tile Label {
-    color: #ffffff !important;
-    font-size: 14px !important;
-    -unity-text-align: middle-center !important; /* Erzwingt zentrierten Text */
-    text-align: center !important;
-    white-space: normal !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-center;
+    text-align: center;
+    white-space: normal;
+    margin: 0;
+    padding: 0;
 }
 
-/* Das große weiße Plus-Zeichen in der vierten Kachel */
-/* KORREKTUR: Schriftgröße für das + massiv erhöht (Figma-Spezifikation) */
 .plus-button-text {
-    font-size: 110px !important;        /* Massive Erhöhung für den Figma-Look */
-    color: #ffffff !important;
-    -unity-font-style: bold !important;
-    opacity: 1 !important;              /* Volle Opazität für bessere Lesbarkeit */
+    font-size: 110px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    opacity: 1;
 }
+
+
