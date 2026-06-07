@@ -96,15 +96,15 @@ public class DocumentDashboard : MonoBehaviour
 
         // 3. Zweispaltiges Listen-Popup
         detailPopupOverlay = root.Q<VisualElement>("Detail-Popup-Overlay");
-        detailListContainer = root.Q<VisualElement>("Detail-List-Container"); // Links
-        globalListContainer = root.Q<VisualElement>("Global-List-Container"); // Rechts
+        detailListContainer = root.Q<VisualElement>("Detail-List-Container"); 
+        globalListContainer = root.Q<VisualElement>("Global-List-Container"); 
         detailCloseButton = root.Q<Button>("Btn-Detail-Close");
         detailPopupTitle = root.Q<Label>("Detail-Popup-Title");
         listCreateNewButton = root.Q<Button>("Btn-List-Create-New"); 
 
         // 4. Überarbeitetes Bearbeiten-Popup
         editPopupOverlay = root.Q<VisualElement>("Edit-Popup-Overlay");
-        editDocNameInput = root.Q<TextField>("Edit-Doc-Name-Input"); // Große Textbox
+        editDocNameInput = root.Q<TextField>("Edit-Doc-Name-Input"); 
         editPopupSubmitButton = root.Q<Button>("Btn-Edit-Submit");
         editPopupCancelButton = root.Q<Button>("Btn-Edit-Cancel");
         btnEditTypeStandard = root.Q<Button>("Btn-Edit-Type-Standard");
@@ -119,12 +119,12 @@ public class DocumentDashboard : MonoBehaviour
         }
 
         // Event-Verdrahtung Erstellung & Hauptmenü
-        if (createButton != null) createButton.clicked += () => OpenPopup();
+        if (createButton != null) createButton.clicked += () => OpenPopup(""); // Leer = Erste Kategorie standardmäßig
         if (deleteButton != null) deleteButton.clicked += deleteAllDocuments;
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
         if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
 
-        // Die 3 Vorlagen-Buttons rufen jetzt sauber die korrigierte ApplyTemplate Methode auf
+        // Vorlagen-Buttons im Erstell-Popup
         Button btnTypeStandard = root.Q<Button>("Btn-Type-Standard");
         Button btnTypeDiagramm = root.Q<Button>("Btn-Type-Diagramm");
         Button btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
@@ -139,7 +139,7 @@ public class DocumentDashboard : MonoBehaviour
         {
             listCreateNewButton.clicked += () => {
                 CloseDetailPopup();
-                OpenPopup(activeCategoryForList); 
+                OpenPopup(activeCategoryForList); // Nimmt die aktuelle Kategorie direkt mit!
             };
         }
 
@@ -160,9 +160,21 @@ public class DocumentDashboard : MonoBehaviour
         if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; 
         if (docNameInput != null) docNameInput.value = ""; 
         selectedType = "Standard"; 
+
+        // FIX: Wenn eine Kategorie übergeben wurde, wähle sie sofort im Dropdown aus!
+        if (!string.IsNullOrEmpty(preselectedCategory) && categoryDropdown != null)
+        {
+            if (dropdownKategorien.Contains(preselectedCategory))
+            {
+                categoryDropdown.value = preselectedCategory;
+            }
+        }
     }
 
-    private void ClosePopup() => popupOverlay.style.display = DisplayStyle.None;
+    private void ClosePopup()
+    {
+        if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.None;
+    }
 
     private void ApplyTemplate(string typeName)
     {
@@ -206,6 +218,7 @@ public class DocumentDashboard : MonoBehaviour
             VisualElement imgShowList = cardInstance.Q("Btn-Show-List");
             if (imgShowList != null) imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup(kategorieName));
 
+            // FIX: Das kleine "+" auf der Dashboard-Kachel übergibt nun seine eigene Kategorie!
             Button plusBtn = cardInstance.Q<Button>("btnPlus");
             if (plusBtn != null) plusBtn.clicked += () => OpenPopup(kategorieName);
 
@@ -255,11 +268,9 @@ public class DocumentDashboard : MonoBehaviour
         detailListContainer.Clear();
         globalListContainer.Clear();
 
-        // --- SPALTE 1: LINKE LISTE (Kategorie Dokumente)
         List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == activeCategoryForList);
         BuildListColumn(kategorieDocs, detailListContainer, isGlobal: false);
 
-        // --- SPALTE 2: RECHTE LISTE (Globale Liste / Sonstige)
         List<DocumentData> alleDocs = speicherDaten.savedDocs;
         BuildListColumn(alleDocs, globalListContainer, isGlobal: true);
     }
