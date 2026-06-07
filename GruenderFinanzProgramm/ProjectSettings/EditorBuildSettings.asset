@@ -29,4 +29,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Login.unity
     guid: 3524e9242d271eb4ba61baf94dc780c7
+  - enabled: 1
+    path: Assets/Scenes/Export-Screen.unity
+    guid: 3c55ce4f639aa1e41aff8b76ccd441e2
+  - enabled: 1
+    path: Assets/Scenes/Angebot.unity
+    guid: 4d18be9d94918b04486f37264d8f222d
+  - enabled: 1
+    path: Assets/Scenes/Fortschritt.unity
+    guid: dbd37b72ebe3795418633166cc352807
+  - enabled: 1
+    path: Assets/Scenes/Rechnung.unity
+    guid: f7afd682bded2104b8b63e991f2c4115
   m_configObjects: {}
