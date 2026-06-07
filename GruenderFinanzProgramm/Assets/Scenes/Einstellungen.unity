@@ -402,6 +402,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[4].sceneName
+      value: Rechnung
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[4].buttonName
+      value: nav-item-rechnung
+      objectReference: {fileID: 0}
     - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 934.71747

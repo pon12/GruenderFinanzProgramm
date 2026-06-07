@@ -55,6 +55,12 @@ MonoBehaviour:
     sceneName: Dienstleistungen
   - buttonName: nav-item-kassenbuch
     sceneName: Kassenbuch
+  - buttonName: nav-item-rechnung
+    sceneName: Rechnungen
+  - buttonName: nav-item-export
+    sceneName: Export-Screen
+  - buttonName: nav-item-dokumente
+    sceneName: Dokument-Screen
 --- !u!1 &9082331523415967194
 GameObject:
   m_ObjectHideFlags: 0
