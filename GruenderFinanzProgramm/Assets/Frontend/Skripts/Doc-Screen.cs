@@ -12,7 +12,7 @@ public class DocumentDashboard : MonoBehaviour
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
 
     [Header("Font Settings")]
-    [Tooltip("Ziehe hier dein Poppins-Bold Font Asset (oder Font Definition Asset) aus dem Projektordner rein!")]
+    [Tooltip("Zieh hier dein Poppins-Bold Font Asset rein!")]
     [SerializeField] private Font poppinsBoldFont;
 
     // UI Elemente
@@ -27,10 +27,12 @@ public class DocumentDashboard : MonoBehaviour
     private DropdownField categoryDropdown; 
     private TextField docNameInput; 
 
-    // Gesamtlisten-Pop-up Elemente
+    // Kategorie-Listen-Pop-up Elemente
     private VisualElement detailPopupOverlay;
     private VisualElement detailListContainer;
     private Button detailCloseButton;
+    private Label detailPopupTitle;
+    private Button listCreateNewButton; 
 
     // Typ-Buttons im Erstell-Popup
     private Button btnTypeStandard;
@@ -38,6 +40,8 @@ public class DocumentDashboard : MonoBehaviour
     private Button btnTypeChecklist;
 
     private string selectedType = "Standard";
+    private string activeCategoryForList = ""; 
+    
     private List<string> dropdownKategorien = new List<string> { 
         "Gründung", "Finanzen", "Marketing", "Steuern", "Personal", "Recht" 
     };
@@ -46,7 +50,7 @@ public class DocumentDashboard : MonoBehaviour
     [System.Serializable]
     public class DocumentData
     {
-        public string id; // Einzigartige ID für den Minus-Button
+        public string id; 
         public string category;
         public string title;
         public string type;
@@ -81,10 +85,12 @@ public class DocumentDashboard : MonoBehaviour
         categoryDropdown = root.Q<DropdownField>("dropKategorie"); 
         docNameInput = root.Q<TextField>("Doc-Name-Input"); 
 
-        // Gesamtlisten-Popup Komponenten holen
+        // Kategorie-Listen-Popup Komponenten holen
         detailPopupOverlay = root.Q<VisualElement>("Detail-Popup-Overlay");
         detailListContainer = root.Q<VisualElement>("Detail-List-Container");
         detailCloseButton = root.Q<Button>("Btn-Detail-Close");
+        detailPopupTitle = root.Q<Label>("Detail-Popup-Title");
+        listCreateNewButton = root.Q<Button>("Btn-List-Create-New"); 
 
         // Typ-Auswahl-Buttons holen
         btnTypeStandard = root.Q<Button>("Btn-Type-Standard");
@@ -98,10 +104,18 @@ public class DocumentDashboard : MonoBehaviour
             if (dropdownKategorien.Count > 0) categoryDropdown.value = dropdownKategorien[0]; 
         }
 
-        // Standard-Popup-Events verdrahten
+        // Popup-Events verdrahten
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
         if (popupBackButton != null) popupBackButton.clicked += ClosePopup;
         if (detailCloseButton != null) detailCloseButton.clicked += CloseDetailPopup;
+
+        if (listCreateNewButton != null)
+        {
+            listCreateNewButton.clicked += () => {
+                CloseDetailPopup();
+                OpenPopup(activeCategoryForList); 
+            };
+        }
 
         // Typen-Auswahl Logik
         if (btnTypeStandard != null) btnTypeStandard.clicked += () => SelectType("Standard");
@@ -142,14 +156,8 @@ public class DocumentDashboard : MonoBehaviour
 
         if (string.IsNullOrEmpty(selectedCategory)) return;
 
-        List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == selectedCategory);
-
-        while (kategorieDocs.Count >= 2)
-        {
-            DocumentData altesDoc = kategorieDocs[0];
-            speicherDaten.savedDocs.Remove(altesDoc);
-            kategorieDocs.Remove(altesDoc);
-        }
+        // GELÖSCHT: Die "while (kategorieDocs.Count >= 2)"-Schleife ist komplett raus!
+        // Dokumente werden ab jetzt unbegrenzt in der Liste gespeichert.
 
         DocumentData newDoc = new DocumentData { 
             id = System.Guid.NewGuid().ToString(), 
@@ -179,14 +187,12 @@ public class DocumentDashboard : MonoBehaviour
             Label titleLabel = cardInstance.Q<Label>("lblName");
             if (titleLabel != null) titleLabel.text = kategorieName;
 
-            // Holt das Bild-Icon DIREKT aus der frisch instanziierten Kachel
             VisualElement imgShowList = cardInstance.Q("Btn-Show-List");
             if (imgShowList != null)
             {
-                imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup());
+                imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup(kategorieName));
             }
 
-            // Holt den Plus-Button aus der Kachel
             Button plusBtn = cardInstance.Q<Button>("btnPlus");
             if (plusBtn != null)
             {
@@ -201,9 +207,10 @@ public class DocumentDashboard : MonoBehaviour
 
             List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == kategorieName);
 
+            // GEÄNDERT: Das Limit von 2 gilt jetzt NUR NOCH hier beim Zeichnen der Kachel-Vorschau!
             for (int i = 0; i < kategorieDocs.Count; i++)
             {
-                if (i >= 2) break;
+                if (i >= 2) break; // Bricht das Zeichnen auf der Kachel ab, löscht aber nichts aus dem Speicher!
 
                 VisualElement target = (i % 2 == 0) ? feldOben : feldUnten;
                 if (target != null)
@@ -222,9 +229,12 @@ public class DocumentDashboard : MonoBehaviour
         }
     }
 
-    private void OpenDetailPopup()
+    private void OpenDetailPopup(string kategorie)
     {
+        activeCategoryForList = kategorie; 
         if (detailPopupOverlay != null) detailPopupOverlay.style.display = DisplayStyle.Flex;
+        if (detailPopupTitle != null) detailPopupTitle.text = $"Dokumente: {kategorie}";
+
         RefreshDetailList();
     }
 
@@ -233,47 +243,44 @@ public class DocumentDashboard : MonoBehaviour
         if (detailListContainer == null) return;
         detailListContainer.Clear();
 
-        if (speicherDaten.savedDocs.Count == 0)
+        List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == activeCategoryForList);
+
+        if (kategorieDocs.Count == 0)
         {
-            Label emptyLabel = new Label("Noch keine Dokumente erstellt.");
+            Label emptyLabel = new Label("Noch keine Dokumente in dieser Kategorie.");
             emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
             emptyLabel.style.marginTop = 20;
-            emptyLabel.style.color = Color.white; // Weiße Schrift
+            emptyLabel.style.color = Color.white; 
             
-            // Schriftart dynamisch zuweisen falls im Inspector hinterlegt
             if (poppinsBoldFont != null) emptyLabel.style.unityFont = poppinsBoldFont;
             
             detailListContainer.Add(emptyLabel);
             return;
         }
 
-        foreach (var doc in speicherDaten.savedDocs)
+        // Hier wird nun absolut JEDES Dokument gelistet, egal wie viele es sind!
+        foreach (var doc in kategorieDocs)
         {
-            // 1. Zeilen-Container erstellen
             VisualElement row = new VisualElement();
             row.AddToClassList("list-row-item"); 
 
             string icon = (doc.type == "Diagramm") ? "📊" : ((doc.type == "Checklist") ? "☑️" : "📄");
             
-            // 2. Label erstellen und per Code stylen (Weiß + Poppins)
-            Label nameLabel = new Label($"[{doc.category}] {icon} {doc.title}");
+            Label nameLabel = new Label($"{icon} {doc.title}"); 
             nameLabel.style.fontSize = 13;
-            nameLabel.style.color = Color.white; // Macht den Text sicher weiß!
+            nameLabel.style.color = Color.white; 
             
-            // Wenn du im Inspector deine Poppins-Schriftart reingezogen hast, nutzt er sie jetzt:
             if (poppinsBoldFont != null)
             {
                 nameLabel.style.unityFont = poppinsBoldFont;
                 nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             }
 
-            // 3. Minus-Button erstellen
             Button deleteSingleBtn = new Button();
             deleteSingleBtn.text = " ➖ "; 
             deleteSingleBtn.AddToClassList("btn-minus-delete"); 
             deleteSingleBtn.clicked += () => DeleteSingleDocument(doc.id);
 
-            // Alles zusammenbauen
             row.Add(nameLabel);
             row.Add(deleteSingleBtn);
             detailListContainer.Add(row);
