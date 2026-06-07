@@ -109,85 +109,114 @@ public class KassenbuchController : MonoBehaviour
         }
         else {
             //_db.Delete<Ausgaben>(id);
-            db.deleteEinkommen(id);
+            db.deleteAusgaben(id);
+
         }
+
+        createList();
 
         Debug.Log($"[DB] {typ} mit ID {id} gelöscht.");
     }
 
 
-public void createList()
-{
-
-
-    balanceLabel.text = db.getDifferenz().ToString() + "€";
-
-    tableInput.Clear();
-    if (outputTemplate == null)
+    public void createList()
     {
-        Debug.LogError("outputTemplate is null! Check the Resources path.");
-        return;
-    }
 
-    if (tableInput == null)
-    {
-        Debug.LogError("tableInput is null! The scrollview wasn't found.");
-        return;
-    }
 
-    List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-    List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
-    if (einkommenList == null || einkommenList.Count == 0)
-    {
-        Debug.Log("No entries to display.");
-        return;
-    }
+        balanceLabel.text = db.getDifferenz().ToString() + "€";
 
-    foreach (Einkommen currentEinkommen in einkommenList)
-    {
-        VisualElement newEntryCopy = outputTemplate.Instantiate();
-        
-        Label nameLabel = newEntryCopy.Q<Label>("Name");
-        Label typLabel = newEntryCopy.Q<Label>("Typ");
-        Label betragLabel = newEntryCopy.Q<Label>("Betrag");
-        Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-        if (nameLabel == null)
+        tableInput.Clear();
+        if (outputTemplate == null)
         {
-            Debug.LogError("Label 'Name' not found in template!");
-            continue;
+            Debug.LogError("outputTemplate is null! Check the Resources path.");
+            return;
         }
 
-        tableInput.Add(newEntryCopy);
-        nameLabel.text = currentEinkommen.getDescription();
-        betragLabel.text = currentEinkommen.getAmount();
-        erstellTagLabel.text = currentEinkommen.getDatum();
-        typLabel.text = "Einkommen";
-        
-        newEntryCopy.visible = true;
-    }
-
-        foreach (Ausgaben currentAusgaben in ausgabenList)
-    {
-        VisualElement newEntryCopy = outputTemplate.Instantiate();
-        
-        Label nameLabel = newEntryCopy.Q<Label>("Name");
-        Label typLabel = newEntryCopy.Q<Label>("Typ");
-        Label betragLabel = newEntryCopy.Q<Label>("Betrag");
-        Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-        if (nameLabel == null)
+        if (tableInput == null)
         {
-            Debug.LogError("Label 'Name' not found in template!");
-            continue;
+            Debug.LogError("tableInput is null! The scrollview wasn't found.");
+            return;
         }
 
-        tableInput.Add(newEntryCopy);
-        nameLabel.text = currentAusgaben.getDescription();
-            betragLabel.text = currentAusgaben.getAmount();
-        erstellTagLabel.text = currentAusgaben.getDatum();
-        typLabel.text = "Ausgabe";
-        newEntryCopy.visible = true;
+        List<Einkommen> einkommenList = db.getAllEinkommenEntries();
+        List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
+        if (einkommenList == null || einkommenList.Count == 0)
+        {
+            Debug.Log("No entries to display.");
+            return;
+        }
+
+        foreach (Einkommen currentEinkommen in einkommenList)
+        {
+            VisualElement newEntryCopy = outputTemplate.Instantiate();
+            
+            Label nameLabel = newEntryCopy.Q<Label>("Name");
+            Label typLabel = newEntryCopy.Q<Label>("Typ");
+            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
+            Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
+            if (nameLabel == null)
+            {
+                Debug.LogError("Label 'Name' not found in template!");
+                continue;
+            }
+
+            tableInput.Add(newEntryCopy);
+            nameLabel.text = currentEinkommen.getDescription();
+            betragLabel.text = currentEinkommen.getAmount();
+            erstellTagLabel.text = currentEinkommen.getDatum();
+            typLabel.text = "Einkommen";
+            
+            newEntryCopy.visible = true;
+        }
+
+            foreach (Ausgaben currentAusgaben in ausgabenList)
+        {
+            VisualElement newEntryCopy = outputTemplate.Instantiate();
+            
+            Label nameLabel = newEntryCopy.Q<Label>("Name");
+            Label typLabel = newEntryCopy.Q<Label>("Typ");
+            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
+            Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
+            if (nameLabel == null)
+            {
+                Debug.LogError("Label 'Name' not found in template!");
+                continue;
+            }
+
+            tableInput.Add(newEntryCopy);
+            nameLabel.text = currentAusgaben.getDescription();
+                betragLabel.text = currentAusgaben.getAmount();
+            erstellTagLabel.text = currentAusgaben.getDatum();
+            typLabel.text = "Ausgabe";
+            newEntryCopy.visible = true;
+        }
     }
-}
+
+
+    public void deleteEntry(int id)
+    {
+        
+        foreach (Einkommen currentEinkommen in db.getAllEinkommenEntries())
+        {
+            if (currentEinkommen.getId() == id && currentEinkommen.GetType().ToString() == "Einkommen")
+            {
+                db.deleteEinkommen(id);
+                createList();
+                return;
+            }
+        }
+        
+        foreach (Ausgaben currentAusgaben in db.getAllAusgabenEntries())
+        {
+            if (currentAusgaben.getId() == id && currentAusgaben.GetType().ToString() == "Ausgaben")
+            {
+                db.deleteAusgaben(id);
+                createList();
+                return;
+            }
+        }
+
+    }
 
 
 
