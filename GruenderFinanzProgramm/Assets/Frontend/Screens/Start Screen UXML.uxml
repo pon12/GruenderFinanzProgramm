@@ -1,14 +1,15 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Frontend/Stylesheets/Start-Screen.uss?fileID=7433441132597879392&amp;guid=2f9e27ba86261eb4cbf90b48746143a5&amp;type=3#Start-Screen"/>
-    <Style src="project://database/Assets/Frontend/Stylesheets/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
-    <ui:VisualElement name="Backround" class="fullscreen-bg" style="flex-grow: 1;">
-        <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/Logo.png?fileID=2800000&amp;guid=fbb87816aeb92954585b915041cf24aa&amp;type=3#Logo" style="width: 536px; height: 384px; top: 177px; left: 692px;"/>
-        <ui:Label text="BUSILESS" name="FirmenName" class="my-text FirmenName" style="top: 200px; left: 653px; -unity-background-image-tint-color: rgb(255, 255, 255); width: 625px; height: 154px;"/>
-        <ui:Label text="weniger für mehr" name="Slogan" class="Slogan" style="top: 200px; left: 765px; width: 389px; height: 62px; font-size: 32px;"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/Start-Screen.uss?fileID=7433441132597879392&amp;guid=2f9e27ba86261eb4cbf90b48746143a5&amp;type=3#Start-Screen"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <ui:VisualElement name="Backround" class="fullscreen-bg" style="flex-grow: 1; width: 100%; height: 100%; background-image: url(&quot;project://database/Assets/Frontend/Bilder/start_bg_1080p.png?fileID=2800000&amp;guid=0ff4864136671e84ea50db619951dea8&amp;type=3#start_bg_1080p&quot;); background-color: rgba(0, 0, 0, 0); position: relative;">
+        <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/start_logo_1080p.png?fileID=2800000&amp;guid=2eab24452a1b4b443a9d597e351b9167&amp;type=3#start_logo_1080p" style="width: 536px; height: 384px; top: 177px; left: 692px;"/>
+        <ui:Label text="Ventoriq" name="FirmenName" class="my-text FirmenName" style="top: 200px; left: 653px; -unity-background-image-tint-color: rgb(255, 255, 255); width: 625px; height: 154px;"/>
+        <ui:Label text="Dein digitaler Mentor" name="Slogan" class="Slogan" style="top: 200px; left: 765px; width: 389px; height: 62px; font-size: 32px;"/>
         <ui:VisualElement name="Logos" style="flex-grow: 1; flex-direction: row;">
-            <ui:Image name="HSMWLogo" source="project://database/Assets/Frontend/Bilder/HSMW-Logo.png?fileID=2800000&amp;guid=003989fbe3bb3144d8a97056429d1b78&amp;type=3#HSMW-Logo" style="width: 149px; height: 149px; top: 270px; left: 1154px;"/>
-            <ui:Image name="UnityLogo" source="project://database/Assets/Frontend/Bilder/Unity.png?fileID=2800000&amp;guid=763da6cc28cd98742a1d3091aa82605f&amp;type=3#Unity" style="top: 270px; left: 450px; width: 153px; height: 153px;"/>
-            <ui:Image name="OenGLLogo" source="project://database/Assets/Frontend/Bilder/OpenGl.png?fileID=2800000&amp;guid=3a10cd9014a54be4f90b562885e3e2c3&amp;type=3#OpenGl" style="width: 215px; height: 215px; top: 240px; left: 550px;"/>
+            <ui:Image name="HSMWLogo" source="project://database/Assets/Frontend/Bilder/start_HSMW_powered_by_1080p.png?fileID=2800000&amp;guid=b0f876a22f6fad746ae1a81ebf8888b7&amp;type=3#start_HSMW_powered_by_1080p" style="width: auto; height: auto; top: 207px; left: 931px; position: absolute;"/>
+            <ui:Image name="UnityLogo" source="project://database/Assets/Frontend/Bilder/start_UNITY_powered_by_1080p.png?fileID=2800000&amp;guid=dc132b5aebc772c43aa007818c0b6601&amp;type=3#start_UNITY_powered_by_1080p" style="top: 206px; left: 466px; width: auto; height: auto; position: absolute;"/>
+            <ui:Image source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="position: absolute; height: 101px; width: 442px; top: 115px; left: 1136px;"/>
+            <ui:Image source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="height: 93px; width: 465px; position: absolute; top: 121px; left: 323px;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
