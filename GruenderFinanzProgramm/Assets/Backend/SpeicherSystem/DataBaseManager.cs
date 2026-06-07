@@ -19,7 +19,7 @@ public abstract class DatabaseManager : MonoBehaviour
     public virtual void initializeDatabase(string databaseName, string customPath = null)
     {
         this.databaseName = databaseName;
-        
+
         if (string.IsNullOrEmpty(customPath))
         {
             databasePath = Path.Combine(Application.persistentDataPath, $"{databaseName}.db");
@@ -28,6 +28,8 @@ public abstract class DatabaseManager : MonoBehaviour
         {
             databasePath = Path.Combine(customPath, $"{databaseName}.db");
         }
+
+        databasePath = Path.GetFullPath(databasePath);
 
         try
         {
@@ -45,6 +47,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual void createTable<T>() where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot create table '{typeof(T).Name}'.");
+            return;
+        }
+
         try
         {
             database.CreateTable<T>();
@@ -61,6 +69,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual int insert<T>(T item) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot insert '{typeof(T).Name}'.");
+            return -1;
+        }
+
         try
         {
             int result = database.Insert(item);
@@ -79,6 +93,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual int insertAll<T>(List<T> items) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot insert records into '{typeof(T).Name}'.");
+            return -1;
+        }
+
         try
         {
             int result = database.InsertAll(items);
@@ -97,6 +117,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual List<T> getAll<T>() where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot retrieve records from '{typeof(T).Name}'.");
+            return new List<T>();
+        }
+
         try
         {
             List<T> results = database.Table<T>().ToList();
@@ -114,6 +140,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual T getById<T>(int id) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot retrieve '{typeof(T).Name}' with ID {id}.");
+            return default;
+        }
+
         try
         {
             T result = database.Find<T>(id);
@@ -131,6 +163,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual int update<T>(T item) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot update '{typeof(T).Name}'.");
+            return -1;
+        }
+
         try
         {
             int result = database.Update(item);
@@ -149,6 +187,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual int delete<T>(int id) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot delete '{typeof(T).Name}' with ID {id}.");
+            return -1;
+        }
+
         try
         {
             T item = getById<T>(id);
@@ -158,6 +202,8 @@ public abstract class DatabaseManager : MonoBehaviour
                 Debug.Log($"Deleted record from '{typeof(T).Name}' table. Result: {result}");
                 return result;
             }
+
+            Debug.LogWarning($"No '{typeof(T).Name}' record found with ID {id}. Nothing deleted.");
             return 0;
         }
         catch (Exception ex)
@@ -170,6 +216,12 @@ public abstract class DatabaseManager : MonoBehaviour
 
     public virtual List<T> query<T>(string queryString) where T : new()
     {
+        if (database == null)
+        {
+            Debug.LogError($"Database '{databaseName}' is not initialized. Cannot execute query for '{typeof(T).Name}'.");
+            return new List<T>();
+        }
+
         try
         {
             List<T> results = database.Query<T>(queryString);

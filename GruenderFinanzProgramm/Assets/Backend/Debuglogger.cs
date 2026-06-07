@@ -6,7 +6,6 @@ public class DebugLogger : MonoBehaviour
     private static DebugLogger instance;
     private static bool isEnabled = false;
     private static string logFilePath = "";
-    private static string settingsFilePath = "";
     public static DebugLogger Instance
     {
         get
@@ -29,59 +28,24 @@ public class DebugLogger : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
-    
-        string basePath = Application.persistentDataPath;
-        settingsFilePath = Path.Combine(basePath, "Settings.txt");
-        // Settings.txt anlegen falls nicht vorhanden
-        if (!File.Exists(settingsFilePath))
-        {
-            File.WriteAllText(settingsFilePath, "DEBUGLOG=false");
-            Debug.Log($"Settings.txt erstellt unter: {settingsFilePath}");
-        }
-    
-        isEnabled = ParseDebugSetting();
+        // Settings laden (SettingsParser kümmert sich um alles)
+        SettingsParser.Initialize();
+        // DebugLog-Status aus Settings lesen
+        isEnabled = SettingsParser.GetBool("DEBUGLOG");
         if (isEnabled)
         {
-            // Debug-Ordner anlegen
-            string debugFolder = Path.Combine(basePath, "Debug");
+            string debugFolder = Path.Combine(Application.persistentDataPath, "Debug");
             Directory.CreateDirectory(debugFolder);
-            // Dateiname mit Datum und Zeit des Programmstarts
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             logFilePath = Path.Combine(debugFolder, $"DebugLog_{timestamp}.txt");
-            // Log-Datei 
             File.WriteAllText(logFilePath, $"=== DebugLog gestartet: {DateTime.Now} ===\n\n");
-            // Unity Log-Handler registrieren
             Application.logMessageReceived += HandleLog;
             Debug.Log("DebugLogger aktiv.");
         }
         else
         {
-            Debug.Log("DebugLogger ist deaktiviert (DEBUGLOG=false in Settings.txt).");
+            Debug.Log("DebugLogger deaktiviert (DEBUGLOG=false).");
         }
-    }
-    private bool ParseDebugSetting()
-    {
-        try
-        {
-            string[] lines = File.ReadAllLines(settingsFilePath);
-            foreach (string line in lines)
-            {
-                // Leerzeilen und Kommentare überspringen
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
-                    continue;
-                // Nach DEBUGLOG= suchen
-                if (line.StartsWith("DEBUGLOG="))
-                {
-                    string value = line.Substring("DEBUGLOG=".Length).Trim().ToLower();
-                    return value == "true";
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Fehler beim Parsen der Settings.txt: {ex.Message}");
-        }
-        return false;
     }
     private void HandleLog(string logString, string stackTrace, LogType type)
     {
@@ -89,7 +53,7 @@ public class DebugLogger : MonoBehaviour
         try
         {
             string timestamp = DateTime.Now.ToString("HH:mm:ss");
-            string logTypeLabel = type switch
+            string label = type switch
             {
                 LogType.Error     => "[ERROR]",
                 LogType.Warning   => "[WARNING]",
@@ -97,15 +61,13 @@ public class DebugLogger : MonoBehaviour
                 LogType.Assert    => "[ASSERT]",
                 _                 => "[LOG]"
             };
-            string entry = $"[{timestamp}] {logTypeLabel} {logString}";
-  
+            string entry = $"[{timestamp}] {label} {logString}";
             if (type == LogType.Error || type == LogType.Exception)
                 entry += $"\n  StackTrace: {stackTrace}";
             File.AppendAllText(logFilePath, entry + "\n");
         }
         catch (Exception ex)
         {
-            // Nicht nochmal loggen sonst endlos
             Console.WriteLine($"DebugLogger Fehler: {ex.Message}");
         }
     }
