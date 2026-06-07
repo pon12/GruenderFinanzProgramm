@@ -17,10 +17,10 @@ public class DocumentDashboard : MonoBehaviour
     private Button deleteButton;
     private VisualElement gridContainer;
 
-    
     // Pop-up Elemente
     private VisualElement popupOverlay;
     private Button popupCancelButton;
+    private Button popupBackButton; // NEU: Für den Pfeil oben rechts/links im Pop-up
     private Button popupSubmitButton; 
     
     // Eingabefelder
@@ -37,7 +37,7 @@ public class DocumentDashboard : MonoBehaviour
         "Gründung", "Finanzen", "Marketing", "Steuern", "Personal", "Recht" 
     };
 
-    // Datenstruktur
+    // Lokale Datenstruktur (Sichert Funktionalität ohne fehlerhafte DB-Referenzen)
     [System.Serializable]
     public class DocumentData
     {
@@ -64,13 +64,16 @@ public class DocumentDashboard : MonoBehaviour
 
         root = uiDocument.rootVisualElement;
 
+        // UI-Elemente zuweisen
         createButton = root.Q<Button>("Create-Button");
-        deleteButton = root.Q<Button>("Delete-Button");
+        deleteButton = root.Q<Button>("Delete-Button"); // Oben rechts "Dokumente Löschen"
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
+        // Pop-up Elemente zuweisen
         popupOverlay = root.Q<VisualElement>("Popup-Overlay");
-        popupCancelButton = root.Q<Button>("Btn-Cancel"); 
-        popupSubmitButton = root.Q<Button>("Btn-Submit"); 
+        popupCancelButton = root.Q<Button>("Btn-Cancel"); // "Abbrechen"
+        popupBackButton = root.Q<Button>("Btn-Back");     // "Zurück"-Pfeil oben rechts im Pop-up
+        popupSubmitButton = root.Q<Button>("Btn-Submit"); // "erstellen"
         
         categoryDropdown = root.Q<DropdownField>("dropKategorie"); 
         docNameInput = root.Q<TextField>("Doc-Name-Input"); 
@@ -79,48 +82,64 @@ public class DocumentDashboard : MonoBehaviour
         btnTypeDiagramm = root.Q<Button>("Btn-Type-Diagramm");
         btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
 
+        // Dropdown befüllen
         if (categoryDropdown != null)
         {
             categoryDropdown.choices = dropdownKategorien;
             if (dropdownKategorien.Count > 0) categoryDropdown.value = dropdownKategorien[0]; 
         }
 
+        // Klick-Events verknüpfen
         if (createButton != null) createButton.clicked += OpenPopup;
-        if (deleteButton != null) deleteButton.clicked += deleteAllDocuments;
+        if (deleteButton != null) deleteButton.clicked += DeleteAllDocuments;
+        
+        // BEIDE Buttons schließen jetzt das Pop-up zuverlässig!
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
+        if (popupBackButton != null) popupBackButton.clicked += ClosePopup;
 
-        if (btnTypeStandard != null) btnTypeStandard.clicked += () => ApplyTemplate("Standard");
-        if (btnTypeDiagramm != null) btnTypeDiagramm.clicked += () => ApplyTemplate("Diagramm");
-        if (btnTypeChecklist != null) btnTypeChecklist.clicked += () => ApplyTemplate("Checklist");
+        // Typen auswählen (Ändert NUR den Typen-String, überschreibt NICHT mehr dein Textfeld!)
+        if (btnTypeStandard != null) btnTypeStandard.clicked += () => SelectType("Standard");
+        if (btnTypeDiagramm != null) btnTypeDiagramm.clicked += () => SelectType("Diagramm");
+        if (btnTypeChecklist != null) btnTypeChecklist.clicked += () => SelectType("Checklist");
 
         if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
 
+        // Daten laden und UI aufbauen
         LoadDataLocally();
         SpawnAllCardsAtStart();
-        getAllData();
     }
 
-    private void OpenPopup() { if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; }
-    private void ClosePopup() { if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.None; }
+    private void OpenPopup() 
+    { 
+        if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex; 
+        if (docNameInput != null) docNameInput.value = ""; // Textfeld leeren, damit du frei tippen kannst!
+    }
 
-    private void ApplyTemplate(string typeName)
+    private void ClosePopup() 
+    { 
+        if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.None; 
+    }
+
+    private void SelectType(string typeName)
     {
         selectedType = typeName;
-        string templateName = (typeName == "Standard") ? "Businessplan" : (typeName == "Diagramm") ? "Diagramm" : "Checkliste";
-        if (docNameInput != null) docNameInput.value = templateName;
+        Debug.Log($"Typ ausgewählt: {selectedType}");
+        // Hier kannst du optional Code einfügen, um den ausgewählten Button visuell zu markieren
     }
 
     private void CreateNewDocumentEntry()
     {
         string selectedCategory = categoryDropdown != null ? categoryDropdown.value : "";
-        string docText = docNameInput != null ? docNameInput.value : "Unbenannt";
+        
+        // Nutzt deinen eingetippten Namen. Wenn leer, dann "Unbenannt"
+        string docText = (docNameInput != null && !string.IsNullOrEmpty(docNameInput.value)) ? docNameInput.value : "Unbenannt";
 
         if (string.IsNullOrEmpty(selectedCategory)) return;
 
-        // 1. Liste filtern
+        // 1. Liste nach aktueller Kategorie filtern
         List<DocumentData> kategorieDocs = speicherDaten.savedDocs.FindAll(d => d.category == selectedCategory);
 
-        // 2. Älteste löschen, wenn wir schon 2 haben (immer nur max 2 behalten)
+        // 2. Ältestes Dokument kicken, wenn das Kartenlimit (max. 2 Einträge) erreicht ist
         while (kategorieDocs.Count >= 2)
         {
             DocumentData altesDoc = kategorieDocs[0];
@@ -128,7 +147,7 @@ public class DocumentDashboard : MonoBehaviour
             kategorieDocs.Remove(altesDoc);
         }
 
-        // 3. Neues Dokument hinzufügen
+        // 3. Neues Dokument mit freiem Namen hinzufügen
         DocumentData newDoc = new DocumentData { category = selectedCategory, title = docText, type = selectedType };
         speicherDaten.savedDocs.Add(newDoc);
         
@@ -161,7 +180,9 @@ public class DocumentDashboard : MonoBehaviour
 
             for (int i = 0; i < kategorieDocs.Count; i++)
             {
-                // Gerade = Oben, Ungerade = Unten
+                // Maximal 2 Dokumente anzeigen
+                if (i >= 2) break;
+
                 VisualElement target = (i % 2 == 0) ? feldOben : feldUnten;
                 if (target != null)
                 {
@@ -185,46 +206,18 @@ public class DocumentDashboard : MonoBehaviour
         File.WriteAllText(saveFilePath, json);
     }
 
-    //Lösche alle Dokumente.
-    private void deleteAllDocuments()
-    {
-        speicherDaten.savedDocs.Clear();
-        SaveDataLocally();
-        SpawnAllCardsAtStart();
-    }
-
-    //Lösche ein bestimmtes Dokument anhand von Kategorie und Titel.
-    private void clearOneDataEntry(string category, string title)
-    {
-        DocumentData entryToRemove = speicherDaten.savedDocs.Find(d => d.category == category && d.title == title);
-        if (entryToRemove != null)
-        {
-            speicherDaten.savedDocs.Remove(entryToRemove);
-            SaveDataLocally();
-            SpawnAllCardsAtStart();
-        }
-    }
-
-
-    // Gibt alle Dokumente
-    private List<DocumentData> getAllData()
-    {
-    //Test um zu sehen ob funktion gecall wird.
-    Debug.Log("GetAllData function called");
-    List<DocumentData> allData = speicherDaten.savedDocs;
-    //Debug nur zum test kannst du wens geht rausnehmen
-    foreach (var doc in allData)
-    {
-        Debug.Log($"Category: {doc.category}, Title: {doc.title}, Type: {doc.type}");
-    }
-    return allData;
-    }
-
-
-
     private void LoadDataLocally()
     {
         if (File.Exists(saveFilePath))
             speicherDaten = JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(saveFilePath));
+    }
+
+    // "Dokumente Löschen"-Button Logik (Leert die Anzeige und die Speicherdatei)
+    private void DeleteAllDocuments()
+    {
+        speicherDaten.savedDocs.Clear();
+        SaveDataLocally();
+        SpawnAllCardsAtStart();
+        Debug.Log("Alle lokalen Dokumente wurden gelöscht.");
     }
 }
