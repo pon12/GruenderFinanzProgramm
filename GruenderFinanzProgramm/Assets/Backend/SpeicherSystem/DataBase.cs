@@ -387,4 +387,53 @@ public int deleteUserPDFDocument(int pdfId, int userId)
 }
 
 
+
+// Dienstleistungen
+
+public void setupDienstleistungenTable()
+{
+    createTable<Dienstleistung>();
+}
+
+public int createDienstleistung(string titel, string beschreibung, string detail, string betrag, string anzahl, string preismodell)
+{
+    Dienstleistung newDienstleistung = new Dienstleistung
+    {
+        Titel = titel,
+        Beschreibung = beschreibung,
+        Detail = detail,
+        Betrag = betrag,
+        Anzahl = anzahl,
+        Preismodell = preismodell
+    };
+    return insert(newDienstleistung);
+}
+
+
+
+
+public List<Dienstleistung> getAllDienstleistungen()
+{
+    return getAll<Dienstleistung>();
+}
+
+public Dienstleistung getById(int Id)
+{
+    return getById<Dienstleistung>(Id);
+}
+
+public Dienstleistung getId(string titel, string beschreibung, string detail, string betrag, string anzahl, string preismodell)
+{
+    var results = query<Dienstleistung>($"SELECT * FROM Dienstleistung WHERE Titel = '{titel}' AND Beschreibung = '{beschreibung}' AND Detail = '{detail}' AND Betrag = '{betrag}' AND Anzahl = '{anzahl}' AND Preismodell = '{preismodell}'");
+    return results.Count > 0 ? results[0] : null;
+}
+
+public void DeleteDienstleistung(string titel, string beschreibung, string detail, string betrag, string anzahl, string preismodell)
+{       
+    var dienstleistung = getId(titel, beschreibung, detail, betrag, anzahl, preismodell);
+    if (dienstleistung != null)
+    {
+        delete<Dienstleistung>(dienstleistung.Id);
+    }
+}
 }
