@@ -118,80 +118,114 @@ public class KassenbuchController : MonoBehaviour
         Debug.Log($"[DB] {typ} mit ID {id} gelöscht.");
     }
 
+public void createList()
+{
+    float differenz = db.getDifferenz();
+    balanceLabel.text = differenz.ToString() + "€";
 
-    public void createList()
+    // Kontostand rot wenn negativ, gruen wenn positiv
+    balanceLabel.style.color = differenz < 0
+        ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
+        : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
+
+    tableInput.Clear();
+
+    if (outputTemplate == null) { Debug.LogError("outputTemplate is null!"); return; }
+    if (tableInput    == null) { Debug.LogError("tableInput is null!");     return; }
+
+    List<Einkommen> einkommenList = db.getAllEinkommenEntries();
+    List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();
+
+    // Einnahmen
+    foreach (Einkommen currentEinkommen in einkommenList)
     {
+        VisualElement newEntryCopy = outputTemplate.Instantiate();
 
+        Label nameLabel       = newEntryCopy.Q<Label>("Name");
+        Label typLabel        = newEntryCopy.Q<Label>("Typ");
+        Label betragLabel     = newEntryCopy.Q<Label>("Betrag");
+        Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
+        Button loeschenBtn    = newEntryCopy.Q<Button>("BtnLoeschen");
 
-        balanceLabel.text = db.getDifferenz().ToString() + "€";
+        if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
-        tableInput.Clear();
-        if (outputTemplate == null)
+        nameLabel.text       = currentEinkommen.getDescription();
+        betragLabel.text     = currentEinkommen.getAmount();
+        erstellTagLabel.text = currentEinkommen.getDatum();
+        typLabel.text        = "Einkommen";
+
+        // Gruen fuer Einnahme
+        if (betragLabel != null)
+            betragLabel.style.color = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
+
+        // Loeschen Button
+        if (loeschenBtn != null)
         {
-            Debug.LogError("outputTemplate is null! Check the Resources path.");
-            return;
-        }
+            int id = currentEinkommen.getId();
+            loeschenBtn.clicked += () => Loeschen("Einnahme", id);
 
-        if (tableInput == null)
-        {
-            Debug.LogError("tableInput is null! The scrollview wasn't found.");
-            return;
-        }
-
-        List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-        List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
-        if (einkommenList == null || einkommenList.Count == 0)
-        {
-            Debug.Log("No entries to display.");
-            return;
-        }
-
-        foreach (Einkommen currentEinkommen in einkommenList)
-        {
-            VisualElement newEntryCopy = outputTemplate.Instantiate();
-            
-            Label nameLabel = newEntryCopy.Q<Label>("Name");
-            Label typLabel = newEntryCopy.Q<Label>("Typ");
-            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
-            Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-            if (nameLabel == null)
+            // Hover Highlight
+            loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
             {
-                Debug.LogError("Label 'Name' not found in template!");
-                continue;
-            }
-
-            tableInput.Add(newEntryCopy);
-            nameLabel.text = currentEinkommen.getDescription();
-            betragLabel.text = currentEinkommen.getAmount();
-            erstellTagLabel.text = currentEinkommen.getDatum();
-            typLabel.text = "Einkommen";
-            
-            newEntryCopy.visible = true;
-        }
-
-            foreach (Ausgaben currentAusgaben in ausgabenList)
-        {
-            VisualElement newEntryCopy = outputTemplate.Instantiate();
-            
-            Label nameLabel = newEntryCopy.Q<Label>("Name");
-            Label typLabel = newEntryCopy.Q<Label>("Typ");
-            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
-            Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-            if (nameLabel == null)
+                loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                loeschenBtn.style.color           = new StyleColor(UnityEngine.Color.white);
+            });
+            loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
             {
-                Debug.LogError("Label 'Name' not found in template!");
-                continue;
-            }
-
-            tableInput.Add(newEntryCopy);
-            nameLabel.text = currentAusgaben.getDescription();
-                betragLabel.text = currentAusgaben.getAmount();
-            erstellTagLabel.text = currentAusgaben.getDatum();
-            typLabel.text = "Ausgabe";
-            newEntryCopy.visible = true;
+                loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f, 0.15f));
+                loeschenBtn.style.color           = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+            });
         }
+
+        tableInput.Add(newEntryCopy);
+        newEntryCopy.visible = true;
     }
 
+    // Ausgaben
+    foreach (Ausgaben currentAusgaben in ausgabenList)
+    {
+        VisualElement newEntryCopy = outputTemplate.Instantiate();
+
+        Label nameLabel       = newEntryCopy.Q<Label>("Name");
+        Label typLabel        = newEntryCopy.Q<Label>("Typ");
+        Label betragLabel     = newEntryCopy.Q<Label>("Betrag");
+        Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
+        Button loeschenBtn    = newEntryCopy.Q<Button>("BtnLoeschen");
+
+        if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
+
+        nameLabel.text       = currentAusgaben.getDescription();
+        betragLabel.text     = currentAusgaben.getAmount();
+        erstellTagLabel.text = currentAusgaben.getDatum();
+        typLabel.text        = "Ausgabe";
+
+        // Rot fuer Ausgabe
+        if (betragLabel != null)
+            betragLabel.style.color = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+
+        // Loeschen Button
+        if (loeschenBtn != null)
+        {
+            int id = currentAusgaben.getId();
+            loeschenBtn.clicked += () => Loeschen("Ausgabe", id);
+
+            // Hover Highlight
+            loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
+            {
+                loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                loeschenBtn.style.color           = new StyleColor(UnityEngine.Color.white);
+            });
+            loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
+            {
+                loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f, 0.15f));
+                loeschenBtn.style.color           = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+            });
+        }
+
+        tableInput.Add(newEntryCopy);
+        newEntryCopy.visible = true;
+    }
+}
 
     public void deleteEntry(int id)
     {
