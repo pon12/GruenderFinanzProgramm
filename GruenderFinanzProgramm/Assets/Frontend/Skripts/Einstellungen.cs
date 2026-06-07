@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 public class EinstellungenController : MonoBehaviour
 {
+    
     [SerializeField] private UIDocument            uiDocument;
     [SerializeField] private PassKeyAuthController passKeyAuthController;
     [SerializeField] private MainLogoutController  mainLogoutController;
@@ -99,6 +100,7 @@ public class EinstellungenController : MonoBehaviour
     private VisualElement _dialogOverlay;
     private TextField     _inputSuperkey1;
     private TextField     _inputSuperkey2;
+    private TextField     _inputSuperkeyReset;  
     private Button        _btnDialogCancel;
     private Button        _btnDialogConfirm;
 
@@ -186,6 +188,7 @@ public class EinstellungenController : MonoBehaviour
         _dialogOverlay        = _root.Q<VisualElement>("dialog-overlay");
         _inputSuperkey1       = _root.Q<TextField>("input-superkey-1");
         _inputSuperkey2       = _root.Q<TextField>("input-superkey-2");
+        _inputSuperkeyReset   = _root.Q<TextField>("input-superkey-reset");  
         _btnDialogCancel      = _root.Q<Button>("btn-dialog-cancel");
         _btnDialogConfirm     = _root.Q<Button>("btn-dialog-confirm");
     }
@@ -220,17 +223,26 @@ public class EinstellungenController : MonoBehaviour
         if (_btnDarkMode  != null) _btnDarkMode.clicked  += () => SelectMode(true);
 
         // Passkey zuruecksetzen – Backend: resetPassKey()
-        if (_btnResetPasskey != null)
-            _btnResetPasskey.clicked += () =>
-            {
-                if (passKeyAuthController != null)
-                {
-                    passKeyAuthController.resetPassKey();
-                    Debug.Log("[Einstellungen] resetPassKey aufgerufen.");
-                }
-                else
-                    Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
-            };
+      if (_btnResetPasskey != null)
+    _btnResetPasskey.clicked += () =>
+    {
+        string superKey = _inputSuperkeyReset?.value?.Trim() ?? "";
+
+        if (string.IsNullOrEmpty(superKey))
+        {
+            Debug.LogWarning("[Einstellungen] Super-Passkey fehlt.");
+            return;
+        }
+
+        if (passKeyAuthController != null)
+        {
+            passKeyAuthController.resetPassKey();
+            if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
+            Debug.Log("[Einstellungen] resetPassKey aufgerufen.");
+        }
+        else
+            Debug.LogWarning("[Einstellungen] PassKeyAuthController nicht gefunden.");
+    };
 
         // Lokalprofil loeschen – Dialog oeffnen
         if (_btnDeleteProfile  != null) _btnDeleteProfile.clicked  += ShowDeleteDialog;

@@ -12,6 +12,7 @@ public class DataBase : DatabaseManager
         createTable<Customer>();
         createTable<Service>();
         createTable<UserDocument>();
+        createTable<UserPDFDocument>();
     }
 
     public void setupAuthDB()
@@ -241,14 +242,14 @@ public int deleteCompany(int companyId)
         createTable<Ausgaben>();
     }
 
-    public int createEinkommen(float amount, string description)
+    public int createEinkommen(float amount, string description, string datum)
     {
-        return insert(new Einkommen { Amount = amount, Description = description });
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum });
     }
 
-    public int createAusgaben(float amount, string description)
+    public int createAusgaben(float amount, string description, string datum)
     {
-        return insert(new Ausgaben { Amount = amount, Description = description });
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum });
     }
 
     public List<Einkommen> getAllEinkommenEntries()
@@ -283,9 +284,16 @@ public int deleteCompany(int companyId)
         return getTotalEinkommen() - getTotalAusgaben();
     }
 
+    public List<Ausgaben> getAusgabebyDatum(string datum)
+    {
+    return query<Ausgaben>($"SELECT * FROM Ausgaben WHERE Datum = '{datum}'");
+    }
+    public List<Einkommen> getEinkommenbyDatum(string datum)
+    {
+        return query<Einkommen>($"SELECT * FROM Einkommen WHERE Datum = '{datum}'");
+    }
 
-
-
+    
 
     //Documents
     public int createUserDocument(int documentType, string title, string text)
@@ -305,7 +313,78 @@ public int deleteCompany(int companyId)
         return getAll<UserDocument>();
     }
 
-    
-    
+
+    // --- Buissnesplan ---
+
+    public void setupBusinessPlanTable()
+    {
+        createTable<Antworten>();
+    }
+
+    public int createAntwort(int antwort)
+    {
+        Antworten newAntwort = new Antworten
+        {
+            Antwort = antwort
+        };
+        return insert(newAntwort);
+    }
+
+    public List<Antworten> getAllAntworten()
+    {
+        return getAll<Antworten>();
+    }
+
+    public int deleteAntwort(int id)
+    {
+        return delete<Antworten>(id);
+    }
+
+    public int deleteAllAntworten()
+    {
+        List<Antworten> allAntworten = getAllAntworten();
+        int count = 0;
+        foreach (var antwort in allAntworten)
+        {
+            count += deleteAntwort(antwort.Id);
+        }
+        return count;
+    }
+
+// --- User PDFs ---
+
+public int createUserPDFDocument(UserPDFDocument document)
+{
+    document.uploadedAt = System.DateTime.Now;
+    return insert(document);
+}
+
+public UserPDFDocument getUserPDFDocumentById(int pdfId, int userId)
+{
+    UserPDFDocument document = getById<UserPDFDocument>(pdfId);
+
+    if (document == null || document.userId != userId)
+        return null;
+
+    return document;
+}
+
+public List<UserPDFDocument> getPDFDocumentsByUser(int userId)
+{
+    return query<UserPDFDocument>(
+        $"SELECT * FROM UserPDFDocument WHERE userId = {userId} ORDER BY uploadedAt DESC"
+    );
+}
+
+public int deleteUserPDFDocument(int pdfId, int userId)
+{
+    UserPDFDocument document = getUserPDFDocumentById(pdfId, userId);
+
+    if (document == null)
+        return 0;
+
+    return delete<UserPDFDocument>(pdfId);
+}
+
 
 }

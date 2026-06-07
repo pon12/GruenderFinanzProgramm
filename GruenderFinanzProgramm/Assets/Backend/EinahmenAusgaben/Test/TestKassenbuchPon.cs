@@ -23,18 +23,23 @@ public class TestKassenbuchPon : MonoBehaviour
         calculatetotalAusgaben();
 
         calculateDifference();
+
+        AusgabebyDatum();
+
+        EinkommenbyDatum();
+
     }
 
 
 
     private void createSampleKassenbuchEntries()
     {
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(1000, "Gehalt");
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(200, "Freelance Projekt");
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(500, "Freelance Projekt 2");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(300, "Miete");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(150, "Lebensmittel");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(1500, "Lebensmittel 2");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(1000, "Gehalt" , "01.01.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(200, "Freelance Projekt", "12.02.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(500, "Freelance Projekt 2", "01.03.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(300, "Miete", "23.01.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(150, "Lebensmittel", "01.02.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(1500, "Lebensmittel 2", "01.03.2025");
 
         Debug.Log("Beispiel-Einträge hinzugefügt.");
     }
@@ -44,13 +49,13 @@ public class TestKassenbuchPon : MonoBehaviour
     List<Einkommen> einkommenEntries = UserDatabaseAccess.getCurrentUserDatabase().getAllEinkommenEntries();
     foreach (Einkommen entry in einkommenEntries)
     {
-        Debug.Log($"Einkommen: {entry.Amount} {entry.Description}");
+        Debug.Log($"Einkommen: {entry.Amount} {entry.Description} {entry.Datum}");
     }
 
     List<Ausgaben> ausgabenEntries = UserDatabaseAccess.getCurrentUserDatabase().getAllAusgabenEntries();
     foreach (Ausgaben entry in ausgabenEntries)
     {
-        Debug.Log($"Ausgaben: {entry.Amount} {entry.Description}");
+        Debug.Log($"Ausgaben: {entry.Amount} {entry.Description} {entry.Datum}");
     }
     }
 
@@ -82,5 +87,27 @@ public class TestKassenbuchPon : MonoBehaviour
     return difference;
     }
 
+    public void AusgabebyDatum()
+    {
+     string datum = "01.02.2025";
+    List<Ausgaben> ausgabenByDatum = UserDatabaseAccess.getCurrentUserDatabase().getAusgabebyDatum(datum);
+    foreach (Ausgaben entry in ausgabenByDatum)
+    {
+    Debug.Log($"Die Ausgaben am {datum} betragen: {entry.Amount} {entry.Description}");
+    }
+    }
+
+    public void EinkommenbyDatum()
+    {
+        string datum = "01.03.2025";
+        List<Einkommen> einkommenByDatum = UserDatabaseAccess.getCurrentUserDatabase().getEinkommenbyDatum(datum);
+        foreach (Einkommen entry in einkommenByDatum)
+        {
+            Debug.Log($"Die Einkommen am {datum} betragen: {entry.Amount} {entry.Description}");
+        }
+    }
+
+    
+    
 
 }

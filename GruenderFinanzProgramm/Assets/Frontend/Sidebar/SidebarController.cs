@@ -43,17 +43,19 @@ public class SidebarController : MonoBehaviour
 
     // Nav-Item Name → Scene Name
     private static readonly Dictionary<string, string> NavToScene = new()
-    {
-        { "nav-item-dashboard",        "Dashboard"        },
-        { "nav-item-guide",            "Fortschritt"      },
-        { "nav-item-finanz",           "Finanzboard"      },
-        { "nav-item-angebot",          "Angebot"          },
-        { "nav-item-rechnung",         "Rechnung"         },
-        { "nav-item-kunden",           "KundenDB"  },
-        { "nav-item-dienstleistungen", "Dienstleistungen" },
-        { "nav-item-kassenbuch",       "Kassenbuch"       },
-        { "nav-item-einstellungen",    "Einstellungen"    },
-    };
+{
+    { "nav-item-dashboard",        "Dashboard"        },
+    { "nav-item-guide",            "Fortschritt"      },
+    { "nav-item-finanz",           "Finanzboard"      },
+    { "nav-item-angebot",          "Angebot"          },
+    { "nav-item-rechnung",         "Rechnung"         },
+    { "nav-item-kunden",           "KundenDB"  },
+    { "nav-item-dienstleistungen", "Dienstleistungen" },
+    { "nav-item-kassenbuch",       "Kassenbuch"       },
+    { "nav-item-export",           "Export-Screen"    },
+    { "nav-item-dokumente",        "Dokument-Screen"  },
+    { "nav-item-einstellungen",    "Einstellungen"    },
+};
 
     // Sub-Items die unter Finanzboard liegen
     private static readonly HashSet<string> FinanzSubItems = new()
@@ -90,11 +92,23 @@ public class SidebarController : MonoBehaviour
         SetActiveNavItem();
     }
 
-    void OnDisable()
+   void OnDisable()
+{
+    if (_toggleButton    != null) _toggleButton.clicked    -= ToggleSidebar;
+    if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
+
+    // Nav-Item Callbacks abmelden
+    foreach (var kvp in NavToScene)
     {
-        if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
+        var item = _root?.Q<VisualElement>(kvp.Key);
+        if (item != null)
+            item.UnregisterCallback<ClickEvent>(OnNavItemClicked);
     }
+
+    var logoutItem = _root?.Q<VisualElement>("nav-item-logout");
+    if (logoutItem != null)
+        logoutItem.UnregisterCallback<ClickEvent>(OnLogoutClicked);
+}
 
     // ─────────────────────────────────────────────────
     // STATE PERSISTENZ
@@ -229,43 +243,78 @@ public class SidebarController : MonoBehaviour
     // NAVIGATION
     // ─────────────────────────────────────────────────
 
-    private void RegisterNavigation()
+private void RegisterNavigation()
+{
+    foreach (var kvp in NavToScene)
     {
-        foreach (var kvp in NavToScene)
+        string sceneName = kvp.Value;
+        var item = _root.Q<VisualElement>(kvp.Key);
+        if (item == null)
         {
-            string sceneName = kvp.Value;
-            var item = _root.Q<VisualElement>(kvp.Key);
-            if (item != null)
-                item.RegisterCallback<ClickEvent>(_ => SceneManager.LoadScene(sceneName));
+            Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
+            continue;
+        }
+
+        item.RegisterCallback<ClickEvent>(evt =>
+        {
+            // Prueft ob Scene in Build Settings vorhanden ist
+            bool sceneExists = false;
+            for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings; i++)
+            {
+                string path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
+                if (path.Contains(sceneName))
+                {
+                    sceneExists = true;
+                    break;
+                }
+            }
+
+            if (sceneExists)
+                SceneManager.LoadScene(sceneName);
             else
-                Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
+                Debug.LogWarning($"[Sidebar] Scene '{sceneName}' nicht in Build Settings gefunden.");
+        });
+    }
+}
+
+private void OnNavItemClicked(ClickEvent evt)
+{
+    var item = evt.currentTarget as VisualElement;
+    if (item == null) return;
+
+    foreach (var kvp in NavToScene)
+    {
+        if (kvp.Key == item.name)
+        {
+            SceneManager.LoadScene(kvp.Value);
+            return;
         }
     }
+}
 
     // ─────────────────────────────────────────────────
     // LOGOUT – BACKEND VERKNUEPFUNG
     // ─────────────────────────────────────────────────
 
     private void RegisterLogout()
-    {
-        var logoutItem = _root.Q<VisualElement>("nav-item-logout");
-        if (logoutItem == null) return;
+{
+    var logoutItem = _root.Q<VisualElement>("nav-item-logout");
+    if (logoutItem == null) return;
+    logoutItem.RegisterCallback<ClickEvent>(OnLogoutClicked);
+}
 
-        logoutItem.RegisterCallback<ClickEvent>(_ =>
-        {
-            // Backend: Nutzer ausloggen – NutzerDB wird deaktiviert
-            var logoutController = FindAnyObjectByType<MainLogoutController>();
-            if (logoutController != null)
-                logoutController.logout();
-            else
-                Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
+private void OnLogoutClicked(ClickEvent evt)
+{
+    var logoutController = FindAnyObjectByType<MainLogoutController>();
+    if (logoutController != null)
+        logoutController.logout();
+    else
+        Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
 
-            // State beim Logout komplett zuruecksetzen
-            PlayerPrefs.DeleteKey(PREF_COLLAPSED);
-            PlayerPrefs.DeleteKey(PREF_FINANZ_OPEN);
-            PlayerPrefs.Save();
+    PlayerPrefs.DeleteKey("sidebar_collapsed");
+    PlayerPrefs.DeleteKey("sidebar_finanz_open");
+    PlayerPrefs.Save();
 
-            SceneManager.LoadScene("Login");
-        });
-    }
+    SceneManager.LoadScene(0);
+}
 }
