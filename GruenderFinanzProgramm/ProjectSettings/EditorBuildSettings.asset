@@ -5,15 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/Login.unity
-    guid: 3524e9242d271eb4ba61baf94dc780c7
-  - enabled: 1
-    path: Assets/Scenes/3-Start-Screens.unity
-    guid: 75aa7b151959ffd4d86d08e4f04f2221
-  - enabled: 1
-    path: Assets/Scenes/Dashboard.unity
-    guid: b40c0059fe7b9c64080d6cf0288d72ea
   - enabled: 1
     path: Assets/Scenes/3-Start-Screens.unity
     guid: 75aa7b151959ffd4d86d08e4f04f2221
@@ -36,17 +27,6 @@ EditorBuildSettings:
     path: Assets/Scenes/KundenDB.unity
     guid: aa7fb2a9d696a60439e616781ef3928f
   - enabled: 1
-<<<<<<< HEAD
-    path: Assets/Scenes/Einstellungen.unity
-    guid: c6a59d10920a5bb428adbaddadf7a697
-  - enabled: 1
-    path: Assets/Scenes/TestSzenen/Rechnungen.unity
-    guid: bbea47063ea281b4f95956ef967899ab
-  - enabled: 1
-    path: Assets/Scenes/Export-Screen.unity
-    guid: 3c55ce4f639aa1e41aff8b76ccd441e2
-=======
     path: Assets/Scenes/Login.unity
     guid: 3524e9242d271eb4ba61baf94dc780c7
->>>>>>> 35fad607c8605ec2dbb5765d2e235bc97cac598c
   m_configObjects: {}
