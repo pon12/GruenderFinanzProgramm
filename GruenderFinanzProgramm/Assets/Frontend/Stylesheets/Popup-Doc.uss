@@ -1,33 +1,23 @@
-/* ==========================================================================
-   POPUP OVERLAY & WINDOW
-   ========================================================================== */
-
-/* Das dunkle Vollbild-Overlay im Hintergrund */
 .popup-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* Schön dunkel abdunkeln */
+    background-color: rgba(0, 0, 0, 0.85);
     align-items: center;
     justify-content: center;
     padding: 40px;
 }
 
-/* Das Hauptfenster */
 .popup-window {
     width: 100%;
     max-width: 850px;
-    background-color: #111111; /* Sattes Schwarz/Anthrazit */
+    background-color: #111111;
     border-radius: 20px;
     padding: 32px;
     flex-direction: column;
 }
-
-/* ==========================================================================
-   HEADER SECTION
-   ========================================================================== */
 
 #Popup-Header {
     flex-direction: row;
@@ -36,7 +26,6 @@
     margin-bottom: 24px;
 }
 
-/* "Zurück"-Button oben rechts */
 #Btn-Back {
     background-color: #242424;
     color: #ffffff;
@@ -47,21 +36,15 @@
     -unity-font-style: bold;
 }
 
-/* ==========================================================================
-   INPUT FIELDS (Eingabe & Dropdown)
-   ========================================================================== */
-
-/* Das Label über den Feldern (z.B. "Dokumentname") */
 .popup-window Label {
     color: #888888;
     font-size: 14px;
     margin-bottom: 6px;
 }
 
-/* Styling für das Text-Eingabefeld UND das Dropdown */
-.popup-window .unity-text-field__input, 
+.popup-window .unity-text-field__input,
 .popup-window .unity-base-field__input {
-    background-color: #383838; /* Dein Figma-Grau! */
+    background-color: #383838;
     color: #ffffff;
     border-radius: 12px;
     border-width: 0;
@@ -70,16 +53,10 @@
     margin-bottom: 24px;
 }
 
-/* Behebt den Unity-Bug, dass Placeholder-Text manchmal schwarz ist */
 .popup-window .unity-text-field__placeholder {
     color: #aaaaaa;
 }
 
-/* ==========================================================================
-   VORLAGEN GRID (Die 3 Kacheln in der Mitte)
-   ========================================================================== */
-
-/* Überschrift "Vorlage wählen" wieder weiß machen */
 #Form-Group-3 > Label {
     color: #ffffff;
     font-size: 18px;
@@ -87,7 +64,6 @@
     margin-bottom: 12px;
 }
 
-/* Der Container für die 3 Buttons */
 #Template-Grid {
     flex-direction: row;
     justify-content: space-between;
@@ -95,7 +71,6 @@
     margin-bottom: 32px;
 }
 
-/* Styling für die 3 Vorlagen-Kacheln */
 #Template-Grid Button {
     flex-grow: 1;
     height: 120px;
@@ -110,20 +85,14 @@
     align-items: center;
 }
 
-/* Hover-Effekt für die Vorlagen */
 #Template-Grid Button:hover {
     background-color: #2e2e2e;
 }
 
-/* Highlight für den aktuell ausgewählten Button (z.B. Standard) */
 #Template-Grid .selected-template {
-    border-color: #80CF95; /* Dein Figma-Grün als Rand! */
+    border-color: #80CF95;
     border-width: 1.5px;
 }
-
-/* ==========================================================================
-   FOOTER BUTTONS (Unten rechts)
-   ========================================================================== */
 
 #Popup-Footer {
     flex-direction: row;
@@ -131,8 +100,8 @@
     gap: 16px;
 }
 
-/* Abbrechen Button */
-#Btn-Cancel {
+#Btn-Cancel,
+#Btn-Abbrechen {
     background-color: #242424;
     color: #ffffff;
     border-radius: 12px;
@@ -142,9 +111,8 @@
     -unity-font-style: bold;
 }
 
-/* Erstellen Button */
 #Btn-Submit {
-    background-color: #80CF95; /* Dein Figma-Grün! */
+    background-color: #80CF95;
     color: #ffffff;
     border-radius: 12px;
     padding: 14px 32px;
@@ -153,6 +121,6 @@
     -unity-font-style: bold;
 }
 
-/* Kleine Hover-Animationen für die Footer-Buttons */
-#Btn-Cancel:hover { background-color: #2e2e2e; }
+#Btn-Cancel:hover,
+#Btn-Abbrechen:hover { background-color: #2e2e2e; }
 #Btn-Submit:hover { background-color: #6bbf81; }

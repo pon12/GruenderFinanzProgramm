@@ -83,3 +83,26 @@
 .btn-export:active {
     background-color: rgb(51, 153, 93);
 }
+
+/* Standard – kein Hintergrundwechsel */
+.row-item {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+    transition-property: border-color;
+    transition-duration: 0.12s;
+}
+
+/* Hover – grüner Rahmen statt Hintergrundwechsel */
+.row-item:hover {
+    border-top-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+    border-left-color: rgb(128, 207, 149);
+    background-color: rgba(0, 0, 0, 0);
+}
