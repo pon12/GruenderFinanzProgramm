@@ -23,6 +23,14 @@ public class Company
     public int legalForm { get; set; }     // Rechtsform (int)
     public int industry { get; set; }      // Branche (int)
     public string location { get; set; }   // Standort
+    public string steuerNr { get; set; }       // Steuernummer 
+    public string gruendungsJahr { get; set; }  // Gründungsjahr 
+    public string handelsReg { get; set; }      // Handelsregisternummer
+    public string strasseuHausNr { get; set; }         // Straße und Hausnummer
+    public string plz { get; set; }         // Postleitzahl 
+    public string ustIdNr { get; set; }         // Umsatzsteuer-Identifikationsnummer
+    
+
     // --- Mapping Listen ---
     public static readonly List<string> LegalForms = new List<string>
     {
@@ -70,4 +78,54 @@ public class ExportEintrag
     public string format { get; set; }
     public string pfad { get; set; }
     public DateTime lastUpdated { get; set; }
+}
+
+public class RechnungFormuSteuern
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; } 
+   public string rechnungsNrPräfix { get; set; }
+   public string startNr { get; set; }
+   public string Tagen { get; set; } 
+   public int waehrung { get; set; }
+   public int dtmFormat { get; set; }
+   public bool ustRechnung { get; set; }
+   public bool autoNummer { get; set; }
+   public string hinweisText { get; set; }
+}
+
+public class Bankverbindung
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public string kontoInhaber { get; set; }
+    public string iban { get; set; }
+    public string bic { get; set; }
+    public string kreditinstitut { get; set; }
+    public bool ibanRechnung { get; set; }
+
+}
+
+public class PDFLayout
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public bool logo { get; set; }
+    public bool seitenzahl { get; set; }
+    public bool exportpfad { get; set; }
+}
+
+public class Steuersatz
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public int steuersatz { get; set; }
+}
+
+public class LayoutDesign
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public int Mode { get; set; }
+    public bool Begleiter { get; set; }
 }

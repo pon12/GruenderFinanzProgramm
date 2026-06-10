@@ -65,14 +65,26 @@ public class SaveTest1 : MonoBehaviour
                 "Firma1",
                 1,
                 1,
-                "Berlin1"
+                "Berlin1",
+                "321123",
+                "1990",
+                "HRB12345",
+                "Musterstraße 1",
+                "12345",
+                "DE123456789"
             );
 
             userDatabase.createCompany(
                 "Firma2",
                 2,
                 2,
-                "Berlin2"
+                "Berlin2",
+                "654321",
+                "2000",
+                "HRB54321",
+                "Musterstraße 2",
+                "54321",
+                "DE987654321"
             );
         }
         else if (userName == "Nutzer2")
@@ -81,14 +93,26 @@ public class SaveTest1 : MonoBehaviour
                 "Firma1-2",
                 1,
                 1,
-                "Berlin1-2"
+                "Berlin1-2",
+                "321123",
+                "1990",
+                "HRB12345", 
+                "Musterstraße 1",
+                "12345",
+                "DE123456789"
             );
 
             userDatabase.createCompany(
                 "Firma2-2",
                 2,
                 2,
-                "Berlin2-2"
+                "Berlin2-2",                
+                "654321",
+                "2000",
+                "HRB54321",
+                "Musterstraße 2",
+                "54321",
+                "DE987654321"
             );
         }
 

@@ -425,10 +425,16 @@ if (_btnResetPasskey != null)
         int    legalForm = _dropdownRechtsform?.index ?? 0;
         string location  = _inputStadt?.value ?? "";
         int    industry  = 3;
+        string steuerNr  = _inputSteuernummer?.value ?? "";
+        string ustIdNr   = _inputUstidnr?.value ?? "";
+        string handelsReg = _inputHandelsreg?.value ?? "";
+        string gruendungsJahr = _inputGruendungsjahr?.value ?? "";
+        string plz = _inputPlz?.value ?? "";
+        string strasseuHausNr = _inputStrasse?.value ?? "";
 
         if (_currentCompany == null)
         {
-            db.createCompany(name, legalForm, industry, location);
+            db.createCompany( name, legalForm, industry, location, steuerNr,gruendungsJahr ,handelsReg , strasseuHausNr , plz , ustIdNr);
             Debug.Log($"[Einstellungen] Neue Firma angelegt: {name}");
             var all = db.getAllCompanies();
             if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
@@ -438,6 +444,13 @@ if (_btnResetPasskey != null)
             _currentCompany.name      = name;
             _currentCompany.legalForm = legalForm;
             _currentCompany.location  = location;
+            _currentCompany.industry  = industry;
+            _currentCompany.steuerNr  = steuerNr;
+            _currentCompany.ustIdNr   = ustIdNr;
+            _currentCompany.handelsReg = handelsReg;
+            _currentCompany.gruendungsJahr = gruendungsJahr;
+            _currentCompany.plz = plz;
+            _currentCompany.strasseuHausNr = strasseuHausNr;
             db.updateCompany(_currentCompany);
             Debug.Log($"[Einstellungen] Firma aktualisiert: {name}");
         }

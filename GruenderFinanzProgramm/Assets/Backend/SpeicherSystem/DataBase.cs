@@ -67,14 +67,20 @@ public List<Company> getAllCompanies()
 {
     return getAll<Company>();
 }
-public int createCompany(string name, int legalForm, int industry, string location)
+public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, string plz, string ustIdNr)
 {
     Company newCompany = new Company
     {
         name = name,
         legalForm = legalForm,
         industry = industry,
-        location = location
+        location = location,
+        steuerNr = steuerNr,
+        gruendungsJahr = gruendungsJahr,    
+        handelsReg = handelsReg,
+        strasseuHausNr = strasseuHausNr,
+        plz = plz,
+        ustIdNr = ustIdNr
     };
     return insert(newCompany);
 }
@@ -105,6 +111,7 @@ public int deleteCompany(int companyId)
     {
         return query<UserDB>("SELECT * FROM UserDB WHERE isLoggedIn = 1");
     }
+
 
     public List<Company> getCompaniesByLegalForm(int legalForm)
     {
@@ -389,4 +396,201 @@ public int deleteUserPDFDocument(int pdfId, int userId)
 }
 
 
+
+// Steuern
+public void setupSteuernTable()
+{
+    createTable<RechnungFormuSteuern>();
 }
+
+public int createRechnungFormuSteuern (string rechnungsNrPräfix, string startNr, string Tagen, int waehrung, int dtmFormat, bool ustRechnung, bool autoNummer, string hinweisText)
+{
+    RechnungFormuSteuern newRFS = new RechnungFormuSteuern
+    {
+        rechnungsNrPräfix = rechnungsNrPräfix,
+        startNr = startNr,
+        Tagen = Tagen,
+        waehrung = waehrung,
+        dtmFormat = dtmFormat,
+        ustRechnung = ustRechnung,
+        autoNummer = autoNummer, 
+        hinweisText = hinweisText
+    };
+    return insert(newRFS);
+}
+
+public List<RechnungFormuSteuern> getAllRechnungFormuSteuern()
+{
+    return getAll<RechnungFormuSteuern>();
+}
+
+public int updateRechnungFormuSteuern(RechnungFormuSteuern rfs)
+{
+    return update(rfs);
+}
+
+public int deleteRechnungFormuSteuern(int id)
+{
+    return delete<RechnungFormuSteuern>(id);
+}
+
+public RechnungFormuSteuern getRechnungFormuSteuernById(int id)
+{
+    return getById<RechnungFormuSteuern>(id);
+}
+
+//Bank
+public void setupBankverbindungTable()
+{
+    createTable<Bankverbindung>();
+}
+
+public int createBankverbindung(string kontoInhaber, string iban, string bic, string kreditinstitut, bool ibanRechnung)
+{
+    Bankverbindung newBankverbindung = new Bankverbindung
+    {
+        kontoInhaber = kontoInhaber,
+        iban = iban,
+        bic = bic,
+        kreditinstitut = kreditinstitut,
+        ibanRechnung = ibanRechnung
+    };
+    return insert(newBankverbindung);
+}
+
+public List<Bankverbindung> getAllBankverbindung()
+{
+    return getAll<Bankverbindung>();
+}
+
+public int updateBankverbindung(Bankverbindung bankverbindung)
+{
+    return update(bankverbindung);
+}
+
+public int deleteBankverbindung(int id)
+{
+    return delete<Bankverbindung>(id);
+}
+
+public Bankverbindung getBankverbindungById(int id)
+{
+    return getById<Bankverbindung>(id);
+}
+
+// PDF und Layout
+public void setupPDFLayoutTable()
+{
+    createTable<PDFLayout>();
+}
+
+public int createPDFLayout(bool logo, bool seitenzahl, bool exportpfad)
+{
+    PDFLayout newPDFLayout = new PDFLayout
+    {
+        logo = logo,
+        seitenzahl = seitenzahl,
+        exportpfad = exportpfad
+    };
+    return insert(newPDFLayout);
+}
+
+public List<PDFLayout> getAllPDFLayout()
+{
+    return getAll<PDFLayout>();
+}
+
+public int updatePDFLayout(PDFLayout pdfLayout)
+{
+    return update(pdfLayout);
+}
+
+public int deletePDFLayout(int id)
+{
+    return delete<PDFLayout>(id);
+}
+
+public PDFLayout getPDFLayoutById(int id)
+{
+    return getById<PDFLayout>(id);
+}
+
+// Steuersatz
+public void setupSteuersatzTable()
+{
+    createTable<Steuersatz>();
+}
+
+public int createSteuersatz(int steuersatz)
+{
+    Steuersatz newSteuersatz = new Steuersatz
+    {
+        steuersatz = steuersatz,
+    };
+    return insert(newSteuersatz);
+}
+
+public List<Steuersatz> getAllSteuersatz()
+{
+    return getAll<Steuersatz>();
+}
+
+public int updateSteuersatz(Steuersatz steuersatz)
+{
+    return update(steuersatz);
+}
+
+public int deleteSteuersatz(int id)
+{
+    return delete<Steuersatz>(id);
+}
+
+public Steuersatz getSteuersatzById(int id)
+{
+    return getById<Steuersatz>(id);
+}
+
+// Layout und Design
+public void setupLayoutDesignTable()
+{
+    createTable<LayoutDesign>();
+}
+
+public void createLayoutDesign(int Mode, bool Begleiter)
+{
+    LayoutDesign newLayoutDesign = new LayoutDesign
+    {
+        Mode = Mode,
+        Begleiter = Begleiter
+    };
+    insert(newLayoutDesign);
+}
+
+public List<LayoutDesign> getAllLayoutDesign()
+{
+    return getAll<LayoutDesign>();
+}
+
+public int updateLayoutDesign(LayoutDesign layoutDesign)
+{
+    return update(layoutDesign);
+}
+
+public int deleteLayoutDesign(int id)
+{
+    return delete<LayoutDesign>(id);
+}
+
+public LayoutDesign getLayoutDesignById(int id)
+{
+    return getById<LayoutDesign>(id);
+}
+
+
+
+
+
+
+
+}
+
