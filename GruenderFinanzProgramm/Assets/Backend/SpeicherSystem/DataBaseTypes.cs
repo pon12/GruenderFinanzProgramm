@@ -64,10 +64,30 @@ public class UserDocument
 public class ExportEintrag
 {
     // Primärschlüssel für SQLite (wie in der Doku gefordert)
-    public int id { get; set; } 
+    public int id { get; set; }
     public string bezeichnung { get; set; }
     public string art { get; set; }
     public string format { get; set; }
     public string pfad { get; set; }
     public DateTime lastUpdated { get; set; }
+}
+
+
+[System.Serializable]
+public class Dauerauftrag
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+
+    public string typ { get; set; }              // "Einnahme" oder "Ausgabe"
+    public float amount { get; set; }
+    public string description { get; set; }
+
+    public string startDatum { get; set; }
+    public string naechstesDatum { get; set; }
+
+    public int intervallTyp { get; set; }        // 1 = monatlich, 2 = jährlich
+    public bool isActive { get; set; }
+
+    public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
 }
