@@ -1,6 +1,3 @@
-// SidebarController.cs
-// Auf UI_Sidebar_Root Prefab
-
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
@@ -27,7 +24,6 @@ public class SidebarController : MonoBehaviour
     private const float WIDTH_COLLAPSED = 80f;
     private const float ANIM_DURATION = 0.2f;
 
-    // PlayerPrefs Keys fuer State-Persistenz
     private const string PREF_COLLAPSED = "sidebar_collapsed";
     private const string PREF_FINANZ_OPEN = "sidebar_finanz_open";
 
@@ -36,28 +32,25 @@ public class SidebarController : MonoBehaviour
     private Button _toggleButton;
     private bool _isCollapsed = false;
 
-    // Finanzboard Dropdown
     private VisualElement _finanzSubmenu;
     private Button _finanzToggleBtn;
     private bool _finanzOpen = false;
 
-    // Nav-Item Name → Scene Name
     private static readonly Dictionary<string, string> NavToScene = new()
-{
-    { "nav-item-dashboard",        "Dashboard"        },
-    { "nav-item-guide",            "Fortschritt"      },
-    { "nav-item-finanz",           "Finanzboard"      },
-    { "nav-item-angebot",          "Angebot"          },
-    { "nav-item-rechnung",         "Rechnung"         },
-    { "nav-item-kunden",           "KundenDB"         },
-    { "nav-item-dienstleistungen", "Dienstleistungen" },
-    { "nav-item-kassenbuch",       "Kassenbuch"       },
-    { "nav-item-export",           "Export-Screen"    },
-    { "nav-item-dokumente",        "Dokument-Screen"  },
-    { "nav-item-einstellungen",    "Einstellungen"    },
-};
+    {
+        { "nav-item-dashboard",        "Dashboard"        },
+        { "nav-item-guide",            "Fortschritt"      },
+        { "nav-item-finanz",           "Finanzboard"      },
+        { "nav-item-angebot",          "Angebot"          },
+        { "nav-item-rechnung",         "Rechnung"         },
+        { "nav-item-kunden",           "KundenDB"         },
+        { "nav-item-dienstleistungen", "Dienstleistungen" },
+        { "nav-item-kassenbuch",       "Kassenbuch"       },
+        { "nav-item-export",           "Export-Screen"    },
+        { "nav-item-dokumente",        "Dokument-Screen"  },
+        { "nav-item-einstellungen",    "Einstellungen"    },
+    };
 
-    // Sub-Items die unter Finanzboard liegen
     private static readonly HashSet<string> FinanzSubItems = new()
     {
         "nav-item-angebot",
@@ -80,35 +73,32 @@ public class SidebarController : MonoBehaviour
         _finanzToggleBtn = _root.Q<Button>("btn-finanz-toggle");
 
         if (_toggleButton != null) _toggleButton.clicked += ToggleSidebar;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
+        if (_finanzToggleBtn != null)
+        _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
 
         RegisterNavigation();
         RegisterLogout();
 
-        // Gespeicherten State wiederherstellen
         RestoreState();
-
-        // Aktives Nav-Item anhand aktueller Scene setzen
         SetActiveNavItem();
     }
 
-   void OnDisable()
-{
-    if (_toggleButton    != null) _toggleButton.clicked    -= ToggleSidebar;
-    if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
-
-    // Nav-Item Callbacks abmelden
-    foreach (var kvp in NavToScene)
+    void OnDisable()
     {
-        var item = _root?.Q<VisualElement>(kvp.Key);
-        if (item != null)
-            item.UnregisterCallback<ClickEvent>(OnNavItemClicked);
-    }
+        if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
+        if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
 
-    var logoutItem = _root?.Q<VisualElement>("nav-item-logout");
-    if (logoutItem != null)
-        logoutItem.UnregisterCallback<ClickEvent>(OnLogoutClicked);
-}
+        foreach (var kvp in NavToScene)
+        {
+            var item = _root?.Q<VisualElement>(kvp.Key);
+            if (item != null)
+                item.UnregisterCallback<ClickEvent>(OnNavItemClicked);
+        }
+
+        var logoutItem = _root?.Q<VisualElement>("nav-item-logout");
+        if (logoutItem != null)
+            logoutItem.UnregisterCallback<ClickEvent>(OnLogoutClicked);
+    }
 
     // ─────────────────────────────────────────────────
     // STATE PERSISTENZ
@@ -116,7 +106,6 @@ public class SidebarController : MonoBehaviour
 
     private void RestoreState()
     {
-        // Sidebar Collapsed/Expanded State
         _isCollapsed = PlayerPrefs.GetInt(PREF_COLLAPSED, 0) == 1;
 
         if (_sidebar != null)
@@ -127,13 +116,12 @@ public class SidebarController : MonoBehaviour
 
         UpdateNavLabelsVisibility();
 
-        // Finanzboard Dropdown State
         _finanzOpen = PlayerPrefs.GetInt(PREF_FINANZ_OPEN, 0) == 1;
 
         if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.text = _finanzOpen ? "▼" : "▶";
+        if (_finanzToggleBtn != null)
+        _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
 
-        // ContentAreaController informieren
         OnToggled?.Invoke(_isCollapsed);
     }
 
@@ -192,16 +180,18 @@ public class SidebarController : MonoBehaviour
     // FINANZBOARD DROPDOWN
     // ─────────────────────────────────────────────────
 
-    private void ToggleFinanzSubmenu()
-    {
-        _finanzOpen = !_finanzOpen;
+   private void ToggleFinanzSubmenu()
+{
+    _finanzOpen = !_finanzOpen;
 
-        if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.text = _finanzOpen ? "▼" : "▶";
+    if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        SaveState();
-    }
+    // Icon rotieren: 0° = zugeklappt, 90° = aufgeklappt
+    if (_finanzToggleBtn != null)
+        _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
 
+    SaveState();
+}
     // ─────────────────────────────────────────────────
     // ACTIVE NAV ITEM HIGHLIGHTING
     // ─────────────────────────────────────────────────
@@ -210,7 +200,6 @@ public class SidebarController : MonoBehaviour
     {
         string currentScene = SceneManager.GetActiveScene().name;
 
-        // Alle Highlights zuruecksetzen
         foreach (var navName in NavToScene.Keys)
         {
             var item = _root.Q<VisualElement>(navName);
@@ -218,7 +207,6 @@ public class SidebarController : MonoBehaviour
                 item.RemoveFromClassList("nav-item--active");
         }
 
-        // Passendes Item highlighten
         foreach (var kvp in NavToScene)
         {
             if (kvp.Value != currentScene) continue;
@@ -227,12 +215,12 @@ public class SidebarController : MonoBehaviour
             if (item != null)
                 item.AddToClassList("nav-item--active");
 
-            // Wenn Sub-Item aktiv → Finanzboard automatisch aufklappen
             if (FinanzSubItems.Contains(kvp.Key) && !_finanzOpen)
             {
                 _finanzOpen = true;
                 if (_finanzSubmenu != null) _finanzSubmenu.style.display = DisplayStyle.Flex;
-                if (_finanzToggleBtn != null) _finanzToggleBtn.text = "▼";
+                if (_finanzToggleBtn != null)
+                _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
             }
 
             break;
@@ -243,78 +231,87 @@ public class SidebarController : MonoBehaviour
     // NAVIGATION
     // ─────────────────────────────────────────────────
 
-private void RegisterNavigation()
-{
-    foreach (var kvp in NavToScene)
+    private void RegisterNavigation()
     {
-        string sceneName = kvp.Value;
-        var item = _root.Q<VisualElement>(kvp.Key);
-        if (item == null)
+        
+        foreach (var kvp in NavToScene)
         {
-            Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
-            continue;
-        }
-
-        item.RegisterCallback<ClickEvent>(evt =>
-        {
-            // Prueft ob Scene in Build Settings vorhanden ist
-            bool sceneExists = false;
-            for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings; i++)
+            string sceneName = kvp.Value;
+            var item = _root.Q<VisualElement>(kvp.Key);
+            if (item == null)
             {
-                string path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
-                if (path.Contains(sceneName))
-                {
-                    sceneExists = true;
-                    break;
-                }
+                Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
+                continue;
             }
 
-            if (sceneExists)
-                SceneManager.LoadScene(sceneName);
-            else
-                Debug.LogWarning($"[Sidebar] Scene '{sceneName}' nicht in Build Settings gefunden.");
-        });
-    }
+          if (kvp.Key == "nav-item-finanz")
+{
+            item.RegisterCallback<ClickEvent>(evt => ToggleFinanzSubmenu());
+             // Button-Klick nicht nach oben weitergeben
+            if (_finanzToggleBtn != null)
+            _finanzToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+            continue;
 }
 
-private void OnNavItemClicked(ClickEvent evt)
-{
-    var item = evt.currentTarget as VisualElement;
-    if (item == null) return;
-
-    foreach (var kvp in NavToScene)
-    {
-        if (kvp.Key == item.name)
-        {
-            SceneManager.LoadScene(kvp.Value);
-            return;
+            item.RegisterCallback<ClickEvent>(evt =>
+            {   
+                bool sceneExists = false;
+                for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+                {
+                    string path = SceneUtility.GetScenePathByBuildIndex(i);
+                    if (path.Contains(sceneName))
+                    {
+                        sceneExists = true;
+                        break;
+                    }
+                }
+                
+                if (sceneExists)
+                    SceneManager.LoadScene(sceneName);
+                else
+                    Debug.LogWarning($"[Sidebar] Scene '{sceneName}' nicht in Build Settings gefunden.");
+            });
         }
     }
-}
+
+    private void OnNavItemClicked(ClickEvent evt)
+    {
+        var item = evt.currentTarget as VisualElement;
+        if (item == null) return;
+
+        foreach (var kvp in NavToScene)
+        {
+            if (kvp.Key == item.name)
+            {
+                SceneManager.LoadScene(kvp.Value);
+                return;
+            }
+        }
+    }
 
     // ─────────────────────────────────────────────────
-    // LOGOUT – BACKEND VERKNUEPFUNG
+    // LOGOUT
     // ─────────────────────────────────────────────────
 
     private void RegisterLogout()
-{
-    var logoutItem = _root.Q<VisualElement>("nav-item-logout");
-    if (logoutItem == null) return;
-    logoutItem.RegisterCallback<ClickEvent>(OnLogoutClicked);
-}
+    {
+        var logoutItem = _root.Q<VisualElement>("nav-item-logout");
+        if (logoutItem == null) return;
+        logoutItem.RegisterCallback<ClickEvent>(OnLogoutClicked);
+    }
 
-private void OnLogoutClicked(ClickEvent evt)
-{
-    var logoutController = FindAnyObjectByType<MainLogoutController>();
-    if (logoutController != null)
-        logoutController.logout();
-    else
-        Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
+    private void OnLogoutClicked(ClickEvent evt)
+    {
+        var logoutController = FindAnyObjectByType<MainLogoutController>();
+        if (logoutController != null)
+            logoutController.logout();
+        else
+            Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
 
-    PlayerPrefs.DeleteKey("sidebar_collapsed");
-    PlayerPrefs.DeleteKey("sidebar_finanz_open");
-    PlayerPrefs.Save();
+        PlayerPrefs.DeleteKey("sidebar_collapsed");
+        PlayerPrefs.DeleteKey("sidebar_finanz_open");
+        PlayerPrefs.Save();
 
-    SceneManager.LoadScene(0);
-}
+        SceneManager.LoadScene(0);
+    }
 }

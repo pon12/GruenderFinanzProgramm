@@ -266,6 +266,7 @@ GameObject:
   m_Component:
   - component: {fileID: 930790892}
   - component: {fileID: 930790891}
+  - component: {fileID: 930790893}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -287,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: d0d1470aa2ac8414f8871286b4894aac, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: faed016d2b5af0e4bb64885a867cb50c, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -311,6 +312,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &930790893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930790890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6e960dea1e74b345b8cc853b126c453, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
+  uiDocument: {fileID: 0}
 --- !u!1001 &1685637598
 PrefabInstance:
   m_ObjectHideFlags: 0
