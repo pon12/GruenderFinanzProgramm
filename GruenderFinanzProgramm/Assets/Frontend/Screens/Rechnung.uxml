@@ -2,95 +2,120 @@
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Angebot.uss?fileID=7433441132597879392&amp;guid=4b488f833bdc4bf43ac3915e80664efc&amp;type=3#Angebot"/>
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
-    <ui:VisualElement name="root-container" class="screen-root" style="flex-direction: row; width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
-        <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 30px 430px; overflow: hidden;">
+    <Style>
+        .unity-base-field__input {
+            background-color: rgb(70, 70, 70);
+            border-top-width: 0;
+            border-right-width: 0;
+            border-bottom-width: 0;
+            border-left-width: 0;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: rgb(255, 255, 255);
+            padding-left: 10px;
+            -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular");
+            -unity-cursor-color: rgb(255, 255, 255);
+        }
+        .unity-base-field__input:focus {
+            border-top-width: 1px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-color: rgb(128, 207, 149);
+            border-right-color: rgb(128, 207, 149);
+            border-bottom-color: rgb(128, 207, 149);
+            border-left-color: rgb(128, 207, 149);
+        }
+        .unity-base-field__label {
+            display: none;
+        }
+        .unity-base-popup-field__input {
+            background-color: rgb(70, 70, 70);
+            border-top-width: 0;
+            border-right-width: 0;
+            border-bottom-width: 0;
+            border-left-width: 0;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: rgb(255, 255, 255);
+            padding-left: 10px;
+            -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular");
+        }
+        .unity-text-field__input {
+            background-color: rgb(70, 70, 70);
+            border-top-width: 0;
+            border-right-width: 0;
+            border-bottom-width: 0;
+            border-left-width: 0;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: rgb(255, 255, 255);
+            padding-left: 10px;
+            padding-top: 8px;
+            -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular");
+        }
+    </Style>
+
+    <ui:VisualElement name="root-container" class="screen-root" style="width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
+        <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0px 430px; overflow: hidden;">
+
             <ui:Label text="Rechnung erstellen" name="page-title" style="font-size: 32px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 24px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+
             <ui:VisualElement name="content-row" style="flex-direction: row; flex: 1; gap: 20px; overflow: hidden;">
+
                 <ui:VisualElement name="col-left" style="flex: 1; flex-direction: column; gap: 16px; overflow: hidden;">
-                    <ui:VisualElement name="card-partner" class="angebot-card" style="flex-direction: row; gap: 20px; padding: 20px 24px;">
+
+                    <ui:VisualElement name="card-partner" class="angebot-card" style="flex-direction: row; gap: 20px; padding: 20px 24px; flex-shrink: 0;">
                         <ui:VisualElement name="partner-left" style="flex: 1; flex-direction: column; gap: 10px;">
                             <ui:Label text="Rechnungspartner" style="font-size: 16px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 4px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                            <ui:Label text="Kunde" style="font-size: 12px; color: rgb(180, 180, 180); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField name="input-kunde" value="Max Mustermann" class="angebot-input" style="width: 100%; height: 36px;"/>
-                            <ui:VisualElement style="flex-direction: row; gap: 10px; margin-top: 4px;">
-                                <ui:VisualElement class="angebot-address-box" style="flex: 1; padding: 12px;">
-                                    <ui:Label text="Rechnung für" style="font-size: 11px; color: rgb(180, 180, 180); margin-bottom: 4px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="Max Mustermann" style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="000067 Vodel-Str." style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="10115 Berlin" style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                            <ui:Label text="Kunde" style="font-size: 12px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-kundensuche" style="width: 100%;"/>
+                            <ui:VisualElement style="flex-direction: row; gap: 12px; margin-top: 4px;">
+                                <ui:VisualElement name="adresse-box-rechnung" class="angebot-address-box" style="flex: 1;">
+                                    <ui:Label text="Rechnung für" style="font-size: 13px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 6px;"/>
+                                    <ui:Label text="Noch kein Kunde ausgewählt" style="font-size: 12px; color: rgb(200, 200, 200); white-space: normal;"/>
                                 </ui:VisualElement>
-                                <ui:VisualElement class="angebot-address-box" style="flex: 1; padding: 12px;">
-                                    <ui:Label text="Versenden an" style="font-size: 11px; color: rgb(128, 207, 149); margin-bottom: 4px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="Michael Voß" style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="Musterweg 10" style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                    <ui:Label text="10115 Berlin" style="font-size: 13px; color: rgb(220, 220, 220); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                                <ui:VisualElement name="adresse-box-versand" class="angebot-address-box" style="flex: 1;">
+                                    <ui:Label text="Versenden an" style="font-size: 13px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 6px;"/>
+                                    <ui:Label text="Noch kein Kunde ausgewählt" style="font-size: 12px; color: rgb(200, 200, 200); white-space: normal;"/>
                                 </ui:VisualElement>
                             </ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:VisualElement name="partner-right" style="flex: 1; flex-direction: column; gap: 4px; padding-top: 28px; margin-left: 18px;">
-                            <ui:Label text="Ventoriq" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                            <ui:Label text="Michael Voß" style="font-size: 13px; color: rgb(200, 200, 200); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:Label text="000067 Vodel-Str." style="font-size: 13px; color: rgb(200, 200, 200); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:Label text="10115 Berlin" style="font-size: 13px; color: rgb(200, 200, 200); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:Label text="wirkaufendeinauto@gmail.com" style="font-size: 13px; color: rgb(200, 200, 200); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:VisualElement name="partner-right" style="width: 220px; flex-shrink: 0; flex-direction: column; gap: 4px;">
+                            <ui:Label name="label-absender" text="" style="font-size: 13px; color: rgb(200, 200, 200); white-space: normal;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+
                     <ui:VisualElement name="card-positionen" class="angebot-card" style="flex: 1; flex-direction: column; padding: 20px 24px; overflow: hidden;">
-                        <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                            <ui:VisualElement style="flex-direction: row; align-items: center; gap: 8px;">
-                                <ui:Label text="Positionen" style="font-size: 16px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                                <ui:Button name="btn-position-hinzufuegen" text="+" style="width: 22px; height: 22px; background-color: rgb(128, 207, 149); border-top-left-radius: 11px; border-top-right-radius: 11px; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; color: rgb(30, 30, 30); font-size: 16px; -unity-font-style: bold; padding: 0;"/>
-                            </ui:VisualElement>
+                        <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
+                            <ui:Label text="Positionen" style="font-size: 16px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-right: 10px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                            <ui:Button name="btn-position-hinzufuegen" text="+" style="width: 24px; height: 24px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 16px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="tabelle-header" class="angebot-table-header">
-                            <ui:Label text="Artikel" class="angebot-col-artikel" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
-                            <ui:Label text="Beschreibung" class="angebot-col-beschreibung" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
-                            <ui:Label text="Menge" class="angebot-col-menge" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
-                            <ui:Label text="Einheit" class="angebot-col-einheit" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
-                            <ui:Label text="Preis (EUR)" class="angebot-col-preis" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
-                            <ui:Label text="Gesamt (EUR)" class="angebot-col-gesamt" style="font-size: 13px; -unity-font-style: bold; color: rgb(220, 220, 220);"/>
+
+                        <ui:VisualElement name="positionen-header" style="flex-direction: row; align-items: center; padding-top: 6px; padding-bottom: 6px; padding-left: 18px; padding-right: 8px; border-bottom-width: 1px; border-bottom-color: rgb(70, 70, 70); margin-bottom: 4px;">
+                         <ui:Label text="Artikel" style="flex-grow: 1; min-width: 120px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                         <ui:Label text="Beschreibung" style="width: 228px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                         <ui:Label text="Menge" style="width: 78px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                         <ui:Label text="Einheit" style="width: 118px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                         <ui:Label text="Preis (EUR)" style="width: 118px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                         <ui:Label text="Gesamt (EUR)" style="width: 110px; font-size: 12px; color: rgb(180, 180, 180);"/>
+                        <ui:VisualElement style="width: 34px; flex-shrink: 0;"/>
                         </ui:VisualElement>
-                        <ui:ScrollView name="positionen-liste" style="flex: 1; background-color: rgba(0, 0, 0, 0);">
-                            <ui:VisualElement name="position-row-0" class="angebot-position-row">
-                                <ui:VisualElement class="angebot-col-artikel" style="flex-direction: row; align-items: center; gap: 6px;">
-                                    <ui:VisualElement style="width: 10px; height: 10px; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; background-color: rgb(128, 207, 149); flex-shrink: 0;"/>
-                                    <ui:Label name="label-artikel-0" text="Webdesign" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                </ui:VisualElement>
-                                <ui:Label name="label-beschreibung-0" text="Erstellung der Unternehmenswebsite" class="angebot-col-beschreibung" style="font-size: 12px; color: rgb(160, 160, 160);"/>
-                                <ui:Label name="label-menge-0" text="1" class="angebot-col-menge" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-einheit-0" text="Pauschal" class="angebot-col-einheit" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-preis-0" text="2500,00 EUR" class="angebot-col-preis" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-gesamt-0" text="2500,00 EUR" class="angebot-col-gesamt" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                            </ui:VisualElement>
-                            <ui:VisualElement name="position-row-1" class="angebot-position-row">
-                                <ui:VisualElement class="angebot-col-artikel" style="flex-direction: row; align-items: center; gap: 6px;">
-                                    <ui:VisualElement style="width: 10px; height: 10px; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; background-color: rgb(128, 207, 149); flex-shrink: 0;"/>
-                                    <ui:Label name="label-artikel-1" text="Wartung" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                </ui:VisualElement>
-                                <ui:Label name="label-beschreibung-1" text="Monatliche Wartung und Support" class="angebot-col-beschreibung" style="font-size: 12px; color: rgb(160, 160, 160);"/>
-                                <ui:Label name="label-menge-1" text="12" class="angebot-col-menge" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-einheit-1" text="Monate" class="angebot-col-einheit" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-preis-1" text="150,00 EUR" class="angebot-col-preis" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-gesamt-1" text="1800,00 EUR" class="angebot-col-gesamt" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                            </ui:VisualElement>
-                            <ui:VisualElement name="position-row-2" class="angebot-position-row">
-                                <ui:VisualElement class="angebot-col-artikel" style="flex-direction: row; align-items: center; gap: 6px;">
-                                    <ui:VisualElement style="width: 10px; height: 10px; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; background-color: rgb(128, 207, 149); flex-shrink: 0;"/>
-                                    <ui:Label name="label-artikel-2" text="Software-Lizenz" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                </ui:VisualElement>
-                                <ui:Label name="label-beschreibung-2" text="Jahreslizenz für die Projektsoftware" class="angebot-col-beschreibung" style="font-size: 12px; color: rgb(160, 160, 160);"/>
-                                <ui:Label name="label-menge-2" text="1" class="angebot-col-menge" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-einheit-2" text="Pauschal" class="angebot-col-einheit" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-preis-2" text="50,00 EUR" class="angebot-col-preis" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                                <ui:Label name="label-gesamt-2" text="50,00 EUR" class="angebot-col-gesamt" style="font-size: 13px; color: rgb(220, 220, 220);"/>
-                            </ui:VisualElement>
-                        </ui:ScrollView>
+                        
+                        <ui:ScrollView name="positionen-liste" style="flex: 1; margin-top: 4px;"/>
+
                         <ui:VisualElement name="summen-bereich" style="border-top-width: 1px; border-top-color: rgb(70, 70, 70); padding-top: 12px; margin-top: 8px; gap: 6px;">
                             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
-                                <ui:Label text="Netto Gesamt (EUR)" style="font-size: 13px; color: rgb(180, 180, 180); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:Label name="label-netto" text="4.350,00 EUR" style="font-size: 13px; color: rgb(128, 207, 149); -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                                <ui:Label text="Netto Gesamt (EUR)" style="font-size: 13px; color: rgb(180, 180, 180);"/>
+                                <ui:Label name="label-netto" text="0,00 EUR" style="font-size: 13px; color: rgb(128, 207, 149); -unity-font-style: bold;"/>
                             </ui:VisualElement>
-                            <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
+                            <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
                                 <ui:Label text="Rabatt" style="font-size: 13px; color: rgb(180, 180, 180);"/>
                                 <ui:Label name="label-rabatt" text="0,00 EUR" style="font-size: 13px; color: rgb(220, 220, 220);"/>
                             </ui:VisualElement>
@@ -100,75 +125,88 @@
                             </ui:VisualElement>
                             <ui:VisualElement style="flex-direction: row; justify-content: space-between; border-top-width: 1px; border-top-color: rgb(128, 207, 149); padding-top: 8px; margin-top: 4px;">
                                 <ui:Label text="Kosten Gesamt (EUR)" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                                <ui:Label name="label-gesamt-total" text="4.350,00 EUR" style="font-size: 14px; -unity-font-style: bold; color: rgb(128, 207, 149); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                                <ui:Label name="label-gesamt-total" text="0,00 EUR" style="font-size: 14px; -unity-font-style: bold; color: rgb(128, 207, 149); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
+
                 </ui:VisualElement>
-                <ui:VisualElement name="col-right" style="width: 300px; flex-shrink: 0; flex-direction: column; gap: 16px;">
-                    <ui:VisualElement name="card-grunddaten" class="angebot-card" style="flex-direction: column; padding: 20px 24px; gap: 14px;">
+
+                <ui:VisualElement name="col-right" style="width: 300px; flex-shrink: 0; flex-direction: column; gap: 16px; overflow: hidden;">
+
+                    <ui:VisualElement name="card-grunddaten" class="angebot-card" style="flex-direction: column; padding: 20px 24px; gap: 12px;">
                         <ui:Label text="Grunddaten &amp; Status" style="font-size: 15px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                         <ui:VisualElement style="flex-direction: row; gap: 10px;">
                             <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Rechnungsnummer" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:TextField name="input-rechnungsnummer" value="" class="angebot-input" style="height: 36px;"/>
+                                <ui:Label text="Rechnungsnummer" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:TextField name="input-nummer" style="width: 100%;"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Status" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:DropdownField name="dropdown-status" choices="Entwurf,Versendet,Bezahlt,Storniert" index="0" class="angebot-dropdown" style="height: 36px;"/>
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-                        <ui:VisualElement style="flex-direction: row; gap: 10px;">
-                            <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Datum" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:TextField name="input-datum" value="06.03.2026" class="angebot-input" style="height: 36px;"/>
-                            </ui:VisualElement>
-                            <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Währung" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:DropdownField name="dropdown-waehrung" choices="EUR,USD,CHF" index="0" class="angebot-dropdown" style="height: 36px;"/>
+                                <ui:Label text="Status" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:DropdownField name="dropdown-status" style="width: 100%;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: row; gap: 10px;">
                             <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Fällig am" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:TextField name="input-faellig-am" value="" class="angebot-input" style="height: 36px;"/>
+                                <ui:Label text="Datum" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:TextField name="input-datum" style="width: 100%;"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
-                                <ui:Label text="Referenz #" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                                <ui:TextField name="input-referenz" value="" class="angebot-input" style="height: 36px;"/>
+                                <ui:Label text="Währung" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:DropdownField name="dropdown-waehrung" style="width: 100%;"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex-direction: row; gap: 10px;">
+                            <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
+                                <ui:Label text="Fällig bis" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:TextField name="input-frist" style="width: 100%;"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
+                                <ui:Label text="Referenz #" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                                <ui:TextField name="input-referenz" style="width: 100%;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="card-details" class="angebot-card" style="flex-direction: column; padding: 20px 24px; gap: 14px; flex: 1;">
+
+                    <ui:VisualElement name="card-details" class="angebot-card" style="flex: 1; flex-direction: column; padding: 20px 24px; gap: 12px; overflow: hidden;">
                         <ui:Label text="Details &amp; Notizen" style="font-size: 15px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
-                            <ui:Label text="Tags" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField name="input-tags" value="" class="angebot-input" style="height: 36px;"/>
+                            <ui:Label text="Tags" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-tags" style="width: 100%;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
-                            <ui:Label text="Mitarbeiter" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:DropdownField name="dropdown-mitarbeiter" choices="Michael Voß,Max Krause" index="0" class="angebot-dropdown" style="height: 36px;"/>
+                            <ui:Label text="Mitarbeiter" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-mitarbeiter" style="width: 100%;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
-                            <ui:Label text="Rabatt-Typ" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:DropdownField name="dropdown-rabatt-typ" choices="Kein Rabatt,Prozentuell,Fest" index="0" class="angebot-dropdown" style="height: 36px;"/>
+                            <ui:Label text="Rabatt-Typ" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:DropdownField name="dropdown-rabatt-typ" style="width: 100%;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement style="flex-direction: column; gap: 4px; flex: 1;">
-                            <ui:Label text="Notiz" style="font-size: 11px; color: rgb(160, 160, 160); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField name="input-notiz" multiline="true" class="angebot-input" style="flex: 1; min-height: 80px; white-space: normal;"/>
+                        <ui:VisualElement style="flex-direction: column; gap: 4px;">
+                            <ui:Label text="Rabatt (Wert)" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-rabatt-wert" style="width: 100%;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex-direction: column; gap: 4px;">
+                            <ui:Label text="Sonstige Kosten" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-sonstige-kosten" style="width: 100%;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement style="flex: 1; flex-direction: column; gap: 4px;">
+                            <ui:Label text="Notiz" style="font-size: 11px; color: rgb(180, 180, 180);"/>
+                            <ui:TextField name="input-notizen" multiline="true" style="flex: 1; width: 100%;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+
                 </ui:VisualElement>
+
             </ui:VisualElement>
-            <ui:VisualElement name="action-bar" style="flex-direction: row; justify-content: space-between; align-items: center; padding-top: 16px; gap: 12px;">
-                <ui:VisualElement style="flex-direction: row; gap: 12px;">
-                    <ui:Button name="btn-bezahlt" text="Bezahlt" class="angebot-btn-secondary"/>
-                    <ui:Button name="btn-storniert" text="Storniert" class="angebot-btn-danger"/>
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; gap: 12px;">
-                    <ui:Button name="btn-speichern" text="Speichern" class="angebot-btn-primary"/>
-                </ui:VisualElement>
+
+            <ui:VisualElement name="action-bar" style="flex-direction: row; align-items: center; padding-top: 14px; padding-bottom: 14px; border-top-width: 1px; border-top-color: rgb(60, 60, 60); margin-top: 8px; gap: 12px;">
+                <ui:Button name="btn-angenommen" text="Angenommen" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
+                <ui:Button name="btn-abgelehnt" text="Abgelehnt" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
+                <ui:VisualElement style="flex: 1;"/>
+                <ui:Button name="btn-speichern" text="Speichern" style="height: 40px; padding-left: 24px; padding-right: 24px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
             </ui:VisualElement>
+
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
