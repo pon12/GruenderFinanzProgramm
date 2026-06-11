@@ -6,3 +6,4 @@ public class RechnungController : BelegScreenController
     protected override string NummernPrefix => "RE";
     protected override List<string> StatusOptionen => new List<string> { "Entwurf", "Versendet", "Angenommen", "Abgelehnt" };
 }
+

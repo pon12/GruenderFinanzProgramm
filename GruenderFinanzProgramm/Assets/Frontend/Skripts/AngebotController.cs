@@ -13,4 +13,5 @@ public class AngebotController : BelegScreenController
         umwandeln?.RegisterCallback<ClickEvent>(_ =>
             FeedbackPopup.Show(Root, "Angebot in Rechnung umgewandelt", FeedbackTyp.Erfolg));
     }
+
 }

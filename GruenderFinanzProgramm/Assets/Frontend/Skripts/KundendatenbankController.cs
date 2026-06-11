@@ -216,6 +216,7 @@ public class KundendatenbankController : MonoBehaviour
 
             zielContainer.Add(neueKarte);
         }
+
     }
 
     private void SpeichereNeuenKunden()
