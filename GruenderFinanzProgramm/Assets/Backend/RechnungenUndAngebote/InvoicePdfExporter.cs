@@ -17,8 +17,8 @@ public static class InvoicePdfExporter
         string folderPath = Path.Combine(
             Application.persistentDataPath,
             "PDFs",
-            "Rechnungen",
-            "User" + userId
+            StateManager.Instance.getCurrentUser().username,
+            "Rechnungen"
         );
 
         Directory.CreateDirectory(folderPath);
@@ -300,7 +300,8 @@ public static class InvoicePdfExporter
                 PDFStorage.RegisterExistingPDF(
                     filePath,
                     userId,
-                    db
+                    db,
+                    "Rechnungen"
                 );
 
             Application.OpenURL("file://" + filePath);
