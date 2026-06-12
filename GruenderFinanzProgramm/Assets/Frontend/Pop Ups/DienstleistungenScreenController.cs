@@ -56,11 +56,13 @@ public class DienstleistungenScreenController : MonoBehaviour
             gridContainer.Add(karte);
         }
 
-        // Plus-Button
+       // Plus-Button
         var plus = new Button(() => OeffnePopup(-1));
         plus.AddToClassList("cards");
         plus.AddToClassList("add-card");
-        plus.Add(new Label("+") { classList = { "add-card-label" } });
+        var plusLabel = new Label("+");
+        plusLabel.AddToClassList("add-card-label");
+        plus.Add(plusLabel);
         gridContainer.Add(plus);
     }
 

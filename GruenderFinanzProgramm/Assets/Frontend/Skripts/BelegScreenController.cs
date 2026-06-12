@@ -97,15 +97,16 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void LeereDemoInhalte()
-    {
-        _positionenListe?.Clear();
-        Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
+{
+    _zeilen.Clear(); // WICHTIG
 
-        var boxen = Root.Query(className: "angebot-address-box").ToList();
-        if (boxen.Count > 0) SetzeAdresse(boxen[0], "Rechnung für", "Noch kein Kunde ausgewählt");
-        if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", "Noch kein Kunde ausgewählt");
-    }
+    _positionenListe?.Clear();
+    Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
 
+    var boxen = Root.Query(className: "angebot-address-box").ToList();
+    if (boxen.Count > 0) SetzeAdresse(boxen[0], "Rechnung für", "Noch kein Kunde ausgewählt");
+    if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", "Noch kein Kunde ausgewählt");
+}
     private void SetzeAdresse(VisualElement box, string ueberschrift, string inhalt)
     {
         box.Clear();
@@ -525,8 +526,7 @@ public abstract class BelegScreenController : MonoBehaviour
         if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", adresse);
     }
 
-   
-    private void SpeichernGeklickt()
+private void SpeichernGeklickt()
 {
     try
     {
@@ -540,6 +540,10 @@ public abstract class BelegScreenController : MonoBehaviour
 
         float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
         float gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
+
+        PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
+        string rawUserId = currentUser.userId.Replace("user_", "");
+        int userId = int.Parse(rawUserId);
 
         if (BelegTyp == "Angebot")
         {
@@ -574,13 +578,8 @@ public abstract class BelegScreenController : MonoBehaviour
                 db.createOfferItem(item);
             }
 
-            List<OfferItem> gespeicherteItems = db.getItemsByOffer(offerId);
-
-            PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
-            string rawUserId = currentUser.userId.Replace("user_", "");
-            int userId = int.Parse(rawUserId);
-
-            OfferPdfExporter.ExportOfferToPdf(offer, gespeicherteItems, userId, db);
+            List<OfferItem> items = db.getItemsByOffer(offerId);
+            OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
 
             Debug.Log("[Angebot] Gespeichert mit ID: " + offerId);
         }
@@ -618,18 +617,18 @@ public abstract class BelegScreenController : MonoBehaviour
                 db.createInvoiceItem(item);
             }
 
-            List<InvoiceItem> gespeicherteItems = db.getItemsByInvoice(invoiceId);
-
-            PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
-            string rawUserId = currentUser.userId.Replace("user_", "");
-            int userId = int.Parse(rawUserId);
-
-            InvoicePdfExporter.ExportInvoiceToPdf(invoice, gespeicherteItems, userId, db);
+            List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
+            InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
 
             Debug.Log("[Rechnung] Gespeichert mit ID: " + invoiceId);
         }
 
-        FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+                _zeilen.Clear();
+                _positionenListe?.Clear();
+                FuegePositionHinzu();
+                BerechneSummen();
+
+                FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
     }
     catch (Exception e)
     {

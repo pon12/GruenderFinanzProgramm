@@ -24,72 +24,52 @@ public class AngebotController : BelegScreenController
 
         if (umwandeln == null)
         {
-            Debug.LogWarning("[Angebot] Button 'Angebot in Rechnung umwandeln' nicht gefunden.");
+            Debug.LogWarning("[Angebot] Umwandeln-Button nicht gefunden.");
             return;
         }
 
-        umwandeln.RegisterCallback<ClickEvent>(_ =>
+        umwandeln.RegisterCallback<ClickEvent>(_ => WandleLetztesAngebotInRechnungUm());
+    }
+
+    private void WandleLetztesAngebotInRechnungUm()
+    {
+        try
         {
-            try
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
+            if (db == null)
             {
-                DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
-                if (db == null)
-                {
-                    FeedbackPopup.Show(
-                        Root,
-                        "Keine Datenbank gefunden",
-                        FeedbackTyp.Fehler
-                    );
-
-                    return;
-                }
-
-                List<Offer> offers = db.getAllOffers();
-
-                if (offers == null || offers.Count == 0)
-                {
-                    FeedbackPopup.Show(
-                        Root,
-                        "Kein Angebot gefunden",
-                        FeedbackTyp.Fehler
-                    );
-
-                    return;
-                }
-
-                Offer letztesOffer = offers[offers.Count - 1];
-
-                List<OfferItem> items =
-                    db.getItemsByOffer(letztesOffer.id);
-
-                bool success =
-                    OfferInvoiceService.ConvertOfferToInvoice(
-                        letztesOffer,
-                        items,
-                        db
-                    );
-
-                FeedbackPopup.Show(
-                    Root,
-                    success
-                        ? "Angebot in Rechnung umgewandelt"
-                        : "Umwandlung fehlgeschlagen",
-                    success
-                        ? FeedbackTyp.Erfolg
-                        : FeedbackTyp.Fehler
-                );
+                FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
+                return;
             }
-            catch (System.Exception e)
+
+            List<Offer> offers = db.getAllOffers();
+
+            if (offers == null || offers.Count == 0)
             {
-                Debug.LogError("[Angebot] Fehler bei Umwandlung: " + e);
-
-                FeedbackPopup.Show(
-                    Root,
-                    "Fehler bei Umwandlung",
-                    FeedbackTyp.Fehler
-                );
+                FeedbackPopup.Show(Root, "Kein Angebot gefunden", FeedbackTyp.Fehler);
+                return;
             }
-        });
+
+            Offer offer = offers[offers.Count - 1];
+            List<OfferItem> items = db.getItemsByOffer(offer.id);
+
+            bool success = OfferInvoiceService.ConvertOfferToInvoice(
+                offer,
+                items,
+                db
+            );
+
+            FeedbackPopup.Show(
+                Root,
+                success ? "Angebot in Rechnung umgewandelt" : "Umwandlung fehlgeschlagen",
+                success ? FeedbackTyp.Erfolg : FeedbackTyp.Fehler
+            );
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[Angebot] Fehler bei Umwandlung: " + e);
+            FeedbackPopup.Show(Root, "Fehler bei Umwandlung", FeedbackTyp.Fehler);
+        }
     }
 }
