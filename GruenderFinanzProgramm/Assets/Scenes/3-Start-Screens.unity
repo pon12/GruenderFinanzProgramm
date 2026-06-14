@@ -243,7 +243,7 @@ MonoBehaviour:
   loginErrorText: {fileID: 0}
   registerErrorText: {fileID: 0}
   recoveryErrorText: {fileID: 0}
-  mainSceneName: Einstellungen
+  mainSceneName: Dashboard
 --- !u!114 &610038138
 MonoBehaviour:
   m_ObjectHideFlags: 0
