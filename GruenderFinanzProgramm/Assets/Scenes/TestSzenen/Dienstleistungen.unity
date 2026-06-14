@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 403081504}
-  - component: {fileID: 403081503}
   - component: {fileID: 403081505}
   m_Layer: 0
   m_Name: UIManager
@@ -137,20 +136,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &403081503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 403081502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c360dbb3195ba54480f06fd1a686233, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DienstleistungenScreenController
-  uiDocument: {fileID: 1337845830}
-  popupAsset: {fileID: 9197481963319205126, guid: 52152559c5e588e469cd684c7233b44d, type: 3}
 --- !u!4 &403081504
 Transform:
   m_ObjectHideFlags: 0
@@ -178,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e960dea1e74b345b8cc853b126c453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
-  uiDocument: {fileID: 1337845830}
+  uiDocument: {fileID: 1422022047}
 --- !u!1 &618747638
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,7 +346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: c65d2f9e071cdfa40a46195ea67429e0, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 894374fdb5d0d424e9c5ac8245e24da4, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -394,11 +379,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1337845829}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c360dbb3195ba54480f06fd1a686233, type: 3}
+  m_Script: {fileID: 11500000, guid: 1828ee66a6ce80748853cd2f4a8378e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DienstleistungenScreenController
   uiDocument: {fileID: 1337845830}
-  popupAsset: {fileID: 9197481963319205126, guid: 52152559c5e588e469cd684c7233b44d, type: 3}
+  popupAsset: {fileID: 9197481963319205126, guid: bd16387a3bf2d8b4d965e7477b80fbad, type: 3}
+--- !u!114 &1422022047 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 701228406103257917, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+  m_PrefabInstance: {fileID: 1840644442}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
 --- !u!1001 &1840644442
 PrefabInstance:
   m_ObjectHideFlags: 0
