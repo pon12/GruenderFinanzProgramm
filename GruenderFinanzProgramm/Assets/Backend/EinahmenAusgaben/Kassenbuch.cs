@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using SQLite4Unity3d;
+using SQLite;
 
 public class Kassenbuch
 {
