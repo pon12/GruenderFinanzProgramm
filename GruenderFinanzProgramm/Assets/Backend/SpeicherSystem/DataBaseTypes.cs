@@ -80,52 +80,26 @@ public class ExportEintrag
     public DateTime lastUpdated { get; set; }
 }
 
-public class RechnungFormuSteuern
+public class Settings
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; } 
    public string rechnungsNrPräfix { get; set; }
    public string startNr { get; set; }
-   public string Tagen { get; set; } 
+   public string zahlungsziel { get; set; } 
    public int waehrung { get; set; }
    public int dtmFormat { get; set; }
    public bool ustRechnung { get; set; }
    public bool autoNummer { get; set; }
-   public string hinweisText { get; set; }
-}
-
-public class Bankverbindung
-{
-    [PrimaryKey, AutoIncrement]
-    public int id { get; set; }
+   public string zahlungshinweis { get; set; }
     public string kontoInhaber { get; set; }
     public string iban { get; set; }
     public string bic { get; set; }
     public string kreditinstitut { get; set; }
     public bool ibanRechnung { get; set; }
-
-}
-
-public class PDFLayout
-{
-    [PrimaryKey, AutoIncrement]
-    public int id { get; set; }
     public bool logo { get; set; }
     public bool seitenzahl { get; set; }
     public bool exportpfad { get; set; }
-}
-
-public class Steuersatz
-{
-    [PrimaryKey, AutoIncrement]
-    public int id { get; set; }
     public int steuersatz { get; set; }
-}
-
-public class LayoutDesign
-{
-    [PrimaryKey, AutoIncrement]
-    public int id { get; set; }
-    public int Mode { get; set; }
     public bool Begleiter { get; set; }
 }

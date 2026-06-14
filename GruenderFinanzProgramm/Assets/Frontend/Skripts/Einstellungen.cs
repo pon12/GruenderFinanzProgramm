@@ -117,6 +117,7 @@ public class EinstellungenController : MonoBehaviour
     // Aktuelle Firma aus Backend
     private Company _currentCompany = null;
 
+    private Settings _currentSettings = null;
     // Rechtsform Magic Numbers laut Dokumentation
     // 0=GmbH, 1=KG, 2=AG, 3=OHG, 4=GbR, 5=UG, 6=Einzelunternehmen, 7=GmbH & Co. KG, 8=eG
     private readonly List<string> _rechtsformOptions = new List<string>
@@ -412,7 +413,9 @@ if (_btnResetPasskey != null)
     private void SaveSettings()
     {
         SaveCompanyData();
+        SaveSettingsDB();
         SaveLocalSettings();
+        
         Debug.Log("[Einstellungen] Alle Einstellungen gespeichert.");
     }
 
@@ -456,6 +459,64 @@ if (_btnResetPasskey != null)
         }
     }
 
+    private void SaveSettingsDB()
+    {
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
+
+        string rechnungsNrPräfix = _inputRechnrPraefix?.value ?? "";
+        string startNr = _inputStartnummer?.value ?? "";
+        string zahlungsziel = _inputZahlungsziel?.value ?? "";
+        int waehrung = _dropdownWaehrung?.index ?? 0;
+        int dtmFormat = _dropdownDatumsformat?.index ?? 0;
+        bool ustRechnung = _toggleUstRechnung?.value ?? false;
+        bool autoNummer = _toggleAutoNummer?.value ?? false;
+        string zahlungshinweis = _inputZahlungshinweis?.value ?? "";
+        string kontoInhaber = _inputKontoinhaber?.value ?? "";
+        string iban = _inputIban?.value ?? "";
+        string bic = _inputBic?.value ?? "";
+        string kreditinstitut = _inputKreditinstitut?.value ?? "";
+        bool ibanRechnung = _toggleIbanRechnung?.value ?? false;
+        bool logo = _toggleLogo?.value ?? false;
+        bool seitenzahl = _toggleSeitenzahl?.value ?? false;
+        bool exportpfad = _toggleExportpfad?.value ?? false;
+        int steuersatz = _selectedSteuersatz;
+        bool begleiter = _toggleBegleiter?.value ?? false;
+
+        if (_currentSettings == null)
+        {
+        db.createSettings(rechnungsNrPräfix, startNr, zahlungsziel, waehrung, dtmFormat, ustRechnung, autoNummer, 
+        zahlungshinweis, kontoInhaber, iban, bic, kreditinstitut, ibanRechnung, logo, seitenzahl, exportpfad, steuersatz, begleiter);
+        Debug.Log($"[Einstellungen] Einstellungen aktualisiert.");
+
+        var all = db.getAllSettings();
+        if (all != null && all.Count > 0) _currentSettings = all[all.Count - 1];
+        }
+        else
+        {
+            _currentSettings.rechnungsNrPräfix = rechnungsNrPräfix;
+            _currentSettings.startNr = startNr;
+            _currentSettings.zahlungsziel = zahlungsziel;
+            _currentSettings.waehrung = waehrung;
+            _currentSettings.dtmFormat = dtmFormat;
+            _currentSettings.ustRechnung = ustRechnung;
+            _currentSettings.autoNummer = autoNummer;
+            _currentSettings.zahlungshinweis = zahlungshinweis;
+            _currentSettings.kontoInhaber = kontoInhaber;
+            _currentSettings.iban = iban;
+            _currentSettings.bic = bic;
+            _currentSettings.kreditinstitut = kreditinstitut;
+            _currentSettings.ibanRechnung = ibanRechnung;
+            _currentSettings.logo = logo;
+            _currentSettings.seitenzahl = seitenzahl;
+            _currentSettings.exportpfad = exportpfad;
+            _currentSettings.steuersatz = steuersatz;
+            _currentSettings.Begleiter = begleiter;
+            db.updateSettings(_currentSettings);
+            Debug.Log($"[Einstellungen] Einstellungen aktualisiert.");
+        }
+    }
+    
     private void SaveLocalSettings()
     {
         SaveField(PREF_RECHNR_PRAEFIX,  _inputRechnrPraefix);
@@ -548,7 +609,7 @@ if (_btnResetPasskey != null)
             Debug.LogWarning("[Einstellungen] popup-new-passkey nicht gefunden – in UXML pruefen.");
     }
 
-    // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════w
     // LOKALPROFIL LOESCHEN
     // ═══════════════════════════════════════════════════════════
 

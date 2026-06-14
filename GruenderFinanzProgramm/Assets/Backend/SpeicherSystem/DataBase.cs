@@ -15,6 +15,7 @@ public class DataBase : DatabaseManager
         createTable<UserPDFDocument>();
         createTable<Ausgaben>();
         createTable<Einkommen>();
+        createTable<Settings>();
     }
 
     public void setupAuthDB()
@@ -396,201 +397,50 @@ public int deleteUserPDFDocument(int pdfId, int userId)
 }
 
 
+// Settings
 
-// Steuern
-public void setupSteuernTable()
+public int createSettings(string rechnungsNrPräfix, string startNr, string zahlungsziel, int waehrung, int dtmFormat,  
+bool ustRechnung, bool autoNummer, string zahlungshinweis, string kontoInhaber, string iban, string bic, string kreditinstitut, 
+bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter )
 {
-    createTable<RechnungFormuSteuern>();
-}
-
-public int createRechnungFormuSteuern (string rechnungsNrPräfix, string startNr, string Tagen, int waehrung, int dtmFormat, bool ustRechnung, bool autoNummer, string hinweisText)
-{
-    RechnungFormuSteuern newRFS = new RechnungFormuSteuern
+    Settings newSettings = new Settings
     {
         rechnungsNrPräfix = rechnungsNrPräfix,
         startNr = startNr,
-        Tagen = Tagen,
+        zahlungsziel = zahlungsziel,
         waehrung = waehrung,
         dtmFormat = dtmFormat,
         ustRechnung = ustRechnung,
-        autoNummer = autoNummer, 
-        hinweisText = hinweisText
-    };
-    return insert(newRFS);
-}
-
-public List<RechnungFormuSteuern> getAllRechnungFormuSteuern()
-{
-    return getAll<RechnungFormuSteuern>();
-}
-
-public int updateRechnungFormuSteuern(RechnungFormuSteuern rfs)
-{
-    return update(rfs);
-}
-
-public int deleteRechnungFormuSteuern(int id)
-{
-    return delete<RechnungFormuSteuern>(id);
-}
-
-public RechnungFormuSteuern getRechnungFormuSteuernById(int id)
-{
-    return getById<RechnungFormuSteuern>(id);
-}
-
-//Bank
-public void setupBankverbindungTable()
-{
-    createTable<Bankverbindung>();
-}
-
-public int createBankverbindung(string kontoInhaber, string iban, string bic, string kreditinstitut, bool ibanRechnung)
-{
-    Bankverbindung newBankverbindung = new Bankverbindung
-    {
+        autoNummer = autoNummer,
+        zahlungshinweis = zahlungshinweis,
         kontoInhaber = kontoInhaber,
         iban = iban,
         bic = bic,
         kreditinstitut = kreditinstitut,
-        ibanRechnung = ibanRechnung
-    };
-    return insert(newBankverbindung);
-}
-
-public List<Bankverbindung> getAllBankverbindung()
-{
-    return getAll<Bankverbindung>();
-}
-
-public int updateBankverbindung(Bankverbindung bankverbindung)
-{
-    return update(bankverbindung);
-}
-
-public int deleteBankverbindung(int id)
-{
-    return delete<Bankverbindung>(id);
-}
-
-public Bankverbindung getBankverbindungById(int id)
-{
-    return getById<Bankverbindung>(id);
-}
-
-// PDF und Layout
-public void setupPDFLayoutTable()
-{
-    createTable<PDFLayout>();
-}
-
-public int createPDFLayout(bool logo, bool seitenzahl, bool exportpfad)
-{
-    PDFLayout newPDFLayout = new PDFLayout
-    {
+        ibanRechnung = ibanRechnung,
         logo = logo,
         seitenzahl = seitenzahl,
-        exportpfad = exportpfad
-    };
-    return insert(newPDFLayout);
-}
-
-public List<PDFLayout> getAllPDFLayout()
-{
-    return getAll<PDFLayout>();
-}
-
-public int updatePDFLayout(PDFLayout pdfLayout)
-{
-    return update(pdfLayout);
-}
-
-public int deletePDFLayout(int id)
-{
-    return delete<PDFLayout>(id);
-}
-
-public PDFLayout getPDFLayoutById(int id)
-{
-    return getById<PDFLayout>(id);
-}
-
-// Steuersatz
-public void setupSteuersatzTable()
-{
-    createTable<Steuersatz>();
-}
-
-public int createSteuersatz(int steuersatz)
-{
-    Steuersatz newSteuersatz = new Steuersatz
-    {
+        exportpfad = exportpfad,
         steuersatz = steuersatz,
-    };
-    return insert(newSteuersatz);
-}
-
-public List<Steuersatz> getAllSteuersatz()
-{
-    return getAll<Steuersatz>();
-}
-
-public int updateSteuersatz(Steuersatz steuersatz)
-{
-    return update(steuersatz);
-}
-
-public int deleteSteuersatz(int id)
-{
-    return delete<Steuersatz>(id);
-}
-
-public Steuersatz getSteuersatzById(int id)
-{
-    return getById<Steuersatz>(id);
-}
-
-// Layout und Design
-public void setupLayoutDesignTable()
-{
-    createTable<LayoutDesign>();
-}
-
-public void createLayoutDesign(int Mode, bool Begleiter)
-{
-    LayoutDesign newLayoutDesign = new LayoutDesign
-    {
-        Mode = Mode,
         Begleiter = Begleiter
     };
-    insert(newLayoutDesign);
+    return insert(newSettings);
 }
 
-public List<LayoutDesign> getAllLayoutDesign()
+public List<Settings> getAllSettings()
 {
-    return getAll<LayoutDesign>();
+    return getAll<Settings>();
 }
 
-public int updateLayoutDesign(LayoutDesign layoutDesign)
+public int deleteSettings(int id)
 {
-    return update(layoutDesign);
+    return delete<Settings>(id);
 }
 
-public int deleteLayoutDesign(int id)
+public int updateSettings(Settings settings)
 {
-    return delete<LayoutDesign>(id);
+    return update(settings);
 }
-
-public LayoutDesign getLayoutDesignById(int id)
-{
-    return getById<LayoutDesign>(id);
-}
-
-
-
-
-
-
 
 }
 
