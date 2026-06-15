@@ -7,15 +7,12 @@ public class DienstleistungenScreenController : MonoBehaviour
     [SerializeField] private UIDocument uiDocument;
     [SerializeField] private VisualTreeAsset popupAsset;
 
-    // ── Daten ──────────────────────────────────────────────
-    private List<DienstleistungData> daten = new List<DienstleistungData>();
+    private List<Service> daten = new List<Service>();
 
-    // ── UI Referenzen ──────────────────────────────────────
     private ScrollView tabelleBody;
     private VisualElement popupOverlay;
     private int editIndex = -1;
 
-    // ──────────────────────────────────────────────────────
     private void OnEnable()
     {
         var root = uiDocument.rootVisualElement;
@@ -32,36 +29,33 @@ public class DienstleistungenScreenController : MonoBehaviour
         TabelleAktualisieren();
     }
 
-    // ── Beispieldaten ──────────────────────────────────────
     private void BeispieldatenLaden()
     {
         if (daten.Count > 0) return;
-        daten.Add(new DienstleistungData("Beratung",       "Professionelle Unternehmensberatung", "Festpreis",   "500€"));
-        daten.Add(new DienstleistungData("Webdesign",      "Modernes und responsives Webdesign",  "Stundensatz", "80€"));
-        daten.Add(new DienstleistungData("Programmierung", "Individuelle Softwareentwicklung",    "Festpreis",   "120€"));
-        daten.Add(new DienstleistungData("Logo",           "Kreative Logogestaltung",             "Pauschal",    "300€"));
-        daten.Add(new DienstleistungData("Lizenskey",      "Softwarelizenzen & Aktivierungskeys", "Festpreis",   "50€"));
+        daten.Add(new Service { name = "Beratung",       description = "Professionelle Unternehmensberatung", priceModel = "Festpreis",   price = 500.0 });
+        daten.Add(new Service { name = "Webdesign",      description = "Modernes und responsives Webdesign",  priceModel = "Stundensatz", price = 80.0  });
+        daten.Add(new Service { name = "Programmierung", description = "Individuelle Softwareentwicklung",    priceModel = "Festpreis",   price = 120.0 });
+        daten.Add(new Service { name = "Logo",           description = "Kreative Logogestaltung",             priceModel = "Pauschal",    price = 300.0 });
+        daten.Add(new Service { name = "Lizenskey",      description = "Softwarelizenzen & Aktivierungskeys", priceModel = "Festpreis",   price = 50.0  });
     }
 
-    // ── Tabelle aufbauen ───────────────────────────────────
     private void TabelleAktualisieren()
     {
         tabelleBody.Clear();
 
         for (int i = 0; i < daten.Count; i++)
         {
-            int index = i; // Closure-Fix
+            int index = i;
             var d = daten[i];
 
             var zeile = new VisualElement();
             zeile.AddToClassList("tabelle-zeile");
 
-            zeile.Add(Zelle(d.Titel,       "col-titel"));
-            zeile.Add(Zelle(d.Beschreibung,"col-beschreibung"));
-            zeile.Add(Zelle(d.Preismodell, "col-preismodell"));
-            zeile.Add(Zelle(d.Betrag,      "col-betrag"));
+            zeile.Add(Zelle(d.name,                         "col-titel"));
+            zeile.Add(Zelle(d.description,                  "col-beschreibung"));
+            zeile.Add(Zelle(d.priceModel,                   "col-preismodell"));
+            zeile.Add(Zelle(d.price.ToString("F2") + " €", "col-betrag"));
 
-            // Aktionen
             var aktionen = new VisualElement();
             aktionen.AddToClassList("col-aktionen");
 
@@ -82,7 +76,6 @@ public class DienstleistungenScreenController : MonoBehaviour
         }
     }
 
-    // Hilfsmethode: eine Tabellenzelle erstellen
     private VisualElement Zelle(string text, string spaltenKlasse)
     {
         var label = new Label(text);
@@ -91,7 +84,6 @@ public class DienstleistungenScreenController : MonoBehaviour
         return label;
     }
 
-    // ── Popup ──────────────────────────────────────────────
     private void OeffnePopup(int index)
     {
         editIndex = index;
@@ -99,21 +91,29 @@ public class DienstleistungenScreenController : MonoBehaviour
 
         var popup = popupAsset.Instantiate();
 
-        var d = index >= 0 ? daten[index] : new DienstleistungData("", "", "Festpreis", "");
+        var d = index >= 0 ? daten[index] : new Service { name = "", description = "", priceModel = "Festpreis", price = 0.0 };
 
-        popup.Q<TextField>("feld-titel").value          = d.Titel;
-        popup.Q<TextField>("feld-beschreibung").value   = d.Beschreibung;
-        popup.Q<DropdownField>("feld-preismodell").value = d.Preismodell;
-        popup.Q<TextField>("feld-betrag").value         = d.Betrag;
+        popup.Q<TextField>("feld-titel").value              = d.name;
+        popup.Q<TextField>("feld-beschreibung").value       = d.description;
+        popup.Q<DropdownField>("feld-preismodell").value    = d.priceModel;
+        popup.Q<TextField>("feld-betrag").value             = d.price.ToString("F2");
 
         popup.Q<Button>("btn-fertig").clicked += () =>
         {
-            var neu = new DienstleistungData(
-                popup.Q<TextField>("feld-titel").value,
-                popup.Q<TextField>("feld-beschreibung").value,
-                popup.Q<DropdownField>("feld-preismodell").value,
-                popup.Q<TextField>("feld-betrag").value
+            double.TryParse(
+                popup.Q<TextField>("feld-betrag").value,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out double betrag
             );
+
+            var neu = new Service
+            {
+                name        = popup.Q<TextField>("feld-titel").value,
+                description = popup.Q<TextField>("feld-beschreibung").value,
+                priceModel  = popup.Q<DropdownField>("feld-preismodell").value,
+                price       = betrag
+            };
 
             if (editIndex >= 0) daten[editIndex] = neu;
             else                daten.Add(neu);
@@ -131,23 +131,5 @@ public class DienstleistungenScreenController : MonoBehaviour
         popupOverlay.style.display = DisplayStyle.None;
         popupOverlay.Clear();
         editIndex = -1;
-    }
-}
-
-// ── Datenklasse ────────────────────────────────────────────
-[System.Serializable]
-public class DienstleistungData
-{
-    public string Titel;
-    public string Beschreibung;
-    public string Preismodell;
-    public string Betrag;
-
-    public DienstleistungData(string titel, string beschreibung, string preismodell, string betrag)
-    {
-        Titel        = titel;
-        Beschreibung = beschreibung;
-        Preismodell  = preismodell;
-        Betrag       = betrag;
     }
 }
