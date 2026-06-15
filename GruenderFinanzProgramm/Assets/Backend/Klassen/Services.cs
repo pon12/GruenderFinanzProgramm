@@ -11,5 +11,5 @@ public class Service
     public string description { get; set; }
     public double price { get; set; }
 
-    public DateTime lastUpdated { get; set; } = DateTime.Now;
+    public string priceModel {get; set; }
 }

@@ -183,7 +183,6 @@ public int deleteCompany(int companyId)
 
     public int createService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -199,7 +198,6 @@ public int deleteCompany(int companyId)
 
     public int updateService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return update(service);
     }
 
