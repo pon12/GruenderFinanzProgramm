@@ -71,6 +71,18 @@ public abstract class BelegScreenController : MonoBehaviour
     RegistriereKundensuche();
     FuegePositionHinzu();
     BerechneSummen();
+
+    try
+    {
+        var db2 = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db2 != null)
+        {
+            AppEventManager.AngeboteAnzahlGeaendert(db2.getAllOffers()?.Count ?? 0);
+            AppEventManager.RechnungenAnzahlGeaendert(db2.getAllInvoices()?.Count ?? 0);
+        }
+    }
+    catch { }
+
 }
 
     private void SammleElemente()
@@ -555,6 +567,12 @@ public abstract class BelegScreenController : MonoBehaviour
                 : DateTime.Now.ToString("dd.MM.yyyy");
 
             db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum);
+
+            // NEU: Dashboard informieren
+            var alleAngebote  = db.getAllOffers();
+            var alleRechnungen = db.getAllInvoices();
+            AppEventManager.AngeboteAnzahlGeaendert(alleAngebote?.Count ?? 0);
+            AppEventManager.RechnungenAnzahlGeaendert(alleRechnungen?.Count ?? 0);
         }
         catch (Exception e)
         {

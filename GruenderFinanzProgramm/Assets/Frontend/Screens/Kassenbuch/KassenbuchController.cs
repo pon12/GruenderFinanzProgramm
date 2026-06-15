@@ -128,6 +128,29 @@ public void createList()
         ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
         : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
 
+      // Jahresumsatz + Monatswerte für Dashboard berechnen
+    {
+        var heute = System.DateTime.Today;
+        float umsatzJahr = 0f;
+        float[] monate   = new float[12];
+
+        var einkommenListe = db.getAllEinkommenEntries();
+        if (einkommenListe != null)
+        {
+            foreach (var e in einkommenListe)
+            {
+                if (System.DateTime.TryParse(e.Datum, out System.DateTime datum)
+                    && datum.Year == heute.Year)
+                {
+                    umsatzJahr           += e.Amount;
+                    monate[datum.Month - 1] += e.Amount;
+                }
+            }
+        }
+
+        AppEventManager.KassenbuchGeaendert(umsatzJahr, differenz, monate);
+    }
+    
     tableInput.Clear();
 
     if (outputTemplate == null) { Debug.LogError("outputTemplate is null!"); return; }
