@@ -3,16 +3,16 @@
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Dienstleistungen.uss?fileID=7433441132597879392&amp;guid=01fec56cd8896774fab0da40d32297db&amp;type=3#Dienstleistungen"/>
     <ui:VisualElement name="root" style="width: 1920px; height: 1080px; flex-direction: column; background-color: rgb(44, 44, 44);">
-        <ui:VisualElement name="main-content" style="flex-grow: 1; flex-direction: column; padding-left: 430px; padding-right: 46px; padding-top: 40px; padding-bottom: 40px;">
+        <ui:VisualElement name="main-content" style="flex-grow: 1; flex-direction: column; padding-left: 430px; padding-right: 40px; padding-top: 40px; padding-bottom: 40px;">
             <ui:Label text="Dienstleistungen" class="page-title"/>
             <ui:Button name="btn-neu" text="+ Neue Dienstleistung" class="add-btn"/>
             <ui:VisualElement name="tabelle-wrapper" class="tabelle-wrapper">
                 <ui:VisualElement name="tabelle-header" class="tabelle-header">
                     <ui:Label text="Name" class="tabelle-header-zelle col-titel"/>
-                    <ui:Label text="Beschreibung" class="tabelle-header-zelle col-beschreibung"/>
+                    <ui:Label text="Beschreibung" class="tabelle-header-zelle col-beschreibung" style="-unity-text-align: middle-center;"/>
                     <ui:Label text="Preismodell" class="tabelle-header-zelle col-preismodell" style="-unity-text-align: middle-center;"/>
                     <ui:Label text="Betrag" class="tabelle-header-zelle col-betrag" style="-unity-text-align: middle-center;"/>
-                    <ui:Label text="Aktionen" class="tabelle-header-zelle col-aktionen" style="-unity-text-align: middle-center;"/>
+                    <ui:Label text="Aktionen" class="tabelle-header-zelle col-aktionen" style="-unity-text-align: middle-center; display: none;"/>
                 </ui:VisualElement>
                 <ui:ScrollView name="tabelle-body" style="flex-grow: 1;"/>
             </ui:VisualElement>
