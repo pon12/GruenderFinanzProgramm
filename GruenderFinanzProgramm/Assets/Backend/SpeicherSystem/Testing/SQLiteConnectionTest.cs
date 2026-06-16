@@ -1,5 +1,5 @@
 using UnityEngine;
-using SQLite4Unity3d;
+using SQLite;
 using System.IO;
 
 public class SQLiteConnectionTest : MonoBehaviour

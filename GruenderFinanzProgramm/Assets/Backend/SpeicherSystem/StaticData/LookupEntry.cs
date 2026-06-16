@@ -1,4 +1,4 @@
-using SQLite4Unity3d;
+using SQLite;
 [System.Serializable]
 public class LookupEntry
 {

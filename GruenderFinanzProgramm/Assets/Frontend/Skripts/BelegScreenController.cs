@@ -109,15 +109,16 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void LeereDemoInhalte()
-    {
-        _positionenListe?.Clear();
-        Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
+{
+    _zeilen.Clear(); // WICHTIG
 
-        var boxen = Root.Query(className: "angebot-address-box").ToList();
-        if (boxen.Count > 0) SetzeAdresse(boxen[0], "Rechnung für", "Noch kein Kunde ausgewählt");
-        if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", "Noch kein Kunde ausgewählt");
-    }
+    _positionenListe?.Clear();
+    Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
 
+    var boxen = Root.Query(className: "angebot-address-box").ToList();
+    if (boxen.Count > 0) SetzeAdresse(boxen[0], "Rechnung für", "Noch kein Kunde ausgewählt");
+    if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", "Noch kein Kunde ausgewählt");
+}
     private void SetzeAdresse(VisualElement box, string ueberschrift, string inhalt)
     {
         box.Clear();
@@ -537,11 +538,116 @@ public abstract class BelegScreenController : MonoBehaviour
         if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", adresse);
     }
 
-    private void SpeichernGeklickt()
+private void SpeichernGeklickt()
+{
+    try
     {
-        FeedbackPopup.Show(Root, "Einträge gespeichert", FeedbackTyp.Erfolg);
-    }
+        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
 
+        if (db == null)
+        {
+            FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
+            return;
+        }
+
+        float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+        float gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
+
+        PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
+        string rawUserId = currentUser.userId.Replace("user_", "");
+        int userId = int.Parse(rawUserId);
+
+        if (BelegTyp == "Angebot")
+        {
+            Offer offer = new Offer
+            {
+                companyId = 1,
+                customerId = 0,
+                offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                subtotal = netto,
+                tax = 0,
+                total = gesamt,
+                notes = "",
+                bookedToCashbook = false,
+                cashbookEntryId = 0,
+                bookingDate = ""
+            };
+
+            int offerId = db.createOffer(offer);
+
+            foreach (var zeile in _zeilen)
+            {
+                OfferItem item = new OfferItem
+                {
+                    offerId = offerId,
+                    description = zeile.Beschreibung != null ? zeile.Beschreibung.value : "",
+                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.value : "0")
+                };
+
+                db.createOfferItem(item);
+            }
+
+            List<OfferItem> items = db.getItemsByOffer(offerId);
+            OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
+
+            Debug.Log("[Angebot] Gespeichert mit ID: " + offerId);
+        }
+        else if (BelegTyp == "Rechnung")
+        {
+            Invoice invoice = new Invoice
+            {
+                companyId = 1,
+                customerId = 0,
+                invoiceNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                dueDate = _fristFeld != null ? _fristFeld.value : "",
+                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                subtotal = netto,
+                tax = 0,
+                total = gesamt,
+                notes = "",
+                bookedToCashbook = false,
+                cashbookEntryId = 0,
+                bookingDate = ""
+            };
+
+            int invoiceId = db.createInvoice(invoice);
+
+            foreach (var zeile in _zeilen)
+            {
+                InvoiceItem item = new InvoiceItem
+                {
+                    invoiceId = invoiceId,
+                    description = zeile.Beschreibung != null ? zeile.Beschreibung.value : "",
+                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.value : "0")
+                };
+
+                db.createInvoiceItem(item);
+            }
+
+            List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
+            InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
+
+            Debug.Log("[Rechnung] Gespeichert mit ID: " + invoiceId);
+        }
+
+                _zeilen.Clear();
+                _positionenListe?.Clear();
+                FuegePositionHinzu();
+                BerechneSummen();
+
+                FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+    }
+    catch (Exception e)
+    {
+        Debug.LogError("[" + BelegTyp + "] Speicherfehler: " + e);
+        FeedbackPopup.Show(Root, "Speichern fehlgeschlagen", FeedbackTyp.Fehler);
+    }
+}
     private void StatusGeklickt(bool angenommen)
     {
         string neuerStatus = angenommen ? "Angenommen" : "Abgelehnt";

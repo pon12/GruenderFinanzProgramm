@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using SQLite4Unity3d;
+using SQLite;
 using System.IO;
 using System;
 using UnityEditor;
