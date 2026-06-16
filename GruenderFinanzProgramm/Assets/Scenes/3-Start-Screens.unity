@@ -524,7 +524,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LoginFlowController
   uiDocument: {fileID: 0}
   passKeyAuthController: {fileID: 610038137}
-  DASHBOARD_SCENE: Einstellungen
+  DASHBOARD_SCENE: Dashboard
 --- !u!1001 &1253357239
 PrefabInstance:
   m_ObjectHideFlags: 0
