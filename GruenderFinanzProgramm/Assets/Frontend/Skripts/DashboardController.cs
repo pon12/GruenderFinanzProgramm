@@ -15,6 +15,9 @@ public class DashboardController : MonoBehaviour
     private int              _currentMonth;
     private LineChartElement _chart;
 
+    // Deadlines: Key = "yyyy-MM-dd", Value = Liste von Beschreibungen für diesen Tag
+    private Dictionary<string, List<string>> _deadlines = new Dictionary<string, List<string>>();
+
     private readonly string[] _monthNames =
     {
         "Januar","Februar","März","April","Mai","Juni",
@@ -36,6 +39,8 @@ public class DashboardController : MonoBehaviour
 
         // Beim Start einmalig direkt aus DB laden (Fallback)
         LadeInitialDaten();
+        LadeDeadlines();
+        RenderKalender(); // Kalender neu zeichnen damit Deadline-Marker sichtbar sind
 
         // Ab jetzt auf Events hören
         AppEventManager.OnKundenAnzahlGeaendert    += OnKunden;
@@ -67,24 +72,15 @@ public class DashboardController : MonoBehaviour
             SetLabel("lbl-kunden",    (db.getAllCustomers()?.Count ?? 0).ToString());
             SetLabel("lbl-angebote",  (db.getAllOffers()?.Count    ?? 0).ToString());
             SetLabel("lbl-rechnungen",(db.getAllInvoices()?.Count  ?? 0).ToString());
-            SetLabel("lbl-kontostand","€" + db.getDifferenz().ToString("N0"));
 
-            // Kassenbuch-Umsatz Jahr + Chart
+            // Kontostand: Vorzeichen + Leerzeichen + Farbe (rot bei Minus, grün bei Plus)
+            float kontostand = db.getDifferenz();
+            SetKontostand(kontostand);
+
+            // Kassenbuch-Jahresauswertung: BILANZ pro Monat (Einkommen - Ausgaben)
             float umsatzJahr = 0f;
-            float[] monate   = new float[12];
-            var eintraege = db.getAllEinkommenEntries();
-            if (eintraege != null)
-            {
-                foreach (var e in eintraege)
-                {
-                    if (DateTime.TryParse(e.Datum, out DateTime d) && d.Year == DateTime.Today.Year)
-                    {
-                        umsatzJahr += e.Amount;
-                        monate[d.Month - 1] += e.Amount;
-                    }
-                }
-            }
-            SetLabel("lbl-kassenbuch", "€" + umsatzJahr.ToString("N0"));
+            float[] monate   = BerechneMonatsBilanz(db, DateTime.Today.Year, out umsatzJahr);
+            SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
             _chart?.SetValues(monate);
         }
         catch (Exception e)
@@ -94,21 +90,96 @@ public class DashboardController : MonoBehaviour
     }
 
     // ============================================================
+    // KONTOSTAND  – Farbe + Vorzeichen
+    // ============================================================
+    void SetKontostand(float wert)
+    {
+        var lbl = _root.Q<Label>("lbl-kontostand");
+        if (lbl == null) return;
+
+        string vorzeichen = wert < 0 ? "- " : "";
+        float betragAbs   = Mathf.Abs(wert);
+        lbl.text = "€ " + vorzeichen + betragAbs.ToString("N0");
+
+        lbl.RemoveFromClassList("stat-value-green");
+        lbl.RemoveFromClassList("stat-value-red");
+        lbl.AddToClassList(wert < 0 ? "stat-value-red" : "stat-value-green");
+    }
+
+    // ============================================================
+    // MONATS-BILANZ  – Einkommen minus Ausgaben, pro Monat, für 1 Jahr
+    // ============================================================
+    static readonly string[] DatumFormate =
+        { "dd.MM.yyyy","d.M.yyyy","dd.M.yyyy","d.MM.yyyy","yyyy-MM-dd","yyyy/MM/dd" };
+
+    bool TryParseDatum(string text, out DateTime ergebnis)
+    {
+        var inv  = System.Globalization.CultureInfo.InvariantCulture;
+        var deDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+        var none = System.Globalization.DateTimeStyles.None;
+
+        return DateTime.TryParseExact(text, DatumFormate, inv, none, out ergebnis)
+            || DateTime.TryParse(text, deDe, none, out ergebnis);
+    }
+
+    float[] BerechneMonatsBilanz(DataBase db, int jahr, out float summeJahr)
+    {
+        float[] bilanzProMonat = new float[12];
+        summeJahr = 0f;
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+        {
+            foreach (var e in einkommen)
+            {
+                if (TryParseDatum(e.Datum, out DateTime d) && d.Year == jahr)
+                {
+                    bilanzProMonat[d.Month - 1] += e.Amount;
+                    summeJahr += e.Amount;
+                }
+            }
+        }
+
+        var ausgaben = db.getAllAusgabenEntries();
+        if (ausgaben != null)
+        {
+            foreach (var a in ausgaben)
+            {
+                if (TryParseDatum(a.Datum, out DateTime d) && d.Year == jahr)
+                {
+                    bilanzProMonat[d.Month - 1] -= a.Amount;
+                    summeJahr -= a.Amount;
+                }
+            }
+        }
+
+        return bilanzProMonat;
+    }
+
+    // ============================================================
     // EVENT-HANDLER  – werden von anderen Screens gefeuert
     // ============================================================
     void OnKunden(int anzahl)
         => SetLabel("lbl-kunden", anzahl.ToString());
 
     void OnAngebote(int anzahl)
-        => SetLabel("lbl-angebote", anzahl.ToString());
+    {
+        SetLabel("lbl-angebote", anzahl.ToString());
+        LadeDeadlines();
+        RenderKalender();
+    }
 
     void OnRechnungen(int anzahl)
-        => SetLabel("lbl-rechnungen", anzahl.ToString());
+    {
+        SetLabel("lbl-rechnungen", anzahl.ToString());
+        LadeDeadlines();
+        RenderKalender();
+    }
 
     void OnKassenbuch(float umsatzJahr, float kontostand, float[] monate)
     {
-        SetLabel("lbl-kassenbuch", "€" + umsatzJahr.ToString("N0"));
-        SetLabel("lbl-kontostand", "€" + kontostand.ToString("N0"));
+        SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
+        SetKontostand(kontostand);
         if (monate != null && monate.Length == 12)
             _chart?.SetValues(monate);
     }
@@ -194,6 +265,63 @@ public class DashboardController : MonoBehaviour
         RenderKalender();
     }
 
+    // ============================================================
+    // DEADLINES  – aus Angeboten (date + 14 Tage) und Rechnungen (dueDate)
+    // ============================================================
+    private const int ANGEBOT_GUELTIGKEIT_TAGE = 14;
+
+    void LadeDeadlines()
+    {
+        _deadlines.Clear();
+
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) return;
+
+            // --- Angebote: Gültig bis = Erstellungsdatum + 14 Tage ---
+            var angebote = db.getAllOffers();
+            if (angebote != null)
+            {
+                foreach (var a in angebote)
+                {
+                    if (TryParseDatum(a.date, out DateTime erstellt))
+                    {
+                        DateTime gueltigBis = erstellt.AddDays(ANGEBOT_GUELTIGKEIT_TAGE);
+                        string key = gueltigBis.ToString("yyyy-MM-dd");
+
+                        if (!_deadlines.ContainsKey(key))
+                            _deadlines[key] = new List<string>();
+
+                        _deadlines[key].Add($"Angebot {a.offerNumber} gültig bis");
+                    }
+                }
+            }
+
+            // --- Rechnungen: Fälligkeitsdatum direkt aus dueDate ---
+            var rechnungen = db.getAllInvoices();
+            if (rechnungen != null)
+            {
+                foreach (var r in rechnungen)
+                {
+                    if (TryParseDatum(r.dueDate, out DateTime faellig))
+                    {
+                        string key = faellig.ToString("yyyy-MM-dd");
+
+                        if (!_deadlines.ContainsKey(key))
+                            _deadlines[key] = new List<string>();
+
+                        _deadlines[key].Add($"Rechnung {r.invoiceNumber} fällig");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[Dashboard] Deadlines laden: " + e.Message);
+        }
+    }
+
     void RenderKalender()
     {
         var today          = DateTime.Today;
@@ -211,6 +339,8 @@ public class DashboardController : MonoBehaviour
 
             btn.RemoveFromClassList("cal-day-today");
             btn.RemoveFromClassList("cal-day-other-month");
+            btn.RemoveFromClassList("cal-day-deadline");
+            btn.tooltip = "";
 
             int tag; bool anderMonat;
             if      (i < startWochentag)
@@ -222,9 +352,24 @@ public class DashboardController : MonoBehaviour
 
             btn.text = tag.ToString();
             if (anderMonat)
+            {
                 btn.AddToClassList("cal-day-other-month");
-            else if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
-                btn.AddToClassList("cal-day-today");
+            }
+            else
+            {
+                if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
+                    btn.AddToClassList("cal-day-today");
+
+                // Deadline-Check für diesen Tag (nur im aktuellen Monat)
+                var tagDatum = new DateTime(_currentYear, _currentMonth, tag);
+                string key = tagDatum.ToString("yyyy-MM-dd");
+
+                if (_deadlines.TryGetValue(key, out var eintraege))
+                {
+                    btn.AddToClassList("cal-day-deadline");
+                    btn.tooltip = string.Join("\n", eintraege);
+                }
+            }
         }
     }
 

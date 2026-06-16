@@ -133,21 +133,28 @@ public void createList()
         var heute = System.DateTime.Today;
         float umsatzJahr = 0f;
         float[] monate   = new float[12];
-
+ 
+        string[] formate = { "dd.MM.yyyy","d.M.yyyy","dd.M.yyyy","d.MM.yyyy","yyyy-MM-dd","yyyy/MM/dd" };
+        var inv  = System.Globalization.CultureInfo.InvariantCulture;
+        var deDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+        var none = System.Globalization.DateTimeStyles.None;
+ 
+        bool TryParse(string text, out System.DateTime erg)
+            => System.DateTime.TryParseExact(text, formate, inv, none, out erg)
+            || System.DateTime.TryParse(text, deDe, none, out erg);
+ 
         var einkommenListe = db.getAllEinkommenEntries();
         if (einkommenListe != null)
-        {
             foreach (var e in einkommenListe)
-            {
-                if (System.DateTime.TryParse(e.Datum, out System.DateTime datum)
-                    && datum.Year == heute.Year)
-                {
-                    umsatzJahr           += e.Amount;
-                    monate[datum.Month - 1] += e.Amount;
-                }
-            }
-        }
-
+                if (TryParse(e.Datum, out var d) && d.Year == heute.Year)
+                { umsatzJahr += e.Amount; monate[d.Month - 1] += e.Amount; }
+ 
+        var ausgabenListe = db.getAllAusgabenEntries();
+        if (ausgabenListe != null)
+            foreach (var a in ausgabenListe)
+                if (TryParse(a.Datum, out var d) && d.Year == heute.Year)
+                { umsatzJahr -= a.Amount; monate[d.Month - 1] -= a.Amount; }
+ 
         AppEventManager.KassenbuchGeaendert(umsatzJahr, differenz, monate);
     }
     
