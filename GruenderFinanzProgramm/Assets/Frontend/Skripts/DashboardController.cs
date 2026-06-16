@@ -128,11 +128,14 @@ public class DashboardController : MonoBehaviour
         summeJahr = 0f;
 
         var einkommen = db.getAllEinkommenEntries();
+        Debug.Log($"[DEBUG-Dashboard] Einkommen-Einträge gefunden: {einkommen?.Count ?? -1}");
         if (einkommen != null)
         {
             foreach (var e in einkommen)
             {
-                if (TryParseDatum(e.Datum, out DateTime d) && d.Year == jahr)
+                bool ok = TryParseDatum(e.Datum, out DateTime d);
+                Debug.Log($"[DEBUG-Dashboard] Einkommen Datum='{e.Datum}' Amount={e.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} JahrMatch={(ok && d.Year == jahr)}");
+                if (ok && d.Year == jahr)
                 {
                     bilanzProMonat[d.Month - 1] += e.Amount;
                     summeJahr += e.Amount;
@@ -141,17 +144,22 @@ public class DashboardController : MonoBehaviour
         }
 
         var ausgaben = db.getAllAusgabenEntries();
+        Debug.Log($"[DEBUG-Dashboard] Ausgaben-Einträge gefunden: {ausgaben?.Count ?? -1}");
         if (ausgaben != null)
         {
             foreach (var a in ausgaben)
             {
-                if (TryParseDatum(a.Datum, out DateTime d) && d.Year == jahr)
+                bool ok = TryParseDatum(a.Datum, out DateTime d);
+                Debug.Log($"[DEBUG-Dashboard] Ausgabe Datum='{a.Datum}' Amount={a.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} JahrMatch={(ok && d.Year == jahr)}");
+                if (ok && d.Year == jahr)
                 {
                     bilanzProMonat[d.Month - 1] -= a.Amount;
                     summeJahr -= a.Amount;
                 }
             }
         }
+
+        Debug.Log($"[DEBUG-Dashboard] ENDERGEBNIS summeJahr (Bilanz) = {summeJahr}");
 
         return bilanzProMonat;
     }

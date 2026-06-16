@@ -146,14 +146,24 @@ public void createList()
         var einkommenListe = db.getAllEinkommenEntries();
         if (einkommenListe != null)
             foreach (var e in einkommenListe)
-                if (TryParse(e.Datum, out var d) && d.Year == heute.Year)
+            {
+                bool ok = TryParse(e.Datum, out var d);
+                Debug.Log($"[DEBUG-Kassenbuch] Einkommen Datum='{e.Datum}' Amount={e.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} | Jahr-Match={(ok && d.Year == heute.Year)}");
+                if (ok && d.Year == heute.Year)
                 { umsatzJahr += e.Amount; monate[d.Month - 1] += e.Amount; }
+            }
  
         var ausgabenListe = db.getAllAusgabenEntries();
         if (ausgabenListe != null)
             foreach (var a in ausgabenListe)
-                if (TryParse(a.Datum, out var d) && d.Year == heute.Year)
+            {
+                bool ok = TryParse(a.Datum, out var d);
+                Debug.Log($"[DEBUG-Kassenbuch] Ausgabe Datum='{a.Datum}' Amount={a.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} | Jahr-Match={(ok && d.Year == heute.Year)}");
+                if (ok && d.Year == heute.Year)
                 { umsatzJahr -= a.Amount; monate[d.Month - 1] -= a.Amount; }
+            }
+
+        Debug.Log($"[DEBUG-Kassenbuch] ENDERGEBNIS umsatzJahr (Bilanz) = {umsatzJahr} | getDifferenz() = {differenz}");
  
         AppEventManager.KassenbuchGeaendert(umsatzJahr, differenz, monate);
     }
