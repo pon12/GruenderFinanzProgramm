@@ -8,6 +8,7 @@ public class CompanyFrontendController : MonoBehaviour
     [SerializeField] private TMP_InputField legalFormInput;
     [SerializeField] private TMP_InputField industryInput;
     [SerializeField] private TMP_InputField locationInput;
+    
 
     [Header("Output")]
     [SerializeField] private TMP_Text feedbackText;
@@ -48,8 +49,18 @@ public class CompanyFrontendController : MonoBehaviour
             showFeedback("Branche muss eine Zahl sein.");
             return;
         }
+        //Vorrübergehende lösung
 
-        db.createCompany(companyName, legalForm, industry, location);
+        string steuerNr = "";
+        string gruendungsJahr = "";
+        string handelsReg = "";
+        string strasseuHausNr = "";
+        int plz = 0;
+        string ustIdNr = "";
+        string email = "Null";
+        string handyNr = "Null";
+
+        db.createCompany( name, legalForm, industry, location, steuerNr,gruendungsJahr ,handelsReg , strasseuHausNr , plz , ustIdNr, email, handyNr);
 
         showFeedback("Firma gespeichert in: " + db.getDatabaseName());
         Debug.Log("Firma erstellt: " + companyName + " in Datenbank: " + db.getDatabaseName());

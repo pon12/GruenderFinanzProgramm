@@ -70,8 +70,10 @@ public class SaveTest1 : MonoBehaviour
                 "1990",
                 "HRB12345",
                 "Musterstraße 1",
-                "12345",
-                "DE123456789"
+                12345,
+                "DE123456789",
+                "email",
+                "phone"
             );
 
             userDatabase.createCompany(
@@ -83,8 +85,10 @@ public class SaveTest1 : MonoBehaviour
                 "2000",
                 "HRB54321",
                 "Musterstraße 2",
-                "54321",
-                "DE987654321"
+                54321,
+                "DE987654321",
+                "email",
+                "phone"
             );
         }
         else if (userName == "Nutzer2")
@@ -98,8 +102,10 @@ public class SaveTest1 : MonoBehaviour
                 "1990",
                 "HRB12345", 
                 "Musterstraße 1",
-                "12345",
-                "DE123456789"
+                12345,
+                "DE123456789",
+                "email",
+                "phone"
             );
 
             userDatabase.createCompany(
@@ -111,8 +117,10 @@ public class SaveTest1 : MonoBehaviour
                 "2000",
                 "HRB54321",
                 "Musterstraße 2",
-                "54321",
-                "DE987654321"
+                54321,
+                "DE987654321",
+                "email",
+                "phone"
             );
         }
 

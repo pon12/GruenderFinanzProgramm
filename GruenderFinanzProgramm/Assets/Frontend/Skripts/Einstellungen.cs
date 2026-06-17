@@ -432,12 +432,14 @@ if (_btnResetPasskey != null)
         string ustIdNr   = _inputUstidnr?.value ?? "";
         string handelsReg = _inputHandelsreg?.value ?? "";
         string gruendungsJahr = _inputGruendungsjahr?.value ?? "";
-        string plz = _inputPlz?.value ?? "";
+        int plz = int.TryParse(_inputPlz?.value ?? "", out plz) ? plz : 0;
         string strasseuHausNr = _inputStrasse?.value ?? "";
+        string email = "Null";
+        string handyNr = "Null";
 
         if (_currentCompany == null)
         {
-            db.createCompany( name, legalForm, industry, location, steuerNr,gruendungsJahr ,handelsReg , strasseuHausNr , plz , ustIdNr);
+            db.createCompany( name, legalForm, industry, location, steuerNr,gruendungsJahr ,handelsReg , strasseuHausNr , plz , ustIdNr, email, handyNr);
             Debug.Log($"[Einstellungen] Neue Firma angelegt: {name}");
             var all = db.getAllCompanies();
             if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
@@ -446,7 +448,7 @@ if (_btnResetPasskey != null)
         {
             _currentCompany.name      = name;
             _currentCompany.legalForm = legalForm;
-            _currentCompany.location  = location;
+            _currentCompany.location     = location;
             _currentCompany.industry  = industry;
             _currentCompany.steuerNr  = steuerNr;
             _currentCompany.ustIdNr   = ustIdNr;
@@ -458,6 +460,7 @@ if (_btnResetPasskey != null)
             Debug.Log($"[Einstellungen] Firma aktualisiert: {name}");
         }
     }
+
 
     private void SaveSettingsDB()
     {

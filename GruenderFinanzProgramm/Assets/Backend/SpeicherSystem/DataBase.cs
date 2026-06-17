@@ -68,7 +68,7 @@ public List<Company> getAllCompanies()
 {
     return getAll<Company>();
 }
-public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, string plz, string ustIdNr)
+public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, int plz, string ustIdNr, string email, string handyNr)
 {
     Company newCompany = new Company
     {
@@ -81,7 +81,9 @@ public int createCompany(string name, int legalForm, int industry, string locati
         handelsReg = handelsReg,
         strasseuHausNr = strasseuHausNr,
         plz = plz,
-        ustIdNr = ustIdNr
+        ustIdNr = ustIdNr,
+        email = email,
+        handyNr = handyNr
     };
     return insert(newCompany);
 }

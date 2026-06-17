@@ -27,8 +27,10 @@ public class Company
     public string gruendungsJahr { get; set; }  // Gründungsjahr 
     public string handelsReg { get; set; }      // Handelsregisternummer
     public string strasseuHausNr { get; set; }         // Straße und Hausnummer
-    public string plz { get; set; }         // Postleitzahl 
-    public string ustIdNr { get; set; }         // Umsatzsteuer-Identifikationsnummer
+    public int plz { get; set; }         // Postleitzahl 
+    public string ustIdNr { get; set; }         // Umsatzsteuer-Identifikationsnummer 
+    public string email { get; set; }       // E-Mail-Adresse
+    public string handyNr   { get; set; }   // Handy-Nummer
     
 
     // --- Mapping Listen ---
