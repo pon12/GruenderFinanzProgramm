@@ -1,5 +1,5 @@
 using System;
-using SQLite4Unity3d;
+using SQLite;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +9,7 @@ using System.Linq;
 public class Invoice
 {
     [PrimaryKey, AutoIncrement]
+   public int customerId { get; set; }
     public int id { get; set; }
     public int companyId { get; set; }
     public string invoiceNumber { get; set; }
@@ -35,6 +36,10 @@ public class Invoice
         tax = subtotal * 0.19;
         total = subtotal + tax;
     }
+    // Kassenbuch-Anbindung
+    public bool bookedToCashbook { get; set; }
+    public int cashbookEntryId { get; set; }
+    public string bookingDate { get; set; }
 }
 
 #endregion
@@ -66,6 +71,7 @@ public class InvoiceItem
 public class Offer
 {
     [PrimaryKey, AutoIncrement]
+   public int customerId { get; set; }
     public int id { get; set; }
     public int companyId { get; set; }
     public string offerNumber { get; set; }
@@ -76,6 +82,10 @@ public class Offer
     public double tax { get; set; }
     public double total { get; set; }
     public string notes { get; set; }
+    // Kassenbuch-Anbindung
+    public bool bookedToCashbook { get; set; }
+    public int cashbookEntryId { get; set; }
+    public string bookingDate { get; set; }
 }
 #endregion
 

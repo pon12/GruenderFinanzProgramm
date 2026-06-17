@@ -4,7 +4,6 @@ using System.Linq;
 
 public class DataBase : DatabaseManager
 {
-
     public void setupDatabase()
     {
         createTable<Company>();
@@ -15,9 +14,13 @@ public class DataBase : DatabaseManager
         createTable<Ausgaben>();
         createTable<Einkommen>();
         createTable<Dauerauftrag>();
+        createTable<Offer>();
+        createTable<OfferItem>();
+        createTable<Invoice>();
+        createTable<InvoiceItem>();
     }
-
     public void setupAuthDB()
+
     {
         createTable<UserDB>();
     }
@@ -120,25 +123,86 @@ public class DataBase : DatabaseManager
         createTable<OfferItem>();
     }
     // --- Rechnungen ---
-    public int createInvoice(Invoice invoice) => insert(invoice);
-    public int updateInvoice(Invoice invoice) => update(invoice);
-    public int deleteInvoice(int id) => delete<Invoice>(id);
-    public List<Invoice> getAllInvoices() => getAll<Invoice>();
-    public List<InvoiceItem> getItemsByInvoice(int invoiceId) =>
-        query<InvoiceItem>($"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}");
-    public int createInvoiceItem(InvoiceItem item) => insert(item);
+
+    public int createInvoice(Invoice invoice)
+    {
+        return insert(invoice);
+    }
+    public int updateInvoice(Invoice invoice)
+    {
+        return update(invoice);
+    }
+    public int deleteInvoice(int id)
+    {
+        return delete<Invoice>(id);
+    }
+    public List<Invoice> getAllInvoices()
+    {
+        return getAll<Invoice>();
+    }
+    public Invoice getInvoiceById(int id)
+    {
+        return getById<Invoice>(id);
+    }
+    public List<InvoiceItem> getItemsByInvoice(int invoiceId)
+    {
+        return query<InvoiceItem>(
+            $"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}"
+        );
+    }
+    public int createInvoiceItem(InvoiceItem item)
+    {
+        return insert(item);
+    }
+    public int updateInvoiceItem(InvoiceItem item)
+    {
+        return update(item);
+    }
+    public int deleteInvoiceItem(int id)
+    {
+        return delete<InvoiceItem>(id);
+    }
 
     // --- Angebote ---
-    public int createOffer(Offer offer) => insert(offer);
-    public int updateOffer(Offer offer) => update(offer);
-    public int deleteOffer(int id) => delete<Offer>(id);
-    public List<Offer> getAllOffers() => getAll<Offer>();
-    public List<OfferItem> getItemsByOffer(int offerId) =>
-        query<OfferItem>($"SELECT * FROM OfferItem WHERE offerId = {offerId}");
-    public int createOfferItem(OfferItem item) => insert(item);
 
-
-
+    public int createOffer(Offer offer)
+    {
+        return insert(offer);
+    }
+    public int updateOffer(Offer offer)
+    {
+        return update(offer);
+    }
+    public int deleteOffer(int id)
+    {
+        return delete<Offer>(id);
+    }
+    public List<Offer> getAllOffers()
+    {
+        return getAll<Offer>();
+    }
+    public Offer getOfferById(int id)
+    {
+        return getById<Offer>(id);
+    }
+    public List<OfferItem> getItemsByOffer(int offerId)
+    {
+        return query<OfferItem>(
+            $"SELECT * FROM OfferItem WHERE offerId = {offerId}"
+        );
+    }
+    public int createOfferItem(OfferItem item)
+    {
+        return insert(item);
+    }
+    public int updateOfferItem(OfferItem item)
+    {
+        return update(item);
+    }
+    public int deleteOfferItem(int id)
+    {
+        return delete<OfferItem>(id);
+    }
 
     // ---Customer---
     public void setupCustomerTable()
