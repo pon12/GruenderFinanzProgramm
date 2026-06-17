@@ -14,6 +14,7 @@ public class DataBase : DatabaseManager
         createTable<Ausgaben>();
         createTable<Einkommen>();
         createTable<Dauerauftrag>();
+        createTable<GruenderpfadEintrag>();
         createTable<Offer>();
         createTable<OfferItem>();
         createTable<Invoice>();
@@ -600,6 +601,68 @@ public class DataBase : DatabaseManager
             System.Globalization.DateTimeStyles.None,
             out parsedDate
         );
+    }
+
+    // --- Gründerpfad ---
+
+    public int createGruenderpfadEintrag(int meilenstein, string beschreibung, bool erledigt)
+    {
+        GruenderpfadEintrag eintrag = new GruenderpfadEintrag
+        {
+            meilenstein = meilenstein,
+            beschreibung = beschreibung,
+            erledigt = erledigt,
+            lastUpdated = System.DateTime.Now
+        };
+
+        return insert(eintrag);
+    }
+
+    public List<GruenderpfadEintrag> getAllGruenderpfadEintraege()
+    {
+        return getAll<GruenderpfadEintrag>();
+    }
+
+    public GruenderpfadEintrag getGruenderpfadEintragById(int id)
+    {
+        return getById<GruenderpfadEintrag>(id);
+    }
+
+    public int updateGruenderpfadEintrag(GruenderpfadEintrag eintrag)
+    {
+        eintrag.lastUpdated = System.DateTime.Now;
+        return update(eintrag);
+    }
+
+    public int deleteGruenderpfadEintrag(int id)
+    {
+        return delete<GruenderpfadEintrag>(id);
+    }
+
+    public List<GruenderpfadEintrag> getOffeneGruenderpfadEintraege()
+    {
+        return query<GruenderpfadEintrag>("SELECT * FROM GruenderpfadEintrag WHERE erledigt = 0");
+    }
+
+    public List<GruenderpfadEintrag> getErledigteGruenderpfadEintraege()
+    {
+        return query<GruenderpfadEintrag>("SELECT * FROM GruenderpfadEintrag WHERE erledigt = 1");
+    }
+
+    public int setGruenderpfadEintragErledigt(int id, bool erledigt)
+    {
+        GruenderpfadEintrag eintrag = getGruenderpfadEintragById(id);
+
+        if (eintrag == null)
+        {
+            Debug.LogWarning("[Gruenderpfad] Kein Eintrag mit ID " + id + " gefunden.");
+            return 0;
+        }
+
+        eintrag.erledigt = erledigt;
+        eintrag.lastUpdated = System.DateTime.Now;
+
+        return update(eintrag);
     }
 
 }

@@ -91,3 +91,16 @@ public class Dauerauftrag
 
     public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
 }
+
+[System.Serializable]
+public class GruenderpfadEintrag
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+
+    public int meilenstein { get; set; }
+    public string beschreibung { get; set; }
+    public bool erledigt { get; set; }
+
+    public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
+}
