@@ -28,7 +28,8 @@ public class Invoice
     public string customerName { get; set; }
     [Ignore]
     public string customerAddress { get; set; }
-
+    
+    
     // AUTOMATISCHE BERECHNUNG
     public void CalculateTotals(List<InvoiceItem> items)
     {
@@ -52,6 +53,7 @@ public class InvoiceItem
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
     public int invoiceId { get; set; }
+    public string articleNumber { get; set; }
     public string description { get; set; }
     public int quantity { get; set; }
     public double unitPrice { get; set; }
@@ -86,6 +88,15 @@ public class Offer
     public bool bookedToCashbook { get; set; }
     public int cashbookEntryId { get; set; }
     public string bookingDate { get; set; }
+    [Ignore]
+
+    public string customerName { get; set; }
+    [Ignore]
+    public string customerAddress { get; set; }
+    [Ignore]
+    public string companyName { get; set; }
+    [Ignore]
+    public string companyAddress { get; set; }
 }
 #endregion
 
@@ -96,6 +107,7 @@ public class OfferItem
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
     public int offerId { get; set; }
+    public string articleNumber { get; set; }
     public string description { get; set; }
     public int quantity { get; set; }
     public double unitPrice { get; set; }

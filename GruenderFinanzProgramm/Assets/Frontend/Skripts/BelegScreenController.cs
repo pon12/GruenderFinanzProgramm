@@ -43,6 +43,8 @@ public abstract class BelegScreenController : MonoBehaviour
     private DropdownField _statusDropdown, _waehrungDropdown, _rabattTypDropdown;
     private VisualElement _suchErgebnisListe;
     private string _ausgewaehlterKunde = "";
+    private int _ausgewaehlterKundeId = 0;
+    private string _ausgewaehlterKundeAdresse = "";
 
     protected abstract string BelegTyp { get; }
     protected abstract string NummernPrefix { get; }
@@ -516,14 +518,21 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void WaehleKunde(Customer kunde)
     {
+        _ausgewaehlterKundeId = kunde.id;
+        _ausgewaehlterKundeAdresse = KundenAdresse(kunde);
         _ausgewaehlterKunde = KundenAnzeige(kunde);
         _kundensuche.SetValueWithoutNotify(_ausgewaehlterKunde);
         _suchErgebnisListe.style.display = DisplayStyle.None;
-
-        string adresse = KundenAdresse(kunde);
         var boxen = Root.Query(className: "angebot-address-box").ToList();
-        if (boxen.Count > 0) SetzeAdresse(boxen[0], "Rechnung für", adresse);
-        if (boxen.Count > 1) SetzeAdresse(boxen[1], "Versenden an", adresse);
+        if (boxen.Count > 0)
+        {
+            SetzeAdresse(boxen[0], "Rechnung für", _ausgewaehlterKundeAdresse);
+        }
+
+        if (boxen.Count > 1)
+        {
+            SetzeAdresse(boxen[1], "Versenden an", _ausgewaehlterKundeAdresse);
+        }
     }
 
 private void SpeichernGeklickt()
@@ -550,7 +559,11 @@ private void SpeichernGeklickt()
             Offer offer = new Offer
             {
                 companyId = 1,
-                customerId = 0,
+                customerId = _ausgewaehlterKundeId,
+                customerName = _ausgewaehlterKunde,
+                customerAddress = _ausgewaehlterKundeAdresse,
+                companyName = HoleCompanyName(db),
+                companyAddress = HoleCompanyAddress(db),
                 offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
                 date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
                 status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
@@ -563,13 +576,15 @@ private void SpeichernGeklickt()
                 bookingDate = ""
             };
 
+            db.createOffer(offer);
             int offerId = db.createOffer(offer);
-
+            Debug.Log("[Angebot] Neue Offer ID: " + offerId);
             foreach (var zeile in _zeilen)
             {
                 OfferItem item = new OfferItem
                 {
                     offerId = offerId,
+                    articleNumber = zeile.Artikel != null ? zeile.Artikel.value : "",
                     description = zeile.Beschreibung != null ? zeile.Beschreibung.value : "",
                     quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
                     unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.value : "0")
@@ -588,7 +603,11 @@ private void SpeichernGeklickt()
             Invoice invoice = new Invoice
             {
                 companyId = 1,
-                customerId = 0,
+                customerId = _ausgewaehlterKundeId,
+                customerName = _ausgewaehlterKunde,
+                customerAddress = _ausgewaehlterKundeAdresse,
+                companyName = HoleCompanyName(db),
+                companyAddress = HoleCompanyAddress(db),
                 invoiceNumber = _nummerFeld != null ? _nummerFeld.value : "",
                 date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
                 dueDate = _fristFeld != null ? _fristFeld.value : "",
@@ -602,13 +621,15 @@ private void SpeichernGeklickt()
                 bookingDate = ""
             };
 
+            db.createInvoice(invoice);
             int invoiceId = db.createInvoice(invoice);
-
+            Debug.Log("[Rechnung] Neue Invoice ID: " + invoiceId);
             foreach (var zeile in _zeilen)
             {
                 InvoiceItem item = new InvoiceItem
                 {
                     invoiceId = invoiceId,
+                    articleNumber = zeile.Artikel != null ? zeile.Artikel.value : "",
                     description = zeile.Beschreibung != null ? zeile.Beschreibung.value : "",
                     quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
                     unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.value : "0")
@@ -623,11 +644,7 @@ private void SpeichernGeklickt()
             Debug.Log("[Rechnung] Gespeichert mit ID: " + invoiceId);
         }
 
-                _zeilen.Clear();
-                _positionenListe?.Clear();
-                FuegePositionHinzu();
-                BerechneSummen();
-
+                ResetBelegFormular();
                 FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
     }
     catch (Exception e)
@@ -829,4 +846,59 @@ private void SpeichernGeklickt()
 
         return string.Join("\n", zeilen);
     }
+private string HoleCompanyName(DataBase db)
+{
+    List<Company> companies = db.getAllCompanies();
+
+    if (companies == null || companies.Count == 0)
+        return "Keine Firmendaten";
+
+    Company company = companies[companies.Count - 1];
+
+    return LiesFeld(company, "name");
+}
+
+private string HoleCompanyAddress(DataBase db)
+{
+    List<Company> companies = db.getAllCompanies();
+
+    if (companies == null || companies.Count == 0)
+        return "";
+
+    Company company = companies[companies.Count - 1];
+
+    return LiesFeld(company, "location", "ort", "adresse", "address");
+}
+
+private void ResetBelegFormular()
+{
+    _zeilen.Clear();
+    _positionenListe?.Clear();
+
+    Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
+
+    _ausgewaehlterKunde = "";
+    _ausgewaehlterKundeId = 0;
+    _ausgewaehlterKundeAdresse = "";
+
+    var boxen = Root.Query(className: "angebot-address-box").ToList();
+
+    if (boxen.Count > 0)
+        SetzeAdresse(boxen[0], "Rechnung für", "Noch kein Kunde ausgewählt");
+
+    if (boxen.Count > 1)
+        SetzeAdresse(boxen[1], "Versenden an", "Noch kein Kunde ausgewählt");
+
+    SetzeStandardwerte();
+    FuegePositionHinzu();
+    BerechneSummen();
+}
+
+
+
+
+
+
+
+
 }

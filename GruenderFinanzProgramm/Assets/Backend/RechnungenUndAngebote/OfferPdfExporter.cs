@@ -63,18 +63,37 @@ public static class OfferPdfExporter
                 );
 
                 title.Alignment = Element.ALIGN_LEFT;
-
                 doc.Add(title);
                 doc.Add(new Paragraph(" "));
-
+                doc.Add(new Paragraph("Absender:", headerFont));
+                if (!string.IsNullOrEmpty(offer.companyName))
+                {
+                    doc.Add(new Paragraph(offer.companyName, normalFont));
+                }
+                if (!string.IsNullOrEmpty(offer.companyAddress))
+                {
+                    doc.Add(new Paragraph(offer.companyAddress, normalFont));
+                }
+                doc.Add(new Paragraph(" "));
+                doc.Add(new Paragraph("Kunde:", headerFont));
+                if (!string.IsNullOrEmpty(offer.customerName))
+                {
+                    doc.Add(new Paragraph(offer.customerName, normalFont));
+                }
+                if (!string.IsNullOrEmpty(offer.customerAddress))
+                {
+                    doc.Add(new Paragraph(offer.customerAddress, normalFont));
+                }
+                doc.Add(new Paragraph(" "));
                 doc.Add(new Paragraph("Datum: " + offer.date, normalFont));
                 doc.Add(new Paragraph("Status: " + offer.status, normalFont));
                 doc.Add(new Paragraph(" "));
 
-                PdfPTable table = new PdfPTable(4);
+                PdfPTable table = new PdfPTable(5);
                 table.WidthPercentage = 100f;
-                table.SetWidths(new float[] { 3.5f, 1f, 1.2f, 1.2f });
+                table.SetWidths(new float[] { 1.4f, 3.0f, 1f, 1.2f, 1.2f  });
 
+                AddHeaderCell(table, "Artikelnummer", headerFont);
                 AddHeaderCell(table, "Beschreibung", headerFont);
                 AddHeaderCell(table, "Menge", headerFont);
                 AddHeaderCell(table, "Einzel (€)", headerFont);
@@ -82,27 +101,91 @@ public static class OfferPdfExporter
 
                 foreach (OfferItem item in items)
                 {
-                    AddBodyCell(table, item.description, normalFont);
-                    AddBodyCell(table, item.quantity.ToString(), normalFont, Element.ALIGN_CENTER);
-                    AddBodyCell(table, item.unitPrice.ToString("0.00"), normalFont, Element.ALIGN_RIGHT);
-                    AddBodyCell(table, item.calculatedTotal.ToString("0.00"), normalFont, Element.ALIGN_RIGHT);
+                    AddBodyCell(
+                        table, 
+                        item.articleNumber, 
+                        normalFont
+                        );
+                    
+                    AddBodyCell(
+                    table, 
+                    item.description, 
+                    normalFont
+                    );
+                    
+                    AddBodyCell(
+                        table,
+                        item.quantity.ToString(),
+                        normalFont,
+                        Element.ALIGN_CENTER
+                    );
+
+                    AddBodyCell(
+                        table,
+                        item.unitPrice.ToString("0.00"),
+                        normalFont,
+                        Element.ALIGN_RIGHT
+                    );
+
+                    AddBodyCell(
+                        table,
+                        item.calculatedTotal.ToString("0.00"),
+                        normalFont,
+                        Element.ALIGN_RIGHT
+                    );
                 }
 
                 doc.Add(table);
                 doc.Add(new Paragraph(" "));
 
+            double zwischensumme = 0;
+
+            foreach (OfferItem item in items)
+                {
+                    zwischensumme += item.calculatedTotal;
+                }
                 PdfPTable totals = new PdfPTable(2);
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
 
-                AddBodyCell(totals, "Zwischensumme:", normalFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, offer.subtotal.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    "Zwischensumme:",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                    );
+                AddBodyCell(
+                    totals,
+                    zwischensumme.ToString("0.00") + " €",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                    );
 
-                AddBodyCell(totals, "MwSt:", normalFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, offer.tax.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    "MwSt:",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                    );
+                AddBodyCell(
+                    totals,
+                    offer.tax.ToString("0.00") + " €",
+                    normalFont,
+                    Element.ALIGN_RIGHT
+                    );
 
-                AddBodyCell(totals, "Gesamt:", headerFont, Element.ALIGN_RIGHT);
-                AddBodyCell(totals, offer.total.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(
+                    totals,
+                    "Gesamt:",
+                    headerFont,
+                    Element.ALIGN_RIGHT
+                    );
+                AddBodyCell(
+                    totals,
+                    offer.total.ToString("0.00") + " €",
+                    headerFont,
+                    Element.ALIGN_RIGHT
+                    );
 
                 doc.Add(totals);
 
