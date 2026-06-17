@@ -104,3 +104,26 @@ public class GruenderpfadEintrag
 
     public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
 }
+
+[System.Serializable]
+public class TextDocumentMeta
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+
+    public int userId { get; set; }
+
+    public string title { get; set; }
+
+    public string originalFileName { get; set; }
+
+    public string storedFileName { get; set; }
+
+    public string filePath { get; set; }
+
+    public string documentType { get; set; } // STANDARD, DIAGRAMM, CHECKLIST
+
+    public System.DateTime createdAt { get; set; } = System.DateTime.Now;
+
+    public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
+}

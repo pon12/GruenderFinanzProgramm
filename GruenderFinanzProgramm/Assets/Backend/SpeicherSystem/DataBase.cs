@@ -11,6 +11,7 @@ public class DataBase : DatabaseManager
         createTable<Service>();
         createTable<UserDocument>();
         createTable<UserPDFDocument>();
+        createTable<TextDocumentMeta>();
         createTable<Ausgaben>();
         createTable<Einkommen>();
         createTable<Dauerauftrag>();
@@ -663,6 +664,62 @@ public class DataBase : DatabaseManager
         eintrag.lastUpdated = System.DateTime.Now;
 
         return update(eintrag);
+    }
+
+
+
+    // --- Textdokumente ---
+
+    public int createTextDocumentMeta(TextDocumentMeta document)
+    {
+        document.createdAt = System.DateTime.Now;
+        document.lastUpdated = System.DateTime.Now;
+
+        return insert(document);
+    }
+
+    public TextDocumentMeta getTextDocumentMetaById(int documentId, int userId)
+    {
+        TextDocumentMeta document = getById<TextDocumentMeta>(documentId);
+
+        if (document == null || document.userId != userId)
+        {
+            return null;
+        }
+
+        return document;
+    }
+
+    public List<TextDocumentMeta> getTextDocumentsByUser(int userId)
+    {
+        return query<TextDocumentMeta>(
+            $"SELECT * FROM TextDocumentMeta WHERE userId = {userId} ORDER BY lastUpdated DESC"
+        );
+    }
+
+    public List<TextDocumentMeta> getTextDocumentsByUserAndType(int userId, string documentType)
+    {
+        return query<TextDocumentMeta>(
+            $"SELECT * FROM TextDocumentMeta WHERE userId = {userId} AND documentType = '{documentType}' ORDER BY lastUpdated DESC"
+        );
+    }
+
+    public int updateTextDocumentMeta(TextDocumentMeta document)
+    {
+        document.lastUpdated = System.DateTime.Now;
+        return update(document);
+    }
+
+    public int deleteTextDocumentMeta(int documentId, int userId)
+    {
+        TextDocumentMeta document = getTextDocumentMetaById(documentId, userId);
+
+        if (document == null)
+        {
+            return 0;
+        }
+
+        return delete<TextDocumentMeta>(documentId);
     }
 
 }
