@@ -558,7 +558,6 @@ private void SpeichernGeklickt()
         {
             Offer offer = new Offer
             {
-                companyId = 1,
                 customerId = _ausgewaehlterKundeId,
                 customerName = _ausgewaehlterKunde,
                 customerAddress = _ausgewaehlterKundeAdresse,
@@ -576,7 +575,6 @@ private void SpeichernGeklickt()
                 bookingDate = ""
             };
 
-            db.createOffer(offer);
             int offerId = db.createOffer(offer);
             Debug.Log("[Angebot] Neue Offer ID: " + offerId);
             foreach (var zeile in _zeilen)
@@ -595,14 +593,12 @@ private void SpeichernGeklickt()
 
             List<OfferItem> items = db.getItemsByOffer(offerId);
             OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
-
             Debug.Log("[Angebot] Gespeichert mit ID: " + offerId);
         }
         else if (BelegTyp == "Rechnung")
         {
             Invoice invoice = new Invoice
             {
-                companyId = 1,
                 customerId = _ausgewaehlterKundeId,
                 customerName = _ausgewaehlterKunde,
                 customerAddress = _ausgewaehlterKundeAdresse,
@@ -621,7 +617,6 @@ private void SpeichernGeklickt()
                 bookingDate = ""
             };
 
-            db.createInvoice(invoice);
             int invoiceId = db.createInvoice(invoice);
             Debug.Log("[Rechnung] Neue Invoice ID: " + invoiceId);
             foreach (var zeile in _zeilen)

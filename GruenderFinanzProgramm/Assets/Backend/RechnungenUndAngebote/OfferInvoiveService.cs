@@ -17,7 +17,6 @@ public static class OfferInvoiceService
 
         Invoice invoice = new Invoice
         {
-            companyId = offer.companyId,
             customerId = offer.customerId,
 
             invoiceNumber = "RE-" + System.DateTime.Now.ToString("yyyyMMdd-HHmm"),
