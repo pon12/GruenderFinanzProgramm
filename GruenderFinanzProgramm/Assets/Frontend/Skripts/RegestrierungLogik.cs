@@ -40,6 +40,21 @@ public class RegestrierungLogik : MonoBehaviour
     private AuthService authService;
     private string aktuellerPasskey = "";
     private bool istEntschluesselt = false;
+    
+    // Leerzeichen alle 4 zahlen für power passkey
+    
+    private string FormatiereMitLeerzeichen(string input, int gruppenGroesse = 4)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        var sb = new System.Text.StringBuilder();
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (i > 0 && i % gruppenGroesse == 0)
+                sb.Append(' ');
+            sb.Append(input[i]);
+        }
+        return sb.ToString();
+    }
 
     private void OnEnable()
     {
@@ -104,6 +119,7 @@ public class RegestrierungLogik : MonoBehaviour
         if (btnDatenschutzclose != null) btnDatenschutzclose.clicked += OnDatenschutzCloseClicked;
 
         ShowLoginScreen();
+        
     }
 
     private void OnKeyGenerierenClicked()
@@ -157,25 +173,26 @@ public class RegestrierungLogik : MonoBehaviour
     private void AktualisierePasskeyAnzeige()
     {
         if (lblPasskey == null) return;
-
+        string recoveryKey = authService.recoveryPassKeyGlobal;
         string passkeyAnzeige;
-
+        string recoveryAnzeige;
         if (istEntschluesselt)
         {
-            passkeyAnzeige = aktuellerPasskey;
+            // Klartext – Passkey mit Leerzeichen alle 4 Zeichen
+            passkeyAnzeige = FormatiereMitLeerzeichen(aktuellerPasskey);
+            recoveryAnzeige = recoveryKey;
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
         }
         else
         {
+            // Maskiert – beide Keys mit Sternchen
             passkeyAnzeige = new string('*', aktuellerPasskey.Length);
+            recoveryAnzeige = new string('*', recoveryKey.Length);
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
         }
-
-        string recoveryKey = authService.recoveryPassKeyGlobal;
-
         lblPasskey.text =
             "PassKey: " + passkeyAnzeige +
-            "\nRecoveryKey: " + recoveryKey;
+            "\nRecoveryKey: " + recoveryAnzeige;
     }
 
     private void ZeigeEingabeFehler(bool hasText, bool isToggleActive)

@@ -21,10 +21,11 @@ public class SidebarController : MonoBehaviour
     [SerializeField] private List<SceneMapping> navigationConfig;
 
     private const float WIDTH_EXPANDED = 390f;
-    private const float WIDTH_COLLAPSED = 80f;
+    private const float WIDTH_COLLAPSED = 100f;
     private const float ANIM_DURATION = 0.2f;
 
     private const string PREF_COLLAPSED = "sidebar_collapsed";
+    private const string PREF_FORTSCHRITT_OPEN = "sidebar_fortschritt_open";
     private const string PREF_FINANZ_OPEN = "sidebar_finanz_open";
 
     private VisualElement _root;
@@ -35,11 +36,16 @@ public class SidebarController : MonoBehaviour
     private VisualElement _finanzSubmenu;
     private Button _finanzToggleBtn;
     private bool _finanzOpen = false;
+    
+    private VisualElement _fortschrittSubmenu;
+    private Button _fortschrittToggleBtn;
+    private bool _fortschrittOpen = false;
 
     private static readonly Dictionary<string, string> NavToScene = new()
     {
         { "nav-item-dashboard",        "Dashboard"        },
         { "nav-item-guide",            "Fortschritt"      },
+        { "nav-item-wissensdatenbank", "Wissensdatenbank"  },
         { "nav-item-finanz",           "Finanzboard"      },
         { "nav-item-angebot",          "Angebot"          },
         { "nav-item-rechnung",         "Rechnung"         },
@@ -59,6 +65,11 @@ public class SidebarController : MonoBehaviour
         "nav-item-dienstleistungen",
         "nav-item-kassenbuch",
     };
+    
+    private static readonly HashSet<string> FortschrittSubItems = new()
+    {
+        "nav-item-wissensdatenbank",
+    };
 
     void OnEnable()
     {
@@ -68,11 +79,16 @@ public class SidebarController : MonoBehaviour
         _root = uiDocument.rootVisualElement;
         _sidebar = _root.Q<VisualElement>("sidebar");
         _toggleButton = _root.Q<Button>("toggle-button");
+        
+        _fortschrittSubmenu = _root.Q<VisualElement>("fortschritt-submenu");
+        _fortschrittToggleBtn = _root.Q<Button>("btn-fortschritt-toggle");
 
         _finanzSubmenu = _root.Q<VisualElement>("finanz-submenu");
         _finanzToggleBtn = _root.Q<Button>("btn-finanz-toggle");
-
+        
         if (_toggleButton != null) _toggleButton.clicked += ToggleSidebar;
+        if (_fortschrittToggleBtn != null)
+            _fortschrittToggleBtn.clicked += ToggleFortschrittSubmenu;
         if (_finanzToggleBtn != null)
         _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
 
@@ -86,6 +102,8 @@ public class SidebarController : MonoBehaviour
     void OnDisable()
     {
         if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
+        if (_fortschrittToggleBtn != null)
+            _fortschrittToggleBtn.clicked -= ToggleFortschrittSubmenu;
         if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
 
         foreach (var kvp in NavToScene)
@@ -112,7 +130,7 @@ public class SidebarController : MonoBehaviour
             _sidebar.style.width = _isCollapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED;
 
         if (_toggleButton != null)
-            _toggleButton.text = _isCollapsed ? "+" : "−";
+            _toggleButton.text = _isCollapsed ? "+" : "-";
 
         UpdateNavLabelsVisibility();
 
@@ -121,6 +139,12 @@ public class SidebarController : MonoBehaviour
         if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
         if (_finanzToggleBtn != null)
         _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
+        
+        _fortschrittOpen = PlayerPrefs.GetInt(PREF_FORTSCHRITT_OPEN, 0) == 1;
+        if (_fortschrittSubmenu != null)
+            _fortschrittSubmenu.style.display = _fortschrittOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_fortschrittToggleBtn != null)
+            _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(_fortschrittOpen ? 90f : 0f));
 
         OnToggled?.Invoke(_isCollapsed);
     }
@@ -128,6 +152,7 @@ public class SidebarController : MonoBehaviour
     private void SaveState()
     {
         PlayerPrefs.SetInt(PREF_COLLAPSED, _isCollapsed ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_FORTSCHRITT_OPEN, _fortschrittOpen ? 1 : 0);
         PlayerPrefs.SetInt(PREF_FINANZ_OPEN, _finanzOpen ? 1 : 0);
         PlayerPrefs.Save();
     }
@@ -143,7 +168,7 @@ public class SidebarController : MonoBehaviour
         StartCoroutine(AnimateWidth(_isCollapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED));
 
         if (_toggleButton != null)
-            _toggleButton.text = _isCollapsed ? "+" : "−";
+            _toggleButton.text = _isCollapsed ? "+" : "-";
 
         UpdateNavLabelsVisibility();
         OnToggled?.Invoke(_isCollapsed);
@@ -177,7 +202,7 @@ public class SidebarController : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────────
-    // FINANZBOARD DROPDOWN
+    // FORTSCHRITT UND FINANZBOARD DROPDOWN
     // ─────────────────────────────────────────────────
 
    private void ToggleFinanzSubmenu()
@@ -190,6 +215,16 @@ public class SidebarController : MonoBehaviour
     if (_finanzToggleBtn != null)
         _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
 
+    SaveState();
+}
+   
+private void ToggleFortschrittSubmenu()
+{
+    _fortschrittOpen = !_fortschrittOpen;
+    if (_fortschrittSubmenu != null)
+        _fortschrittSubmenu.style.display = _fortschrittOpen ? DisplayStyle.Flex : DisplayStyle.None;
+    if (_fortschrittToggleBtn != null)
+        _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(_fortschrittOpen ? 90f : 0f));
     SaveState();
 }
     // ─────────────────────────────────────────────────
@@ -222,6 +257,15 @@ public class SidebarController : MonoBehaviour
                 if (_finanzToggleBtn != null)
                 _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
             }
+            
+            if (FortschrittSubItems.Contains(kvp.Key) && !_fortschrittOpen)
+            {
+                _fortschrittOpen = true;
+                if (_fortschrittSubmenu != null)
+                    _fortschrittSubmenu.style.display = DisplayStyle.Flex;
+                if (_fortschrittToggleBtn != null)
+                    _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(90f));
+            }
 
             break;
         }
@@ -241,6 +285,14 @@ public class SidebarController : MonoBehaviour
             if (item == null)
             {
                 Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
+                continue;
+            }
+            
+            if (kvp.Key == "nav-item-guide")
+            {
+                item.RegisterCallback<ClickEvent>(evt => ToggleFortschrittSubmenu());
+                if (_fortschrittToggleBtn != null)
+                    _fortschrittToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
                 continue;
             }
 
@@ -309,6 +361,7 @@ public class SidebarController : MonoBehaviour
             Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
 
         PlayerPrefs.DeleteKey("sidebar_collapsed");
+        PlayerPrefs.DeleteKey("sidebar_fortschritt_open");
         PlayerPrefs.DeleteKey("sidebar_finanz_open");
         PlayerPrefs.Save();
 
