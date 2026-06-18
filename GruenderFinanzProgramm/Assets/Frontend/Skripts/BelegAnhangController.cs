@@ -9,7 +9,8 @@ public static class BelegAnhangController
         "AGB",
         "Disclaimer",
         "Barzahlung",
-        "Überweisung"
+        "Überweisung",
+        "Bezahlweise"
     };
 
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
@@ -41,6 +42,9 @@ public static class BelegAnhangController
                      || titelKlein.Contains("konto") || titelKlein.Contains("iban")
                      || titelKlein.Contains("zahlung")))
                     ergebnis["Überweisung"] = true;
+
+                if (doc.category == "Bezahlweise")
+                    ergebnis["Bezahlweise"] = true;
             }
         }
         catch (Exception e)
@@ -83,6 +87,10 @@ public static class BelegAnhangController
                              || titelKlein.Contains("zahlung")))
                             return doc;
                         break;
+                    case "Bezahlweise":
+                        if (doc.category == "Bezahlweise")
+                            return doc;
+                        break;
                 }
             }
         }
@@ -118,13 +126,10 @@ public static class BelegAnhangController
             try
             {
                 document.NewPage();
-
                 document.Add(new iTextSharp.text.Paragraph(schluessel, titelFont));
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Kategorie: " + doc.category + "  |  " + DateTime.Now.ToString("dd.MM.yyyy"),
-                    subFont));
+                    "Kategorie: " + doc.category + "  |  " + DateTime.Now.ToString("dd.MM.yyyy"), subFont));
                 document.Add(new iTextSharp.text.Paragraph(" "));
-
                 var linie = new iTextSharp.text.pdf.draw.LineSeparator();
                 document.Add(new iTextSharp.text.Chunk(linie));
                 document.Add(new iTextSharp.text.Paragraph(" "));
