@@ -478,50 +478,50 @@ public int updateFinanzdaten(Finanzdaten finanzdaten)
     return update(finanzdaten);
 }
 
-public int getFinanzdatenMonat(int monat)
+public Finanzdaten  getFinanzdatenMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 
 }
 
-public int orderFinanzdatenASC()
+public List<Finanzdaten> orderFinanzdatenASC()
 {
     return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat ASC");
 }
 
-public int orderFinanzdatenDESC()
+public List<Finanzdaten> orderFinanzdatenDESC()
 {
     return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat DESC");
 }
 
-public int getAusgabenbyMonat(int monat)
+public Finanzdaten getAusgabenbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
-public int getEinahmenTotalbyMonat(int monat)
+public Finanzdaten  getEinahmenTotalbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
-public int getErstellteAngbyMonat(int monat)
+public Finanzdaten  getErstellteAngbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
-public int getAngenommenAngbyMonat(int monat)
+public Finanzdaten  getAngenommenAngbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
-public int getErstellteRechbyMonat(int monat)
+public Finanzdaten  getErstellteRechbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
-public int getAngenommenRechbyMonat(int monat)
+public Finanzdaten  getAngenommenRechbyMonat(int monat)
 {
-    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}");
+    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
 }
 
 

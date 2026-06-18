@@ -115,6 +115,6 @@ public class Finanzdaten
     public int einahmenTotal { get; set; }
     public int erstellteAng { get; set; }
     public int angenommenAng { get; set; }
-    public int erstellteRechnungen { get; set; }
-    public int angenommenRechnungen { get; set; }
+    public int erstellteRech { get; set; }
+    public int angenommenRech { get; set; }
 }
