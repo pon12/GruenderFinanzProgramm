@@ -9,11 +9,13 @@ using iTextSharp.text; // Für den PDF-Export benötigt
 public class KassenbuchController : MonoBehaviour
 {
     private VisualElement _overlay;
+    private DropdownField dropJahrField;
     private VisualElement tableInput; // Repräsentiert deinen 'tableBody'
     private VisualTreeAsset outputTemplate;
 
 
     private Label balanceLabel;
+    private Label letzteAktualLabel;
 
     private Label fehlerLabel;
    
@@ -69,6 +71,7 @@ public class KassenbuchController : MonoBehaviour
         tableInput = root.Q<VisualElement>("tableBody") ?? root.Q<VisualElement>("unity-content-container");
        
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
+        letzteAktualLabel = root.Q<Label>("letzteAktual");
 
         if (_overlay != null)
 {
@@ -78,7 +81,7 @@ public class KassenbuchController : MonoBehaviour
     {
         fehlerLabel.text = "";
         fehlerLabel.style.display = DisplayStyle.None;
-        fehlerLabel.style.color = Color.red;
+        fehlerLabel.style.color = UnityEngine.Color.red;
     }
 }
 
@@ -124,7 +127,7 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // INITIALISIERUNG DES EXPORT-DROPDOWNS (100 JAHRE)
         // ==========================================
-        var dropJahrField = root.Q<DropdownField>("dropJahr");
+        dropJahrField = root.Q<DropdownField>("dropJahr");
         if (dropJahrField != null)
         {
             List<string> jahre = new List<string>();
@@ -134,6 +137,10 @@ public class KassenbuchController : MonoBehaviour
             }
             dropJahrField.choices = jahre;
             dropJahrField.value = today.Year.ToString();
+
+            // FIX: Ohne diesen Callback passierte beim Jahreswechsel
+            // im Dropdown nichts – Tabelle und Kontostand blieben statisch.
+            dropJahrField.RegisterValueChangedCallback(_ => createList());
         }
 
 
@@ -189,12 +196,15 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // EXPORT BUTTON EVENT VERKNÜPFEN
         // ==========================================
-        var btnExport = root.Q<Button>("btn-export") ?? root.Q<Button>("Export");
+        var btnExport = root.Q<Button>("FinanzExport") ?? root.Q<Button>("btn-export") ?? root.Q<Button>("Export");
+        Debug.Log($"[DEBUG-Export] Export-Button gefunden: {btnExport != null}");
         if (btnExport != null)
         {
             btnExport.clicked += () =>
             {
+                Debug.Log("[DEBUG-Export] Button wurde geklickt!");
                 var dj = root.Q<DropdownField>("dropJahr");
+                Debug.Log($"[DEBUG-Export] dropJahr gefunden: {dj != null}, Wert: '{dj?.value}'");
                 if (dj != null)
                 {
                     ExportJahrAlsPdf(dj.value);
@@ -215,6 +225,26 @@ public class KassenbuchController : MonoBehaviour
 
         if (datumKlickLabel != null)
             datumKlickLabel.UnregisterCallback<ClickEvent>(OnDatumLabelClicked);
+    }
+
+
+    // ==========================================
+    // FEHLERANZEIGE IM POPUP
+    //
+    // Zeigt 'nachricht' im fehlerLabel an (im Erstell-Popup).
+    // Blendet sich nach 3 Sekunden automatisch wieder aus.
+    // ==========================================
+    private void ShowFehler(string nachricht)
+    {
+        if (fehlerLabel == null) return;
+
+        fehlerLabel.text = nachricht;
+        fehlerLabel.style.display = DisplayStyle.Flex;
+
+        fehlerLabel.schedule.Execute(() =>
+        {
+            fehlerLabel.style.display = DisplayStyle.None;
+        }).ExecuteLater(3000);
     }
 
 
@@ -595,6 +625,13 @@ public class KassenbuchController : MonoBehaviour
         return;
     }
 
+    if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
+    {
+        ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
+        return;
+    }
+    datum = normalisiertesDatum;
+
     // ==========================
     // SPEICHERN
     // ==========================
@@ -610,6 +647,33 @@ public class KassenbuchController : MonoBehaviour
 
     ClosePopup();
     createList();
+}
+
+// ==========================================
+// DATUM-VALIDIERUNG
+//
+// Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
+// normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
+// Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
+// unbemerkt in der DB landen und spätere Berechnungen verfälschen.
+// ==========================================
+private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
+{
+    normalisiert = "";
+
+    string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
+    var inv  = System.Globalization.CultureInfo.InvariantCulture;
+    var none = System.Globalization.DateTimeStyles.None;
+
+    if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
+        return false;
+
+    // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
+    if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
+        return false;
+
+    normalisiert = ergebnis.ToString("dd.MM.yyyy");
+    return true;
 }
 
 
@@ -640,8 +704,16 @@ public class KassenbuchController : MonoBehaviour
     {
         if (db == null || tableInput == null) return;
 
+        // Aktuell gewähltes Jahr aus dem Export/Filter-Dropdown lesen.
+        // Falls noch kein Wert gesetzt ist, alle Jahre zeigen (kein Filter).
+        bool jahresFilterAktiv = dropJahrField != null && !string.IsNullOrEmpty(dropJahrField.value)
+                                  && int.TryParse(dropJahrField.value, out _);
+        int gewaehltesJahr = jahresFilterAktiv ? int.Parse(dropJahrField.value) : DateTime.Today.Year;
 
-        float differenz = db.getDifferenz();
+        // Kontostand: gefiltert auf das gewählte Jahr statt immer die Gesamtdifferenz
+        float differenz = jahresFilterAktiv
+            ? BerechneKontostandFuerJahr(gewaehltesJahr)
+            : db.getDifferenz();
 
 
         if (balanceLabel != null)
@@ -653,9 +725,20 @@ public class KassenbuchController : MonoBehaviour
                 : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
         }
 
+        // FIX: 'Letzte Aktualisierung' war bisher ein fester Platzhalter
+        // ("02.02.2222") und wurde nie aktualisiert. Zeigt jetzt das
+        // aktuelle Datum/Uhrzeit, sobald die Liste neu geladen wird.
+        if (letzteAktualLabel != null)
+        {
+            letzteAktualLabel.text = "Letzte Aktualisierung: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+        }
+
 
         // ==========================================
         // APP-EVENT-MANAGER LOGIK FÜR DAS DASHBOARD (Aus Code 2)
+        // Bleibt bewusst beim heutigen Jahr, unabhängig vom Kassenbuch-
+        // Filter-Dropdown – das Dashboard hat seinen eigenen Jahres-
+        // Kalender und soll davon nicht beeinflusst werden.
         // ==========================================
         {
             var heute = System.DateTime.Today;
@@ -702,7 +785,16 @@ public class KassenbuchController : MonoBehaviour
 
 
         List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();  
+        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();
+
+        // Tabelle nach gewähltem Jahr filtern, falls ein gültiges Jahr gewählt ist
+        if (jahresFilterAktiv)
+        {
+            einkommenList = einkommenList?.FindAll(e =>
+                TryParseDatum(e.getDatum(), out DateTime d) && d.Year == gewaehltesJahr);
+            ausgabenList = ausgabenList?.FindAll(a =>
+                TryParseDatum(a.getDatum(), out DateTime d) && d.Year == gewaehltesJahr);
+        }
 
 
         // Einnahmen
@@ -835,6 +927,29 @@ public class KassenbuchController : MonoBehaviour
             || System.DateTime.TryParse(text, deDe, none, out erg);
     }
 
+    // ===============================
+    // KONTOSTAND FÜR EIN BESTIMMTES JAHR
+    // Summiert nur Einkommen/Ausgaben mit Datum in diesem Jahr.
+    // ===============================
+    private float BerechneKontostandFuerJahr(int jahr)
+    {
+        float summe = 0f;
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+            foreach (var e in einkommen)
+                if (TryParseDatum(e.getDatum(), out DateTime d) && d.Year == jahr)
+                    summe += e.Amount;
+
+        var ausgaben = db.getAllAusgabenEntries();
+        if (ausgaben != null)
+            foreach (var a in ausgaben)
+                if (TryParseDatum(a.getDatum(), out DateTime d) && d.Year == jahr)
+                    summe -= a.Amount;
+
+        return summe;
+    }
+
 
     public void deleteEntry(int id)
     {
@@ -854,9 +969,12 @@ public class KassenbuchController : MonoBehaviour
 
     public void ExportJahrAlsPdf(string jahr)
     {
+        Debug.Log($"[DEBUG-Export] ExportJahrAlsPdf wurde aufgerufen mit Jahr='{jahr}'");
+
         if (db == null)
         {
             Debug.LogError("[Export] Keine Datenbankverbindung vorhanden!");
+            ShowFehler("Keine Datenbankverbindung vorhanden.");
             return;
         }
 
@@ -889,6 +1007,7 @@ public class KassenbuchController : MonoBehaviour
         if (gefundeneEintraege == 0)
         {
             Debug.LogWarning($"[Export Abgebrochen] Es sind keine Einträge in der Datenbank für das Jahr {jahr} vorhanden.");
+            ShowFehler($"Keine Einträge im Jahr {jahr} gefunden.");
             return;
         }
 
@@ -933,10 +1052,26 @@ public class KassenbuchController : MonoBehaviour
                 doc.Close();
             }
             Debug.Log("PDF erfolgreich exportiert unter: " + filePath);
+
+            // Datei direkt öffnen, damit der Erfolg auch sichtbar ist
+            // (ohne das würde der Export lautlos im Hintergrund passieren)
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName        = filePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception oeffnenEx)
+            {
+                Debug.LogWarning("[Export] PDF erstellt, konnte aber nicht automatisch geöffnet werden: " + oeffnenEx.Message);
+            }
         }
         catch (Exception ex)
         {
             Debug.LogError("Fehler beim PDF-Export: " + ex.Message);
+            ShowFehler("Export fehlgeschlagen: " + ex.Message);
         }
     }
 }

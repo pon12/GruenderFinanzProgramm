@@ -80,17 +80,15 @@
     flex-shrink: 0;
 }
 .stat-card {
-    flex-grow: 1;
-    flex-basis: 0;
+    width: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
     background-color: #2C2C2C;
     border-radius: 10px;
     padding: 14px 16px;
-    margin: 0 5px;
     border-width: 1px;
     border-color: #444444;
 }
-.stat-card:first-child { margin-left: 0; }
-.stat-card:last-child  { margin-right: 0; }
 .stat-title {
     color: #888888;
     font-size: 12px;
@@ -247,12 +245,13 @@
 
 /* DropdownField: Unity rendert Text in einer internen TextElement-Struktur.
    Direkte .cal-dropdown { color: } reicht oft nicht – wir setzen die Farbe
-   explizit auf den inneren Unity-Text-Container. */
+   explizit auf den inneren Unity-Text-Container.
+   Styleguide-Sekundärfarbe #646464 als Basis. */
 .cal-dropdown {
     flex-grow: 1;
     margin: 0 6px;
-    background-color: #383838;
-    border-color: #555555;
+    background-color: #646464;
+    border-color: #646464;
     border-width: 1px;
     border-radius: 6px;
     color: #ffffff;
@@ -260,8 +259,11 @@
     font-weight: bold;
     height: 30px;
     -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
 }
 .cal-dropdown:hover {
+    background-color: #787878;
     border-color: #80CF95;
 }
 .cal-dropdown > .unity-base-popup-field__text {
@@ -331,6 +333,39 @@
 .cal-day-other-month {
     color: #3A3A3A;
     font-weight: normal;
+}
+
+/* Leeres Feld (Platzhalter vor/nach dem aktuellen Monat) – komplett unsichtbar,
+   kein Hover, keine Interaktion, einfach nur ein Platzhalter im Grid */
+.cal-day-empty {
+    background-color: transparent;
+    color: transparent;
+}
+.cal-day-empty:hover {
+    background-color: transparent;
+}
+
+/* ============================================
+   STAT-NAV-BUTTONS  – unter jeder der 5 Kacheln
+   Sekundärbutton-Stil nach Styleguide #646464
+   ============================================ */
+.btn-stat-nav {
+    background-color: #646464;
+    color: #ffffff;
+    border-width: 0;
+    border-radius: 8px;
+    padding: 9px 4px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: link;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-stat-nav:hover {
+    background-color: #787878;
+}
+.btn-stat-nav:active {
+    background-color: #505050;
 }
 
 /* Deadline-Marker: kleiner Punkt unter der Zahl wenn an dem Tag

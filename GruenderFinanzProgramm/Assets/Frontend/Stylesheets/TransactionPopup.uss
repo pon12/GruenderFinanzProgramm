@@ -1,5 +1,19 @@
 /* TransactionPopup.uss */
 
+/* Globale Schriftart für den gesamten Kassenbuch-Screen: Poppins-Bold,
+   durchgängig für alle Texte (Wunsch: alles in Poppins Bold).
+   Direkt auf Element-Typen gesetzt statt nur auf #root zu vererben,
+   robuster gegen Konflikte mit GridSystem.uss, sidebar.uss,
+   Background.uss und USS-Main.uss. */
+#root,
+Label,
+Button,
+TextField,
+DropdownField,
+.unity-text-element {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+
 /* Overlay: muss auf root-ebene liegen, ueberdeckt alles */
 .popup-overlay {
     position: absolute;
@@ -118,4 +132,112 @@
 
 .btn-secondary:hover {
     background-color: rgb(100, 100, 100);
+}
+
+/* ============================================
+   KASSENBUCH-KOPFZEILE: Jahr-Dropdown + Export-Button
+   Konsistent mit Styleguide: Primär #80CF95, Sekundär #646464
+   ============================================ */
+.jahr-dropdown {
+    height: 40px;
+    width: 160px;
+    margin-right: 12px;
+    background-color: rgb(58, 58, 58);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.jahr-dropdown:hover {
+    background-color: rgb(75, 75, 75);
+}
+.jahr-dropdown .unity-base-popup-field__text {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+}
+.jahr-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+.jahr-dropdown .unity-base-field__input {
+    background-color: transparent;
+    border-width: 0;
+}
+.jahr-dropdown .unity-base-field__label {
+    display: none;
+}
+
+.btn-export-finanzamt {
+    height: 40px;
+    padding: 0 20px;
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-export-finanzamt:hover {
+    background-color: rgb(120, 120, 120);
+}
+.btn-export-finanzamt:active {
+    background-color: rgb(80, 80, 80);
+}
+
+/* ============================================
+   3ER-AKTIONSREIHE: Ausgaben / Einnahmen / Export
+   Alle drei gleich groß, klar als zusammengehörige
+   Aktionsgruppe erkennbar.
+   ============================================ */
+.btn-action-3er {
+    width: 220px;
+    height: 44px;
+    margin-left: 6px;
+    margin-right: 6px;
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-action-3er.btn-red {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+}
+.btn-action-3er.btn-red:hover {
+    background-color: rgb(208, 45, 57);
+}
+.btn-action-3er.btn-green {
+    background-color: rgb(128, 207, 149);
+    color: rgb(28, 28, 28);
+}
+.btn-action-3er.btn-green:hover {
+    background-color: rgb(107, 191, 130);
+}
+.btn-action-3er.btn-export-finanzamt {
+    width: 220px;
+    background-color: rgb(100, 100, 100);
+}
+
+/* Header-Zeile: Titel links, Jahr-Dropdown rechts */
+.header-row {
+    margin-bottom: 8px;
 }

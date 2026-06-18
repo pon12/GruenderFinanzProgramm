@@ -1,4 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
     <ui:VisualElement name="root-container" class="screen-root" style="width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0 430px; overflow: hidden;">
@@ -66,14 +67,15 @@
         <ui:VisualElement name="Edit-Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Edit-Popup-Container" class="doc-card edit-popup-box">
                 <ui:Label text="Dokument bearbeiten" class="card-title"/>
-                <ui:Label text="🔒 Pflichtdokument – Titel &amp; Inhalt änderbar, aber nicht löschbar" name="Edit-Locked-Hint" class="locked-hint" style="display: none;"/>
+                <ui:Label text="🔒 Pflichtdokument – Werte änderbar, aber nicht löschbar" name="Edit-Locked-Hint" class="locked-hint" style="display: none;"/>
                 <ui:VisualElement class="form-group" style="margin-top: 12px;">
                     <ui:Label text="Titel" class="field-label"/>
                     <ui:TextField label="" placeholder-text="Dokumenttitel" name="Edit-Doc-Name-Input"/>
                 </ui:VisualElement>
+                <ui:VisualElement name="Edit-Struktur-Felder-Box" style="display: none;"/>
                 <ui:VisualElement class="form-group">
                     <ui:Label text="Inhalt" class="field-label"/>
-                    <ui:TextField label="" placeholder-text="z.B. IBAN, Notizen, Beschreibung..." name="Edit-Inhalt-Input" multiline="true" class="edit-textarea"/>
+                    <ui:TextField label="" placeholder-text="z.B. Notizen, Beschreibung..." name="Edit-Inhalt-Input" multiline="true" class="edit-textarea"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Edit-Buttons-Type-Group" class="template-grid" style="margin-top: 12px;">
                     <ui:Button text="Standard" name="Btn-Edit-Type-Standard" class="template-btn"/>
@@ -83,6 +85,17 @@
                 <ui:VisualElement class="popup-footer-row" style="margin-top: 18px;">
                     <ui:Button text="Abbrechen" name="Btn-Edit-Cancel" class="doc-btn-secondary"/>
                     <ui:Button text="Fertig" name="Btn-Edit-Submit" class="doc-btn-primary"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Delete-Confirm-Overlay" class="popup-overlay" style="display: none;">
+            <ui:VisualElement name="Delete-Confirm-Container" class="doc-card delete-confirm-box">
+                <ui:Label text="⚠ Alle Dokumente löschen?" class="card-title"/>
+                <ui:Label text="" name="Delete-Confirm-Hint" class="delete-confirm-hint" style="margin-top: 10px; margin-bottom: 4px;"/>
+                <ui:Label text="Diese Aktion kann nicht widerrufen werden." class="card-subtitle" style="margin-bottom: 16px;"/>
+                <ui:VisualElement class="popup-footer-row">
+                    <ui:Button text="Abbrechen" name="Btn-Delete-Confirm-Cancel" class="doc-btn-secondary"/>
+                    <ui:Button text="Endgültig löschen" name="Btn-Delete-Confirm-Yes" class="doc-btn-danger-outline"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
