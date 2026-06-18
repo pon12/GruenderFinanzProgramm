@@ -14,6 +14,8 @@ public class KassenbuchController : MonoBehaviour
 
 
     private Label balanceLabel;
+
+    private Label fehlerLabel;
    
     private VisualElement datumKlickLabel;          
     private VisualElement meinUxmlKalender;
@@ -67,6 +69,18 @@ public class KassenbuchController : MonoBehaviour
         tableInput = root.Q<VisualElement>("tableBody") ?? root.Q<VisualElement>("unity-content-container");
        
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
+
+        if (_overlay != null)
+{
+    fehlerLabel = _overlay.Q<Label>("label-fehler");
+
+    if (fehlerLabel != null)
+    {
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
+        fehlerLabel.style.color = Color.red;
+    }
+}
 
 
         // --- DASHBOARD LABELS ZUWEISEN ---
@@ -519,34 +533,84 @@ public class KassenbuchController : MonoBehaviour
 
 
     private void OnSpeichern()
+{
+    if (_overlay == null)
+        return;
+
+    if (fehlerLabel != null)
     {
-        if (_overlay == null) return;
-
-
-        string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
-        string zweck      = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
-        string datum      = _overlay.Q<TextField>("input-datum").value.Trim();
-
-
-        if (betragText == PLACEHOLDER_BETRAG) betragText = "";
-        if (zweck == PLACEHOLDER_ZWECK) zweck = "";
-
-
-        betragText = betragText.Replace("€", "").Trim();
-
-
-        if (!float.TryParse(betragText, out float betrag) || string.IsNullOrEmpty(zweck) || string.IsNullOrEmpty(datum))
-        {
-            Debug.LogWarning("[Kassenbuch] Ungültige Eingabe beim Speichern.");
-            return;
-        }
-
-
-        var eintrag = new KassenbuchEintrag(_aktuellerTyp, betrag, zweck, datum);
-        SpeichereEintrag(eintrag);
-        ClosePopup();
-        createList();
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
     }
+
+    string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
+    string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
+    string datum = _overlay.Q<TextField>("input-datum").value.Trim();
+
+    if (betragText == PLACEHOLDER_BETRAG)
+        betragText = "";
+
+    if (zweck == PLACEHOLDER_ZWECK)
+        zweck = "";
+
+    betragText = betragText.Replace("€", "").Trim();
+
+    // ==========================
+    // BETRAG PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(betragText))
+    {
+        ShowFehler("Bitte einen Betrag eingeben.");
+        return;
+    }
+
+    if (!float.TryParse(
+            betragText.Replace(",", "."),
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out float betrag))
+    {
+        ShowFehler("Ungültiger Betrag.");
+        return;
+    }
+
+    // ==========================
+    // ZWECK PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(zweck))
+    {
+        ShowFehler("Bitte einen Verwendungszweck eingeben.");
+        return;
+    }
+
+    // ==========================
+    // DATUM PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(datum))
+    {
+        ShowFehler("Bitte ein Datum auswählen.");
+        return;
+    }
+
+    // ==========================
+    // SPEICHERN
+    // ==========================
+
+    var eintrag = new KassenbuchEintrag(
+        _aktuellerTyp,
+        betrag,
+        zweck,
+        datum
+    );
+
+    SpeichereEintrag(eintrag);
+
+    ClosePopup();
+    createList();
+}
 
 
     private void SpeichereEintrag(KassenbuchEintrag eintrag)
