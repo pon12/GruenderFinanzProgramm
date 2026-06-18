@@ -16,6 +16,7 @@ public class DataBase : DatabaseManager
         createTable<Ausgaben>();
         createTable<Einkommen>();
         createTable<Settings>();
+        createTable<Finanzdaten>();
     }
 
     public void setupAuthDB()
@@ -443,6 +444,88 @@ public int updateSettings(Settings settings)
 {
     return update(settings);
 }
+
+
+//Finanzdaten 
+
+public int createFinanzdaten(int monat,int ausgaben,int einahmenTotal,int erstellteAng ,int angenommenAng, int erstellteRech ,int angenommenRech)
+{
+    Finanzdaten newFinanzdaten = new Finanzdaten
+    {
+        monat = monat,
+        ausgaben = ausgaben,
+        einahmenTotal = einahmenTotal,
+        erstellteAng = erstellteAng,
+        angenommenAng = angenommenAng,
+        erstellteRech = erstellteRech,
+        angenommenRech = angenommenRech
+    };
+    return insert(newFinanzdaten);
+}
+
+public List<Finanzdaten> getAllFinanzdaten()
+{
+    return getAll<Finanzdaten>();
+}
+
+public int deleteFinanzdatenMonat(int monat)
+{
+    return delete<Finanzdaten>(monat);
+}
+
+public int updateFinanzdaten(Finanzdaten finanzdaten)
+{
+    return update(finanzdaten);
+}
+
+public int getFinanzdatenMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}");
+
+}
+
+public int orderFinanzdatenASC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat ASC");
+}
+
+public int orderFinanzdatenDESC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat DESC");
+}
+
+public int getAusgabenbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}");
+}
+
+public int getEinahmenTotalbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}");
+}
+
+public int getErstellteAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}");
+}
+
+public int getAngenommenAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}");
+}
+
+public int getErstellteRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}");
+}
+
+public int getAngenommenRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}");
+}
+
+
+
 
 }
 

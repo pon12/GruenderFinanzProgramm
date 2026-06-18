@@ -105,3 +105,16 @@ public class Settings
     public int steuersatz { get; set; }
     public bool Begleiter { get; set; }
 }
+
+public class Finanzdaten
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public int monat { get; set; }
+    public int ausgaben { get; set; }
+    public int einahmenTotal { get; set; }
+    public int erstellteAng { get; set; }
+    public int angenommenAng { get; set; }
+    public int erstellteRechnungen { get; set; }
+    public int angenommenRechnungen { get; set; }
+}
