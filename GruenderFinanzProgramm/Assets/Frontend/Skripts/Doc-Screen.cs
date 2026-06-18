@@ -1,5 +1,20 @@
+// ================================================================
+// DocumentDashboard.cs  – Dokumente-Pool, überarbeitet
+//
+// NEU:
+//  - Feste Kategorien (Gründung, Bezahlweise) mit vordefinierten
+//    Pflicht-Dokumenten. Diese sind NICHT löschbar, aber Titel und
+//    Inhalt bleiben frei bearbeitbar. Sie können nicht aus der
+//    "Globale Liste" in andere Kategorien verschoben werden.
+//  - Flexible Kategorien (Finanzen, Marketing, Steuern, Personal,
+//    Recht) funktionieren weiterhin wie bisher.
+//  - Bezahlweise-Daten sind über GetBezahlweiseDaten() für den
+//    BelegScreenController / PDF-Export zugänglich.
+//  - Design an Angebot-Screen angepasst (siehe Doc-Screen.uss).
+// ================================================================
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,12 +26,8 @@ public class DocumentDashboard : MonoBehaviour
     [Header("Templates")]
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
 
-    [Header("Font Settings")]
-    [SerializeField] private Font poppinsBoldFont;
-
     // UI Elemente Hauptbildschirm
     private VisualElement root;
-    private Button        createButton;
     private Button        deleteButton;
     private VisualElement gridContainer;
 
@@ -26,6 +37,9 @@ public class DocumentDashboard : MonoBehaviour
     private Button        popupSubmitButton;
     private DropdownField categoryDropdown;
     private TextField     docNameInput;
+    private Button        btnTypeStandard;
+    private Button        btnTypeDiagramm;
+    private Button        btnTypeChecklist;
 
     // Kategorie-Listen-Popup Elemente
     private VisualElement detailPopupOverlay;
@@ -38,11 +52,13 @@ public class DocumentDashboard : MonoBehaviour
     // Bearbeiten-Popup Elemente
     private VisualElement editPopupOverlay;
     private TextField     editDocNameInput;
+    private TextField     editInhaltInput;
     private Button        editPopupSubmitButton;
     private Button        editPopupCancelButton;
     private Button        btnEditTypeStandard;
     private Button        btnEditTypeDiagramm;
     private Button        btnEditTypeChecklist;
+    private Label         editLockedHint;
 
     // System-Zustaende
     private string       selectedType           = "Standard";
@@ -50,10 +66,34 @@ public class DocumentDashboard : MonoBehaviour
     private string       activeCategoryForList  = "";
     private DocumentData activeDocForEditing;
 
-  private List<string> dropdownKategorien = new List<string>
+    // ============================================================
+    // KATEGORIEN-DEFINITION
+    //
+    // istFest = true  -> nicht löschbar, nicht in andere Kategorie
+    //                     verschiebbar. Titel/Inhalt bleiben editierbar.
+    // pflichtDocs      -> werden beim ersten Start automatisch angelegt
+    //                     falls noch nicht vorhanden.
+    // ============================================================
+    private class KategorieDefinition
     {
-    "Gründung", "Finanzen", "Marketing", "Steuern", "Personal", "Recht"
+        public string       name;
+        public bool         istFest;
+        public List<string> pflichtDocs;
+    }
+
+    private readonly List<KategorieDefinition> kategorien = new List<KategorieDefinition>
+    {
+        new KategorieDefinition { name = "Gründung",    istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Handelsregisterauszug" } },
+        new KategorieDefinition { name = "Bezahlweise",  istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen" } },
+        new KategorieDefinition { name = "Finanzen",     istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Marketing",    istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Steuern",      istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Personal",     istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Recht",        istFest = false, pflichtDocs = new List<string>() },
     };
+
+    private bool IstKategorieFest(string kategorieName)
+        => kategorien.Find(k => k.name == kategorieName)?.istFest ?? false;
 
     [System.Serializable]
     public class DocumentData
@@ -62,6 +102,8 @@ public class DocumentDashboard : MonoBehaviour
         public string category;
         public string title;
         public string type;
+        public bool   istPflichtdokument; // true = Teil der festen Kategorie, nicht löschbar
+        public string inhalt;             // freier Text/Daten (z.B. IBAN bei Bezahlweise)
     }
 
     [System.Serializable]
@@ -87,18 +129,18 @@ public class DocumentDashboard : MonoBehaviour
         root = uiDocument.rootVisualElement;
 
         // 1. Hauptbildschirm
-        createButton  = root.Q<Button>("Create-Button");
         deleteButton  = root.Q<Button>("Delete-Button");
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
         // 2. Erstell-Popup
         popupOverlay      = root.Q<VisualElement>("Popup-Overlay");
         popupCancelButton = root.Q<Button>("Btn-Cancel");
-        var btnAbbrechen = root.Q<Button>("Btn-Abbrechen");
+        var btnAbbrechen  = root.Q<Button>("Btn-Abbrechen");
         if (btnAbbrechen != null) btnAbbrechen.clicked += ClosePopup;
         popupSubmitButton = root.Q<Button>("Btn-Submit");
         categoryDropdown  = root.Q<DropdownField>("dropKategorie");
         docNameInput      = root.Q<TextField>("Doc-Name-Input");
+        ErzwingeCursorSichtbarkeit(docNameInput);
 
         // 3. Zweispaltiges Listen-Popup
         detailPopupOverlay  = root.Q<VisualElement>("Detail-Popup-Overlay");
@@ -111,31 +153,35 @@ public class DocumentDashboard : MonoBehaviour
         // 4. Bearbeiten-Popup
         editPopupOverlay      = root.Q<VisualElement>("Edit-Popup-Overlay");
         editDocNameInput      = root.Q<TextField>("Edit-Doc-Name-Input");
+        editInhaltInput       = root.Q<TextField>("Edit-Inhalt-Input");
+        ErzwingeCursorSichtbarkeit(editDocNameInput);
+        ErzwingeCursorSichtbarkeit(editInhaltInput);
         editPopupSubmitButton = root.Q<Button>("Btn-Edit-Submit");
         editPopupCancelButton = root.Q<Button>("Btn-Edit-Cancel");
         btnEditTypeStandard   = root.Q<Button>("Btn-Edit-Type-Standard");
         btnEditTypeDiagramm   = root.Q<Button>("Btn-Edit-Type-Diagramm");
         btnEditTypeChecklist  = root.Q<Button>("Btn-Edit-Type-Checklist");
+        editLockedHint        = root.Q<Label>("Edit-Locked-Hint");
 
-        // Dropdown befuellen
+        // Dropdown befuellen (nur Kategorienamen)
         if (categoryDropdown != null)
         {
-            categoryDropdown.choices = dropdownKategorien;
-            if (dropdownKategorien.Count > 0)
-                categoryDropdown.value = dropdownKategorien[0];
+            var namen = kategorien.Select(k => k.name).ToList();
+            categoryDropdown.choices = namen;
+            if (namen.Count > 0)
+                categoryDropdown.value = namen[0];
         }
 
         // Event-Verdrahtung Hauptmenu
-        if (createButton != null) createButton.clicked += () => OpenPopup("");
         if (deleteButton != null) deleteButton.clicked += deleteAllDocuments;
 
         // Event-Verdrahtung Erstell-Popup
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
         if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
 
-        Button btnTypeStandard  = root.Q<Button>("Btn-Type-Standard");
-        Button btnTypeDiagramm  = root.Q<Button>("Btn-Type-Diagramm");
-        Button btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
+        btnTypeStandard  = root.Q<Button>("Btn-Type-Standard");
+        btnTypeDiagramm  = root.Q<Button>("Btn-Type-Diagramm");
+        btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
 
         if (btnTypeStandard  != null) btnTypeStandard.clicked  += () => ApplyTemplate("Standard");
         if (btnTypeDiagramm  != null) btnTypeDiagramm.clicked  += () => ApplyTemplate("Diagramm");
@@ -157,7 +203,7 @@ public class DocumentDashboard : MonoBehaviour
         if (btnEditTypeDiagramm  != null) btnEditTypeDiagramm.clicked   += () => SelectEditType("Diagramm");
         if (btnEditTypeChecklist != null) btnEditTypeChecklist.clicked  += () => SelectEditType("Checklist");
 
-        // Enter schlukt nur Zeilenumbruch im Edit-Textfeld
+        // Enter schluckt nur Zeilenumbruch im Edit-Textfeld
         if (editDocNameInput != null)
             editDocNameInput.RegisterCallback<KeyDownEvent>(evt =>
             {
@@ -166,7 +212,44 @@ public class DocumentDashboard : MonoBehaviour
             }, TrickleDown.TrickleDown);
 
         LoadDataLocally();
+        SicherePflichtdokumente();   // legt fehlende Pflicht-Docs an
         SpawnAllCardsAtStart();
+    }
+
+    // ─────────────────────────────────────────
+    // PFLICHTDOKUMENTE SICHERSTELLEN
+    // (läuft bei jedem Start, ergänzt nur was fehlt)
+    // ─────────────────────────────────────────
+    private void SicherePflichtdokumente()
+    {
+        bool geaendert = false;
+
+        foreach (var kategorie in kategorien.Where(k => k.istFest))
+        {
+            foreach (string pflichtTitel in kategorie.pflichtDocs)
+            {
+                bool existiertSchon = speicherDaten.savedDocs.Any(d =>
+                    d.category == kategorie.name &&
+                    d.istPflichtdokument &&
+                    d.title == pflichtTitel);
+
+                if (!existiertSchon)
+                {
+                    speicherDaten.savedDocs.Add(new DocumentData
+                    {
+                        id                 = System.Guid.NewGuid().ToString(),
+                        category           = kategorie.name,
+                        title              = pflichtTitel,
+                        type               = "Standard",
+                        istPflichtdokument = true,
+                        inhalt             = ""
+                    });
+                    geaendert = true;
+                }
+            }
+        }
+
+        if (geaendert) SaveDataLocally();
     }
 
     // ─────────────────────────────────────────
@@ -178,9 +261,10 @@ public class DocumentDashboard : MonoBehaviour
         if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex;
         if (docNameInput != null) docNameInput.value         = "";
         selectedType = "Standard";
+        MarkiereAusgewaehlteVorlage(btnTypeStandard, btnTypeDiagramm, btnTypeChecklist, selectedType);
 
         if (!string.IsNullOrEmpty(preselectedCategory) && categoryDropdown != null)
-            if (dropdownKategorien.Contains(preselectedCategory))
+            if (kategorien.Any(k => k.name == preselectedCategory))
                 categoryDropdown.value = preselectedCategory;
     }
 
@@ -192,23 +276,35 @@ public class DocumentDashboard : MonoBehaviour
     private void ApplyTemplate(string typeName)
     {
         selectedType = typeName;
+        MarkiereAusgewaehlteVorlage(btnTypeStandard, btnTypeDiagramm, btnTypeChecklist, selectedType);
     }
 
     private void CreateNewDocumentEntry()
     {
         string selectedCategory = categoryDropdown != null ? categoryDropdown.value : "";
-        string docText = (docNameInput != null && !string.IsNullOrEmpty(docNameInput.value))
-            ? docNameInput.value
-            : "Unbenannt";
+
+        // Pflicht: Dokumenttitel muss vorhanden sein
+        string docText = docNameInput != null ? docNameInput.value.Trim() : "";
+        if (string.IsNullOrEmpty(docText))
+        {
+            if (docNameInput != null)
+            {
+                docNameInput.AddToClassList("input-error");
+                docNameInput.schedule.Execute(() => docNameInput.RemoveFromClassList("input-error")).ExecuteLater(1200);
+            }
+            return;
+        }
 
         if (string.IsNullOrEmpty(selectedCategory)) return;
 
         DocumentData newDoc = new DocumentData
         {
-            id       = System.Guid.NewGuid().ToString(),
-            category = selectedCategory,
-            title    = docText,
-            type     = selectedType
+            id                 = System.Guid.NewGuid().ToString(),
+            category           = selectedCategory,
+            title              = docText,
+            type               = selectedType,
+            istPflichtdokument = false,
+            inhalt             = ""
         };
 
         speicherDaten.savedDocs.Add(newDoc);
@@ -226,47 +322,108 @@ public class DocumentDashboard : MonoBehaviour
         if (gridContainer == null || categoryCardTemplate == null) return;
         gridContainer.Clear();
 
-        foreach (string kategorieName in dropdownKategorien)
+        foreach (var kategorie in kategorien)
         {
             VisualElement cardInstance = categoryCardTemplate.Instantiate();
-            cardInstance.style.width       = Length.Percent(30f);
-            cardInstance.style.marginBottom = 20;
 
             Label titleLabel = cardInstance.Q<Label>("lblName");
-            if (titleLabel != null) titleLabel.text = kategorieName;
+            if (titleLabel != null) titleLabel.text = kategorie.name;
+
+            // Feste Kategorien bekommen ein Schloss-Badge
+            VisualElement lockBadge = cardInstance.Q<VisualElement>("lock-badge");
+            if (lockBadge != null)
+                lockBadge.style.display = kategorie.istFest ? DisplayStyle.Flex : DisplayStyle.None;
 
             VisualElement imgShowList = cardInstance.Q("Btn-Show-List");
             if (imgShowList != null)
-                imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup(kategorieName));
+                imgShowList.RegisterCallback<ClickEvent>(evt => OpenDetailPopup(kategorie.name));
 
-            Button plusBtn = cardInstance.Q<Button>("btnPlus");
-            if (plusBtn != null) plusBtn.clicked += () => OpenPopup(kategorieName);
-
-            VisualElement feldOben = cardInstance.Q<VisualElement>("Datenfeld-Oben");
-            VisualElement feldUnten = cardInstance.Q<VisualElement>("Datenfeld-Unten");
-            if (feldOben  != null) feldOben.Clear();
-            if (feldUnten != null) feldUnten.Clear();
+            // "Alle anzeigen" öffnet ebenfalls die Detail-Liste dieser Kategorie
+            Button alleAnzeigenBtn = cardInstance.Q<Button>("btnPlus");
+            if (alleAnzeigenBtn != null) alleAnzeigenBtn.clicked += () => OpenDetailPopup(kategorie.name);
 
             List<DocumentData> kategorieDocs =
-                speicherDaten.savedDocs.FindAll(d => d.category == kategorieName);
+                speicherDaten.savedDocs.FindAll(d => d.category == kategorie.name);
 
-            for (int i = 0; i < kategorieDocs.Count; i++)
+            // 2x2 Grid: 4 Slots befüllen, jeder mit eigenem Icon, Inhalt und Plus-Button
+            for (int slotIndex = 0; slotIndex < 4; slotIndex++)
             {
-                if (i >= 2) break;
+                VisualElement slot       = cardInstance.Q<VisualElement>($"Slot-{slotIndex}");
+                VisualElement iconBox    = cardInstance.Q<VisualElement>($"Slot-{slotIndex}-Icon");
+                VisualElement contentBox = cardInstance.Q<VisualElement>($"Slot-{slotIndex}-Content");
+                Button        plusBtn    = cardInstance.Q<Button>($"Slot-{slotIndex}-Plus");
 
-                VisualElement target = (i % 2 == 0) ? feldOben : feldUnten;
-                if (target == null) continue;
+                if (contentBox == null) continue;
+                contentBox.Clear();
 
-                string icon       = kategorieDocs[i].type == "Diagramm" ? "D" :
-                                    kategorieDocs[i].type == "Checklist" ? "C" : "S";
-                string firstLine  = kategorieDocs[i].title.Split('\n')[0];
-                if (firstLine.Length > 20) firstLine = firstLine.Substring(0, 17) + "...";
+                bool hatDokument = slotIndex < kategorieDocs.Count;
 
-                VisualElement docEntry = new VisualElement();
-                Label         docLabel = new Label($"[{icon}] {firstLine}");
-                docLabel.style.fontSize = 12;
-                docEntry.Add(docLabel);
-                target.Add(docEntry);
+                if (hatDokument)
+                {
+                    var aktuellesDoc = kategorieDocs[slotIndex];
+
+                    string iconGlyph = aktuellesDoc.type == "Diagramm" ? "📊" :
+                                        aktuellesDoc.type == "Checklist" ? "✅" : "📄";
+                    if (iconBox != null)
+                    {
+                        iconBox.Clear();
+                        var iconLabel = new Label(iconGlyph);
+                        iconLabel.style.fontSize = 13;
+                        iconLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+                        iconLabel.style.flexGrow = 1;
+                        iconBox.Add(iconLabel);
+                    }
+
+                    string titel = aktuellesDoc.title.Split('\n')[0];
+                    if (titel.Length > 22) titel = titel.Substring(0, 19) + "...";
+                    Label titelLabel = new Label(titel);
+                    titelLabel.AddToClassList("doc-mini-title");
+                    contentBox.Add(titelLabel);
+
+                    if (!string.IsNullOrEmpty(aktuellesDoc.inhalt))
+                    {
+                        string inhaltVorschau = aktuellesDoc.inhalt.Split('\n')[0];
+                        if (inhaltVorschau.Length > 24) inhaltVorschau = inhaltVorschau.Substring(0, 21) + "...";
+                        Label inhaltLabel = new Label(inhaltVorschau);
+                        inhaltLabel.AddToClassList("doc-mini-inhalt");
+                        contentBox.Add(inhaltLabel);
+                    }
+                    else
+                    {
+                        Label leerHinweis = new Label("Kein Inhalt hinterlegt");
+                        leerHinweis.AddToClassList("doc-mini-inhalt-leer");
+                        contentBox.Add(leerHinweis);
+                    }
+
+                    // Plus-Button im befüllten Slot öffnet die Bearbeitung dieses Dokuments
+                    if (plusBtn != null)
+                    {
+                        plusBtn.text = "✎";
+                        plusBtn.clicked += () => OpenEditPopup(aktuellesDoc);
+                    }
+                }
+                else
+                {
+                    // Leerer Slot: dezenter Hinweis + Plus-Button öffnet Erstell-Popup
+                    if (iconBox != null)
+                    {
+                        iconBox.Clear();
+                        iconBox.style.opacity = 0.4f;
+                    }
+
+                    Label leerLabel = new Label("Leer");
+                    leerLabel.AddToClassList("doc-mini-empty-label");
+                    contentBox.Add(leerLabel);
+
+                    if (plusBtn != null)
+                    {
+                        plusBtn.text = "+";
+                        plusBtn.clicked += () => OpenPopup(kategorie.name);
+                    }
+                }
+
+                if (slot != null)
+                    slot.style.opacity = hatDokument ? 1f : 0.75f;
             }
 
             gridContainer.Add(cardInstance);
@@ -303,10 +460,7 @@ public class DocumentDashboard : MonoBehaviour
         if (docs.Count == 0)
         {
             Label emptyLabel = new Label(isGlobal ? "Keine Dokumente vorhanden." : "Kategorie ist leer.");
-            emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-            emptyLabel.style.marginTop      = 15;
-            emptyLabel.style.color          = Color.gray;
-            if (poppinsBoldFont != null) emptyLabel.style.unityFont = poppinsBoldFont;
+            emptyLabel.AddToClassList("list-empty-hint");
             container.Add(emptyLabel);
             return;
         }
@@ -319,49 +473,63 @@ public class DocumentDashboard : MonoBehaviour
             string icon         = doc.type == "Diagramm" ? "D" : doc.type == "Checklist" ? "C" : "S";
             string displayTitle = doc.title.Split('\n')[0];
             if (displayTitle.Length > 30) displayTitle = displayTitle.Substring(0, 27) + "...";
-            string textToShow   = isGlobal
-                ? $"[{doc.category}] [{icon}] {displayTitle}"
-                : $"[{icon}] {displayTitle}";
+            string lockIcon      = doc.istPflichtdokument ? "🔒 " : "";
+            string textToShow    = isGlobal
+                ? $"{lockIcon}[{doc.category}] [{icon}] {displayTitle}"
+                : $"{lockIcon}[{icon}] {displayTitle}";
 
             Label nameLabel = new Label(textToShow);
-            nameLabel.style.fontSize = 14;
-            nameLabel.style.color    = Color.white;
-            if (poppinsBoldFont != null)
-            {
-                nameLabel.style.unityFont               = poppinsBoldFont;
-                nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            }
+            nameLabel.AddToClassList("list-row-label");
             row.Add(nameLabel);
+
+            // Inhalt-Vorschau direkt in der Zeile (falls vorhanden)
+            if (!string.IsNullOrEmpty(doc.inhalt))
+            {
+                string vorschau = doc.inhalt.Length > 40 ? doc.inhalt.Substring(0, 37) + "..." : doc.inhalt;
+                Label inhaltLabel = new Label(vorschau);
+                inhaltLabel.AddToClassList("list-row-inhalt-preview");
+                row.Add(inhaltLabel);
+            }
 
             VisualElement btnGroup = new VisualElement();
             btnGroup.AddToClassList("row-btn-group");
 
             if (isGlobal)
             {
-                if (doc.category != activeCategoryForList)
+                // Pflichtdokumente können NICHT in andere Kategorien verschoben werden
+                if (doc.category != activeCategoryForList && !doc.istPflichtdokument)
                 {
-                    Button moveBtn = new Button { text = "Hinzufuegen" };
+                    Button moveBtn = new Button { text = "Hinzufügen" };
                     moveBtn.AddToClassList("btn-add-global");
-                    if (poppinsBoldFont != null) moveBtn.style.unityFont = poppinsBoldFont;
                     moveBtn.clicked += () => MoveDocumentToActiveCategory(doc);
                     btnGroup.Add(moveBtn);
                 }
             }
             else
             {
-                Button editBtn = new Button();
-                editBtn.AddToClassList("btn-action-icon");
+                Button editBtn = new Button { text = "Bearbeiten" };
+                editBtn.AddToClassList("btn-action-text");
                 editBtn.AddToClassList("btn-edit-pen");
                 editBtn.tooltip  = "Dokument bearbeiten";
                 editBtn.clicked += () => OpenEditPopup(doc);
                 btnGroup.Add(editBtn);
 
-                Button deleteBtn = new Button();
-                deleteBtn.AddToClassList("btn-action-icon");
-                deleteBtn.AddToClassList("btn-minus-delete");
-                deleteBtn.tooltip  = "Dokument loeschen";
-                deleteBtn.clicked += () => DeleteSingleDocument(doc.id);
-                btnGroup.Add(deleteBtn);
+                // Pflichtdokumente sind nicht löschbar
+                if (!doc.istPflichtdokument)
+                {
+                    Button deleteBtn = new Button { text = "Löschen" };
+                    deleteBtn.AddToClassList("btn-action-text");
+                    deleteBtn.AddToClassList("btn-minus-delete");
+                    deleteBtn.tooltip  = "Dokument löschen";
+                    deleteBtn.clicked += () => DeleteSingleDocument(doc.id);
+                    btnGroup.Add(deleteBtn);
+                }
+                else
+                {
+                    Label gesperrtLabel = new Label("Geschützt");
+                    gesperrtLabel.AddToClassList("locked-badge-inline");
+                    btnGroup.Add(gesperrtLabel);
+                }
             }
 
             row.Add(btnGroup);
@@ -373,6 +541,7 @@ public class DocumentDashboard : MonoBehaviour
     {
         DocumentData docInStorage = speicherDaten.savedDocs.Find(d => d.id == doc.id);
         if (docInStorage == null) return;
+        if (docInStorage.istPflichtdokument) return; // Sicherheitsnetz
 
         docInStorage.category = activeCategoryForList;
         SaveDataLocally();
@@ -382,6 +551,9 @@ public class DocumentDashboard : MonoBehaviour
 
     private void DeleteSingleDocument(string docId)
     {
+        var doc = speicherDaten.savedDocs.Find(d => d.id == docId);
+        if (doc == null || doc.istPflichtdokument) return; // Pflichtdoks nicht löschbar
+
         speicherDaten.savedDocs.RemoveAll(d => d.id == docId);
         SaveDataLocally();
         RefreshDetailList();
@@ -398,34 +570,28 @@ public class DocumentDashboard : MonoBehaviour
     // BEARBEITEN-POPUP
     // ─────────────────────────────────────────
 
-   private void OpenEditPopup(DocumentData doc)
-{
-    activeDocForEditing = doc;
-    selectedEditType    = doc.type;
-
-    if (editPopupOverlay != null)
-        editPopupOverlay.style.display = DisplayStyle.Flex;
-
-    if (editDocNameInput != null)
+    private void OpenEditPopup(DocumentData doc)
     {
-        editDocNameInput.value = doc.title;
+        activeDocForEditing = doc;
+        selectedEditType    = doc.type;
 
-        editDocNameInput.schedule.Execute(() =>
+        if (editPopupOverlay != null)
+            editPopupOverlay.style.display = DisplayStyle.Flex;
+
+        if (editLockedHint != null)
+            editLockedHint.style.display = doc.istPflichtdokument ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (editDocNameInput != null)
         {
-            editDocNameInput.Focus();
+            editDocNameInput.value = doc.title;
+            editDocNameInput.schedule.Execute(() => editDocNameInput.Focus()).ExecuteLater(50);
+        }
 
-            // Cursor Farbe per C# setzen
-            var inputElement = editDocNameInput.Q(className: "unity-base-field__input");
-            if (inputElement != null)
-            {
-                inputElement.style.color = new StyleColor(Color.white);
-                // Hintergrund leicht heller damit schwarzer Cursor sichtbar waere als Fallback
-                inputElement.style.backgroundColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
-            }
+        if (editInhaltInput != null)
+            editInhaltInput.value = doc.inhalt ?? "";
 
-        }).ExecuteLater(50);
+        MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
     }
-}
 
     private void CloseEditPopup()
     {
@@ -437,6 +603,7 @@ public class DocumentDashboard : MonoBehaviour
     private void SelectEditType(string typeName)
     {
         selectedEditType = typeName;
+        MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
     }
 
     private void SaveEditedDocumentEntry()
@@ -447,11 +614,15 @@ public class DocumentDashboard : MonoBehaviour
             ? editDocNameInput.value
             : "Unbenannt";
 
+        string updatedInhalt = editInhaltInput != null ? editInhaltInput.value : "";
+
         DocumentData docInList = speicherDaten.savedDocs.Find(d => d.id == activeDocForEditing.id);
         if (docInList != null)
         {
-            docInList.title = updatedTitle;
-            docInList.type  = selectedEditType;
+            // Titel UND Inhalt bleiben editierbar, auch bei Pflichtdokumenten
+            docInList.title  = updatedTitle;
+            docInList.type   = selectedEditType;
+            docInList.inhalt = updatedInhalt;
         }
 
         SaveDataLocally();
@@ -472,7 +643,8 @@ public class DocumentDashboard : MonoBehaviour
 
     private void deleteAllDocuments()
     {
-        speicherDaten.savedDocs.Clear();
+        // Löscht nur NICHT-Pflichtdokumente. Feste Kategorien bleiben erhalten.
+        speicherDaten.savedDocs.RemoveAll(d => !d.istPflichtdokument);
         SaveDataLocally();
         SpawnAllCardsAtStart();
     }
@@ -497,5 +669,51 @@ public class DocumentDashboard : MonoBehaviour
         string path = GetSaveFilePath();
         if (!File.Exists(path)) return new DocumentSaveData();
         return JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(path));
+    }
+
+    // ─────────────────────────────────────────
+    // BEZAHLWEISE-ZUGRIFF
+    // Für BelegScreenController / PDF-Export:
+    // Liefert alle Dokumente der Kategorie "Bezahlweise" als
+    // Liste von (Titel, Inhalt)-Paaren, z.B. für IBAN/BIC-Einfügung
+    // in Angebot/Rechnung PDFs.
+    // ─────────────────────────────────────────
+    public static List<DocumentData> GetBezahlweiseDaten()
+    {
+        var alle = GetSavedDocuments();
+        return alle.savedDocs.FindAll(d => d.category == "Bezahlweise");
+    }
+
+    // ─────────────────────────────────────────
+    // VORLAGEN-AUSWAHL VISUELL MARKIEREN
+    //
+    // Setzt die Klasse "selected-template" auf den Button der
+    // aktuell aktiven Vorlage und entfernt sie von den anderen.
+    // ─────────────────────────────────────────
+    private void MarkiereAusgewaehlteVorlage(Button standard, Button diagramm, Button checklist, string aktiverTyp)
+    {
+        standard?.RemoveFromClassList("selected-template");
+        diagramm?.RemoveFromClassList("selected-template");
+        checklist?.RemoveFromClassList("selected-template");
+
+        switch (aktiverTyp)
+        {
+            case "Standard":  standard?.AddToClassList("selected-template");  break;
+            case "Diagramm":  diagramm?.AddToClassList("selected-template");  break;
+            case "Checklist": checklist?.AddToClassList("selected-template"); break;
+        }
+    }
+
+    // ─────────────────────────────────────────
+    // CURSOR-SICHTBARKEIT
+    //
+    // Wird vollständig über die USS-Eigenschaft --unity-cursor-color
+    // in Doc-Screen.uss gesteuert. Die C#-Properties cursorColor /
+    // selectionColor sind in dieser Unity-Version deprecated und
+    // wurden deshalb entfernt.
+    // ─────────────────────────────────────────
+    private void ErzwingeCursorSichtbarkeit(TextField feld)
+    {
+        // Bewusst leer – Cursor-Farbe kommt rein aus USS (siehe .unity-base-field__input)
     }
 }

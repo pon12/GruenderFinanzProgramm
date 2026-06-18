@@ -246,7 +246,6 @@ public int deleteOfferItem(int id)
 
     public int createService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -262,7 +261,6 @@ public int deleteOfferItem(int id)
 
     public int updateService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return update(service);
     }
 

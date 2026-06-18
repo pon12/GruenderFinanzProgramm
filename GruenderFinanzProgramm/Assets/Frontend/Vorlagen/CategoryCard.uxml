@@ -1,18 +1,42 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Frontend/Stylesheets/doc-main.uss?fileID=7433441132597879392&amp;guid=a0d03a3f5149e1d448b98d3e66e7b5de&amp;type=3#doc-main"/>
-    <ui:VisualElement class="category-card" style="flex-grow: 1; aspect-ratio: auto; width: 90%;">
-        <ui:VisualElement class="sub-tile main-info-tile" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
-            <ui:Button text="" name="Btn-Show-List" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/category%201.png?fileID=2800000&amp;guid=d244de2ad7c4e684ab776e2d07940759&amp;type=3#category 1&quot;); background-color: rgb(44, 44, 46); border-left-color: rgb(44, 44, 46); border-right-color: rgb(44, 44, 46); border-top-color: rgb(44, 44, 46); border-bottom-color: rgb(44, 44, 46); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; font-size: 20px; width: 100px; height: 100px;"/>
-            <ui:Label text="Card Name" name="lblName" class="main-info-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
+    <ui:VisualElement class="doc-card category-card">
+        <ui:VisualElement class="category-header-row">
+            <ui:VisualElement name="Btn-Show-List" class="category-icon-tile">
+                <ui:Label text="📁" class="category-icon-glyph"/>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; flex-direction: column;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; gap: 6px;">
+                    <ui:Label text="Card Name" name="lblName" class="category-title"/>
+                    <ui:VisualElement name="lock-badge" class="lock-badge" style="display: none;">
+                        <ui:Label text="🔒" class="lock-badge-glyph"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label text="Kategorie" class="category-meta"/>
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="Datenfeld-Oben" class="sub-tile" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
-            <ui:Label text="Dokumenttext" class="sub-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
+        <ui:VisualElement class="category-doc-grid-2x2">
+            <ui:VisualElement name="Slot-0" class="doc-mini-slot">
+                <ui:VisualElement name="Slot-0-Icon" class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-0-Content" class="doc-mini-content"/>
+                <ui:Button name="Slot-0-Plus" text="+" class="doc-mini-plus"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="Slot-1" class="doc-mini-slot">
+                <ui:VisualElement name="Slot-1-Icon" class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-1-Content" class="doc-mini-content"/>
+                <ui:Button name="Slot-1-Plus" text="+" class="doc-mini-plus"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="Slot-2" class="doc-mini-slot">
+                <ui:VisualElement name="Slot-2-Icon" class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-2-Content" class="doc-mini-content"/>
+                <ui:Button name="Slot-2-Plus" text="+" class="doc-mini-plus"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="Slot-3" class="doc-mini-slot">
+                <ui:VisualElement name="Slot-3-Icon" class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-3-Content" class="doc-mini-content"/>
+                <ui:Button name="Slot-3-Plus" text="+" class="doc-mini-plus"/>
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="Datenfeld-Unten" class="sub-tile" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
-            <ui:Label text="Dokumenttext" class="sub-tile" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;);"/>
-        </ui:VisualElement>
-        <ui:VisualElement class="sub-tile" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
-            <ui:Button text="+" name="btnPlus" class="plus-button-text" style="border-left-color: rgb(44, 44, 46); border-right-color: rgb(44, 44, 46); border-top-color: rgb(44, 44, 46); border-bottom-color: rgb(44, 44, 46); background-color: rgb(44, 44, 46); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-        </ui:VisualElement>
+        <ui:Button text="Alle anzeigen" name="btnPlus" class="doc-btn-add-inline"/>
     </ui:VisualElement>
 </ui:UXML>

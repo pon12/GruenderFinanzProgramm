@@ -1,88 +1,251 @@
-.cards {
+.page-title {
+    font-size: 42px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
     margin: 8px;
-    padding: 16px;
-    border-radius: 8px;
-    background-color: rgb(0, 0, 0);
-    width: 33%;
-    shrink: 1;
-    grow: 0;
 }
 
-.Label1 {
-    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
-    font-size: 26px;
-    color: rgb(255, 255, 255);
-    margin: 4px;
-    padding: 4px;
-}
-
-.beschreibung {
-    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
-    font-size: 15px;
-    color: rgb(255, 255, 255);
-    margin: 4px;
-    padding: 4px;
-}
-
-.preis {
-    flex-grow: 1;
-    flex-direction: row;
-    align-items: bottom;
-    padding: 4px;
-    margin: 4px;
-}
-
-.buttons {
-    flex-grow: 1;
-    height: 48px;
-}
-
-.cards-grid {
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    align-content: flex-start;
-}
-
-.unity-scroll-view__vertical-scroller {
-    width: 8px;
-    background-color: rgb(38, 38, 38);
-    border-radius: 4px;
-    margin-left: 8px;
-    border-top-width: 0;
-    border-right-width: 0;
-    border-bottom-width: 0;
-    border-left-width: 0;
-}
-
-.unity-scroller--vertical .unity-base-slider__dragger {
+.add-btn {
     background-color: rgb(128, 207, 149);
-    border-radius: 4px;
-    min-height: 40px;
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    border-radius: 8px;
     border-top-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
     border-left-width: 0;
+    height: 44px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 16px;
+    align-self: flex-end;
+}
+
+.tabelle-wrapper {
+    flex-grow: 1;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-color: rgb(142, 141, 141);
+    overflow: hidden;
+}
+
+.tabelle-header {
+    flex-direction: row;
+    background-color: rgb(0, 0, 0);
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.tabelle-header-zelle {
+    color: #80CF95;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    -unity-text-align: middle-left;
+}
+
+.tabelle-zeile {
+    flex-direction: row;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-top-width: 2px;
+    border-color: rgb(60, 60, 60);
+    background-color: rgb(38, 38, 38);
+    border-radius: 8px;
+}
+
+.tabelle-zeile:hover {
+    background-color: rgb(50, 50, 50);
+}
+
+.tabelle-zelle {
+    color: #ffffff;
+    font-size: 15px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    -unity-text-align: middle-center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.col-titel {
+    width: 20%;
+    flex-shrink: 0;
+    -unity-text-align: middle-center;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
     margin-left: 0;
+    padding: 0;
+}
+
+.col-beschreibung {
+    width: 35%;
+    flex-shrink: 0;
+    -unity-text-align: middle-center;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
+    margin-left: 0;
+    padding: 0;
+}
+
+.col-preismodell {
+    width: 15%;
+    flex-shrink: 0;
+    -unity-text-align: middle-center;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
+    margin-left: 0;
+    padding: 0;
+}
+
+.col-betrag {
+    width: 15%;
+    flex-shrink: 0;
+    -unity-text-align: middle-center;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
+    margin-left: 0;
+    padding: 0;
+}
+
+.col-aktionen {
+    width: 15%;
+    flex-shrink: 0;
+    flex-direction: row;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
+    margin-left: 0;
+    padding: 0;
+}
+
+.zeile-btn {
+    flex-grow: 0;
+    height: 32px;
+    border-radius: 6px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
+    color: rgb(0, 0, 0);
+    background-color: #80CF95;
+    margin-right: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.zeile-btn-loeschen {
+    background-color: rgb(207, 80, 80);
+    color: rgb(255, 255, 255);
     margin-right: 0;
 }
 
-.unity-scroller--vertical .unity-base-slider__tracker {
+.popup-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-box {
+    width: 600px;
     background-color: rgb(38, 38, 38);
-    border-radius: 4px;
+    border-radius: 16px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: rgb(128, 207, 149);
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 36px;
+    padding-right: 36px;
 }
 
-.unity-scroller--vertical .unity-scroller__low-button,
-.unity-scroller--vertical .unity-scroller__high-button {
-    display: none;
+.popup-titel {
+    font-size: 26px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    margin-bottom: 20px;
 }
 
-.unity-scroll-view__horizontal-scroller {
-    display: none;
+.popup-label {
+    font-size: 14px;
+    color: rgb(160, 160, 160);
+    margin-bottom: 4px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
 }
 
-.unity-scroll-view__content-and-vertical-scroll-container {
-    flex-grow: 1;
+.popup-input {
+    height: 40px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border-color: rgb(80, 80, 80);
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
+.popup-input > .unity-base-field__input {
+    background-color: rgb(55, 55, 55);
+    border-color: rgb(80, 80, 80);
+    border-radius: 6px;
+    color: rgb(255, 255, 255);
+}
 
+.popup-dropdown {
+    height: 40px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    border-color: rgb(80, 80, 80);
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+}
+
+.popup-dropdown > .unity-base-field__input {
+    background-color: rgb(80, 80, 80);
+    border-color: rgb(80, 80, 80);
+    border-radius: 6px;
+    color: rgb(255, 255, 255);
+    padding-left: 8px;
+    margin-left: 0;
+}
+
+.popup-btn-fertig {
+    background-color: rgb(128, 207, 149);
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    border-radius: 10px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    height: 50px;
+    margin-top: 8px;
+}

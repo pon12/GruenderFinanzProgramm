@@ -217,6 +217,8 @@ public class KundendatenbankController : MonoBehaviour
             zielContainer.Add(neueKarte);
         }
 
+        AppEventManager.KundenAnzahlGeaendert(kundenListe.Count);
+
     }
 
     private void SpeichereNeuenKunden()
