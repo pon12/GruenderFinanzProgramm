@@ -4,6 +4,8 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using iTextSharp.text; // Für den PDF-Export benötigt
+using System.Linq;
+using System.Globalization;
 
 
 public class KassenbuchController : MonoBehaviour
@@ -59,6 +61,15 @@ public class KassenbuchController : MonoBehaviour
     {
         // Holt die aktive Nutzer-Datenbank laut Dokumentation
         db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        if (db == null)
+        {
+            Debug.LogError("[Kassenbuch] Keine aktive Nutzer-Datenbank gefunden.");
+            return;
+        }
+
+        db.setupKassenbuchTable();
+
         outputTemplate = Resources.Load<VisualTreeAsset>("Kassenbuch_Field");
 
 
@@ -682,10 +693,12 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         if (db == null) return;
 
 
-        if (eintrag.Typ == "Einnahme")
+        if (eintrag.Typ == "Einnahme") {
             db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
-        else
+        }
+        else {
             db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
+    }
     }
 
 
@@ -966,6 +979,11 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         }
     }
 
+    private List<KassenbuchEintrag> getCombinedEntries()
+    {
+        List<KassenbuchEintrag> entries = new List<KassenbuchEintrag>();
+        return entries;
+    }
 
     public void ExportJahrAlsPdf(string jahr)
     {
@@ -978,6 +996,18 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             return;
         }
 
+        /* AUSKOMMENTIERT NACH MERGE CONFLICT DA ENTRIES CONTEXT FEHLT - Pontus
+        foreach (Ausgaben ausgabe in db.getAllAusgabenEntries())
+        {
+            entries.Add(new KassenbuchEintrag(
+                ausgabe.getId(),
+                "Ausgabe",
+                ausgabe.Amount,
+                ausgabe.Description,
+                ausgabe.Datum
+            ));
+        }
+        */ 
 
         var einkommen = db.getAllEinkommenEntries();
         var ausgaben  = db.getAllAusgabenEntries();  
@@ -1079,17 +1109,28 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 public class KassenbuchEintrag
 {
+    public int Id;
     public string Typ;
-    public float  Betrag;
+    public float Betrag;
     public string Beschreibung;
     public string Datum;
 
 
    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
     {
-        Typ          = typ;
-        Betrag       = betrag;
+        Id = 0;
+        Typ = typ;
+        Betrag = betrag;
         Beschreibung = beschreibung;
-        Datum        = datum;
+        Datum = datum;
+    }
+
+    public KassenbuchEintrag(int id, string typ, float betrag, string beschreibung, string datum)
+    {
+        Id = id;
+        Typ = typ;
+        Betrag = betrag;
+        Beschreibung = beschreibung;
+        Datum = datum;
     }
 }
