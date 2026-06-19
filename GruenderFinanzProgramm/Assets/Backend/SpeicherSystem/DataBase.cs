@@ -125,7 +125,7 @@ public int deleteCompany(int companyId)
 
 public int createInvoice(Invoice invoice)
 {
-    return insert(invoice);
+    return insertAndGetId(invoice);
 }
 public int updateInvoice(Invoice invoice)
 {
@@ -166,7 +166,7 @@ public int deleteInvoiceItem(int id)
 
 public int createOffer(Offer offer)
 {
-    return insert(offer);
+    return insertAndGetId(offer);
 }
 public int updateOffer(Offer offer)
 {
