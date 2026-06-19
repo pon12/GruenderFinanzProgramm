@@ -171,29 +171,35 @@ public class RegestrierungLogik : MonoBehaviour
     }
 
     private void AktualisierePasskeyAnzeige()
+{
+    if (lblPasskey == null) return;
+    
+    string recoveryKey = authService.recoveryPassKeyGlobal;
+    string passkeyAnzeige;
+    string recoveryAnzeige;
+
+    if (istEntschluesselt)
     {
-        if (lblPasskey == null) return;
-        string recoveryKey = authService.recoveryPassKeyGlobal;
-        string passkeyAnzeige;
-        string recoveryAnzeige;
-        if (istEntschluesselt)
-        {
-            // Klartext – Passkey mit Leerzeichen alle 4 Zeichen
-            passkeyAnzeige = FormatiereMitLeerzeichen(aktuellerPasskey);
-            recoveryAnzeige = recoveryKey;
-            if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
-        }
-        else
-        {
-            // Maskiert – beide Keys mit Sternchen
-            passkeyAnzeige = new string('*', aktuellerPasskey.Length);
-            recoveryAnzeige = new string('*', recoveryKey.Length);
-            if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
-        }
-        lblPasskey.text =
-            "PassKey: " + passkeyAnzeige +
-            "\nRecoveryKey: " + recoveryAnzeige;
+        // Hier wendest du die Formatierung auf BEIDE Keys an
+        passkeyAnzeige = FormatiereMitLeerzeichen(aktuellerPasskey);
+        recoveryAnzeige = FormatiereMitLeerzeichen(recoveryKey); // <-- Hier musst du die Funktion aufrufen
+        
+        if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
     }
+    else
+    {
+        // Maskiert – hier willst du vermutlich keine Leerzeichen, 
+        // da Sternchen eh nur Platzhalter sind
+        passkeyAnzeige = new string('*', aktuellerPasskey.Length);
+        recoveryAnzeige = new string('*', recoveryKey.Length);
+        
+        if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
+    }
+
+    lblPasskey.text =
+        "PassKey: " + passkeyAnzeige +
+        "\nRecoveryKey: " + recoveryAnzeige;
+}
 
     private void ZeigeEingabeFehler(bool hasText, bool isToggleActive)
     {

@@ -47,6 +47,8 @@ public class KassenbuchController : MonoBehaviour
     private string _aktuellerTyp;
     private DataBase db;
 
+    private DropdownField artDropdown;
+
 
     // ==========================================
     // UNSERE PLATZHALTER-TEXTE
@@ -57,6 +59,8 @@ public class KassenbuchController : MonoBehaviour
 
     void OnEnable()
     {
+
+        
         // Holt die aktive Nutzer-Datenbank laut Dokumentation
         db = UserDatabaseAccess.getCurrentUserDatabase();
         outputTemplate = Resources.Load<VisualTreeAsset>("Kassenbuch_Field");
@@ -75,7 +79,7 @@ public class KassenbuchController : MonoBehaviour
 
         if (_overlay != null)
 {
-    fehlerLabel = _overlay.Q<Label>("label-fehler");
+    fehlerLabel = _overlay.Q<Label>("FehlerText");
 
     if (fehlerLabel != null)
     {
@@ -212,6 +216,28 @@ public class KassenbuchController : MonoBehaviour
             };
         }
 
+        artDropdown = _overlay.Q<DropdownField>("Art");
+
+    if (artDropdown != null)
+    {
+        artDropdown.choices = new List<string>()
+        {
+            "Marketing",
+            "Reisekosten",
+            "Sonstige Kosten",
+            "Barentnahme / Privatentnahme",
+            "Privateinzahlung",
+            "Sonstige Einzahlung",
+            "Darlehen",
+            "Tilgungsraten",
+            "Finanzamt",
+            "Steuern",
+            "Gehälter"
+        };
+
+        artDropdown.value = "Marketing";
+    }
+
 
         createList();
     }
@@ -262,28 +288,42 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        field.RegisterValueChangedCallback(evt =>
+       field.RegisterValueChangedCallback(evt =>
+{
+    string original = evt.newValue;
+
+    // Cursorposition merken
+    int cursorPos = field.cursorIndex;
+
+    // Nur Zahlen behalten
+    string zahlen = "";
+    foreach (char c in original)
+    {
+        if (char.IsDigit(c))
+            zahlen += c;
+    }
+
+    if (string.IsNullOrEmpty(zahlen))
+    {
+        field.SetValueWithoutNotify("");
+        return;
+    }
+
+    if (long.TryParse(zahlen, out long wert))
+    {
+        string formatiert = wert.ToString("N0")
+            .Replace(",", ".");
+
+        field.SetValueWithoutNotify(formatiert);
+
+        // Cursor ans Ende setzen
+        field.schedule.Execute(() =>
         {
-            string neueEingabe = evt.newValue;
-            string bereinigt = neueEingabe.Replace("€", "").Trim();
-
-
-            string gefiltert = "";
-            foreach (char c in bereinigt)
-            {
-                if (char.IsDigit(c) || c == ',' || c == '.')
-                {
-                    gefiltert += c;
-                }
-            }
-
-
-            if (bereinigt != gefiltert)
-            {
-                field.value = gefiltert;
-            }
+            field.cursorIndex = formatiert.Length;
+            field.selectIndex = formatiert.Length;
         });
-
+    }
+});
 
         field.RegisterCallback<FocusInEvent>(evt => {
             if (field.value == placeholder)
@@ -530,8 +570,7 @@ public class KassenbuchController : MonoBehaviour
         _overlay.style.display = DisplayStyle.Flex;
     }
 
-
-    private void ClosePopup()
+       private void ClosePopup()
     {
         if (_overlay == null) return;
 
@@ -561,9 +600,23 @@ public class KassenbuchController : MonoBehaviour
         _overlay.style.display = DisplayStyle.None;
     }
 
+ private void Fehleranzeigen(string text)
+    {
+        if (fehlerLabel == null)
+            return;
+
+        fehlerLabel.text = text;
+        fehlerLabel.style.display = DisplayStyle.Flex;
+    }
 
     private void OnSpeichern()
 {
+    if (fehlerLabel != null)
+    {
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
+    }
+
     if (_overlay == null)
         return;
 
@@ -591,9 +644,12 @@ public class KassenbuchController : MonoBehaviour
 
     if (string.IsNullOrWhiteSpace(betragText))
     {
-        ShowFehler("Bitte einen Betrag eingeben.");
+        Fehleranzeigen("Bitte einen Betrag eingeben.");
         return;
     }
+
+    betragText = betragText.Replace(".", "");
+betragText = betragText.Replace("€", "").Trim();
 
     if (!float.TryParse(
             betragText.Replace(",", "."),
@@ -611,7 +667,7 @@ public class KassenbuchController : MonoBehaviour
 
     if (string.IsNullOrWhiteSpace(zweck))
     {
-        ShowFehler("Bitte einen Verwendungszweck eingeben.");
+        Fehleranzeigen("Bitte einen Verwendungszweck eingeben.");
         return;
     }
 
@@ -642,6 +698,37 @@ public class KassenbuchController : MonoBehaviour
         zweck,
         datum
     );
+
+    Debug.Log("Betrag: '" + betragText + "'");
+Debug.Log("Zweck: '" + zweck + "'");
+
+    if (betragText == PLACEHOLDER_BETRAG)
+    betragText = "";
+
+    if (zweck == PLACEHOLDER_ZWECK)
+    zweck = "";
+
+    // Beide fehlen
+    if (string.IsNullOrWhiteSpace(betragText) &&
+        string.IsNullOrWhiteSpace(zweck))
+    {
+        ShowFehler("Bitte Betrag und Verwendungszweck eingeben.");
+        return;
+    }
+
+    // Nur Betrag fehlt
+    if (string.IsNullOrWhiteSpace(betragText))
+    {
+        ShowFehler("Bitte einen Betrag eingeben.");
+        return;
+    }
+
+    // Nur Zweck fehlt
+    if (string.IsNullOrWhiteSpace(zweck))
+    {
+        ShowFehler("Bitte einen Verwendungszweck eingeben.");
+        return;
+    }
 
     SpeichereEintrag(eintrag);
 
@@ -815,7 +902,14 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
                 nameLabel.text       = currentEinkommen.getDescription();
-                betragLabel.text     = currentEinkommen.getAmount() + " €";
+                if (float.TryParse(currentEinkommen.getAmount(), out float betrag))
+                {
+                    betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
+                }
+                else
+                {
+                    betragLabel.text = currentEinkommen.getAmount() + " €";
+                }
                 erstellTagLabel.text = currentEinkommen.getDatum();
                 typLabel.text        = "Einkommen";
                
@@ -869,7 +963,14 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
                 nameLabel.text       = currentAusgaben.getDescription();
-                betragLabel.text     = currentAusgaben.getAmount() + " €";
+               if (float.TryParse(currentAusgaben.getAmount(), out float betrag))
+                    {
+                        betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
+                    }
+                    else
+                    {
+                        betragLabel.text = currentAusgaben.getAmount() + " €";
+                    }
                 erstellTagLabel.text = currentAusgaben.getDatum();
                 typLabel.text        = "Ausgabe";
                
