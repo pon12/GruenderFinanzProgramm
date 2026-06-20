@@ -3,9 +3,9 @@ using UnityEngine.UIElements;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using iTextSharp.text; // Für den PDF-Export benötigt
 using System.Linq;
 using System.Globalization;
+using iTextSharp.text; // Für den PDF-Export benötigt
 
 
 public class KassenbuchController : MonoBehaviour
@@ -20,8 +20,8 @@ public class KassenbuchController : MonoBehaviour
     private Label letzteAktualLabel;
 
     private Label fehlerLabel;
-   
-    private VisualElement datumKlickLabel;          
+
+    private VisualElement datumKlickLabel;
     private VisualElement meinUxmlKalender;
 
 
@@ -77,24 +77,24 @@ public class KassenbuchController : MonoBehaviour
 
 
         _overlay = root.Q<VisualElement>("popup-overlay");
-       
+
         // Greift sich das Element "tableBody" für deine Dokumente/Einträge
         tableInput = root.Q<VisualElement>("tableBody") ?? root.Q<VisualElement>("unity-content-container");
-       
+
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
         letzteAktualLabel = root.Q<Label>("letzteAktual");
 
         if (_overlay != null)
-{
-    fehlerLabel = _overlay.Q<Label>("label-fehler");
+        {
+            fehlerLabel = _overlay.Q<Label>("label-fehler");
 
-    if (fehlerLabel != null)
-    {
-        fehlerLabel.text = "";
-        fehlerLabel.style.display = DisplayStyle.None;
-        fehlerLabel.style.color = UnityEngine.Color.red;
-    }
-}
+            if (fehlerLabel != null)
+            {
+                fehlerLabel.text = "";
+                fehlerLabel.style.display = DisplayStyle.None;
+                fehlerLabel.style.color = UnityEngine.Color.red;
+            }
+        }
 
 
         // --- DASHBOARD LABELS ZUWEISEN ---
@@ -127,8 +127,8 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        var today     = DateTime.Today;
-        _currentYear  = today.Year;
+        var today = DateTime.Today;
+        _currentYear = today.Year;
         _currentMonth = today.Month;
 
 
@@ -296,7 +296,8 @@ public class KassenbuchController : MonoBehaviour
         });
 
 
-        field.RegisterCallback<FocusInEvent>(evt => {
+        field.RegisterCallback<FocusInEvent>(evt =>
+        {
             if (field.value == placeholder)
             {
                 field.value = "";
@@ -309,7 +310,8 @@ public class KassenbuchController : MonoBehaviour
         });
 
 
-        field.RegisterCallback<FocusOutEvent>(evt => {
+        field.RegisterCallback<FocusOutEvent>(evt =>
+        {
             string aktuellerText = field.value.Trim();
 
 
@@ -339,7 +341,8 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        field.RegisterCallback<FocusInEvent>(evt => {
+        field.RegisterCallback<FocusInEvent>(evt =>
+        {
             if (field.value == placeholder)
             {
                 field.value = "";
@@ -348,7 +351,8 @@ public class KassenbuchController : MonoBehaviour
         });
 
 
-        field.RegisterCallback<FocusOutEvent>(evt => {
+        field.RegisterCallback<FocusOutEvent>(evt =>
+        {
             if (string.IsNullOrEmpty(field.value.Trim()))
             {
                 field.value = placeholder;
@@ -383,13 +387,13 @@ public class KassenbuchController : MonoBehaviour
     void SetupDashboardCalendar(VisualElement root)
     {
         var dropMonat = root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = root.Q<DropdownField>("dropdown-jahr");
 
 
         if (dropMonat != null)
         {
             dropMonat.choices = new List<string>(_monthNames);
-            dropMonat.index   = _currentMonth - 1;
+            dropMonat.index = _currentMonth - 1;
             dropMonat.RegisterValueChangedCallback(_ =>
             {
                 _currentMonth = dropMonat.index + 1;
@@ -409,7 +413,7 @@ public class KassenbuchController : MonoBehaviour
 
 
             dropJahr.choices = jahre;
-            dropJahr.value   = _currentYear.ToString();
+            dropJahr.value = _currentYear.ToString();
             dropJahr.RegisterValueChangedCallback(evt =>
             {
                 if (int.TryParse(evt.newValue, out int y))
@@ -433,14 +437,14 @@ public class KassenbuchController : MonoBehaviour
     void WechsleMonat(VisualElement root, int delta)
     {
         _currentMonth += delta;
-        if (_currentMonth < 1)  { _currentMonth = 12; _currentYear--; }
-        if (_currentMonth > 12) { _currentMonth = 1;  _currentYear++; }
+        if (_currentMonth < 1) { _currentMonth = 12; _currentYear--; }
+        if (_currentMonth > 12) { _currentMonth = 1; _currentYear++; }
 
 
         var dropMonat = root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = root.Q<DropdownField>("dropdown-jahr");
         if (dropMonat != null) dropMonat.index = _currentMonth - 1;
-        if (dropJahr  != null) dropJahr.value  = _currentYear.ToString();
+        if (dropJahr != null) dropJahr.value = _currentYear.ToString();
 
 
         RenderKalender(root);
@@ -449,10 +453,10 @@ public class KassenbuchController : MonoBehaviour
 
     void RenderKalender(VisualElement root)
     {
-        var today          = DateTime.Today;
-        var ersterTag      = new DateTime(_currentYear, _currentMonth, 1);
-        int tageImMonat    = DateTime.DaysInMonth(_currentYear, _currentMonth);
-       
+        var today = DateTime.Today;
+        var ersterTag = new DateTime(_currentYear, _currentMonth, 1);
+        int tageImMonat = DateTime.DaysInMonth(_currentYear, _currentMonth);
+
         int startWochentag = ((int)ersterTag.DayOfWeek + 6) % 7;
 
 
@@ -465,7 +469,7 @@ public class KassenbuchController : MonoBehaviour
             btn.RemoveFromClassList("cal-day-today");
             btn.style.backgroundColor = new StyleColor(StyleKeyword.Null);
             btn.style.color = new StyleColor(StyleKeyword.Null);
-           
+
             btn.style.display = DisplayStyle.Flex;
 
 
@@ -501,13 +505,13 @@ public class KassenbuchController : MonoBehaviour
     private void OnTagAusgewaehlt(int tag, int monat, int jahr)
     {
         DateTime ausgewaehltesDatum = new DateTime(jahr, monat, tag);
-       
+
         if (_overlay != null)
         {
             var inputDatum = _overlay.Q<TextField>("input-datum");
             if (inputDatum != null) inputDatum.value = ausgewaehltesDatum.ToString("dd.MM.yyyy");
         }
-       
+
         if (meinUxmlKalender != null)
         {
             meinUxmlKalender.style.display = DisplayStyle.None;
@@ -523,7 +527,7 @@ public class KassenbuchController : MonoBehaviour
         _aktuellerTyp = typ;
         _overlay.Q<Label>("popup-title").text = $"{typ} hinzufügen";
         _overlay.Q<TextField>("input-datum").value = DateTime.Now.ToString("dd.MM.yyyy");
-       
+
         var inputBetrag = _overlay.Q<TextField>("input-betrag");
         SetupBetragInputAnpassung(inputBetrag, PLACEHOLDER_BETRAG);
 
@@ -562,7 +566,7 @@ public class KassenbuchController : MonoBehaviour
 
 
         _overlay.Q<TextField>("input-datum").value = "";
-       
+
         if (meinUxmlKalender != null)
         {
             meinUxmlKalender.style.display = DisplayStyle.None;
@@ -574,118 +578,118 @@ public class KassenbuchController : MonoBehaviour
 
 
     private void OnSpeichern()
-{
-    if (_overlay == null)
-        return;
-
-    if (fehlerLabel != null)
     {
-        fehlerLabel.text = "";
-        fehlerLabel.style.display = DisplayStyle.None;
+        if (_overlay == null)
+            return;
+
+        if (fehlerLabel != null)
+        {
+            fehlerLabel.text = "";
+            fehlerLabel.style.display = DisplayStyle.None;
+        }
+
+        string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
+        string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
+        string datum = _overlay.Q<TextField>("input-datum").value.Trim();
+
+        if (betragText == PLACEHOLDER_BETRAG)
+            betragText = "";
+
+        if (zweck == PLACEHOLDER_ZWECK)
+            zweck = "";
+
+        betragText = betragText.Replace("€", "").Trim();
+
+        // ==========================
+        // BETRAG PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(betragText))
+        {
+            ShowFehler("Bitte einen Betrag eingeben.");
+            return;
+        }
+
+        if (!float.TryParse(
+                betragText.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out float betrag))
+        {
+            ShowFehler("Ungültiger Betrag.");
+            return;
+        }
+
+        // ==========================
+        // ZWECK PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(zweck))
+        {
+            ShowFehler("Bitte einen Verwendungszweck eingeben.");
+            return;
+        }
+
+        // ==========================
+        // DATUM PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(datum))
+        {
+            ShowFehler("Bitte ein Datum auswählen.");
+            return;
+        }
+
+        if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
+        {
+            ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
+            return;
+        }
+        datum = normalisiertesDatum;
+
+        // ==========================
+        // SPEICHERN
+        // ==========================
+
+        var eintrag = new KassenbuchEintrag(
+            _aktuellerTyp,
+            betrag,
+            zweck,
+            datum
+        );
+
+        SpeichereEintrag(eintrag);
+
+        ClosePopup();
+        createList();
     }
 
-    string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
-    string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
-    string datum = _overlay.Q<TextField>("input-datum").value.Trim();
-
-    if (betragText == PLACEHOLDER_BETRAG)
-        betragText = "";
-
-    if (zweck == PLACEHOLDER_ZWECK)
-        zweck = "";
-
-    betragText = betragText.Replace("€", "").Trim();
-
-    // ==========================
-    // BETRAG PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(betragText))
+    // ==========================================
+    // DATUM-VALIDIERUNG
+    //
+    // Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
+    // normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
+    // Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
+    // unbemerkt in der DB landen und spätere Berechnungen verfälschen.
+    // ==========================================
+    private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
     {
-        ShowFehler("Bitte einen Betrag eingeben.");
-        return;
+        normalisiert = "";
+
+        string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+        var none = System.Globalization.DateTimeStyles.None;
+
+        if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
+            return false;
+
+        // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
+        if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
+            return false;
+
+        normalisiert = ergebnis.ToString("dd.MM.yyyy");
+        return true;
     }
-
-    if (!float.TryParse(
-            betragText.Replace(",", "."),
-            System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture,
-            out float betrag))
-    {
-        ShowFehler("Ungültiger Betrag.");
-        return;
-    }
-
-    // ==========================
-    // ZWECK PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(zweck))
-    {
-        ShowFehler("Bitte einen Verwendungszweck eingeben.");
-        return;
-    }
-
-    // ==========================
-    // DATUM PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(datum))
-    {
-        ShowFehler("Bitte ein Datum auswählen.");
-        return;
-    }
-
-    if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
-    {
-        ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
-        return;
-    }
-    datum = normalisiertesDatum;
-
-    // ==========================
-    // SPEICHERN
-    // ==========================
-
-    var eintrag = new KassenbuchEintrag(
-        _aktuellerTyp,
-        betrag,
-        zweck,
-        datum
-    );
-
-    SpeichereEintrag(eintrag);
-
-    ClosePopup();
-    createList();
-}
-
-// ==========================================
-// DATUM-VALIDIERUNG
-//
-// Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
-// normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
-// Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
-// unbemerkt in der DB landen und spätere Berechnungen verfälschen.
-// ==========================================
-private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
-{
-    normalisiert = "";
-
-    string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
-    var inv  = System.Globalization.CultureInfo.InvariantCulture;
-    var none = System.Globalization.DateTimeStyles.None;
-
-    if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
-        return false;
-
-    // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
-    if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
-        return false;
-
-    normalisiert = ergebnis.ToString("dd.MM.yyyy");
-    return true;
-}
 
 
     private void SpeichereEintrag(KassenbuchEintrag eintrag)
@@ -693,12 +697,14 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         if (db == null) return;
 
 
-        if (eintrag.Typ == "Einnahme") {
+        if (eintrag.Typ == "Einnahme")
+        {
             db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
         }
-        else {
+        else
+        {
             db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
-    }
+        }
     }
 
 
@@ -734,8 +740,8 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             // Erhält das Format aus dem 2. Code bei
             balanceLabel.text = differenz.ToString() + "€";
             balanceLabel.style.color = differenz < 0
-                ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
-                : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
+                ? new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f))   // Rot #E63946
+                : new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f)); // Gruen #80CF95
         }
 
         // FIX: 'Letzte Aktualisierung' war bisher ein fester Platzhalter
@@ -756,7 +762,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         {
             var heute = System.DateTime.Today;
             float umsatzJahr = 0f;
-            float[] monate   = new float[12];
+            float[] monate = new float[12];
 
 
             var einkommenListe = db.getAllEinkommenEntries();
@@ -798,7 +804,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
         List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();
+        List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
 
         // Tabelle nach gewähltem Jahr filtern, falls ein gültiges Jahr gewählt ist
         if (jahresFilterAktiv)
@@ -816,25 +822,25 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             foreach (Einkommen currentEinkommen in einkommenList)
             {
                 VisualElement newEntryCopy = outputTemplate.Instantiate();
-               
-                Label nameLabel       = newEntryCopy.Q<Label>("Name");
-                Label typLabel        = newEntryCopy.Q<Label>("Typ");
-                Label betragLabel     = newEntryCopy.Q<Label>("Betrag");
+
+                Label nameLabel = newEntryCopy.Q<Label>("Name");
+                Label typLabel = newEntryCopy.Q<Label>("Typ");
+                Label betragLabel = newEntryCopy.Q<Label>("Betrag");
                 Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-                Button loeschenBtn    = newEntryCopy.Q<Button>("BtnLoeschen");
+                Button loeschenBtn = newEntryCopy.Q<Button>("BtnLoeschen");
 
 
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text       = currentEinkommen.getDescription();
-                betragLabel.text     = currentEinkommen.getAmount() + " €";
+                nameLabel.text = currentEinkommen.getDescription();
+                betragLabel.text = currentEinkommen.getAmount() + " €";
                 erstellTagLabel.text = currentEinkommen.getDatum();
-                typLabel.text        = "Einkommen";
-               
+                typLabel.text = "Einkommen";
+
                 // Gruen fuer Einnahme
                 if (betragLabel != null)
-                    betragLabel.style.color = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
+                    betragLabel.style.color = new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
 
 
                 var progBar = newEntryCopy.Q<VisualElement>("ProgressBarFill");
@@ -850,13 +856,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
                     loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
                     {
-                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
-                        loeschenBtn.style.color           = new StyleColor(UnityEngine.Color.white);
+                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+                        loeschenBtn.style.color = new StyleColor(UnityEngine.Color.white);
                     });
                     loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
                     {
-                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f, 0.15f));
-                        loeschenBtn.style.color           = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f, 0.15f));
+                        loeschenBtn.style.color = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
                     });
                 }
                 tableInput.Add(newEntryCopy);
@@ -870,25 +876,25 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             foreach (Ausgaben currentAusgaben in ausgabenList)
             {
                 VisualElement newEntryCopy = outputTemplate.Instantiate();
-               
-                Label nameLabel       = newEntryCopy.Q<Label>("Name");
-                Label typLabel        = newEntryCopy.Q<Label>("Typ");
-                Label betragLabel     = newEntryCopy.Q<Label>("Betrag");
+
+                Label nameLabel = newEntryCopy.Q<Label>("Name");
+                Label typLabel = newEntryCopy.Q<Label>("Typ");
+                Label betragLabel = newEntryCopy.Q<Label>("Betrag");
                 Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-                Button loeschenBtn    = newEntryCopy.Q<Button>("BtnLoeschen");
+                Button loeschenBtn = newEntryCopy.Q<Button>("BtnLoeschen");
 
 
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text       = currentAusgaben.getDescription();
-                betragLabel.text     = currentAusgaben.getAmount() + " €";
+                nameLabel.text = currentAusgaben.getDescription();
+                betragLabel.text = currentAusgaben.getAmount() + " €";
                 erstellTagLabel.text = currentAusgaben.getDatum();
-                typLabel.text        = "Ausgabe";
-               
+                typLabel.text = "Ausgabe";
+
                 // Rot fuer Ausgabe
                 if (betragLabel != null)
-                    betragLabel.style.color = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                    betragLabel.style.color = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
 
 
                 // Loeschen Button & Hover (Aus Code 2)
@@ -900,13 +906,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
                     loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
                     {
-                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
-                        loeschenBtn.style.color           = new StyleColor(UnityEngine.Color.white);
+                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+                        loeschenBtn.style.color = new StyleColor(UnityEngine.Color.white);
                     });
                     loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
                     {
-                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f, 0.15f));
-                        loeschenBtn.style.color           = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                        loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f, 0.15f));
+                        loeschenBtn.style.color = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
                     });
                 }
                 tableInput.Add(newEntryCopy);
@@ -915,7 +921,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
     }
 
 
-    
+
     // ===============================
     // Aus altem Code übernommen
     // Robustes Datums-Parsing
@@ -932,7 +938,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             "yyyy/MM/dd"
         };
 
-        var inv  = System.Globalization.CultureInfo.InvariantCulture;
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
         var deDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
         var none = System.Globalization.DateTimeStyles.None;
 
@@ -982,7 +988,220 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
     private List<KassenbuchEintrag> getCombinedEntries()
     {
         List<KassenbuchEintrag> entries = new List<KassenbuchEintrag>();
+
+        if (db == null)
+        {
+            return entries;
+        }
+
+        List<Einkommen> einkommenList = db.getAllEinkommenEntries();
+        List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
+
+        int gewaehltesJahr = 0;
+        bool jahresFilterAktiv = false;
+
+        if (dropJahrField != null && !string.IsNullOrEmpty(dropJahrField.value))
+        {
+            jahresFilterAktiv = int.TryParse(dropJahrField.value, out gewaehltesJahr);
+        }
+
+        if (einkommenList != null)
+        {
+            foreach (Einkommen einkommen in einkommenList)
+            {
+                if (jahresFilterAktiv)
+                {
+                    if (!TryParseDatum(einkommen.getDatum(), out DateTime datum) || datum.Year != gewaehltesJahr)
+                    {
+                        continue;
+                    }
+                }
+
+                entries.Add(new KassenbuchEintrag(
+                    einkommen.getId(),
+                    "Einnahme",
+                    einkommen.Amount,
+                    einkommen.Description,
+                    einkommen.Datum
+                ));
+            }
+        }
+
+        if (ausgabenList != null)
+        {
+            foreach (Ausgaben ausgabe in ausgabenList)
+            {
+                if (jahresFilterAktiv)
+                {
+                    if (!TryParseDatum(ausgabe.getDatum(), out DateTime datum) || datum.Year != gewaehltesJahr)
+                    {
+                        continue;
+                    }
+                }
+
+                entries.Add(new KassenbuchEintrag(
+                    ausgabe.getId(),
+                    "Ausgabe",
+                    ausgabe.Amount,
+                    ausgabe.Description,
+                    ausgabe.Datum
+                ));
+            }
+        }
+
         return entries;
+    }
+
+    // ===============================
+    // SORTIERFUNKTIONEN
+    // Können vom Frontend an Buttons/Dropdowns gehängt werden.
+    // ===============================
+
+    public void sortiereNachDatumAufsteigend()
+    {
+        RenderKassenbuchEintraege(sortByDate(false));
+    }
+
+    public void sortiereNachDatumAbsteigend()
+    {
+        RenderKassenbuchEintraege(sortByDate(true));
+    }
+
+    public void sortiereNachBetragAufsteigend()
+    {
+        RenderKassenbuchEintraege(sortByAmount(false));
+    }
+
+    public void sortiereNachBetragAbsteigend()
+    {
+        RenderKassenbuchEintraege(sortByAmount(true));
+    }
+
+    public void sortiereNachTyp()
+    {
+        RenderKassenbuchEintraege(sortByType());
+    }
+
+    public void sortiereNachBeschreibung()
+    {
+        RenderKassenbuchEintraege(sortByDescription());
+    }
+
+    private List<KassenbuchEintrag> sortByAmount(bool descending)
+    {
+        List<KassenbuchEintrag> entries = getCombinedEntries();
+
+        return descending
+            ? entries.OrderByDescending(e => e.Betrag).ToList()
+            : entries.OrderBy(e => e.Betrag).ToList();
+    }
+
+    private List<KassenbuchEintrag> sortByType()
+    {
+        return getCombinedEntries()
+            .OrderBy(e => e.Typ)
+            .ToList();
+    }
+
+    private List<KassenbuchEintrag> sortByDescription()
+    {
+        return getCombinedEntries()
+            .OrderBy(e => e.Beschreibung)
+            .ToList();
+    }
+
+    private List<KassenbuchEintrag> sortByDate(bool descending)
+    {
+        List<KassenbuchEintrag> entries = getCombinedEntries();
+
+        return descending
+            ? entries.OrderByDescending(e => parseDate(e.Datum)).ToList()
+            : entries.OrderBy(e => parseDate(e.Datum)).ToList();
+    }
+
+    private DateTime parseDate(string datum)
+    {
+        if (TryParseDatum(datum, out DateTime parsedDate))
+        {
+            return parsedDate;
+        }
+
+        return DateTime.MinValue;
+    }
+
+    private void RenderKassenbuchEintraege(List<KassenbuchEintrag> entries)
+    {
+        if (tableInput == null)
+        {
+            Debug.LogError("[Kassenbuch] tableInput ist null.");
+            return;
+        }
+
+        if (outputTemplate == null)
+        {
+            Debug.LogError("[Kassenbuch] outputTemplate is null!");
+            return;
+        }
+
+        tableInput.Clear();
+
+        foreach (KassenbuchEintrag entry in entries)
+        {
+            VisualElement newEntryCopy = outputTemplate.Instantiate();
+
+            Label nameLabel = newEntryCopy.Q<Label>("Name");
+            Label typLabel = newEntryCopy.Q<Label>("Typ");
+            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
+            Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
+            Button loeschenBtn = newEntryCopy.Q<Button>("BtnLoeschen");
+
+            if (nameLabel == null)
+            {
+                Debug.LogError("Label 'Name' nicht gefunden!");
+                continue;
+            }
+
+            nameLabel.text = entry.Beschreibung;
+            erstellTagLabel.text = entry.Datum;
+            typLabel.text = entry.Typ;
+
+            if (betragLabel != null)
+            {
+                betragLabel.text = entry.Betrag.ToString() + " €";
+
+                betragLabel.style.color = entry.Typ == "Einnahme"
+                    ? new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f))
+                    : new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+            }
+
+            var progBar = newEntryCopy.Q<VisualElement>("ProgressBarFill");
+            if (progBar != null)
+            {
+                progBar.style.width = Length.Percent(100);
+            }
+
+            if (loeschenBtn != null)
+            {
+                int id = entry.Id;
+                string typ = entry.Typ;
+
+                loeschenBtn.clicked += () => Loeschen(typ, id);
+
+                loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
+                {
+                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+                    loeschenBtn.style.color = new StyleColor(UnityEngine.Color.white);
+                });
+
+                loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
+                {
+                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f, 0.15f));
+                    loeschenBtn.style.color = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+                });
+            }
+
+            tableInput.Add(newEntryCopy);
+        }
     }
 
     public void ExportJahrAlsPdf(string jahr)
@@ -1007,10 +1226,10 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 ausgabe.Datum
             ));
         }
-        */ 
+        */
 
         var einkommen = db.getAllEinkommenEntries();
-        var ausgaben  = db.getAllAusgabenEntries();  
+        var ausgaben = db.getAllAusgabenEntries();
 
 
         int gefundeneEintraege = 0;
@@ -1044,7 +1263,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
         string fileName = "Kassenbuch_" + jahr + ".pdf";
         string filePath = Path.Combine(Application.persistentDataPath, fileName);
-       
+
         try
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
@@ -1052,11 +1271,11 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 Document doc = new Document();
                 iTextSharp.text.pdf.PdfWriter.GetInstance(doc, fs);
                 doc.Open();
-               
+
                 doc.Add(new Paragraph("Kassenbuch Export - Jahr: " + jahr));
                 doc.Add(new Paragraph("Generiert am: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm")));
                 doc.Add(new Paragraph(" "));
-               
+
                 if (einkommen != null)
                 {
                     foreach (var e in einkommen)
@@ -1067,7 +1286,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                         }
                     }
                 }
-               
+
                 if (ausgaben != null)
                 {
                     foreach (var a in ausgaben)
@@ -1078,7 +1297,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                         }
                     }
                 }
-               
+
                 doc.Close();
             }
             Debug.Log("PDF erfolgreich exportiert unter: " + filePath);
@@ -1089,7 +1308,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName        = filePath,
+                    FileName = filePath,
                     UseShellExecute = true
                 });
             }
@@ -1116,7 +1335,7 @@ public class KassenbuchEintrag
     public string Datum;
 
 
-   public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
+    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
     {
         Id = 0;
         Typ = typ;
