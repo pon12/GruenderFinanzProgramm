@@ -23,6 +23,14 @@ public class Company
     public int legalForm { get; set; }     // Rechtsform (int)
     public int industry { get; set; }      // Branche (int)
     public string location { get; set; }   // Standort
+    public string steuerNr { get; set; }       // Steuernummer 
+    public string gruendungsJahr { get; set; }  // Gründungsjahr 
+    public string handelsReg { get; set; }      // Handelsregisternummer
+    public string strasseuHausNr { get; set; }         // Straße und Hausnummer
+    public int plz { get; set; }         // Postleitzahl 
+    public string ustIdNr { get; set; }         // Umsatzsteuer-Identifikationsnummer 
+    public string email { get; set; }       // E-Mail-Adresse
+    public string handyNr   { get; set; }    // Standort
     // --- Mapping Listen ---
     public static readonly List<string> LegalForms = new List<string>
     {
@@ -126,4 +134,41 @@ public class TextDocumentMeta
     public System.DateTime createdAt { get; set; } = System.DateTime.Now;
 
     public System.DateTime lastUpdated { get; set; } = System.DateTime.Now;
+}
+
+public class Settings
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; } 
+    public string rechnungsNrPräfix { get; set; }
+    public string startNr { get; set; }
+    public string zahlungsziel { get; set; } 
+    public int waehrung { get; set; }
+    public int dtmFormat { get; set; }
+    public bool ustRechnung { get; set; }
+    public bool autoNummer { get; set; }
+    public string zahlungshinweis { get; set; }
+    public string kontoInhaber { get; set; }
+    public string iban { get; set; }
+    public string bic { get; set; }
+    public string kreditinstitut { get; set; }
+    public bool ibanRechnung { get; set; }
+    public bool logo { get; set; }
+    public bool seitenzahl { get; set; }
+    public bool exportpfad { get; set; }
+    public int steuersatz { get; set; }
+    public bool Begleiter { get; set; }
+}
+
+public class Finanzdaten
+{
+    [PrimaryKey, AutoIncrement]
+    public int id { get; set; }
+    public int monat { get; set; }
+    public int ausgaben { get; set; }
+    public int einahmenTotal { get; set; }
+    public int erstellteAng { get; set; }
+    public int angenommenAng { get; set; }
+    public int erstellteRech { get; set; }
+    public int angenommenRech { get; set; }
 }
