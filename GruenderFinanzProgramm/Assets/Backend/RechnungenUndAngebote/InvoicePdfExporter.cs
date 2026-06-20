@@ -150,20 +150,15 @@ public static class InvoicePdfExporter
                 // TABELLE
                 // =========================
 
-                PdfPTable table = new PdfPTable(4);
+                PdfPTable table = new PdfPTable(5);
 
                 table.WidthPercentage = 100f;
 
                 table.SetWidths(
                     new float[]
-                    {
-                        3.5f,
-                        1f,
-                        1.2f,
-                        1.2f
-                    }
+                    {1.4f, 3.0f, 1f, 1.2f, 1.2f }
                 );
-
+                AddHeaderCell(table, "Artikelnummer", headerFont);
                 AddHeaderCell(table, "Beschreibung", headerFont);
                 AddHeaderCell(table, "Menge", headerFont);
                 AddHeaderCell(table, "Einzel (€)", headerFont);
@@ -171,6 +166,12 @@ public static class InvoicePdfExporter
 
                 foreach (InvoiceItem item in items)
                 {
+                   AddBodyCell(
+                    table, 
+                    item.articleNumber, 
+                    normalFont
+                    );
+                   
                     AddBodyCell(
                         table,
                         item.description,
@@ -205,7 +206,15 @@ public static class InvoicePdfExporter
                 // =========================
                 // SUMMEN
                 // =========================
-
+                
+                double zwischensumme = 0;
+                foreach (InvoiceItem item in items)
+                {
+                    zwischensumme += item.calculatedTotal;
+                }
+                double mwst = zwischensumme * 0.19;
+                double gesamt = zwischensumme + mwst;
+                
                 PdfPTable totals = new PdfPTable(2);
 
                 totals.WidthPercentage = 50f;
@@ -216,14 +225,14 @@ public static class InvoicePdfExporter
                     "Zwischensumme:",
                     normalFont,
                     Element.ALIGN_RIGHT
-                );
+                    );
 
                 AddBodyCell(
                     totals,
-                    invoice.subtotal.ToString("0.00") + " €",
+                    zwischensumme.ToString("0.00") + " €",
                     normalFont,
                     Element.ALIGN_RIGHT
-                );
+                    );
 
                 AddBodyCell(
                     totals,

@@ -409,7 +409,7 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadVersionInfo()
     {
-        if (_labelVersion != null) _labelVersion.text = "Version 1.0.0";
+        if (_labelVersion != null) _labelVersion.text = Versionsnummer.getVersion();
     }
 
     private void LoadCompanyData()
