@@ -72,17 +72,25 @@ public class DataBase : DatabaseManager
     {
         return getAll<Company>();
     }
-    public int createCompany(string name, int legalForm, int industry, string location)
+ public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, int plz, string ustIdNr, string email, string handyNr)
+{
+    Company newCompany = new Company
     {
-        Company newCompany = new Company
-        {
-            name = name,
-            legalForm = legalForm,
-            industry = industry,
-            location = location
-        };
-        return insert(newCompany);
-    }
+        name = name,
+        legalForm = legalForm,
+        industry = industry,
+        location = location,
+        steuerNr = steuerNr,
+        gruendungsJahr = gruendungsJahr,    
+        handelsReg = handelsReg,
+        strasseuHausNr = strasseuHausNr,
+        plz = plz,
+        ustIdNr = ustIdNr,
+        email = email,
+        handyNr = handyNr
+    };
+    return insert(newCompany);
+}
     public int updateCompany(Company company)
     {
         return update(company);
@@ -719,5 +727,132 @@ public int deleteInvoiceItem(int id)
 
         return delete<TextDocumentMeta>(documentId);
     }
+
+
+// Settings
+
+public int createSettings(string rechnungsNrPräfix, string startNr, string zahlungsziel, int waehrung, int dtmFormat,  
+bool ustRechnung, bool autoNummer, string zahlungshinweis, string kontoInhaber, string iban, string bic, string kreditinstitut, 
+bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter )
+{
+    Settings newSettings = new Settings
+    {
+        rechnungsNrPräfix = rechnungsNrPräfix,
+        startNr = startNr,
+        zahlungsziel = zahlungsziel,
+        waehrung = waehrung,
+        dtmFormat = dtmFormat,
+        ustRechnung = ustRechnung,
+        autoNummer = autoNummer,
+        zahlungshinweis = zahlungshinweis,
+        kontoInhaber = kontoInhaber,
+        iban = iban,
+        bic = bic,
+        kreditinstitut = kreditinstitut,
+        ibanRechnung = ibanRechnung,
+        logo = logo,
+        seitenzahl = seitenzahl,
+        exportpfad = exportpfad,
+        steuersatz = steuersatz,
+        Begleiter = Begleiter
+    };
+    return insert(newSettings);
+}
+
+public List<Settings> getAllSettings()
+{
+    return getAll<Settings>();
+}
+
+public int deleteSettings(int id)
+{
+    return delete<Settings>(id);
+}
+
+public int updateSettings(Settings settings)
+{
+    return update(settings);
+}
+
+
+//Finanzdaten 
+
+public int createFinanzdaten(int monat,int ausgaben,int einahmenTotal,int erstellteAng ,int angenommenAng, int erstellteRech ,int angenommenRech)
+{
+    Finanzdaten newFinanzdaten = new Finanzdaten
+    {
+        monat = monat,
+        ausgaben = ausgaben,
+        einahmenTotal = einahmenTotal,
+        erstellteAng = erstellteAng,
+        angenommenAng = angenommenAng,
+        erstellteRech = erstellteRech,
+        angenommenRech = angenommenRech
+    };
+    return insert(newFinanzdaten);
+}
+
+public List<Finanzdaten> getAllFinanzdaten()
+{
+    return getAll<Finanzdaten>();
+}
+
+public int deleteFinanzdatenMonat(int monat)
+{
+    return delete<Finanzdaten>(monat);
+}
+
+public int updateFinanzdaten(Finanzdaten finanzdaten)
+{
+    return update(finanzdaten);
+}
+
+public Finanzdaten  getFinanzdatenMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+
+}
+
+public List<Finanzdaten> orderFinanzdatenASC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat ASC");
+}
+
+public List<Finanzdaten> orderFinanzdatenDESC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat DESC");
+}
+
+public Finanzdaten getAusgabenbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getEinahmenTotalbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+
 
 }

@@ -506,23 +506,40 @@ public class EinstellungenController : MonoBehaviour
         var db = UserDatabaseAccess.getCurrentUserDatabase();
         if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
 
-        string name = _inputFirmenname?.value ?? "";
-        int legalForm = _dropdownRechtsform?.index ?? 0;
-        string location = _inputStadt?.value ?? "";
-        int industry = 3;
+        string name      = _inputFirmenname?.value ?? "";
+        int    legalForm = _dropdownRechtsform?.index ?? 0;
+        string location  = _inputStadt?.value ?? "";
+        int    industry  = 3;
+        string steuerNr  = _inputSteuernummer?.value ?? "";
+        string ustIdNr   = _inputUstidnr?.value ?? "";
+        string handelsReg = _inputHandelsreg?.value ?? "";
+        string gruendungsJahr = _inputGruendungsjahr?.value ?? "";
+        int plz = int.TryParse(_inputPlz?.value ?? "", out plz) ? plz : 0;
+        string strasseuHausNr = _inputStrasse?.value ?? "";
+        string email = "Null";
+        string handyNr = "Null";
 
         if (_currentCompany == null)
         {
-            db.createCompany(name, legalForm, industry, location);
+            db.createCompany( name, legalForm, industry, location, steuerNr,gruendungsJahr ,handelsReg , strasseuHausNr , plz , ustIdNr, email, handyNr);
+            Debug.Log($"[Einstellungen] Neue Firma angelegt: {name}");
             var all = db.getAllCompanies();
             if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
         }
         else
         {
-            _currentCompany.name = name;
+            _currentCompany.name      = name;
             _currentCompany.legalForm = legalForm;
-            _currentCompany.location = location;
+            _currentCompany.location     = location;
+            _currentCompany.industry  = industry;
+            _currentCompany.steuerNr  = steuerNr;
+            _currentCompany.ustIdNr   = ustIdNr;
+            _currentCompany.handelsReg = handelsReg;
+            _currentCompany.gruendungsJahr = gruendungsJahr;
+            _currentCompany.plz = plz;
+            _currentCompany.strasseuHausNr = strasseuHausNr;
             db.updateCompany(_currentCompany);
+            Debug.Log($"[Einstellungen] Firma aktualisiert: {name}");
         }
     }
 
