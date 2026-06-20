@@ -74,6 +74,130 @@ public static class TextDocumentService
         return meta;
     }
 
+    public static ParsedTextDocument ReadTextDocument(TextDocumentMeta document)
+    {
+        if (document == null)
+        {
+            Debug.LogError("[TextDocumentService] Dokument ist null.");
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(document.filePath))
+        {
+            Debug.LogError("[TextDocumentService] Dokument hat keinen Dateipfad.");
+            return null;
+        }
+
+        return TextDocumentParser.ParseTextDocument(document.filePath);
+    }
+
+    public static string ReadPlainText(TextDocumentMeta document)
+    {
+        ParsedTextDocument parsedDocument = ReadTextDocument(document);
+
+        if (parsedDocument == null)
+        {
+            return "";
+        }
+
+        return parsedDocument.plainText;
+    }
+
+    public static bool UpdateTextDocument(
+        TextDocumentMeta document,
+        DataBase db,
+        string newTitle,
+        string newContent,
+        string newDocumentType = TYPE_STANDARD
+    )
+    {
+        if (document == null)
+        {
+            Debug.LogError("[TextDocumentService] Dokument ist null.");
+            return false;
+        }
+
+        if (db == null)
+        {
+            Debug.LogError("[TextDocumentService] Datenbank ist null.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(document.filePath))
+        {
+            Debug.LogError("[TextDocumentService] Dokument hat keinen Dateipfad.");
+            return false;
+        }
+
+        string documentType = NormalizeDocumentType(newDocumentType);
+
+        string fileContent =
+            "[DOCTYPE " + documentType + "]" + Environment.NewLine +
+            "[TITLE " + newTitle + "]" + Environment.NewLine +
+            Environment.NewLine +
+            newContent;
+
+        try
+        {
+            File.WriteAllText(document.filePath, fileContent);
+
+            document.title = newTitle;
+            document.documentType = documentType;
+            document.lastUpdated = DateTime.Now;
+
+            db.updateTextDocumentMeta(document);
+
+            Debug.Log("[TextDocumentService] Textdokument aktualisiert: " + document.filePath);
+
+            return true;
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError("[TextDocumentService] Fehler beim Aktualisieren: " + exception.Message);
+            return false;
+        }
+    }
+
+    public static bool DeleteTextDocument(
+        int documentId,
+        int userId,
+        DataBase db
+    )
+    {
+        if (db == null)
+        {
+            Debug.LogError("[TextDocumentService] Datenbank ist null.");
+            return false;
+        }
+
+        TextDocumentMeta document = db.getTextDocumentMetaById(documentId, userId);
+
+        if (document == null)
+        {
+            Debug.LogError("[TextDocumentService] Textdokument nicht gefunden oder gehört nicht diesem Nutzer.");
+            return false;
+        }
+
+        try
+        {
+            if (!string.IsNullOrEmpty(document.filePath) && File.Exists(document.filePath))
+            {
+                File.Delete(document.filePath);
+            }
+
+            db.deleteTextDocumentMeta(documentId, userId);
+
+            Debug.Log("[TextDocumentService] Textdokument gelöscht: " + documentId);
+
+            return true;
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError("[TextDocumentService] Fehler beim Löschen: " + exception.Message);
+            return false;
+        }
+    }
+
     public static string GetUserTextDocumentFolder(int userId, string documentType)
     {
         string folderPath = Path.Combine(
