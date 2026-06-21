@@ -25,7 +25,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         btnNeu.clicked += () => OeffnePopup(-1);
         popupOverlay.RegisterCallback<ClickEvent>(evt => { if (evt.target == popupOverlay) SchliessPopup(); });
 
-        BeispieldatenLaden();
+        LadeDienstleistungenAusDatenbank();
         TabelleAktualisieren();
     }
 
@@ -63,7 +63,22 @@ public class DienstleistungenScreenController : MonoBehaviour
             btnEdit.text = "Bearbeiten";
             btnEdit.AddToClassList("zeile-btn");
 
-            var btnDel = new Button(() => { daten.RemoveAt(index); TabelleAktualisieren(); });
+            var btnDel = new Button(() =>
+            {
+                DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
+                if (db == null)
+                {
+                    Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
+                    return;
+                }
+
+                db.deleteService(daten[index].id);
+
+                LadeDienstleistungenAusDatenbank();
+                TabelleAktualisieren();
+            });
+            
             btnDel.text = "Löschen";
             btnDel.AddToClassList("zeile-btn");
             btnDel.AddToClassList("zeile-btn-loeschen");
@@ -115,8 +130,25 @@ public class DienstleistungenScreenController : MonoBehaviour
                 price       = betrag
             };
 
-            if (editIndex >= 0) daten[editIndex] = neu;
-            else                daten.Add(neu);
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
+            if (db == null)
+            {
+                Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
+                return;
+            }
+
+            if (editIndex >= 0)
+            {
+                neu.id = daten[editIndex].id;
+                db.updateService(neu);
+            }
+            else
+            {
+                db.createService(neu);
+            }
+
+            LadeDienstleistungenAusDatenbank();
 
             SchliessPopup();
             TabelleAktualisieren();
@@ -132,4 +164,29 @@ public class DienstleistungenScreenController : MonoBehaviour
         popupOverlay.Clear();
         editIndex = -1;
     }
+
+    private void LadeDienstleistungenAusDatenbank()
+    {
+        try
+        {
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
+            if (db == null)
+            {
+                Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
+                daten = new List<Service>();
+                return;
+            }
+
+            daten = db.getAllServices() ?? new List<Service>();
+
+            Debug.Log("[Dienstleistungen] Geladen: " + daten.Count);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[Dienstleistungen] Laden fehlgeschlagen: " + e);
+            daten = new List<Service>();
+        }
+    }
 }
+

@@ -27,8 +27,8 @@ public class Invoice
     public string customerName { get; set; }
     [Ignore]
     public string customerAddress { get; set; }
-    
-    
+    public double discount { get; set; }
+    public double extraCosts { get; set; }
     // AUTOMATISCHE BERECHNUNG
     public void CalculateTotals(List<InvoiceItem> items)
     {
@@ -76,18 +76,22 @@ public class Offer
     public int customerId { get; set; } 
     public string offerNumber { get; set; }
     public string date { get; set; }
+    public string validUntil { get; set; }
     // offen, akzeptiert, abgelehnt
     public string status { get; set; }
     public double subtotal { get; set; }
     public double tax { get; set; }
     public double total { get; set; }
     public string notes { get; set; }
+    public double discount { get; set; }
+    public double extraCosts { get; set; }
+   
     // Kassenbuch-Anbindung
     public bool bookedToCashbook { get; set; }
     public int cashbookEntryId { get; set; }
     public string bookingDate { get; set; }
     [Ignore]
-
+   
     public string customerName { get; set; }
     [Ignore]
     public string customerAddress { get; set; }

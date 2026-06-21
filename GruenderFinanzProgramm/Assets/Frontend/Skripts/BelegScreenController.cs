@@ -47,6 +47,8 @@ public abstract class BelegScreenController : MonoBehaviour
     private DropdownField _statusDropdown, _rabattTypDropdown;
     private VisualElement _suchErgebnisListe;
     private string _ausgewaehlterKunde = "";
+    private int _ausgewaehlterKundeId = 0;
+    private string _ausgewaehlterKundeAdresse = "";
 
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
     private VisualElement _anhangBereich;
@@ -212,18 +214,23 @@ public abstract class BelegScreenController : MonoBehaviour
     // ─────────────────────────────────────────
 
     private void LadeDienstleistungen()
+{
+    try
     {
-        try
-        {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            _dienstleistungen = db.getAllServices() ?? new List<Service>();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("[" + BelegTyp + "] Dienstleistungen: " + e.Message);
-            _dienstleistungen = new List<Service>();
-        }
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        Debug.Log("[Beleg] DB: " + db.getDatabasePath());
+
+        _dienstleistungen = db.getAllServices() ?? new List<Service>();
+
+        Debug.Log("[Beleg] Dienstleistungen geladen: " + _dienstleistungen.Count);
     }
+    catch (Exception e)
+    {
+        Debug.LogWarning("[" + BelegTyp + "] Dienstleistungen: " + e.Message);
+        _dienstleistungen = new List<Service>();
+    }
+}
 
     // ─────────────────────────────────────────
     // SUMMEN-EINGABEN
@@ -687,12 +694,16 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void WaehleKunde(Customer kunde)
     {
+        _ausgewaehlterKundeId = kunde.id;
+        _ausgewaehlterKundeAdresse = KundenAdresse(kunde);
         _ausgewaehlterKunde = KundenAnzeige(kunde);
         _kundensuche.SetValueWithoutNotify(_ausgewaehlterKunde);
         _suchErgebnisListe.style.display = DisplayStyle.None;
-
         var boxen = Root.Query(className: "angebot-address-box").ToList();
-        if (boxen.Count > 0) SetzeAdresse(boxen[0], "Kunde:", KundenAdresse(kunde));
+        if (boxen.Count > 0)
+        {
+            SetzeAdresse(boxen[0], "Kunde:", _ausgewaehlterKundeAdresse);
+        }
     }
 
     // ─────────────────────────────────────────
@@ -859,9 +870,123 @@ public abstract class BelegScreenController : MonoBehaviour
     // ─────────────────────────────────────────
 
     private void SpeichernGeklickt()
+{
+    try
     {
-        FeedbackPopup.Show(Root, "Einträge gespeichert", FeedbackTyp.Erfolg);
+        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        if (db == null)
+        {
+            FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
+            return;
+        }
+
+        float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+        float gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
+        float rabatt = ParseBetrag(_rabattLabel != null ? _rabattLabel.text : "0");
+        float mwstSatz = HoleMwstSatz();
+        float steuerBasis = netto - rabatt;
+        float steuer = steuerBasis * mwstSatz;
+        float finalTotal = steuerBasis + steuer;
+
+        PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
+        string rawUserId = currentUser.userId.Replace("user_", "");
+        int userId = int.Parse(rawUserId);
+
+        if (BelegTyp == "Angebot")
+        {
+            Offer offer = new Offer
+            {
+                customerId = _ausgewaehlterKundeId,
+                customerName = _ausgewaehlterKunde,
+                customerAddress = _ausgewaehlterKundeAdresse,
+                companyName = HoleCompanyName(db),
+                companyAddress = HoleCompanyAddress(db),
+                offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                validUntil = _fristFeld != null ? _fristFeld.value : "",
+                subtotal = netto,
+                discount = rabatt,
+                tax = steuer,
+                total = finalTotal,
+                notes = "",
+                bookedToCashbook = false,
+                cashbookEntryId = 0,
+                bookingDate = ""
+            };
+
+            int offerId = db.createOffer(offer);
+
+            foreach (var zeile in _zeilen)
+            {
+                OfferItem item = new OfferItem
+                {
+                    offerId = offerId,
+                    articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+                    description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                };
+
+                db.createOfferItem(item);
+            }
+
+            List<OfferItem> items = db.getItemsByOffer(offerId);
+            OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
+        }
+        else if (BelegTyp == "Rechnung")
+        {
+            Invoice invoice = new Invoice
+            {
+                customerId = _ausgewaehlterKundeId,
+                customerName = _ausgewaehlterKunde,
+                customerAddress = _ausgewaehlterKundeAdresse,
+                companyName = HoleCompanyName(db),
+                companyAddress = HoleCompanyAddress(db),
+                invoiceNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                dueDate = _fristFeld != null ? _fristFeld.value : "",
+                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                subtotal = netto,
+                discount = rabatt,
+                tax = steuer,
+                total = finalTotal,
+                notes = "",
+                bookedToCashbook = false,
+                cashbookEntryId = 0,
+                bookingDate = ""
+            };
+
+            int invoiceId = db.createInvoice(invoice);
+
+            foreach (var zeile in _zeilen)
+            {
+                InvoiceItem item = new InvoiceItem
+                {
+                    invoiceId = invoiceId,
+                    articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+                    description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                };
+
+                db.createInvoiceItem(item);
+            }
+
+            List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
+            InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
+        }
+
+        ResetBelegFormular();
+        FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
     }
+    catch (Exception e)
+    {
+        Debug.LogError("[" + BelegTyp + "] Speicherfehler: " + e);
+        FeedbackPopup.Show(Root, "Speichern fehlgeschlagen", FeedbackTyp.Fehler);
+    }
+}
 
     private void StatusGeklickt(bool angenommen)
     {
@@ -1072,4 +1197,59 @@ public abstract class BelegScreenController : MonoBehaviour
 
         return string.Join("\n", zeilen);
     }
+
+    private string HoleCompanyName(DataBase db)
+    {
+        List<Company> companies = db.getAllCompanies();
+
+        if (companies == null || companies.Count == 0)
+        return "Keine Firmendaten";
+
+        Company company = companies[companies.Count - 1];
+
+        return LiesFeld(company, "name");
+    }
+
+    private string HoleCompanyAddress(DataBase db)
+    {
+        List<Company> companies = db.getAllCompanies();
+
+        if (companies == null || companies.Count == 0)
+            return "";
+
+        Company company = companies[companies.Count - 1];
+
+        return LiesFeld(company, "location", "ort", "adresse", "address");
+    }
+
+    private void ResetBelegFormular()
+    {
+        _zeilen.Clear();
+        _positionenListe?.Clear();
+        Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
+        _ausgewaehlterKunde = "";
+        _ausgewaehlterKundeId = 0;
+        _ausgewaehlterKundeAdresse = "";
+        var boxen = Root.Query(className: "angebot-address-box").ToList();
+        if (boxen.Count > 0)
+        {
+            SetzeAdresse(boxen[0], "Kunde:", "Kunde auswählen");
+        }
+        if (boxen.Count > 1)
+        {
+            LadeAbsenderdaten();
+        }
+        SetzeStandardwerte();
+        BerechneSummen();
+    }
+
+    private float HoleMwstSatz()
+    {
+        int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
+        return steuersatz / 100f;
+    }
+
+
+
+
 }
