@@ -42,8 +42,10 @@
                     <ui:Label name="label-verwendungzweck" text="Verwendungzweck" class="field-label"/>
                     <ui:TextField name="input-verwendungzweck" label="" value="" class="field-input" style="color: rgb(102, 102, 102);"/>
                 </ui:VisualElement>
-                <ui:Label text="Art"/>
-                <ui:DropdownField label="" name="Art" style="margin-left: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                <ui:VisualElement name="field-art" class="field-group">
+                    <ui:Label name="label-art" text="Art" class="field-label"/>
+                    <ui:DropdownField label="" name="Art" class="art-dropdown"/>
+                </ui:VisualElement>
                 <ui:VisualElement name="field-datum" class="field-group">
                     <ui:Label name="label-datum" text="Datum" class="field-label"/>
                     <ui:TextField name="input-datum" class="field-input"/>
