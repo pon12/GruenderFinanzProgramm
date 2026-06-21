@@ -53,6 +53,8 @@ public class SidebarController : MonoBehaviour
         { "nav-item-dienstleistungen", "Dienstleistungen" },
         { "nav-item-kassenbuch",       "Kassenbuch"       },
         { "nav-item-export",           "Export-Screen"    },
+        { "nav-item-finanzen1",        "Finanzen1"        }, 
+        { "nav-item-finanzen2",        "Finanzen2"        },
         { "nav-item-dokumente",        "Dokument-Screen"  },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
@@ -64,6 +66,8 @@ public class SidebarController : MonoBehaviour
         "nav-item-kunden",
         "nav-item-dienstleistungen",
         "nav-item-kassenbuch",
+        "nav-item-finanzen1",
+        "nav-item-finanzen2",
     };
     
     private static readonly HashSet<string> FortschrittSubItems = new()
