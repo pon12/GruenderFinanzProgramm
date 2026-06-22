@@ -113,7 +113,7 @@
                 </ui:VisualElement>
 
                 <!-- Rechte Spalte: Details & Anhaenge -->
-                <ui:VisualElement name="col-right" style="width: 290px; flex-shrink: 0; flex-direction: column; gap: 16px; overflow: hidden;">
+                <ui:ScrollView name="col-right" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" style="width: 290px; flex-shrink: 0;">
 
                     <!-- Details & Notizen -->
                     <ui:VisualElement name="card-details" class="angebot-card" style="flex-direction: column; padding: 16px 20px; gap: 12px; margin-left: 8px; margin-bottom: 8px;">
@@ -132,13 +132,13 @@
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
                             <ui:Label text="Notiz (max. 150 Zeichen)" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                            <ui:TextField name="input-notizen" multiline="true" max-length="150" style="width: 100%; min-height: 80px;"/>
+                            <ui:TextField name="input-notizen" multiline="true" max-length="150" style="width: 100%; min-height: 60px; max-height: 100px;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
 
                     <!-- Anhaenge -->
                     <ui:VisualElement name="card-anhaenge" class="angebot-card" style="flex-direction: column; padding: 14px 16px; flex-shrink: 0; margin-left: 8px;"/>
-                </ui:VisualElement>
+                </ui:ScrollView>
 
             </ui:VisualElement>
 

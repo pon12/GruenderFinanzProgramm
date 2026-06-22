@@ -54,18 +54,19 @@ public abstract class BelegScreenController : MonoBehaviour
                       _rabattWertFeld, _skontoWertFeld, _notizenFeld;
     private DropdownField _statusDropdown, _rabattTypDropdown;
     private VisualElement _suchErgebnisListe;
-    private string _ausgewaehlterKunde = "";
-    private int _ausgewaehlterKundeId = 0;
-    private string _ausgewaehlterKundeAdresse = "";
-    private Button  _umwandelnButton;
-    private bool _buttonsRegistriert = false;
+    private string        _ausgewaehlterKunde          = "";
+    private int           _ausgewaehlterKundeId        = 0;
+    private string        _ausgewaehlterKundeAdresse   = "";
+    private Button        _umwandelnButton;
+    private bool          _buttonsRegistriert          = false;
+
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
     private VisualElement _anhangBereich;
 
     private VisualElement _dienstleistungPopup;
     private VisualElement _kalenderPopup;
     private List<Service> _dienstleistungen = new List<Service>();
-   
+
     private readonly string[] _monatsNamen =
     {
         "Januar", "Februar", "M\u00e4rz", "April", "Mai", "Juni",
@@ -91,10 +92,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
         SammleElemente();
         _zeilen.Clear();
-        if (_positionenListe != null)
-        {
-            _positionenListe.Clear();
-        }
+        if (_positionenListe != null) _positionenListe.Clear();
         LeereDemoInhalte();
         SetzeStandardwerte();
         LadeAbsenderdaten();
@@ -132,31 +130,95 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void LeereDemoInhalte()
-{
-    _zeilen.Clear();
-    _positionenListe?.Clear();
-    Root.Query<TextField>().ForEach(f => f.SetValueWithoutNotify(""));
-    var boxen = Root.Query(className: "angebot-address-box").ToList();
-    if (boxen.Count > 0)
-        SetzeAdresse(boxen[0], "Rechnungsempfänger:", "Kunde auswählen");
-    if (boxen.Count > 1)
-        SetzeAdresse(boxen[1], "Rechnungssender:", "");
-}
+    {
+        _zeilen.Clear();
+        _positionenListe?.Clear();
+        Root.Query<TextField>().ForEach(f => f.SetValueWithoutNotify(""));
 
+        var boxen = Root.Query(className: "angebot-address-box").ToList();
+        if (boxen.Count > 0) SetzeAdressePlatzhalter(boxen[0], HoleEmpfaengerBezeichnung());
+        if (boxen.Count > 1) SetzeAdressePlatzhalter(boxen[1], HoleSenderBezeichnung());
+    }
+
+    // Zeigt einen leeren Adressblock mit Platzhaltertext
+    private void SetzeAdressePlatzhalter(VisualElement box, string ueberschrift)
+    {
+        box.Clear();
+        AdressTitel(box, ueberschrift);
+
+        var platzhalter = new Label("Noch nicht ausgew\u00e4hlt");
+        platzhalter.style.fontSize  = 12;
+        platzhalter.style.color     = new Color(0.59f, 0.59f, 0.59f);
+        platzhalter.style.marginTop = 2;
+        box.Add(platzhalter);
+    }
+
+    // Zeigt einen strukturierten Adressblock mit Bezeichnung und Einzelfeldern
+    private void SetzeAdresseStrukturiert(
+        VisualElement box, string ueberschrift,
+        (string bezeichnung, string wert)[] felder)
+    {
+        box.Clear();
+        AdressTitel(box, ueberschrift);
+
+        foreach (var (bezeichnung, wert) in felder)
+        {
+            if (!string.IsNullOrWhiteSpace(wert))
+                AdressZeile(box, bezeichnung, wert);
+        }
+    }
+
+    // Dezente Überschrift des Adressblocks
+    private static void AdressTitel(VisualElement box, string text)
+    {
+        var label = new Label(text);
+        label.style.fontSize       = 10;
+        label.style.color          = new Color(0.5f, 0.5f, 0.5f);
+        label.style.unityFontStyleAndWeight = FontStyle.Normal;
+        label.style.marginBottom   = 6;
+        label.style.letterSpacing  = 0.5f;
+        box.Add(label);
+    }
+
+    // Einzelne Adresszeile mit optionaler Bezeichnung links
+    private static void AdressZeile(VisualElement box, string bezeichnung, string wert)
+    {
+        var zeile = new VisualElement();
+        zeile.style.flexDirection = FlexDirection.Row;
+        zeile.style.marginBottom  = 3;
+        zeile.style.alignItems    = Align.FlexStart;
+
+        if (!string.IsNullOrEmpty(bezeichnung))
+        {
+            var key = new Label(bezeichnung);
+            key.style.fontSize    = 10;
+            key.style.color       = new Color(0.5f, 0.5f, 0.5f);
+            key.style.minWidth    = 52;
+            key.style.marginRight = 4;
+            key.style.marginTop   = 1;
+            key.style.whiteSpace  = WhiteSpace.NoWrap;
+            zeile.Add(key);
+        }
+
+        var val = new Label(wert);
+        val.style.fontSize   = 12;
+        val.style.color      = new Color(0.88f, 0.88f, 0.88f);
+        val.style.whiteSpace = WhiteSpace.Normal;
+        val.style.flexShrink = 1;
+        zeile.Add(val);
+
+        box.Add(zeile);
+    }
+
+    // Kompatibilitätsmethode für einfachen Textinhalt (Fehlermeldungen, Platzhalter)
     private void SetzeAdresse(VisualElement box, string ueberschrift, string inhalt)
     {
         box.Clear();
-
-        var titel = new Label(ueberschrift);
-        titel.style.fontSize = 13;
-        titel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        titel.style.color = Color.white;
-        titel.style.marginBottom = 6;
-        box.Add(titel);
+        AdressTitel(box, ueberschrift);
 
         var text = new Label(inhalt);
-        text.style.fontSize = 12;
-        text.style.color = string.IsNullOrEmpty(inhalt) || inhalt == "Kunde ausw\u00e4hlen"
+        text.style.fontSize  = 12;
+        text.style.color     = string.IsNullOrEmpty(inhalt)
             ? new Color(0.59f, 0.59f, 0.59f)
             : new Color(0.78f, 0.78f, 0.78f);
         text.style.whiteSpace = WhiteSpace.Normal;
@@ -181,20 +243,17 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (_rabattTypDropdown != null)
         {
-            _rabattTypDropdown.choices = new List<string>
-                { "Kein Rabatt", "Prozent", "Festbetrag" };
+            _rabattTypDropdown.choices = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
             _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
             _rabattTypDropdown.RegisterValueChangedCallback(_ => BerechneSummen());
         }
     }
 
-    // Erzeugt eine fortlaufende Nummer im Format PREFIX-0001
-    // Kann in Unterklassen überschrieben werden um eine andere Zählliste zu verwenden
     protected virtual string ErzeugeNaechsteNummer()
     {
         try
         {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            var db       = UserDatabaseAccess.getCurrentUserDatabase();
             var eintraege = db.getAllOffers();
             int naechste = (eintraege != null ? eintraege.Count : 0) + 1;
             return string.Format("{0}-{1:D4}", NummernPrefix, naechste);
@@ -205,18 +264,15 @@ public abstract class BelegScreenController : MonoBehaviour
         }
     }
 
-    // Setzt den Umwandeln-Button aktiv nur wenn Status "Angenommen" ist
     private void AktualisiereUmwandelnButton()
     {
         if (_umwandelnButton == null) return;
 
-        bool angenommen = _statusDropdown != null
-            && _statusDropdown.value == "Angenommen";
+        bool angenommen = _statusDropdown != null && _statusDropdown.value == "Angenommen";
 
         _umwandelnButton.SetEnabled(angenommen);
         _umwandelnButton.style.backgroundColor = angenommen
-            ? Gruen
-            : new Color(70f / 255f, 70f / 255f, 70f / 255f);
+            ? Gruen : new Color(70f / 255f, 70f / 255f, 70f / 255f);
         _umwandelnButton.style.color = angenommen
             ? new Color(30f / 255f, 30f / 255f, 30f / 255f)
             : new Color(180f / 255f, 180f / 255f, 180f / 255f);
@@ -224,29 +280,42 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void LadeAbsenderdaten()
     {
-        var boxen = Root.Query(className: "angebot-address-box").ToList();
-        VisualElement senderBox = boxen.Count > 1 ? boxen[1] : null;
+        var boxen     = Root.Query(className: "angebot-address-box").ToList();
+        var senderBox = boxen.Count > 1 ? boxen[1] : null;
 
         try
         {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            var db     = UserDatabaseAccess.getCurrentUserDatabase();
             var firmen = db.getAllCompanies();
-            if (firmen != null && firmen.Count > 0)
-            
-            
-            {
-                string name    = LiesFeld(firmen[0], "name");
-                string ort     = LiesFeld(firmen[0], "location", "ort", "adresse");
-                string anzeige = string.IsNullOrEmpty(ort) ? name : name + "\n" + ort;
 
-                var absenderLabel = Root.Q<Label>(AbsenderLabelName);
-                if (absenderLabel != null) absenderLabel.text = anzeige;
-                if (senderBox != null) SetzeAdresse(senderBox, "Rechnungssender:", anzeige);
+            if (firmen != null && firmen.Count > 0)
+            {
+                var f = firmen[0];
+
+                string name    = LiesFeld(f, "name");
+                string strasse = LiesFeld(f, "strasseuHausNr", "strasse", "adresse", "address");
+                string plz     = LiesFeld(f, "plz");
+                string ort     = LiesFeld(f, "location", "ort", "stadt");
+                string plzOrt  = (plz + " " + ort).Trim();
+                string steuer  = LiesFeld(f, "steuerNr", "steuernummer");
+                string ustId   = LiesFeld(f, "ustIdNr", "ustidnr");
+
+                var felder = new (string, string)[]
+                {
+                    ("Name",      name),
+                    ("Stra\u00dfe",    strasse),
+                    ("Ort",       plzOrt),
+                    ("St.-Nr.",   steuer),
+                    ("USt-IdNr.", ustId),
+                };
+
+                if (senderBox != null)
+                    SetzeAdresseStrukturiert(senderBox, HoleSenderBezeichnung(), felder);
             }
             else
             {
                 if (senderBox != null)
-                    SetzeAdresse(senderBox, "Rechnungssender:",
+                    SetzeAdresse(senderBox, HoleSenderBezeichnung(),
                         "Firmendaten in den Einstellungen hinterlegen.");
             }
         }
@@ -257,23 +326,20 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void LadeDienstleistungen()
-{
-    try
     {
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        Debug.Log("[Beleg] DB: " + db.getDatabasePath());
-
-        _dienstleistungen = db.getAllServices() ?? new List<Service>();
-
-        Debug.Log("[Beleg] Dienstleistungen geladen: " + _dienstleistungen.Count);
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            Debug.Log("[Beleg] DB: " + db.getDatabasePath());
+            _dienstleistungen = db.getAllServices() ?? new List<Service>();
+            Debug.Log("[Beleg] Dienstleistungen geladen: " + _dienstleistungen.Count);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[" + BelegTyp + "] Dienstleistungen: " + e.Message);
+            _dienstleistungen = new List<Service>();
+        }
     }
-    catch (Exception e)
-    {
-        Debug.LogWarning("[" + BelegTyp + "] Dienstleistungen: " + e.Message);
-        _dienstleistungen = new List<Service>();
-    }
-}
 
     private void RegistriereSummenEingaben()
     {
@@ -291,22 +357,23 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void RegistriereButtons()
-{
-    if (_buttonsRegistriert)
-        return;
-    _buttonsRegistriert = true;
-    FindeButton(SpeichernButtonName, "Speichern")?
-        .RegisterCallback<ClickEvent>(_ => SpeichernGeklickt());
-    FindeButton(AngenommenButtonName, "Angenommen")?
-        .RegisterCallback<ClickEvent>(_ => StatusGeklickt(true));
-    FindeButton(AbgelehntButtonName, "Abgelehnt")?
-        .RegisterCallback<ClickEvent>(_ => StatusGeklickt(false));
-    FindeButton("btn-export", "Als PDF")?
-        .RegisterCallback<ClickEvent>(_ => ExportierePDF());
-    FindeButton(PositionAddButtonName, "+")?
-        .RegisterCallback<ClickEvent>(_ => OeffneDienstleistungsPopup());
-    RegistriereZusatzButtons();
-}
+    {
+        if (_buttonsRegistriert) return;
+        _buttonsRegistriert = true;
+
+        FindeButton(SpeichernButtonName, "Speichern")?
+            .RegisterCallback<ClickEvent>(_ => SpeichernGeklickt());
+        FindeButton(AngenommenButtonName, "Angenommen")?
+            .RegisterCallback<ClickEvent>(_ => StatusGeklickt(true));
+        FindeButton(AbgelehntButtonName, "Abgelehnt")?
+            .RegisterCallback<ClickEvent>(_ => StatusGeklickt(false));
+        FindeButton("btn-export", "Als PDF")?
+            .RegisterCallback<ClickEvent>(_ => ExportierePDF());
+        FindeButton(PositionAddButtonName, "+")?
+            .RegisterCallback<ClickEvent>(_ => OeffneDienstleistungsPopup());
+
+        RegistriereZusatzButtons();
+    }
 
     protected Button FindeButton(string elementName, string buttonText)
     {
@@ -317,10 +384,9 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // KALENDER-POPUP
+    // Kalender-Popup
     // ============================================================
 
-    // Kalender-Buttons sind in der UXML bereits als btn-kalender-datum / btn-kalender-frist definiert
     private void RegistriereKalenderButtons()
     {
         var btnDatum = Root.Q<Button>("btn-kalender-datum");
@@ -355,7 +421,6 @@ public abstract class BelegScreenController : MonoBehaviour
             _kalenderPopup = null;
         }
 
-        // Startmonat: Feldwert lesen, sonst Fallback
         DateTime start = DateTime.Today;
         if (!string.IsNullOrWhiteSpace(zielFeld.value))
         {
@@ -364,18 +429,13 @@ public abstract class BelegScreenController : MonoBehaviour
                 start = DateTime.Today;
         }
 
-        // Ist dieses Feld das Frist-Feld, soll der Startmonat mindestens
-        // beim Datum-Feld liegen (und nie vor heute)
         if (zielFeld == _fristFeld && _datumFeld != null
             && !string.IsNullOrWhiteSpace(_datumFeld.value))
         {
             if (DateTime.TryParseExact(_datumFeld.value, "dd.MM.yyyy",
                 De, DateTimeStyles.None, out DateTime datumStart)
-                && datumStart.Year >= 2000
-                && datumStart > start)
-            {
+                && datumStart.Year >= 2000 && datumStart > start)
                 start = datumStart;
-            }
         }
 
         if (start < DateTime.Today) start = DateTime.Today;
@@ -403,55 +463,50 @@ public abstract class BelegScreenController : MonoBehaviour
         karte.style.paddingTop    = 18; karte.style.paddingBottom = 18;
         karte.style.paddingLeft   = 18; karte.style.paddingRight  = 18;
 
-        // Schließen-Button oben rechts
         var btnSchliessen = new Button(() => SchliessKalender()) { text = "\u2715" };
-        btnSchliessen.style.position         = Position.Absolute;
-        btnSchliessen.style.top              = 8;
-        btnSchliessen.style.right            = 10;
-        btnSchliessen.style.width            = 26;
-        btnSchliessen.style.height           = 26;
-        btnSchliessen.style.backgroundColor  = Color.clear;
-        btnSchliessen.style.color            = Color.white;
-        btnSchliessen.style.fontSize         = 14;
-        btnSchliessen.style.borderTopWidth   = 0; btnSchliessen.style.borderRightWidth   = 0;
-        btnSchliessen.style.borderBottomWidth= 0; btnSchliessen.style.borderLeftWidth    = 0;
+        btnSchliessen.style.position          = Position.Absolute;
+        btnSchliessen.style.top               = 8;
+        btnSchliessen.style.right             = 10;
+        btnSchliessen.style.width             = 26;
+        btnSchliessen.style.height            = 26;
+        btnSchliessen.style.backgroundColor   = Color.clear;
+        btnSchliessen.style.color             = Color.white;
+        btnSchliessen.style.fontSize          = 14;
+        btnSchliessen.style.borderTopWidth    = 0; btnSchliessen.style.borderRightWidth    = 0;
+        btnSchliessen.style.borderBottomWidth = 0; btnSchliessen.style.borderLeftWidth     = 0;
         btnSchliessen.RegisterCallback<MouseEnterEvent>(_ =>
             btnSchliessen.style.color = new Color(0.7f, 0.7f, 0.7f));
         btnSchliessen.RegisterCallback<MouseLeaveEvent>(_ =>
             btnSchliessen.style.color = Color.white);
         karte.Add(btnSchliessen);
 
-        // Navigations-Kopfzeile: Pfeil | Monat Jahr | Pfeil
         var kopf = new VisualElement();
         kopf.style.flexDirection  = FlexDirection.Row;
         kopf.style.justifyContent = Justify.SpaceBetween;
         kopf.style.alignItems     = Align.Center;
         kopf.style.marginBottom   = 12;
 
-        var btnVorig = new Button { text = "\u2039" };
+        var btnVorig   = new Button { text = "\u2039" };
+        var btnNaechst = new Button { text = "\u203a" };
         StileNavButton(btnVorig);
+        StileNavButton(btnNaechst);
 
         var monatLabel = new Label();
-        monatLabel.style.color           = Color.white;
-        monatLabel.style.fontSize        = 14;
-        monatLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        monatLabel.style.flexGrow        = 1;
-        monatLabel.style.unityTextAlign  = TextAnchor.MiddleCenter;
-
-        var btnNaechst = new Button { text = "\u203a" };
-        StileNavButton(btnNaechst);
+        monatLabel.style.color                      = Color.white;
+        monatLabel.style.fontSize                   = 14;
+        monatLabel.style.unityFontStyleAndWeight    = FontStyle.Bold;
+        monatLabel.style.flexGrow                   = 1;
+        monatLabel.style.unityTextAlign             = TextAnchor.MiddleCenter;
 
         kopf.Add(btnVorig);
         kopf.Add(monatLabel);
         kopf.Add(btnNaechst);
         karte.Add(kopf);
 
-        // Wochentag-Header (Mo–So)
         var wochenHeader = new VisualElement();
         wochenHeader.style.flexDirection = FlexDirection.Row;
         wochenHeader.style.marginBottom  = 4;
-        string[] wochentage = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
-        foreach (var wt in wochentage)
+        foreach (var wt in new[] { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" })
         {
             var wl = new Label(wt);
             wl.style.width          = 38;
@@ -463,7 +518,6 @@ public abstract class BelegScreenController : MonoBehaviour
         }
         karte.Add(wochenHeader);
 
-        // Tag-Grid (6 Reihen x 7 Spalten)
         var grid = new VisualElement();
         grid.style.flexDirection = FlexDirection.Row;
         grid.style.flexWrap      = Wrap.Wrap;
@@ -477,7 +531,6 @@ public abstract class BelegScreenController : MonoBehaviour
 
             var ersterTag   = new DateTime(jahr, monat, 1);
             int tageImMonat = DateTime.DaysInMonth(jahr, monat);
-            // Montag-basierter Start: Mo=0 … So=6
             int startSlot   = ((int)ersterTag.DayOfWeek + 6) % 7;
 
             for (int i = 0; i < 42; i++)
@@ -486,19 +539,16 @@ public abstract class BelegScreenController : MonoBehaviour
                 int  tag        = istImMonat ? i - startSlot + 1 : 0;
 
                 var btn = new Button();
-                btn.style.width  = 34;
-                btn.style.height = 34;
-                btn.style.marginTop    = 2;
-                btn.style.marginBottom = 2;
-                btn.style.marginLeft   = 2;
-                btn.style.marginRight  = 2;
+                btn.style.width  = 34; btn.style.height = 34;
+                btn.style.marginTop    = 2; btn.style.marginBottom = 2;
+                btn.style.marginLeft   = 2; btn.style.marginRight  = 2;
                 btn.style.borderTopWidth    = 0; btn.style.borderRightWidth   = 0;
                 btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth    = 0;
                 btn.style.borderTopLeftRadius    = 6; btn.style.borderTopRightRadius   = 6;
                 btn.style.borderBottomLeftRadius = 6; btn.style.borderBottomRightRadius= 6;
-                btn.style.fontSize      = 12;
-                btn.style.paddingTop    = 0; btn.style.paddingBottom = 0;
-                btn.style.paddingLeft   = 0; btn.style.paddingRight  = 0;
+                btn.style.fontSize    = 12;
+                btn.style.paddingTop  = 0; btn.style.paddingBottom = 0;
+                btn.style.paddingLeft = 0; btn.style.paddingRight  = 0;
 
                 if (!istImMonat)
                 {
@@ -509,15 +559,11 @@ public abstract class BelegScreenController : MonoBehaviour
                 else
                 {
                     btn.text = tag.ToString();
-
-                    var heute  = DateTime.Today;
-                    bool istHeute = tag == heute.Day
-                        && monat == heute.Month
-                        && jahr  == heute.Year;
+                    var heute    = DateTime.Today;
+                    bool istHeute = tag == heute.Day && monat == heute.Month && jahr == heute.Year;
 
                     btn.style.backgroundColor = istHeute
-                        ? new Color(Gruen.r, Gruen.g, Gruen.b, 0.25f)
-                        : Color.clear;
+                        ? new Color(Gruen.r, Gruen.g, Gruen.b, 0.25f) : Color.clear;
                     btn.style.color = istHeute ? Gruen : Color.white;
 
                     if (istHeute)
@@ -528,26 +574,20 @@ public abstract class BelegScreenController : MonoBehaviour
                         btn.style.borderBottomColor = Gruen; btn.style.borderLeftColor   = Gruen;
                     }
 
-                    int lokalTag   = tag;
-                    int lokalMonat = monat;
-                    int lokalJahr  = jahr;
-
+                    int lokalTag = tag, lokalMonat = monat, lokalJahr = jahr;
                     btn.RegisterCallback<MouseEnterEvent>(_ =>
                     {
                         if (!istHeute)
-                            btn.style.backgroundColor =
-                                new Color(Gruen.r, Gruen.g, Gruen.b, 0.15f);
+                            btn.style.backgroundColor = new Color(Gruen.r, Gruen.g, Gruen.b, 0.15f);
                     });
                     btn.RegisterCallback<MouseLeaveEvent>(_ =>
                     {
-                        if (!istHeute)
-                            btn.style.backgroundColor = Color.clear;
+                        if (!istHeute) btn.style.backgroundColor = Color.clear;
                     });
                     btn.RegisterCallback<ClickEvent>(_ =>
                     {
                         zielFeld.SetValueWithoutNotify(
-                            new DateTime(lokalJahr, lokalMonat, lokalTag)
-                                .ToString("dd.MM.yyyy"));
+                            new DateTime(lokalJahr, lokalMonat, lokalTag).ToString("dd.MM.yyyy"));
                         SchliessKalender();
                     });
                 }
@@ -572,7 +612,6 @@ public abstract class BelegScreenController : MonoBehaviour
 
         karte.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
         overlay.RegisterCallback<ClickEvent>(_ => SchliessKalender());
-
         overlay.Add(karte);
         Root.Add(overlay);
         _kalenderPopup = overlay;
@@ -587,8 +626,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private static void StileNavButton(Button btn)
     {
-        btn.style.width             = 28;
-        btn.style.height            = 28;
+        btn.style.width             = 28; btn.style.height            = 28;
         btn.style.backgroundColor   = FeldFarbe;
         btn.style.color             = Color.white;
         btn.style.fontSize          = 16;
@@ -601,76 +639,77 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // PFLICHTFELD-PRÜFUNG
+    // Pflichtfeld-Prüfung
     // ============================================================
 
-    // Prüft ob Pflichtfelder (Kunde + Unternehmensdaten) gefüllt sind
     private bool PflichtfelderGefuellt()
-{
-    if (string.IsNullOrWhiteSpace(_ausgewaehlterKunde))
     {
-        FeedbackPopup.Show(Root, "Bitte einen Kunden auswählen.", FeedbackTyp.Fehler);
-        return false;
-    }
-
-    if (_zeilen == null || _zeilen.Count == 0)
-    {
-        FeedbackPopup.Show(Root, "Bitte mindestens eine Dienstleistung hinzufügen.", FeedbackTyp.Fehler);
-        return false;
-    }
-
-    bool hatGueltigePosition = _zeilen.Exists(z =>
-        z != null &&
-        !string.IsNullOrWhiteSpace(z.Artikel?.text) &&
-        ParseBetrag(z.Menge?.value ?? "0") > 0
-    );
-
-    if (!hatGueltigePosition)
-    {
-        FeedbackPopup.Show(Root, "Bitte mindestens eine Dienstleistung auswählen.", FeedbackTyp.Fehler);
-        return false;
-    }
-
-    try
-    {
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
+        if (string.IsNullOrWhiteSpace(_ausgewaehlterKunde))
         {
-            FeedbackPopup.Show(Root, "Keine Datenbank gefunden.", FeedbackTyp.Fehler);
+            FeedbackPopup.Show(Root, "Bitte einen Kunden ausw\u00e4hlen.", FeedbackTyp.Fehler);
             return false;
         }
 
-        var firmen = db.getAllCompanies();
-
-        if (firmen == null || firmen.Count == 0)
+        if (_zeilen == null || _zeilen.Count == 0)
         {
-            FeedbackPopup.Show(Root, "Bitte Unternehmensdaten in den Einstellungen hinterlegen.", FeedbackTyp.Fehler);
+            FeedbackPopup.Show(Root, "Bitte mindestens eine Dienstleistung hinzuf\u00fcgen.", FeedbackTyp.Fehler);
             return false;
         }
 
-        Company firma = firmen[firmen.Count - 1];
+        bool hatGueltigePosition = _zeilen.Exists(z =>
+            z != null &&
+            !string.IsNullOrWhiteSpace(z.Artikel?.text) &&
+            ParseBetrag(z.Menge?.value ?? "0") > 0);
 
-        string firmenname = LiesFeld(firma, "name");
-        string adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
-
-        if (string.IsNullOrWhiteSpace(firmenname) || string.IsNullOrWhiteSpace(adresse))
+        if (!hatGueltigePosition)
         {
-            FeedbackPopup.Show(Root, "Bitte vollständige Unternehmensdaten in den Einstellungen hinterlegen.", FeedbackTyp.Fehler);
+            FeedbackPopup.Show(Root, "Bitte mindestens eine Dienstleistung ausw\u00e4hlen.", FeedbackTyp.Fehler);
             return false;
         }
-    }
-    catch
-    {
-        FeedbackPopup.Show(Root, "Unternehmensdaten konnten nicht geprüft werden.", FeedbackTyp.Fehler);
-        return false;
-    }
 
-    return true;
-}
+        try
+        {
+            var db    = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null)
+            {
+                FeedbackPopup.Show(Root, "Keine Datenbank gefunden.", FeedbackTyp.Fehler);
+                return false;
+            }
+
+            var firmen = db.getAllCompanies();
+            if (firmen == null || firmen.Count == 0)
+            {
+                FeedbackPopup.Show(Root,
+                    "Bitte Unternehmensdaten in den Einstellungen hinterlegen.",
+                    FeedbackTyp.Fehler);
+                return false;
+            }
+
+            var firma      = firmen[firmen.Count - 1];
+            string firmName = LiesFeld(firma, "name");
+            string adresse  = LiesFeld(firma, "location", "ort", "adresse", "address");
+
+            if (string.IsNullOrWhiteSpace(firmName) || string.IsNullOrWhiteSpace(adresse))
+            {
+                FeedbackPopup.Show(Root,
+                    "Bitte vollst\u00e4ndige Unternehmensdaten in den Einstellungen hinterlegen.",
+                    FeedbackTyp.Fehler);
+                return false;
+            }
+        }
+        catch
+        {
+            FeedbackPopup.Show(Root,
+                "Unternehmensdaten konnten nicht gepr\u00fcft werden.",
+                FeedbackTyp.Fehler);
+            return false;
+        }
+
+        return true;
+    }
 
     // ============================================================
-    // DIENSTLEISTUNGS-POPUP
+    // Dienstleistungs-Popup
     // ============================================================
 
     private void OeffneDienstleistungsPopup()
@@ -718,8 +757,7 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             overlay.RemoveFromHierarchy();
             _dienstleistungPopup = null;
-        })
-        { text = "\u2715" };
+        }) { text = "\u2715" };
         schliessen.style.backgroundColor  = Color.clear;
         schliessen.style.color            = new Color(0.7f, 0.7f, 0.7f);
         schliessen.style.fontSize         = 14;
@@ -745,9 +783,9 @@ public abstract class BelegScreenController : MonoBehaviour
         else
         {
             var dropdownLabel = new Label("Dienstleistung");
-            dropdownLabel.style.fontSize    = 12;
-            dropdownLabel.style.color       = new Color(0.7f, 0.7f, 0.7f);
-            dropdownLabel.style.marginBottom= 4;
+            dropdownLabel.style.fontSize     = 12;
+            dropdownLabel.style.color        = new Color(0.7f, 0.7f, 0.7f);
+            dropdownLabel.style.marginBottom = 4;
             karte.Add(dropdownLabel);
 
             var optionen = _dienstleistungen.Select(d =>
@@ -762,20 +800,20 @@ public abstract class BelegScreenController : MonoBehaviour
             var eingabe = dropdown.Q(className: "unity-base-popup-field__input");
             if (eingabe != null)
             {
-                eingabe.style.backgroundColor       = FeldFarbe;
-                eingabe.style.color                 = Color.white;
-                eingabe.style.borderTopWidth        = 0; eingabe.style.borderRightWidth        = 0;
-                eingabe.style.borderBottomWidth     = 0; eingabe.style.borderLeftWidth         = 0;
-                eingabe.style.borderTopLeftRadius    = 6; eingabe.style.borderTopRightRadius   = 6;
-                eingabe.style.borderBottomLeftRadius = 6; eingabe.style.borderBottomRightRadius= 6;
+                eingabe.style.backgroundColor        = FeldFarbe;
+                eingabe.style.color                  = Color.white;
+                eingabe.style.borderTopWidth         = 0; eingabe.style.borderRightWidth         = 0;
+                eingabe.style.borderBottomWidth      = 0; eingabe.style.borderLeftWidth          = 0;
+                eingabe.style.borderTopLeftRadius    = 6; eingabe.style.borderTopRightRadius     = 6;
+                eingabe.style.borderBottomLeftRadius = 6; eingabe.style.borderBottomRightRadius  = 6;
                 eingabe.style.paddingLeft = 10;
             }
             karte.Add(dropdown);
 
             var mengeLabel = new Label("Menge");
-            mengeLabel.style.fontSize    = 12;
-            mengeLabel.style.color       = new Color(0.7f, 0.7f, 0.7f);
-            mengeLabel.style.marginBottom= 4;
+            mengeLabel.style.fontSize     = 12;
+            mengeLabel.style.color        = new Color(0.7f, 0.7f, 0.7f);
+            mengeLabel.style.marginBottom = 4;
             karte.Add(mengeLabel);
 
             var mengeFeld = NeuesTextFeld();
@@ -797,8 +835,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 FuegeZeileAusDienstleistungHinzu(service, menge);
                 overlay.RemoveFromHierarchy();
                 _dienstleistungPopup = null;
-            })
-            { text = "Hinzuf\u00fcgen" };
+            }) { text = "Hinzuf\u00fcgen" };
 
             btnHinzufuegen.style.height          = 40;
             btnHinzufuegen.style.backgroundColor = Gruen;
@@ -825,7 +862,7 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // POSITIONSZEILEN
+    // Positionszeilen
     // ============================================================
 
     private void FuegeZeileAusDienstleistungHinzu(Service service, int menge)
@@ -879,12 +916,12 @@ public abstract class BelegScreenController : MonoBehaviour
 
         var loeschen = new Button { text = "\u2715" };
         loeschen.style.width  = 26; loeschen.style.height = 26;
-        loeschen.style.marginLeft       = 8;
-        loeschen.style.backgroundColor  = Color.clear;
-        loeschen.style.color            = new Color(0.6f, 0.6f, 0.6f);
-        loeschen.style.fontSize         = 12;
-        loeschen.style.borderTopWidth   = 0; loeschen.style.borderRightWidth   = 0;
-        loeschen.style.borderBottomWidth= 0; loeschen.style.borderLeftWidth    = 0;
+        loeschen.style.marginLeft        = 8;
+        loeschen.style.backgroundColor   = Color.clear;
+        loeschen.style.color             = new Color(0.6f, 0.6f, 0.6f);
+        loeschen.style.fontSize          = 12;
+        loeschen.style.borderTopWidth    = 0; loeschen.style.borderRightWidth   = 0;
+        loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth    = 0;
         loeschen.RegisterCallback<MouseEnterEvent>(_ => loeschen.style.color = Rot);
         loeschen.RegisterCallback<MouseLeaveEvent>(_ =>
             loeschen.style.color = new Color(0.6f, 0.6f, 0.6f));
@@ -933,7 +970,7 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // SUMMEN-BERECHNUNG  –  Rabatt und Skonto getrennt
+    // Summenberechnung
     // ============================================================
 
     protected void BerechneSummen()
@@ -951,19 +988,16 @@ public abstract class BelegScreenController : MonoBehaviour
             netto += gz;
         }
 
-        // Rabatt: Prozent oder Festbetrag
         float  rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
         string typ        = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
         float  rabatt     = 0f;
         if      (typ == "Prozent")    rabatt = netto * rabattWert / 100f;
         else if (typ == "Festbetrag") rabatt = rabattWert;
 
-        // Skonto: Prozentwert auf den Betrag nach Rabatt
         float nettoNachRabatt = netto - rabatt;
         float skontoWert      = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
         float skonto          = nettoNachRabatt * skontoWert / 100f;
-
-        float gesamtSumme = nettoNachRabatt - skonto;
+        float gesamtSumme     = nettoNachRabatt - skonto;
 
         if (_nettoLabel  != null) _nettoLabel.text  = FormatBetrag(netto);
         if (_rabattLabel != null) _rabattLabel.text = FormatBetrag(rabatt);
@@ -972,7 +1006,7 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // KUNDENSUCHE
+    // Kundensuche
     // ============================================================
 
     private void RegistriereKundensuche()
@@ -981,8 +1015,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
         _suchErgebnisListe = new VisualElement();
         _suchErgebnisListe.style.display         = DisplayStyle.None;
-        _suchErgebnisListe.style.backgroundColor =
-            new Color(45f / 255f, 45f / 255f, 45f / 255f);
+        _suchErgebnisListe.style.backgroundColor = new Color(45f / 255f, 45f / 255f, 45f / 255f);
         _suchErgebnisListe.style.borderTopWidth    = 1; _suchErgebnisListe.style.borderRightWidth   = 1;
         _suchErgebnisListe.style.borderBottomWidth = 1; _suchErgebnisListe.style.borderLeftWidth    = 1;
         _suchErgebnisListe.style.borderTopColor    = Gruen; _suchErgebnisListe.style.borderRightColor  = Gruen;
@@ -1041,8 +1074,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 eintrag.style.paddingTop    = 6;
                 eintrag.style.paddingBottom = 6;
                 eintrag.RegisterCallback<MouseEnterEvent>(_ =>
-                    eintrag.style.backgroundColor =
-                        new Color(Gruen.r, Gruen.g, Gruen.b, 0.2f));
+                    eintrag.style.backgroundColor = new Color(Gruen.r, Gruen.g, Gruen.b, 0.2f));
                 eintrag.RegisterCallback<MouseLeaveEvent>(_ =>
                     eintrag.style.backgroundColor = Color.clear);
                 eintrag.RegisterCallback<ClickEvent>(_ => WaehleKunde(aktuellerKunde));
@@ -1054,21 +1086,29 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void WaehleKunde(Customer kunde)
     {
-        _ausgewaehlterKundeId = kunde.id;
-        _ausgewaehlterKundeAdresse = KundenAdresse(kunde);
-        _ausgewaehlterKunde = KundenAnzeige(kunde);
+        _ausgewaehlterKundeId       = kunde.id;
+        _ausgewaehlterKundeAdresse  = KundenAdresse(kunde);
+        _ausgewaehlterKunde         = KundenAnzeige(kunde);
         _kundensuche.SetValueWithoutNotify(_ausgewaehlterKunde);
         _suchErgebnisListe.style.display = DisplayStyle.None;
+
         var boxen = Root.Query(className: "angebot-address-box").ToList();
         if (boxen.Count > 0)
         {
-            SetzeAdresse(boxen[0], "Kunde:", _ausgewaehlterKundeAdresse);
+            SetzeAdresseStrukturiert(boxen[0], HoleEmpfaengerBezeichnung(),
+                new (string, string)[]
+                {
+                    ("Name",    KundenAnzeige(kunde)),
+                    ("Stra\u00dfe",  LiesFeld(kunde, "strasse", "adresse", "address", "street")),
+                    ("Ort",     (LiesFeld(kunde, "plz", "postleitzahl", "zip") + " " +
+                                 LiesFeld(kunde, "ort", "stadt", "city", "location")).Trim()),
+                    ("E-Mail",  LiesFeld(kunde, "email", "mail")),
+                });
         }
-            //SetzeAdresse(boxen[0], "Rechnungsempf\u00e4nger:", KundenAdresse(kunde));
     }
 
     // ============================================================
-    // ANHÄNGE
+    // Anhänge
     // ============================================================
 
     private void RegistriereAnhaenge()
@@ -1082,15 +1122,15 @@ public abstract class BelegScreenController : MonoBehaviour
         var ueberschrift = new Label("Anh\u00e4nge");
         ueberschrift.style.fontSize = 13;
         ueberschrift.style.unityFontStyleAndWeight = FontStyle.Bold;
-        ueberschrift.style.color       = Color.white;
-        ueberschrift.style.marginBottom= 6;
+        ueberschrift.style.color        = Color.white;
+        ueberschrift.style.marginBottom = 6;
         _anhangBereich.Add(ueberschrift);
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
 
         foreach (string key in BelegAnhangController.AnhangSchluessel)
         {
-            bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
+            bool vorhanden  = verfuegbar.ContainsKey(key) && verfuegbar[key];
             _anhangAusgewaehlt[key] = false;
             string lokalerKey = key;
 
@@ -1154,8 +1194,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 zeile.RegisterCallback<MouseEnterEvent>(_ =>
                 {
                     if (!_anhangAusgewaehlt[lokalerKey])
-                        zeile.style.backgroundColor =
-                            new Color(65f / 255f, 65f / 255f, 65f / 255f);
+                        zeile.style.backgroundColor = new Color(65f / 255f, 65f / 255f, 65f / 255f);
                 });
                 zeile.RegisterCallback<MouseLeaveEvent>(_ =>
                 {
@@ -1215,169 +1254,149 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // STATUS & SPEICHERN
+    // Status und Speichern
     // ============================================================
 
     private void SpeichernGeklickt()
-{
-    if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
-        return;
-
-    if (!PflichtfelderGefuellt())
-        return;
-
-    try
     {
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
+        if (!PflichtfelderGefuellt()) return;
 
-        if (db == null)
+        try
         {
-            FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
-            return;
-        }
-
-        float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
-        float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
-        string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-        float rabatt = 0f;
-
-        if (rabattTyp == "Prozent")
-        {
-            rabatt = netto * rabattWert / 100f;
-        }
-        else if (rabattTyp == "Festbetrag")
-        {
-            rabatt = rabattWert;
-        }
-        float mwstSatz = HoleMwstSatz();
-
-        float steuerBasis = netto - rabatt;
-        float steuer = steuerBasis * mwstSatz;
-        float finalTotal = steuerBasis + steuer;
-
-        PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
-        string rawUserId = currentUser.userId.Replace("user_", "");
-        int userId = int.Parse(rawUserId);
-
-        if (BelegTyp == "Angebot")
-{
-    Offer offer = new Offer
-    {
-        customerId = _ausgewaehlterKundeId,
-        customerName = _ausgewaehlterKunde,
-        customerAddress = _ausgewaehlterKundeAdresse,
-        companyName = HoleCompanyName(db),
-        companyAddress = HoleCompanyAddress(db),
-        offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
-        date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
-        validUntil = _fristFeld != null ? _fristFeld.value : "",
-        status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
-        subtotal = netto,
-        discount = rabatt,
-        tax = steuer,
-        total = finalTotal,
-        notes = _notizenFeld != null ? _notizenFeld.value : "",
-        bookedToCashbook = false,
-        cashbookEntryId = 0,
-        bookingDate = ""
-    };
-
-    int offerId = db.createOffer(offer);
-
-    List<OfferItem> items = new List<OfferItem>();
-
-    foreach (var zeile in _zeilen.ToList())
-    {
-        OfferItem item = new OfferItem
-        {
-            offerId = offerId,
-            articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
-            description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-            quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-            unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
-        };
-
-        db.createOfferItem(item);
-        items.Add(item);
-    }
-
-    OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
-}
-        else if (BelegTyp == "Rechnung")
-        {
-            Invoice invoice = new Invoice
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null)
             {
-                customerId = _ausgewaehlterKundeId,
-                customerName = _ausgewaehlterKunde,
-                customerAddress = _ausgewaehlterKundeAdresse,
-                companyName = HoleCompanyName(db),
-                companyAddress = HoleCompanyAddress(db),
-                invoiceNumber = _nummerFeld != null ? _nummerFeld.value : "",
-                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
-                dueDate = _fristFeld != null ? _fristFeld.value : "",
-                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
-                subtotal = netto,
-                discount = rabatt,
-                tax = steuer,
-                total = finalTotal,
-                notes = _notizenFeld != null ? _notizenFeld.value : "",
-                bookedToCashbook = false,
-                cashbookEntryId = 0,
-                bookingDate = ""
-            };
-
-            int invoiceId = db.createInvoice(invoice);
-
-            foreach (var zeile in _zeilen.ToList())
-            {
-                InvoiceItem item = new InvoiceItem
-                {
-                    invoiceId = invoiceId,
-                    articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
-                    description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
-                };
-
-                db.createInvoiceItem(item);
+                FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
+                return;
             }
 
-            List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
-            InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
-        }
+            float  netto      = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+            float  rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+            string rabattTyp  = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
+            float  rabatt     = 0f;
 
-        ResetBelegFormular();
-        FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+            if      (rabattTyp == "Prozent")    rabatt = netto * rabattWert / 100f;
+            else if (rabattTyp == "Festbetrag") rabatt = rabattWert;
+
+            float mwstSatz   = HoleMwstSatz();
+            float steuerBasis = netto - rabatt;
+            float steuer      = steuerBasis * mwstSatz;
+            float finalTotal  = steuerBasis + steuer;
+
+            PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
+            string rawUserId = currentUser.userId.Replace("user_", "");
+            int    userId    = int.Parse(rawUserId);
+
+            if (BelegTyp == "Angebot")
+            {
+                Offer offer = new Offer
+                {
+                    customerId      = _ausgewaehlterKundeId,
+                    customerName    = _ausgewaehlterKunde,
+                    customerAddress = _ausgewaehlterKundeAdresse,
+                    companyName     = HoleCompanyName(db),
+                    companyAddress  = HoleCompanyAddress(db),
+                    offerNumber     = _nummerFeld != null ? _nummerFeld.value : "",
+                    date            = _datumFeld  != null ? _datumFeld.value  : DateTime.Now.ToString("dd.MM.yyyy"),
+                    validUntil      = _fristFeld  != null ? _fristFeld.value  : "",
+                    status          = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                    subtotal        = netto,
+                    discount        = rabatt,
+                    tax             = steuer,
+                    total           = finalTotal,
+                    notes           = _notizenFeld != null ? _notizenFeld.value : "",
+                    bookedToCashbook = false,
+                    cashbookEntryId  = 0,
+                    bookingDate      = ""
+                };
+
+                int offerId = db.createOffer(offer);
+                var items   = new List<OfferItem>();
+
+                foreach (var zeile in _zeilen.ToList())
+                {
+                    var item = new OfferItem
+                    {
+                        offerId       = offerId,
+                        articleNumber = zeile.Artikel     != null ? zeile.Artikel.text     : "",
+                        description   = zeile.Beschreibung!= null ? zeile.Beschreibung.text : "",
+                        quantity      = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                        unitPrice     = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                    };
+                    db.createOfferItem(item);
+                    items.Add(item);
+                }
+
+                OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
+            }
+            else if (BelegTyp == "Rechnung")
+            {
+                Invoice invoice = new Invoice
+                {
+                    customerId      = _ausgewaehlterKundeId,
+                    customerName    = _ausgewaehlterKunde,
+                    customerAddress = _ausgewaehlterKundeAdresse,
+                    companyName     = HoleCompanyName(db),
+                    companyAddress  = HoleCompanyAddress(db),
+                    invoiceNumber   = _nummerFeld != null ? _nummerFeld.value : "",
+                    date            = _datumFeld  != null ? _datumFeld.value  : DateTime.Now.ToString("dd.MM.yyyy"),
+                    dueDate         = _fristFeld  != null ? _fristFeld.value  : "",
+                    status          = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                    subtotal        = netto,
+                    discount        = rabatt,
+                    tax             = steuer,
+                    total           = finalTotal,
+                    notes           = _notizenFeld != null ? _notizenFeld.value : "",
+                    bookedToCashbook = false,
+                    cashbookEntryId  = 0,
+                    bookingDate      = ""
+                };
+
+                int invoiceId = db.createInvoice(invoice);
+
+                foreach (var zeile in _zeilen.ToList())
+                {
+                    var item = new InvoiceItem
+                    {
+                        invoiceId     = invoiceId,
+                        articleNumber = zeile.Artikel     != null ? zeile.Artikel.text     : "",
+                        description   = zeile.Beschreibung!= null ? zeile.Beschreibung.text : "",
+                        quantity      = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+                        unitPrice     = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                    };
+                    db.createInvoiceItem(item);
+                }
+
+                var items = db.getItemsByInvoice(invoiceId);
+                InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
+            }
+
+            ResetBelegFormular();
+            FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[" + BelegTyp + "] Speicherfehler: " + e);
+            FeedbackPopup.Show(Root, "Speichern fehlgeschlagen", FeedbackTyp.Fehler);
+        }
     }
-    catch (Exception e)
-    {
-        Debug.LogError("[" + BelegTyp + "] Speicherfehler: " + e);
-        FeedbackPopup.Show(Root, "Speichern fehlgeschlagen", FeedbackTyp.Fehler);
-    }
-}
 
     private void StatusGeklickt(bool angenommen)
-{
-    if (angenommen && !VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
-        return;
+    {
+        if (angenommen && !VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
+        if (angenommen && !PflichtfelderGefuellt()) return;
 
-    if (angenommen && !PflichtfelderGefuellt())
-        return;
+        string neuerStatus = angenommen ? "Angenommen" : "Abgelehnt";
+        _statusDropdown?.SetValueWithoutNotify(neuerStatus);
+        AktualisiereUmwandelnButton();
 
-    string neuerStatus = angenommen ? "Angenommen" : "Abgelehnt";
+        if (angenommen) UebernimmInsKassenbuch();
 
-    _statusDropdown?.SetValueWithoutNotify(neuerStatus);
-    AktualisiereUmwandelnButton();
-
-    if (angenommen)
-        UebernimmInsKassenbuch();
-
-    FeedbackPopup.Show(
-        Root,
-        angenommen ? BelegTyp + " bestätigt" : BelegTyp + " abgelehnt",
-        angenommen ? FeedbackTyp.Erfolg : FeedbackTyp.Fehler
-    );
-}
+        FeedbackPopup.Show(Root,
+            angenommen ? BelegTyp + " best\u00e4tigt" : BelegTyp + " abgelehnt",
+            angenommen ? FeedbackTyp.Erfolg : FeedbackTyp.Fehler);
+    }
 
     private void UebernimmInsKassenbuch()
     {
@@ -1401,7 +1420,7 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // PDF-EXPORT
+    // PDF-Export
     // ============================================================
 
     private void ExportierePDF()
@@ -1413,8 +1432,7 @@ public abstract class BelegScreenController : MonoBehaviour
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string nummer      = _nummerFeld != null ? _nummerFeld.value : BelegTyp;
-            string zielPfad    = System.IO.Path.Combine(
-                desktopPath, nummer + "_" + zeitstempel + ".pdf");
+            string zielPfad    = System.IO.Path.Combine(desktopPath, nummer + "_" + zeitstempel + ".pdf");
 
             using (var fs = new System.IO.FileStream(
                 zielPfad, System.IO.FileMode.Create,
@@ -1424,26 +1442,19 @@ public abstract class BelegScreenController : MonoBehaviour
                 iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
                 document.Open();
 
-                var titelFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
-                var textFont  = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA, 11);
-                var subFont   = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
-                var fettFont  = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 13);
+                var titelFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
+                var textFont  = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA, 11);
+                var subFont   = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
+                var fettFont  = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 13);
+                var linie     = new iTextSharp.text.pdf.draw.LineSeparator();
 
-                var linie = new iTextSharp.text.pdf.draw.LineSeparator();
-
-                document.Add(new iTextSharp.text.Paragraph(
-                    BelegTyp + "  " + nummer, titelFont));
+                document.Add(new iTextSharp.text.Paragraph(BelegTyp + "  " + nummer, titelFont));
                 document.Add(new iTextSharp.text.Paragraph(
                     "Datum: " + (_datumFeld != null ? _datumFeld.value : "") +
                     "   Kunde: " + _ausgewaehlterKunde, subFont));
                 document.Add(new iTextSharp.text.Paragraph(" "));
                 document.Add(new iTextSharp.text.Chunk(linie));
                 document.Add(new iTextSharp.text.Paragraph(" "));
-
                 document.Add(new iTextSharp.text.Paragraph("Positionen", titelFont));
                 document.Add(new iTextSharp.text.Paragraph(" "));
 
@@ -1454,43 +1465,35 @@ public abstract class BelegScreenController : MonoBehaviour
                     float preis  = ParseBetrag(zeile.Preis.text);
                     float gesamt = menge * preis;
 
-                    string zeileText = zeile.Artikel.text
+                    document.Add(new iTextSharp.text.Paragraph(
+                        zeile.Artikel.text
                         + "   " + zeile.Beschreibung.text
                         + "   Menge: " + menge
                         + "   " + zeile.Einheit.text
                         + "   " + FormatBetrag(preis)
-                        + "   Netto: " + FormatBetrag(gesamt);
-
-                    document.Add(new iTextSharp.text.Paragraph(zeileText, textFont));
+                        + "   Netto: " + FormatBetrag(gesamt), textFont));
                 }
 
                 document.Add(new iTextSharp.text.Paragraph(" "));
                 document.Add(new iTextSharp.text.Chunk(linie));
                 document.Add(new iTextSharp.text.Paragraph(" "));
-
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Netto (EUR):       " +
-                    (_nettoLabel  != null ? _nettoLabel.text  : ""), textFont));
+                    "Netto (EUR):       " + (_nettoLabel  != null ? _nettoLabel.text  : ""), textFont));
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Rabatt:            " +
-                    (_rabattLabel != null ? _rabattLabel.text : ""), textFont));
+                    "Rabatt:            " + (_rabattLabel != null ? _rabattLabel.text : ""), textFont));
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Skonto:            " +
-                    (_skontoLabel != null ? _skontoLabel.text : ""), textFont));
+                    "Skonto:            " + (_skontoLabel != null ? _skontoLabel.text : ""), textFont));
                 document.Add(new iTextSharp.text.Paragraph(" "));
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Gesamtpreis (EUR): " +
-                    (_gesamtLabel != null ? _gesamtLabel.text : ""), fettFont));
+                    "Gesamtpreis (EUR): " + (_gesamtLabel != null ? _gesamtLabel.text : ""), fettFont));
 
                 BelegAnhangController.SchreibeAnhaenge(document, HoleAusgewaehlteAnhaenge());
-
                 document.Close();
             }
 
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName        = zielPfad,
-                UseShellExecute = true
+                FileName = zielPfad, UseShellExecute = true
             });
 
             FeedbackPopup.Show(Root, "PDF exportiert", FeedbackTyp.Erfolg);
@@ -1503,7 +1506,7 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     // ============================================================
-    // EINGABE-HILFSMETHODEN
+    // Eingabe-Hilfsmethoden
     // ============================================================
 
     private static void NurGanzeZahlen(TextField feld)
@@ -1512,10 +1515,8 @@ public abstract class BelegScreenController : MonoBehaviour
         feld.RegisterCallback<KeyDownEvent>(evt =>
         {
             bool erlaubt = char.IsDigit(evt.character)
-                        || evt.keyCode == KeyCode.Backspace
-                        || evt.keyCode == KeyCode.Delete
-                        || evt.keyCode == KeyCode.LeftArrow
-                        || evt.keyCode == KeyCode.RightArrow;
+                        || evt.keyCode == KeyCode.Backspace || evt.keyCode == KeyCode.Delete
+                        || evt.keyCode == KeyCode.LeftArrow || evt.keyCode == KeyCode.RightArrow;
             if (!erlaubt) { evt.StopPropagation(); evt.PreventDefault(); }
         }, TrickleDown.TrickleDown);
     }
@@ -1526,12 +1527,9 @@ public abstract class BelegScreenController : MonoBehaviour
         feld.RegisterCallback<KeyDownEvent>(evt =>
         {
             bool erlaubt = char.IsDigit(evt.character)
-                        || evt.character == ','
-                        || evt.character == '.'
-                        || evt.keyCode == KeyCode.Backspace
-                        || evt.keyCode == KeyCode.Delete
-                        || evt.keyCode == KeyCode.LeftArrow
-                        || evt.keyCode == KeyCode.RightArrow;
+                        || evt.character == ',' || evt.character == '.'
+                        || evt.keyCode == KeyCode.Backspace || evt.keyCode == KeyCode.Delete
+                        || evt.keyCode == KeyCode.LeftArrow || evt.keyCode == KeyCode.RightArrow;
             if (!erlaubt) { evt.StopPropagation(); evt.PreventDefault(); }
         }, TrickleDown.TrickleDown);
     }
@@ -1542,51 +1540,35 @@ public abstract class BelegScreenController : MonoBehaviour
 
         feld.RegisterCallback<KeyDownEvent>(evt =>
         {
-            bool erlaubt = char.IsDigit(evt.character)
-                        || evt.character == '.'
-                        || evt.keyCode == KeyCode.Backspace
-                        || evt.keyCode == KeyCode.Delete
-                        || evt.keyCode == KeyCode.LeftArrow
-                        || evt.keyCode == KeyCode.RightArrow
-                        || evt.keyCode == KeyCode.Home
-                        || evt.keyCode == KeyCode.End;
+            bool erlaubt = char.IsDigit(evt.character) || evt.character == '.'
+                        || evt.keyCode == KeyCode.Backspace || evt.keyCode == KeyCode.Delete
+                        || evt.keyCode == KeyCode.LeftArrow || evt.keyCode == KeyCode.RightArrow
+                        || evt.keyCode == KeyCode.Home      || evt.keyCode == KeyCode.End;
             if (!erlaubt) { evt.StopPropagation(); evt.PreventDefault(); }
         }, TrickleDown.TrickleDown);
 
         feld.RegisterValueChangedCallback(evt =>
         {
-            string neu = evt.newValue      ?? "";
-            string alt = evt.previousValue ?? "";
+            string neu = evt.newValue ?? "", alt = evt.previousValue ?? "";
             if (neu.Length <= alt.Length) return;
 
             string nurZiffern = "";
-            foreach (char c in neu)
-                if (char.IsDigit(c)) nurZiffern += c;
-
-            if (nurZiffern.Length > 8)
-                nurZiffern = nurZiffern.Substring(0, 8);
+            foreach (char c in neu) if (char.IsDigit(c)) nurZiffern += c;
+            if (nurZiffern.Length > 8) nurZiffern = nurZiffern.Substring(0, 8);
 
             string formatiert = nurZiffern;
             if      (nurZiffern.Length > 4)
-                formatiert = nurZiffern.Substring(0, 2) + "."
-                           + nurZiffern.Substring(2, 2) + "."
-                           + nurZiffern.Substring(4);
+                formatiert = nurZiffern.Substring(0, 2) + "." + nurZiffern.Substring(2, 2) + "." + nurZiffern.Substring(4);
             else if (nurZiffern.Length > 2)
                 formatiert = nurZiffern.Substring(0, 2) + "." + nurZiffern.Substring(2);
 
             if (formatiert == neu) return;
 
-            int cursorVorher  = feld.cursorIndex;
-            int cursorNachher = cursorVorher + (formatiert.Length - neu.Length);
-            if (cursorNachher < 0) cursorNachher = 0;
-            if (cursorNachher > formatiert.Length) cursorNachher = formatiert.Length;
+            int cursor = feld.cursorIndex + (formatiert.Length - neu.Length);
+            cursor = Mathf.Clamp(cursor, 0, formatiert.Length);
 
             feld.SetValueWithoutNotify(formatiert);
-            feld.schedule.Execute(() =>
-            {
-                feld.cursorIndex = cursorNachher;
-                feld.selectIndex = cursorNachher;
-            });
+            feld.schedule.Execute(() => { feld.cursorIndex = cursor; feld.selectIndex = cursor; });
         });
     }
 
@@ -1599,10 +1581,10 @@ public abstract class BelegScreenController : MonoBehaviour
         var eingabe = feld.Q(className: "unity-base-field__input");
         if (eingabe != null)
         {
-            eingabe.style.backgroundColor   = FeldFarbe;
-            eingabe.style.color             = Color.white;
-            eingabe.style.borderTopWidth    = 0; eingabe.style.borderRightWidth  = 0;
-            eingabe.style.borderBottomWidth = 0; eingabe.style.borderLeftWidth   = 0;
+            eingabe.style.backgroundColor        = FeldFarbe;
+            eingabe.style.color                  = Color.white;
+            eingabe.style.borderTopWidth         = 0; eingabe.style.borderRightWidth  = 0;
+            eingabe.style.borderBottomWidth      = 0; eingabe.style.borderLeftWidth   = 0;
             eingabe.style.borderTopLeftRadius    = 6; eingabe.style.borderTopRightRadius   = 6;
             eingabe.style.borderBottomLeftRadius = 6; eingabe.style.borderBottomRightRadius= 6;
             eingabe.style.paddingLeft = 8;
@@ -1615,8 +1597,7 @@ public abstract class BelegScreenController : MonoBehaviour
         if (string.IsNullOrWhiteSpace(text)) return 0f;
         string bereinigt = text.Replace("EUR", "").Replace("\u20AC", "").Trim();
         if (float.TryParse(bereinigt, NumberStyles.Float, De, out float wert)) return wert;
-        if (float.TryParse(bereinigt, NumberStyles.Float,
-            CultureInfo.InvariantCulture, out wert)) return wert;
+        if (float.TryParse(bereinigt, NumberStyles.Float, CultureInfo.InvariantCulture, out wert)) return wert;
         return 0f;
     }
 
@@ -1629,8 +1610,7 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         if (objekt == null) return "";
         var typ = objekt.GetType();
-        const BindingFlags flags =
-            BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
         foreach (string name in feldNamen)
         {
@@ -1677,72 +1657,49 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private string HoleCompanyName(DataBase db)
     {
-        List<Company> companies = db.getAllCompanies();
-
-        if (companies == null || companies.Count == 0)
-        return "Keine Firmendaten";
-
-        Company company = companies[companies.Count - 1];
-
-        return LiesFeld(company, "name");
+        var companies = db.getAllCompanies();
+        if (companies == null || companies.Count == 0) return "Keine Firmendaten";
+        return LiesFeld(companies[companies.Count - 1], "name");
     }
 
     private string HoleCompanyAddress(DataBase db)
     {
-        List<Company> companies = db.getAllCompanies();
+        var companies = db.getAllCompanies();
+        if (companies == null || companies.Count == 0) return "";
 
-        if (companies == null || companies.Count == 0)
-            return "";
+        var company = companies[companies.Count - 1];
+        string strasse = LiesFeld(company, "strasseuHausNR", "street", "strasse", "adresse", "address");
+        string plz     = LiesFeld(company, "zip", "plz", "postleitzahl");
+        string ort     = LiesFeld(company, "city", "stadt", "ort", "location");
 
-        Company company = companies[companies.Count - 1];
-
-        string strasse = LiesFeld(company,"strasseuHausNR", "street", "strasse", "adresse", "address");
-        string plz = LiesFeld(company, "zip", "plz", "postleitzahl");
-        string ort = LiesFeld(company, "city", "stadt", "ort", "location");
-
-        List<string> zeilen = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(strasse))
-            zeilen.Add(strasse);
-
+        var zeilen = new List<string>();
+        if (!string.IsNullOrWhiteSpace(strasse)) zeilen.Add(strasse);
         string plzOrt = (plz + " " + ort).Trim();
-
-        if (!string.IsNullOrWhiteSpace(plzOrt))
-            zeilen.Add(plzOrt);
+        if (!string.IsNullOrWhiteSpace(plzOrt)) zeilen.Add(plzOrt);
 
         return string.Join("\n", zeilen);
     }
 
     private void ResetBelegFormular()
-{
-    Debug.Log("[Reset-Test] ResetBelegFormular ausgeführt für: " + BelegTyp);
-    _zeilen.Clear();
-    _positionenListe?.Clear();
-    Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
-    _ausgewaehlterKunde = "";
-    _ausgewaehlterKundeId = 0;
-    _ausgewaehlterKundeAdresse = "";
-    var boxen = Root.Query(className: "angebot-address-box").ToList();
-    if (boxen.Count > 0)
     {
-        SetzeAdresse(boxen[0], "Rechnungsempfänger:", "Kunde auswählen");
-    }
-    if (boxen.Count > 1)
-    {
-        LadeAbsenderdaten();
-    }
-    SetzeStandardwerte();
-    RegistriereSummenEingaben();
-    BerechneSummen();
+        Debug.Log("[Reset] Formular zurückgesetzt für: " + BelegTyp);
+        _zeilen.Clear();
+        _positionenListe?.Clear();
+        Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
+        _ausgewaehlterKunde         = "";
+        _ausgewaehlterKundeId       = 0;
+        _ausgewaehlterKundeAdresse  = "";
 
-    _zeilen.Clear();
+        var boxen = Root.Query(className: "angebot-address-box").ToList();
+        if (boxen.Count > 0) SetzeAdressePlatzhalter(boxen[0], HoleEmpfaengerBezeichnung());
+        if (boxen.Count > 1) LadeAbsenderdaten();
 
-    if (_positionenListe != null)
-    {
-        _positionenListe.Clear();
-        Debug.Log("[Reset-Test] PositionenListe nach Reset Count: " + _positionenListe.childCount);
+        SetzeStandardwerte();
+        RegistriereSummenEingaben();
+        BerechneSummen();
+        _zeilen.Clear();
+        _positionenListe?.Clear();
     }
-}
 
     private float HoleMwstSatz()
     {
@@ -1751,65 +1708,60 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private List<VoraussetzungsBereich> PruefePflichtdaten()
-{
-    var fehlend = new List<VoraussetzungsBereich>();
-
-    try
     {
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+        var fehlend = new List<VoraussetzungsBereich>();
 
-        if (db == null)
+        try
         {
-            fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
-            return fehlend;
-        }
-
-        List<Company> firmen = db.getAllCompanies();
-
-        if (firmen == null || firmen.Count == 0)
-        {
-            fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
-        }
-        else
-        {
-            Company firma = firmen[firmen.Count - 1];
-
-            string name = LiesFeld(firma, "name");
-            string adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
-
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(adresse))
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null)
+            {
                 fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
+                return fehlend;
+            }
+
+            var firmen = db.getAllCompanies();
+            if (firmen == null || firmen.Count == 0)
+            {
+                fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
+            }
+            else
+            {
+                var firma  = firmen[firmen.Count - 1];
+                string name    = LiesFeld(firma, "name");
+                string adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(adresse))
+                    fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
+            }
+
+            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_iban", "")) ||
+                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_bic", "")) ||
+                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_kontoinhaber", "")))
+                fehlend.Add(VoraussetzungsBereich.Bankverbindung);
+
+            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_rechnr_praefix", "")) ||
+                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_startnummer", "")) ||
+                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungsziel", "")))
+                fehlend.Add(VoraussetzungsBereich.Rechnungsformat);
+
+            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungshinweis", "")))
+                fehlend.Add(VoraussetzungsBereich.Bezahlweise);
+        }
+        catch
+        {
+            fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
         }
 
-        if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_iban", "")) ||
-            string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_bic", "")) ||
-            string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_kontoinhaber", "")))
-        {
-            fehlend.Add(VoraussetzungsBereich.Bankverbindung);
-        }
-
-        if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_rechnr_praefix", "")) ||
-            string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_startnummer", "")) ||
-            string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungsziel", "")))
-        {
-            fehlend.Add(VoraussetzungsBereich.Rechnungsformat);
-        }
-
-        if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungshinweis", "")))
-        {
-            fehlend.Add(VoraussetzungsBereich.Bezahlweise);
-        }
+        return fehlend;
     }
-    catch
+
+    private string HoleEmpfaengerBezeichnung()
     {
-        fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
+        return BelegTyp == "Angebot" ? "Angebotsempf\u00e4nger" : "Rechnungsempf\u00e4nger";
     }
 
-    return fehlend;
-}
-
-
-
-
-
+    private string HoleSenderBezeichnung()
+    {
+        return BelegTyp == "Angebot" ? "Angebotssteller" : "Rechnungssteller";
+    }
 }
