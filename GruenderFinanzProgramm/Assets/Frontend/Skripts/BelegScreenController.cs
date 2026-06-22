@@ -462,23 +462,7 @@ public abstract class BelegScreenController : MonoBehaviour
         karte.style.paddingTop    = 18; karte.style.paddingBottom = 18;
         karte.style.paddingLeft   = 18; karte.style.paddingRight  = 18;
 
-        var btnSchliessen = new Button(() => SchliessKalender()) { text = "\u2715" };
-        btnSchliessen.style.position          = Position.Absolute;
-        btnSchliessen.style.top               = 8;
-        btnSchliessen.style.right             = 10;
-        btnSchliessen.style.width             = 26;
-        btnSchliessen.style.height            = 26;
-        btnSchliessen.style.backgroundColor   = Color.clear;
-        btnSchliessen.style.color             = Color.white;
-        btnSchliessen.style.fontSize          = 14;
-        btnSchliessen.style.borderTopWidth    = 0; btnSchliessen.style.borderRightWidth    = 0;
-        btnSchliessen.style.borderBottomWidth = 0; btnSchliessen.style.borderLeftWidth     = 0;
-        btnSchliessen.RegisterCallback<MouseEnterEvent>(_ =>
-            btnSchliessen.style.color = new Color(0.7f, 0.7f, 0.7f));
-        btnSchliessen.RegisterCallback<MouseLeaveEvent>(_ =>
-            btnSchliessen.style.color = Color.white);
-        karte.Add(btnSchliessen);
-
+        // Kopfzeile: Pfeil | Monatsname | Pfeil
         var kopf = new VisualElement();
         kopf.style.flexDirection  = FlexDirection.Row;
         kopf.style.justifyContent = Justify.SpaceBetween;
@@ -502,13 +486,18 @@ public abstract class BelegScreenController : MonoBehaviour
         kopf.Add(btnNaechst);
         karte.Add(kopf);
 
+        // Zellgröße: 7 Spalten gleichmäßig in (322 - 36px Padding) = 286px → 40px pro Zelle
+        const int zellBreite = 36;
+        const int zellHoehe  = 36;
+        const int zellMargin = 2;
+
         var wochenHeader = new VisualElement();
         wochenHeader.style.flexDirection = FlexDirection.Row;
         wochenHeader.style.marginBottom  = 4;
         foreach (var wt in new[] { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" })
         {
             var wl = new Label(wt);
-            wl.style.width          = 38;
+            wl.style.width          = zellBreite + zellMargin * 2;
             wl.style.height         = 24;
             wl.style.fontSize       = 11;
             wl.style.color          = new Color(0.6f, 0.6f, 0.6f);
@@ -517,11 +506,69 @@ public abstract class BelegScreenController : MonoBehaviour
         }
         karte.Add(wochenHeader);
 
+        // Container für Zeilen
         var grid = new VisualElement();
-        grid.style.flexDirection = FlexDirection.Row;
-        grid.style.flexWrap      = Wrap.Wrap;
-        grid.style.width         = 266;
+        grid.style.flexDirection = FlexDirection.Column;
         karte.Add(grid);
+
+        void BaueTagButton(VisualElement zeile, int tag, bool istImMonat)
+        {
+            var btn = new Button();
+            btn.style.width        = zellBreite;
+            btn.style.height       = zellHoehe;
+            btn.style.marginTop    = zellMargin; btn.style.marginBottom = zellMargin;
+            btn.style.marginLeft   = zellMargin; btn.style.marginRight  = zellMargin;
+            btn.style.borderTopWidth    = 0; btn.style.borderRightWidth   = 0;
+            btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth    = 0;
+            btn.style.borderTopLeftRadius    = 6; btn.style.borderTopRightRadius   = 6;
+            btn.style.borderBottomLeftRadius = 6; btn.style.borderBottomRightRadius= 6;
+            btn.style.fontSize    = 12;
+            btn.style.paddingTop  = 0; btn.style.paddingBottom = 0;
+            btn.style.paddingLeft = 0; btn.style.paddingRight  = 0;
+
+            if (!istImMonat)
+            {
+                btn.text = "";
+                btn.style.backgroundColor = Color.clear;
+                btn.SetEnabled(false);
+            }
+            else
+            {
+                btn.text = tag.ToString();
+                var  heute    = DateTime.Today;
+                bool istHeute = tag == heute.Day && monat == heute.Month && jahr == heute.Year;
+
+                btn.style.backgroundColor = istHeute
+                    ? new Color(Gruen.r, Gruen.g, Gruen.b, 0.25f) : Color.clear;
+                btn.style.color = istHeute ? Gruen : Color.white;
+
+                if (istHeute)
+                {
+                    btn.style.borderTopWidth    = 1; btn.style.borderRightWidth   = 1;
+                    btn.style.borderBottomWidth = 1; btn.style.borderLeftWidth    = 1;
+                    btn.style.borderTopColor    = Gruen; btn.style.borderRightColor  = Gruen;
+                    btn.style.borderBottomColor = Gruen; btn.style.borderLeftColor   = Gruen;
+                }
+
+                int lokalTag = tag, lokalMonat = monat, lokalJahr = jahr;
+                btn.RegisterCallback<MouseEnterEvent>(_ =>
+                {
+                    if (!istHeute)
+                        btn.style.backgroundColor = new Color(Gruen.r, Gruen.g, Gruen.b, 0.15f);
+                });
+                btn.RegisterCallback<MouseLeaveEvent>(_ =>
+                {
+                    if (!istHeute) btn.style.backgroundColor = Color.clear;
+                });
+                btn.RegisterCallback<ClickEvent>(_ =>
+                {
+                    zielFeld.SetValueWithoutNotify(
+                        new DateTime(lokalJahr, lokalMonat, lokalTag).ToString("dd.MM.yyyy"));
+                    SchliessKalender();
+                });
+            }
+            zeile.Add(btn);
+        }
 
         void RenderMonat()
         {
@@ -532,65 +579,26 @@ public abstract class BelegScreenController : MonoBehaviour
             int tageImMonat = DateTime.DaysInMonth(jahr, monat);
             int startSlot   = ((int)ersterTag.DayOfWeek + 6) % 7;
 
-            for (int i = 0; i < 42; i++)
+            int benotigteSlots = startSlot + tageImMonat;
+            int zeilenAnzahl   = (int)Math.Ceiling(benotigteSlots / 7.0);
+
+            int tagZaehler = 1;
+
+            for (int z = 0; z < zeilenAnzahl; z++)
             {
-                bool istImMonat = i >= startSlot && i - startSlot < tageImMonat;
-                int  tag        = istImMonat ? i - startSlot + 1 : 0;
+                var zeile = new VisualElement();
+                zeile.style.flexDirection = FlexDirection.Row;
+                grid.Add(zeile);
 
-                var btn = new Button();
-                btn.style.width  = 34; btn.style.height = 34;
-                btn.style.marginTop    = 2; btn.style.marginBottom = 2;
-                btn.style.marginLeft   = 2; btn.style.marginRight  = 2;
-                btn.style.borderTopWidth    = 0; btn.style.borderRightWidth   = 0;
-                btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth    = 0;
-                btn.style.borderTopLeftRadius    = 6; btn.style.borderTopRightRadius   = 6;
-                btn.style.borderBottomLeftRadius = 6; btn.style.borderBottomRightRadius= 6;
-                btn.style.fontSize    = 12;
-                btn.style.paddingTop  = 0; btn.style.paddingBottom = 0;
-                btn.style.paddingLeft = 0; btn.style.paddingRight  = 0;
-
-                if (!istImMonat)
+                for (int s = 0; s < 7; s++)
                 {
-                    btn.text = "";
-                    btn.style.backgroundColor = Color.clear;
-                    btn.SetEnabled(false);
+                    int slot = z * 7 + s;
+                    bool istImMonat = slot >= startSlot && tagZaehler <= tageImMonat;
+                    int  tag        = istImMonat ? tagZaehler : 0;
+                    if (istImMonat) tagZaehler++;
+
+                    BaueTagButton(zeile, tag, istImMonat);
                 }
-                else
-                {
-                    btn.text = tag.ToString();
-                    var  heute    = DateTime.Today;
-                    bool istHeute = tag == heute.Day && monat == heute.Month && jahr == heute.Year;
-
-                    btn.style.backgroundColor = istHeute
-                        ? new Color(Gruen.r, Gruen.g, Gruen.b, 0.25f) : Color.clear;
-                    btn.style.color = istHeute ? Gruen : Color.white;
-
-                    if (istHeute)
-                    {
-                        btn.style.borderTopWidth    = 1; btn.style.borderRightWidth   = 1;
-                        btn.style.borderBottomWidth = 1; btn.style.borderLeftWidth    = 1;
-                        btn.style.borderTopColor    = Gruen; btn.style.borderRightColor  = Gruen;
-                        btn.style.borderBottomColor = Gruen; btn.style.borderLeftColor   = Gruen;
-                    }
-
-                    int lokalTag = tag, lokalMonat = monat, lokalJahr = jahr;
-                    btn.RegisterCallback<MouseEnterEvent>(_ =>
-                    {
-                        if (!istHeute)
-                            btn.style.backgroundColor = new Color(Gruen.r, Gruen.g, Gruen.b, 0.15f);
-                    });
-                    btn.RegisterCallback<MouseLeaveEvent>(_ =>
-                    {
-                        if (!istHeute) btn.style.backgroundColor = Color.clear;
-                    });
-                    btn.RegisterCallback<ClickEvent>(_ =>
-                    {
-                        zielFeld.SetValueWithoutNotify(
-                            new DateTime(lokalJahr, lokalMonat, lokalTag).ToString("dd.MM.yyyy"));
-                        SchliessKalender();
-                    });
-                }
-                grid.Add(btn);
             }
         }
 
