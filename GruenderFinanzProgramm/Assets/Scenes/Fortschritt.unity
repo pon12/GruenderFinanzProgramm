@@ -278,6 +278,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1149013153}
   - component: {fileID: 1149013152}
+  - component: {fileID: 1149013154}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -299,7 +300,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: d0d1470aa2ac8414f8871286b4894aac, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 517df1b247231ff4e9d50be0d44f5c41, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -323,6 +324,141 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1149013154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1149013151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a46dd647c18df7241a6480f29427298d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GruendungspfadController
+  uiDocument: {fileID: 0}
+  phasen:
+  - name: Vorbereitung
+    icon: "\U0001F4CB"
+    schritte:
+    - id: vorb_1
+      titel: "Gesch\xE4ftsidee ausarbeiten"
+      beschreibung: Idee konkretisieren und Alleinstellungsmerkmal definieren
+      istPflicht: 1
+      erledigt: 0
+    - id: vorb_2
+      titel: "Marktanalyse durchf\xFChren"
+      beschreibung: Zielgruppe, Wettbewerber und Marktpotenzial analysieren
+      istPflicht: 1
+      erledigt: 0
+    - id: vorb_3
+      titel: Businessplan erstellen
+      beschreibung: Finanz-, Marketing- und Betriebsplan ausarbeiten
+      istPflicht: 1
+      erledigt: 0
+    - id: vorb_4
+      titel: "Rechtsform w\xE4hlen"
+      beschreibung: "GmbH, UG, GbR, Einzelunternehmen \u2013 passende Form ausw\xE4hlen"
+      istPflicht: 1
+      erledigt: 0
+    - id: vorb_5
+      titel: "Finanzierung kl\xE4ren"
+      beschreibung: "Eigenkapital, Kredit, F\xF6rdermittel oder Investoren pr\xFCfen"
+      istPflicht: 1
+      erledigt: 0
+  - name: Anmeldung
+    icon: "\U0001F4DD"
+    schritte:
+    - id: anm_1
+      titel: Gewerbeanmeldung
+      beschreibung: Beim Gewerbeamt oder Finanzamt anmelden
+      istPflicht: 1
+      erledigt: 0
+    - id: anm_2
+      titel: Notar beauftragen
+      beschreibung: "F\xFCr GmbH/UG: Gesellschaftsvertrag beurkunden lassen"
+      istPflicht: 1
+      erledigt: 0
+    - id: anm_3
+      titel: Handelsregistereintrag
+      beschreibung: "Eintragung beim zust\xE4ndigen Amtsgericht beantragen"
+      istPflicht: 1
+      erledigt: 0
+    - id: anm_4
+      titel: Steuernummer beantragen
+      beschreibung: Fragebogen zur steuerlichen Erfassung beim Finanzamt einreichen
+      istPflicht: 1
+      erledigt: 0
+    - id: anm_5
+      titel: IHK/HWK Mitgliedschaft
+      beschreibung: "Industrie- oder Handelskammer Pflichtmitgliedschaft kl\xE4ren"
+      istPflicht: 1
+      erledigt: 0
+  - name: Finanzen
+    icon: "\U0001F4B0"
+    schritte:
+    - id: fin_1
+      titel: "Gesch\xE4ftskonto er\xF6ffnen"
+      beschreibung: "Separates Konto f\xFCr gesch\xE4ftliche Transaktionen anlegen"
+      istPflicht: 1
+      erledigt: 0
+    - id: fin_2
+      titel: Buchhaltung einrichten
+      beschreibung: "Software oder Steuerberater f\xFCr laufende Buchhaltung organisieren"
+      istPflicht: 1
+      erledigt: 0
+    - id: fin_3
+      titel: "Versicherungen abschlie\xDFen"
+      beschreibung: "Betriebs-, Haftpflicht- und ggf. Berufsunf\xE4higkeitsversicherung"
+      istPflicht: 1
+      erledigt: 0
+    - id: fin_4
+      titel: Startkapital verwalten
+      beschreibung: "Liquidit\xE4tsplanung f\xFCr die ersten 6\u201312 Monate aufstellen"
+      istPflicht: 1
+      erledigt: 0
+  - name: Betrieb
+    icon: "\U0001F680"
+    schritte:
+    - id: betr_1
+      titel: Erste Kunden akquirieren
+      beschreibung: "Netzwerk nutzen, Marketing starten, erste Auftr\xE4ge gewinnen"
+      istPflicht: 1
+      erledigt: 0
+    - id: betr_2
+      titel: Website & Branding
+      beschreibung: Professionellen Online-Auftritt und Corporate Design erstellen
+      istPflicht: 1
+      erledigt: 0
+    - id: betr_3
+      titel: Prozesse dokumentieren
+      beschreibung: "Arbeitsabl\xE4ufe, Vorlagen und Standards festhalten"
+      istPflicht: 1
+      erledigt: 0
+    - id: betr_4
+      titel: Jahresabschluss vorbereiten
+      beschreibung: "Buchhaltungsunterlagen f\xFCr Steuerberater oder Finanzamt bereitstellen"
+      istPflicht: 1
+      erledigt: 0
+  - name: Sonstiges
+    icon: "\u2705"
+    schritte:
+    - id: sonst_1
+      titel: Team aufbauen
+      beschreibung: Erste Mitarbeiter einstellen oder Freelancer beauftragen
+      istPflicht: 1
+      erledigt: 0
+    - id: sonst_2
+      titel: "F\xF6rdermittel beantragen"
+      beschreibung: "Staatliche Zusch\xFCsse und F\xF6rderprogramme f\xFCr Gr\xFCnder
+        pr\xFCfen"
+      istPflicht: 1
+      erledigt: 0
+    - id: sonst_3
+      titel: Skalierung planen
+      beschreibung: "Wachstumsstrategie und n\xE4chste Meilensteine definieren"
+      istPflicht: 1
+      erledigt: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
