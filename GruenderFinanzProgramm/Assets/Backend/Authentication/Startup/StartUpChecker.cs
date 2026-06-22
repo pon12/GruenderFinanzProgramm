@@ -45,21 +45,20 @@ public class StartUpChecker : MonoBehaviour
 
     private void checkUserPDFFolder(UserDB user)
     {
-        string pdfFolder = Path.Combine(
+        string pdfFolderPath = System.IO.Path.Combine(
             Application.persistentDataPath,
-            "Ventoriq",
             "PDFs",
-            $"User_{user.id}"
+            "User_" + user.id
         );
 
-        if (!Directory.Exists(pdfFolder))
+        if (!System.IO.Directory.Exists(pdfFolderPath))
         {
-            Directory.CreateDirectory(pdfFolder);
-            Debug.Log("PDF-Ordner erstellt: " + pdfFolder);
+            System.IO.Directory.CreateDirectory(pdfFolderPath);
+            Debug.Log("PDF-Ordner erstellt: " + pdfFolderPath);
         }
         else
         {
-            Debug.Log("PDF-Ordner erkannt: " + pdfFolder);
+            Debug.Log("PDF-Ordner erkannt: " + pdfFolderPath);
         }
     }
 }

@@ -1,0 +1,37 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
+    <ui:VisualElement name="root-container" class="screen-root" style="width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
+        <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0 430px; overflow: hidden;">
+            <ui:VisualElement name="page-header-row" style="flex-direction: row; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <ui:VisualElement>
+                    <ui:Label text="Wissensdatenbank" name="page-title" class="page-title"/>
+                    <ui:Label text="Anleitungen und Erklärungen rund um deine Gründung" class="page-subtitle"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="Main-Scroll-View" style="flex-grow: 1;">
+                <ui:VisualElement name="Grid-Container" class="grid-container"/>
+            </ui:ScrollView>
+        </ui:VisualElement>
+        <ui:VisualElement name="Detail-Popup-Overlay" class="popup-overlay" style="display: none;">
+            <ui:VisualElement name="Detail-Menu-Container" class="doc-card detail-popup-box" style="height: auto; max-height: 80%;">
+                <ui:VisualElement name="Detail-Header" class="popup-header-row">
+                    <ui:Label text="Wissens-Einträge" name="Detail-Popup-Title" class="card-title" style="flex-grow: 1;"/>
+                    <ui:Button text="Schließen" name="Btn-Detail-Close" class="doc-btn-secondary"/>
+                </ui:VisualElement>
+                <ui:ScrollView name="Detail-List-Container" class="scroll-list-box" style="max-height: 420px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="View-Popup-Overlay" class="popup-overlay" style="display: none;">
+            <ui:VisualElement name="View-Popup-Container" class="doc-card view-popup-box">
+                <ui:Label text="Titel" name="View-Popup-Title" class="card-title" style="margin-bottom: 14px;"/>
+                <ui:ScrollView style="max-height: 360px; margin-bottom: 16px;">
+                    <ui:Label text="" name="View-Popup-Inhalt" class="view-popup-text"/>
+                </ui:ScrollView>
+                <ui:VisualElement class="popup-footer-row">
+                    <ui:Button text="Schließen" name="Btn-View-Close" class="doc-btn-primary"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

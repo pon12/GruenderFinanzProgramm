@@ -325,6 +325,7 @@ GameObject:
   - component: {fileID: 1337845831}
   - component: {fileID: 1337845830}
   - component: {fileID: 1337845832}
+  - component: {fileID: 1337845833}
   m_Layer: 0
   m_Name: Dienstleistungen UI
   m_TagString: Untagged
@@ -384,6 +385,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DienstleistungenScreenController
   uiDocument: {fileID: 1337845830}
   popupAsset: {fileID: 9197481963319205126, guid: f823119cef1ce8b45a16ffd5d64a2214, type: 3}
+--- !u!114 &1337845833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337845829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6e960dea1e74b345b8cc853b126c453, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContentAreaController
+  uiDocument: {fileID: 0}
 --- !u!114 &1422022047 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 701228406103257917, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}

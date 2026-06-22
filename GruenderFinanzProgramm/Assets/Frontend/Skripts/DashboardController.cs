@@ -1,5 +1,10 @@
 // ================================================================
-// DashboardController.cs  – MIT EventManager
+// DashboardController.cs  – Frontend-Meeting-Fixes
+//
+// Änderungen:
+//  1. Y-Achse Chart: dynamische Eurowerte statt 1.0/0.5/0.0
+//  2. Kalender: keine Tage aus Vor-/Folgemonat mehr, nur leere Felder
+//  3. 5 Navigations-Buttons unter den 5 Stat-Kacheln statt 3 unter Chart
 // ================================================================
 using System;
 using System.Collections.Generic;
@@ -58,35 +63,98 @@ public class DashboardController : MonoBehaviour
     }
 
     // ============================================================
-    // INITIALER DB-LOAD (nur beim ersten Öffnen des Dashboards,
-    // danach kommen Updates via Events)
+    // INITIALER DB-LOAD (beim ersten Öffnen UND bei Jahreswechsel
+    // im Kalender – lädt alle 5 Kacheln + Chart für ein bestimmtes Jahr)
     // ============================================================
     private void LadeInitialDaten()
+    {
+        LadeJahresDaten(_currentYear);
+    }
+
+    private void LadeJahresDaten(int jahr)
     {
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
             if (db == null) return;
 
-            // Kacheln
-            SetLabel("lbl-kunden",    (db.getAllCustomers()?.Count ?? 0).ToString());
-            SetLabel("lbl-angebote",  (db.getAllOffers()?.Count    ?? 0).ToString());
-            SetLabel("lbl-rechnungen",(db.getAllInvoices()?.Count  ?? 0).ToString());
+            // --- Kunden: gefiltert nach lastUpdated-Jahr ---
+            var alleKunden = db.getAllCustomers();
+            int kundenImJahr = 0;
+            if (alleKunden != null)
+            {
+                foreach (var k in alleKunden)
+                    if (k.lastUpdated.Year == jahr) kundenImJahr++;
+            }
+            SetLabel("lbl-kunden", kundenImJahr.ToString());
 
-            // Kontostand: Vorzeichen + Leerzeichen + Farbe (rot bei Minus, grün bei Plus)
-            float kontostand = db.getDifferenz();
-            SetKontostand(kontostand);
+            // --- Angebote: gefiltert nach date-Jahr ---
+            var alleAngebote = db.getAllOffers();
+            int angeboteImJahr = 0;
+            if (alleAngebote != null)
+            {
+                foreach (var a in alleAngebote)
+                    if (TryParseDatum(a.date, out DateTime d) && d.Year == jahr) angeboteImJahr++;
+            }
+            SetLabel("lbl-angebote", angeboteImJahr.ToString());
 
-            // Kassenbuch-Jahresauswertung: BILANZ pro Monat (Einkommen - Ausgaben)
-            float umsatzJahr = 0f;
-            float[] monate   = BerechneMonatsBilanz(db, DateTime.Today.Year, out umsatzJahr);
+            // --- Rechnungen: gefiltert nach date-Jahr ---
+            var alleRechnungen = db.getAllInvoices();
+            int rechnungenImJahr = 0;
+            if (alleRechnungen != null)
+            {
+                foreach (var r in alleRechnungen)
+                    if (TryParseDatum(r.date, out DateTime d) && d.Year == jahr) rechnungenImJahr++;
+            }
+            SetLabel("lbl-rechnungen", rechnungenImJahr.ToString());
+
+            // --- Kassenbuch: Bilanz + Monatswerte + Kontostand, alles für 'jahr' ---
+            float umsatzJahr  = 0f;
+            float[] monate    = BerechneMonatsBilanz(db, jahr, out umsatzJahr);
+            float kontostandJahr = BerechneKontostandBisJahresende(db, jahr);
+
             SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
+            SetKontostand(kontostandJahr);
+
             _chart?.SetValues(monate);
+            UpdateYAxisLabels(monate);
         }
         catch (Exception e)
         {
-            Debug.LogWarning("[Dashboard] InitialLaden: " + e.Message);
+            Debug.LogWarning("[Dashboard] JahresDatenLaden: " + e.Message);
         }
+    }
+
+    // Kontostand "bis zum gewählten Jahr" = alle Einkommen/Ausgaben mit
+    // Datum <= 31.12.<jahr>. So bleibt der Kontostand bei Jahreswechsel
+    // konsistent mit dem, was bis dahin tatsächlich passiert ist.
+    float BerechneKontostandBisJahresende(DataBase db, int jahr)
+    {
+        var stichtag = new DateTime(jahr, 12, 31);
+        float summe = 0f;
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+            foreach (var e in einkommen)
+            {
+                bool ok = TryParseDatum(e.Datum, out DateTime d);
+                bool zaehlt = ok && d <= stichtag;
+                Debug.Log($"[DEBUG-Kontostand] EINKOMMEN '{e.Datum}' Amount={e.Amount} parsed={ok}->{(ok?d.ToString("yyyy-MM-dd"):"FEHLER")} zaehlt={zaehlt}");
+                if (zaehlt) summe += e.Amount;
+            }
+
+        var ausgaben = db.getAllAusgabenEntries();
+        if (ausgaben != null)
+            foreach (var a in ausgaben)
+            {
+                bool ok = TryParseDatum(a.Datum, out DateTime d);
+                bool zaehlt = ok && d <= stichtag;
+                Debug.Log($"[DEBUG-Kontostand] AUSGABE '{a.Datum}' Amount={a.Amount} parsed={ok}->{(ok?d.ToString("yyyy-MM-dd"):"FEHLER")} zaehlt={zaehlt}");
+                if (zaehlt) summe -= a.Amount;
+            }
+
+        Debug.Log($"[DEBUG-Kontostand] ENDERGEBNIS = {summe}");
+        return summe;
     }
 
     // ============================================================
@@ -128,14 +196,11 @@ public class DashboardController : MonoBehaviour
         summeJahr = 0f;
 
         var einkommen = db.getAllEinkommenEntries();
-        Debug.Log($"[DEBUG-Dashboard] Einkommen-Einträge gefunden: {einkommen?.Count ?? -1}");
         if (einkommen != null)
         {
             foreach (var e in einkommen)
             {
-                bool ok = TryParseDatum(e.Datum, out DateTime d);
-                Debug.Log($"[DEBUG-Dashboard] Einkommen Datum='{e.Datum}' Amount={e.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} JahrMatch={(ok && d.Year == jahr)}");
-                if (ok && d.Year == jahr)
+                if (TryParseDatum(e.Datum, out DateTime d) && d.Year == jahr)
                 {
                     bilanzProMonat[d.Month - 1] += e.Amount;
                     summeJahr += e.Amount;
@@ -144,14 +209,11 @@ public class DashboardController : MonoBehaviour
         }
 
         var ausgaben = db.getAllAusgabenEntries();
-        Debug.Log($"[DEBUG-Dashboard] Ausgaben-Einträge gefunden: {ausgaben?.Count ?? -1}");
         if (ausgaben != null)
         {
             foreach (var a in ausgaben)
             {
-                bool ok = TryParseDatum(a.Datum, out DateTime d);
-                Debug.Log($"[DEBUG-Dashboard] Ausgabe Datum='{a.Datum}' Amount={a.Amount} parsed={ok} -> {(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} JahrMatch={(ok && d.Year == jahr)}");
-                if (ok && d.Year == jahr)
+                if (TryParseDatum(a.Datum, out DateTime d) && d.Year == jahr)
                 {
                     bilanzProMonat[d.Month - 1] -= a.Amount;
                     summeJahr -= a.Amount;
@@ -159,9 +221,46 @@ public class DashboardController : MonoBehaviour
             }
         }
 
-        Debug.Log($"[DEBUG-Dashboard] ENDERGEBNIS summeJahr (Bilanz) = {summeJahr}");
-
         return bilanzProMonat;
+    }
+
+    // ============================================================
+    // Y-ACHSE  – dynamische Eurowert-Labels statt fixer 1.0/0.5/0.0
+    // ============================================================
+    void UpdateYAxisLabels(float[] monatswerte)
+    {
+        var yAxisContainer = _root.Q<VisualElement>("chart-y-axis");
+        if (yAxisContainer == null || monatswerte == null || monatswerte.Length == 0) return;
+
+        float maxV = float.MinValue, minV = float.MaxValue;
+        foreach (var v in monatswerte) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
+
+        // Etwas Puffer wie im Chart selbst, damit die Linie nicht exakt am Rand klebt
+        float range = Mathf.Max(maxV - minV, 1f);
+        float vMin  = minV - range * 0.08f;
+        float vMax  = maxV + range * 0.08f;
+
+        // 5 Labels von oben (vMax) nach unten (vMin), gleichmäßig verteilt
+        var labels = yAxisContainer.Query<Label>().ToList();
+        for (int i = 0; i < labels.Count; i++)
+        {
+            float t      = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
+            float wert   = Mathf.Lerp(vMax, vMin, t);
+            labels[i].text = FormatiereEuroKompakt(wert);
+        }
+    }
+
+    // Formatiert z.B. 15000 -> "€15k", -500 -> "-€500", 1234567 -> "€1,2M"
+    string FormatiereEuroKompakt(float wert)
+    {
+        string vorzeichen = wert < 0 ? "-" : "";
+        float abs = Mathf.Abs(wert);
+
+        if (abs >= 1_000_000f)
+            return $"{vorzeichen}€{(abs / 1_000_000f).ToString("0.#")}M";
+        if (abs >= 1_000f)
+            return $"{vorzeichen}€{(abs / 1_000f).ToString("0.#")}k";
+        return $"{vorzeichen}€{abs.ToString("0")}";
     }
 
     // ============================================================
@@ -189,17 +288,27 @@ public class DashboardController : MonoBehaviour
         SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
         SetKontostand(kontostand);
         if (monate != null && monate.Length == 12)
+        {
             _chart?.SetValues(monate);
+            UpdateYAxisLabels(monate);
+        }
     }
 
     // ============================================================
-    // BUTTONS  – wie SidebarController per SceneManager
+    // BUTTONS  – 5 Stück, je einer unter den 5 Stat-Kacheln
+    //
+    // Layout:
+    //   unter "Kunden hinterlegt"      -> Kundendatenbank
+    //   unter "Angebote erstellt"      -> Angebot
+    //   unter "Rechnungen gestellt"    -> Rechnung
+    //   unter "Kassenbuch-Umsatz Jahr" + "Kontostand" (1 breiter Button) -> Kassenbuch
     // ============================================================
     void SetupButtons()
     {
-        BindScene("btn-nav-finanzen", "Kassenbuch");
-        BindScene("btn-nav-angebot",  "Angebot");
-        BindScene("btn-nav-rechnung", "Rechnung");
+        BindScene("btn-nav-kunden",     "KundenDB");
+        BindScene("btn-nav-angebot",    "Angebot");
+        BindScene("btn-nav-rechnung",   "Rechnung");
+        BindScene("btn-nav-kassenbuch", "Kassenbuch");
     }
 
     void BindScene(string buttonName, string sceneName)
@@ -248,7 +357,15 @@ public class DashboardController : MonoBehaviour
             dropJahr.choices = jahre;
             dropJahr.value   = _currentYear.ToString();
             dropJahr.RegisterValueChangedCallback(evt =>
-            { if (int.TryParse(evt.newValue, out int y)) { _currentYear = y; RenderKalender(); } });
+            {
+                if (int.TryParse(evt.newValue, out int y))
+                {
+                    _currentYear = y;
+                    RenderKalender();
+                    LadeJahresDaten(_currentYear);
+                    LadeDeadlines();
+                }
+            });
         }
 
         _root.Q<Button>("btn-prev-month")?.RegisterCallback<ClickEvent>(_ => WechsleMonat(-1));
@@ -262,6 +379,8 @@ public class DashboardController : MonoBehaviour
 
     void WechsleMonat(int delta)
     {
+        int vorherigesJahr = _currentYear;
+
         _currentMonth += delta;
         if (_currentMonth < 1)  { _currentMonth = 12; _currentYear--; }
         if (_currentMonth > 12) { _currentMonth = 1;  _currentYear++; }
@@ -271,6 +390,13 @@ public class DashboardController : MonoBehaviour
         if (dropMonat != null) dropMonat.index = _currentMonth - 1;
         if (dropJahr  != null) dropJahr.value  = _currentYear.ToString();
         RenderKalender();
+
+        // Nur neu laden wenn sich das Jahr durch den Monatswechsel tatsächlich geändert hat
+        if (_currentYear != vorherigesJahr)
+        {
+            LadeJahresDaten(_currentYear);
+            LadeDeadlines();
+        }
     }
 
     // ============================================================
@@ -330,15 +456,14 @@ public class DashboardController : MonoBehaviour
         }
     }
 
+    // FIX: keine Tage aus Vor-/Folgemonat mehr anzeigen.
+    // Slots vor dem 1. des Monats und nach dem letzten Tag bleiben leer (kein Text, deaktiviert).
     void RenderKalender()
     {
         var today          = DateTime.Today;
         var ersterTag      = new DateTime(_currentYear, _currentMonth, 1);
         int tageImMonat    = DateTime.DaysInMonth(_currentYear, _currentMonth);
         int startWochentag = (int)ersterTag.DayOfWeek;
-        int vormonatTage   = DateTime.DaysInMonth(
-            _currentMonth == 1 ? _currentYear - 1 : _currentYear,
-            _currentMonth == 1 ? 12 : _currentMonth - 1);
 
         for (int i = 0; i < 42; i++)
         {
@@ -348,35 +473,34 @@ public class DashboardController : MonoBehaviour
             btn.RemoveFromClassList("cal-day-today");
             btn.RemoveFromClassList("cal-day-other-month");
             btn.RemoveFromClassList("cal-day-deadline");
+            btn.RemoveFromClassList("cal-day-empty");
             btn.tooltip = "";
 
-            int tag; bool anderMonat;
-            if      (i < startWochentag)
-                { tag = vormonatTage - (startWochentag - 1 - i); anderMonat = true; }
-            else if (i - startWochentag < tageImMonat)
-                { tag = i - startWochentag + 1; anderMonat = false; }
-            else
-                { tag = i - startWochentag - tageImMonat + 1; anderMonat = true; }
+            bool istImAktuellenMonat = i >= startWochentag && i - startWochentag < tageImMonat;
 
-            btn.text = tag.ToString();
-            if (anderMonat)
+            if (!istImAktuellenMonat)
             {
-                btn.AddToClassList("cal-day-other-month");
+                // Leeres Feld statt Tag aus Vor-/Folgemonat
+                btn.text = "";
+                btn.AddToClassList("cal-day-empty");
+                btn.SetEnabled(false);
+                continue;
             }
-            else
+
+            btn.SetEnabled(true);
+            int tag = i - startWochentag + 1;
+            btn.text = tag.ToString();
+
+            if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
+                btn.AddToClassList("cal-day-today");
+
+            var tagDatum = new DateTime(_currentYear, _currentMonth, tag);
+            string key = tagDatum.ToString("yyyy-MM-dd");
+
+            if (_deadlines.TryGetValue(key, out var eintraege))
             {
-                if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
-                    btn.AddToClassList("cal-day-today");
-
-                // Deadline-Check für diesen Tag (nur im aktuellen Monat)
-                var tagDatum = new DateTime(_currentYear, _currentMonth, tag);
-                string key = tagDatum.ToString("yyyy-MM-dd");
-
-                if (_deadlines.TryGetValue(key, out var eintraege))
-                {
-                    btn.AddToClassList("cal-day-deadline");
-                    btn.tooltip = string.Join("\n", eintraege);
-                }
+                btn.AddToClassList("cal-day-deadline");
+                btn.tooltip = string.Join("\n", eintraege);
             }
         }
     }

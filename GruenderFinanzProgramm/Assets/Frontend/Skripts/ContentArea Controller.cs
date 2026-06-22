@@ -21,7 +21,17 @@ public class ContentAreaController : MonoBehaviour
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        _mainContent = uiDocument.rootVisualElement.Q<VisualElement>("main-content");
+        // FIX: uiDocument kann immer noch null sein, wenn weder im Inspector
+        // zugewiesen noch ein UIDocument auf demselben GameObject vorhanden ist.
+        // Ohne diesen Check crasht der nächste Zugriff mit NullReferenceException.
+        if (uiDocument == null)
+        {
+            Debug.LogWarning("[ContentArea] Kein UIDocument zugewiesen oder auf diesem GameObject gefunden. " +
+                              "Bitte im Inspector das Feld 'uiDocument' setzen oder ein UIDocument-Component hinzufügen.");
+            return;
+        }
+
+        _mainContent = uiDocument.rootVisualElement?.Q<VisualElement>("main-content");
 
         if (_mainContent == null)
         {
