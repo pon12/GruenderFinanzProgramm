@@ -8,6 +8,7 @@
 // ================================================================
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
@@ -48,18 +49,20 @@ public class DashboardController : MonoBehaviour
         RenderKalender(); // Kalender neu zeichnen damit Deadline-Marker sichtbar sind
 
         // Ab jetzt auf Events hören
-        AppEventManager.OnKundenAnzahlGeaendert    += OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert   += OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert += OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert       += OnKassenbuch;
+        AppEventManager.OnKundenAnzahlGeaendert         += OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert        += OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert      += OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert            += OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert  += OnDokumenteFortschritt;
     }
 
     void OnDisable()
     {
-        AppEventManager.OnKundenAnzahlGeaendert    -= OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert   -= OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert -= OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert       -= OnKassenbuch;
+        AppEventManager.OnKundenAnzahlGeaendert         -= OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert        -= OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert      -= OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert            -= OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert  -= OnDokumenteFortschritt;
     }
 
     // ============================================================
@@ -69,6 +72,44 @@ public class DashboardController : MonoBehaviour
     private void LadeInitialDaten()
     {
         LadeJahresDaten(_currentYear);
+        LadeGruendungspfadFortschritt();
+    }
+
+    // ============================================================
+    // GRÜNDUNGSPFAD-FORTSCHRITT LADEN
+    // Liest den gespeicherten Fortschritt direkt aus der DB,
+    // damit der Dashboard-Balken auch beim ersten Öffnen stimmt
+    // (ohne dass der Gründungspfad-Screen zuerst besucht werden muss).
+    // ============================================================
+    private void LadeGruendungspfadFortschritt()
+    {
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) return;
+
+            var docs = db.getAllUserDocuments();
+            var save = docs?.FirstOrDefault(d => d.documentType == 9001);
+            if (save == null) return;
+
+            var data = JsonUtility.FromJson<GruendungspfadSpeicher>(save.text);
+            if (data == null) return;
+
+            // Gleiche Segment-Zuordnung wie im GruendungspfadController
+            float[] seg = data.segmentFortschritt ?? new float[5];
+            if (seg.Length >= 5)
+            {
+                SetzeSegmente(seg[0], seg[1], seg[2], seg[3], seg[4]);
+            }
+        }
+        catch { /* kein Gründungspfad-Save vorhanden, Balken bleibt bei 0 */ }
+    }
+
+    // Minimale Datenklasse zum Deserialisieren des Gründungspfad-Speichers
+    [System.Serializable]
+    private class GruendungspfadSpeicher
+    {
+        public float[] segmentFortschritt;
     }
 
     private void LadeJahresDaten(int jahr)
@@ -292,6 +333,29 @@ public class DashboardController : MonoBehaviour
             _chart?.SetValues(monate);
             UpdateYAxisLabels(monate);
         }
+    }
+
+    void OnDokumenteFortschritt(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
+        => SetzeSegmente(stammdaten, vertraege, steuer, rechnungen, sonstiges);
+
+    void SetzeSegmente(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
+    {
+        SetSegment("seg-fill-stammdaten", stammdaten);
+        SetSegment("seg-fill-vertraege",  vertraege);
+        SetSegment("seg-fill-steuer",     steuer);
+        SetSegment("seg-fill-rechnungen", rechnungen);
+        SetSegment("seg-fill-sonstiges",  sonstiges);
+
+        float gesamt = (stammdaten + vertraege + steuer + rechnungen + sonstiges) / 5f;
+        var pctLabel = _root.Q<Label>("lbl-fortschritt-gesamt");
+        if (pctLabel != null) pctLabel.text = Mathf.RoundToInt(gesamt * 100f) + "%";
+    }
+
+    void SetSegment(string name, float wert)
+    {
+        var fill = _root.Q<VisualElement>(name);
+        if (fill == null) return;
+        fill.style.width = new StyleLength(new Length(Mathf.Clamp01(wert) * 100f, LengthUnit.Percent));
     }
 
     // ============================================================
