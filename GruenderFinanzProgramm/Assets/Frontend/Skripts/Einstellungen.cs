@@ -176,6 +176,8 @@ public class EinstellungenController : MonoBehaviour
     private VisualElement _popupGespeichert;
     private Label         _labelGespeichertText;
     private Button        _btnCloseGespeichert;
+    private VisualElement _popupZurueckgesetzt;
+    private Button        _btnCloseZurueckgesetzt;
 
     private Company _currentCompany = null;
 
@@ -210,7 +212,7 @@ public class EinstellungenController : MonoBehaviour
 
         _root.schedule.Execute(() =>
         {
-            if (_popupUnternehmen == null || _popupGespeichert == null)
+            if (_popupUnternehmen == null || _popupGespeichert == null || _popupZurueckgesetzt == null)
             {
                 QueryAllElements();
                 SetupDropdowns();
@@ -320,7 +322,9 @@ public class EinstellungenController : MonoBehaviour
 
         _popupGespeichert    = _root.Q<VisualElement>("popup-gespeichert");
         _labelGespeichertText = _root.Q<Label>("label-gespeichert-text");
-        _btnCloseGespeichert = _root.Q<Button>("btn-close-gespeichert");
+        _btnCloseGespeichert    = _root.Q<Button>("btn-close-gespeichert");
+        _popupZurueckgesetzt    = _root.Q<VisualElement>("popup-zurueckgesetzt");
+        _btnCloseZurueckgesetzt = _root.Q<Button>("btn-close-zurueckgesetzt");
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -398,7 +402,7 @@ public class EinstellungenController : MonoBehaviour
     private void RegisterButtons()
     {
         if (_btnSave  != null) _btnSave.clicked  += () => { SaveSettings(); ShowGespeichertPopup(); };
-        if (_btnReset != null) _btnReset.clicked  += LoadSettings;
+        if (_btnReset != null) _btnReset.clicked += () => { LoadSettings(); ShowPopup(_popupZurueckgesetzt); };
 
         if (_btnOpenUnternehmen  != null) _btnOpenUnternehmen.clicked  += () => ShowPopup(_popupUnternehmen);
         if (_btnOpenBank         != null) _btnOpenBank.clicked         += () => ShowPopup(_popupBank);
@@ -458,7 +462,8 @@ public class EinstellungenController : MonoBehaviour
         if (_btnDialogConfirm != null) _btnDialogConfirm.clicked += ConfirmDeleteProfile;
 
         if (_btnClosePasskeyPopup != null) _btnClosePasskeyPopup.clicked += () => HidePopup(_popupNewPasskey);
-        if (_btnCloseGespeichert  != null) _btnCloseGespeichert.clicked  += () => HidePopup(_popupGespeichert);
+        if (_btnCloseGespeichert    != null) _btnCloseGespeichert.clicked    += () => HidePopup(_popupGespeichert);
+        if (_btnCloseZurueckgesetzt != null) _btnCloseZurueckgesetzt.clicked += () => HidePopup(_popupZurueckgesetzt);
     }
 
     // ═══════════════════════════════════════════════════════════
