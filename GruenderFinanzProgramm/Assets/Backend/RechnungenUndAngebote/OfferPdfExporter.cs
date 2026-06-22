@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-
+using iTextSharp.text.pdf.draw;
 public static class OfferPdfExporter
 {
     public static UserPDFDocument ExportOfferToPdf(
@@ -34,7 +34,11 @@ public static class OfferPdfExporter
 
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
             {
-                PdfWriter.GetInstance(doc, fs);
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent(
+                offer.companyName,
+                offer.companyAddress
+            );
 
                 doc.AddAuthor("Ventoriq");
                 
@@ -42,24 +46,41 @@ public static class OfferPdfExporter
 
                 doc.Open();
 
+                //Fonts//
+
                 iTextSharp.text.Font titleFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                    FontFactory.GetFont(
+                        FontFactory.HELVETICA_BOLD, 
+                        18
+                        );
 
                 iTextSharp.text.Font headerFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+                    FontFactory.GetFont(
+                        FontFactory.HELVETICA_BOLD,
+                        12
+                        );
 
                 iTextSharp.text.Font normalFont =
-                    FontFactory.GetFont(FontFactory.HELVETICA, 12);
+                    FontFactory.GetFont(
+                    FontFactory.HELVETICA,
+                    12
+                    );
 
                 iTextSharp.text.Font grayFont =
                     FontFactory.GetFont(
-                        FontFactory.HELVETICA_OBLIQUE,
-                        10,
-                        new iTextSharp.text.Color(128, 128, 128)
+                    FontFactory.HELVETICA_OBLIQUE,
+                    10,
+                    new iTextSharp.text.Color(128, 128, 128)
                     );
 
+                iTextSharp.text.Font footerFont =
+                    FontFactory.GetFont(
+                    FontFactory.HELVETICA,
+                    9
+                    );
                 
-                
+
+
                 PdfPTable adressen = new PdfPTable(2);
                 adressen.WidthPercentage = 100f;
                 adressen.SetWidths(new float[] { 1f, 1f });
@@ -108,11 +129,6 @@ public static class OfferPdfExporter
                 title.Alignment = Element.ALIGN_LEFT;
                 doc.Add(title);
                 doc.Add(new Paragraph(" "));
-
-                if (!string.IsNullOrEmpty(offer.companyAddress))
-                {
-                    firmaCell.AddElement(new Paragraph(offer.companyAddress, normalFont));
-                }
 
                 doc.Add(new Paragraph(" "));
                 doc.Add(new Paragraph("Datum: " + offer.date, normalFont));
@@ -183,6 +199,7 @@ public static class OfferPdfExporter
                 double gesamt = zwischensumme + mwst;
                 
                 PdfPTable totals = new PdfPTable(2);
+                totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
                 
@@ -205,7 +222,7 @@ public static class OfferPdfExporter
                     );
                 AddBodyCell(
                     totals, 
-                    "-" + offer.discount.ToString("0.00") + " €", 
+                    "+" + sonstigeKosten.ToString("0.00") + " €",
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
@@ -218,7 +235,7 @@ public static class OfferPdfExporter
                     );
                 AddBodyCell(
                     totals, 
-                    "+" + offer.extraCosts.ToString("0.00") + " €", 
+                    "+" + sonstigeKosten.ToString("0.00") + " €",
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
@@ -275,11 +292,8 @@ public static class OfferPdfExporter
 
                 Paragraph footer = new Paragraph(
                     "Erstellt am " + DateTime.Now.ToString("dd.MM.yyyy"),
-                    grayFont
+                    footerFont
                 );
-
-                footer.Alignment = Element.ALIGN_CENTER;
-                doc.Add(footer);
 
                 doc.Close();
             }
@@ -328,4 +342,20 @@ public static class OfferPdfExporter
         cell.HorizontalAlignment = alignment;
         table.AddCell(cell);
     }
+
+private static void AddFooterCell(
+    PdfPTable table,
+    string text,
+    iTextSharp.text.Font font
+)
+{
+    PdfPCell cell = new PdfPCell(new Phrase(text, font));
+    cell.Border = Rectangle.NO_BORDER;
+    cell.PaddingTop = 6;
+    cell.PaddingRight = 10;
+    cell.HorizontalAlignment = Element.ALIGN_LEFT;
+    table.AddCell(cell);
+}
+
+
 }

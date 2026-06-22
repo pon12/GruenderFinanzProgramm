@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-
+using iTextSharp.text.pdf.draw;
 public static class InvoicePdfExporter
 {
     public static UserPDFDocument ExportInvoiceToPdf(
@@ -40,7 +40,11 @@ public static class InvoicePdfExporter
 
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
             {
-                PdfWriter.GetInstance(doc, fs);
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent(
+                invoice.companyName,
+                invoice.companyAddress
+                );
 
                 doc.AddAuthor("Ventoriq");
                 doc.AddTitle("Rechnung " + invoice.invoiceNumber);
@@ -76,7 +80,11 @@ public static class InvoicePdfExporter
                         new iTextSharp.text.Color(128, 128, 128)
                     );
 
-            
+                iTextSharp.text.Font footerFont =
+                FontFactory.GetFont(
+                FontFactory.HELVETICA,
+                9
+                    );
 
                 // =========================
                 // KUNDE und firma
@@ -231,7 +239,7 @@ public static class InvoicePdfExporter
                 double gesamt = zwischensumme + mwst;
                 
                 PdfPTable totals = new PdfPTable(2);
-
+                totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
 
@@ -254,7 +262,7 @@ public static class InvoicePdfExporter
                     );
                 AddBodyCell(
                     totals, 
-                    "-" + invoice.discount.ToString("0.00") + " €", 
+                    "-" + rabatt.ToString("0.00") + " €",
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
@@ -267,7 +275,7 @@ public static class InvoicePdfExporter
                     );
                 AddBodyCell(
                     totals, 
-                    "+" + invoice.extraCosts.ToString("0.00") + " €", 
+                    "+" + sonstigeKosten.ToString("0.00") + " €", 
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
@@ -341,12 +349,8 @@ public static class InvoicePdfExporter
                 Paragraph footer = new Paragraph(
                     "Erstellt am " +
                     DateTime.Now.ToString("dd.MM.yyyy"),
-                    grayFont
+                    footerFont
                 );
-
-                footer.Alignment = Element.ALIGN_CENTER;
-
-                doc.Add(footer);
 
                 doc.Close();
             }
@@ -409,5 +413,21 @@ public static class InvoicePdfExporter
 
         table.AddCell(cell);
     }
+private static void AddFooterCell(
+    PdfPTable table,
+    string text,
+    iTextSharp.text.Font font
+)
+{
+    PdfPCell cell = new PdfPCell(new Phrase(text, font));
+    cell.Border = Rectangle.NO_BORDER;
+    cell.PaddingTop = 6;
+    cell.PaddingRight = 10;
+    cell.HorizontalAlignment = Element.ALIGN_LEFT;
+    table.AddCell(cell);
+}
+
+
+
 }
 
