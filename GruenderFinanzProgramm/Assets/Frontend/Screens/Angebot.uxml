@@ -10,14 +10,14 @@
                     <ui:Label text="Angebotspartner" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:VisualElement style="flex-direction: column; gap: 4px;">
                         <ui:Label text="Kunde suchen" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                        <ui:TextField name="input-kundensuche" style="width: 100%; margin-bottom: 8px; margin-left: 0;"/>
+                        <ui:TextField name="input-kundensuche" style="width: 100%; margin-left: 0; margin-bottom: 8px;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex-direction: row; gap: 10px;">
                         <ui:VisualElement name="adresse-box-rechnung" class="angebot-address-box" style="flex: 1; padding: 8px 12px;">
                             <ui:Label text="Rechnungsempfänger:" style="font-size: 12px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 2px;"/>
                             <ui:Label text="Kunde auswählen" style="font-size: 11px; color: rgb(150, 150, 150); white-space: normal;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="adresse-box-versand" class="angebot-address-box" style="flex: 1; padding: 8px 12px;">
+                        <ui:VisualElement name="adresse-box-versand" class="angebot-address-box" style="flex: 1; padding: 8px 12px; margin-left: 8px;">
                             <ui:Label text="Rechnungssender:" style="font-size: 12px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-bottom: 2px;"/>
                             <ui:Label name="label-absender" text="" style="font-size: 11px; color: rgb(200, 200, 200); white-space: normal;"/>
                         </ui:VisualElement>
@@ -56,7 +56,7 @@
                         </ui:VisualElement>
                         <ui:VisualElement style="flex: 0; flex-direction: column; gap: 4px; min-width: 60px;">
                             <ui:Label text="Währung" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                            <ui:Label text="EUR" style="font-size: 12px; color: rgb(255, 255, 255); background-color: rgb(70, 70, 70); border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; padding-top: 10px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; height: 36px; margin-left: 8px;"/>
+                            <ui:Label text="EUR" style="font-size: 12px; color: rgb(255, 255, 255); background-color: rgb(70, 70, 70); border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; padding-top: 6px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; height: 37px; margin-left: 8px;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
@@ -90,8 +90,12 @@
                             <ui:Label text="Skonto" style="font-size: 13px; color: rgb(180, 180, 180);"/>
                             <ui:Label name="label-skonto" text="0,00 EUR" style="font-size: 13px; color: rgb(220, 220, 220);"/>
                         </ui:VisualElement>
+                        <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                            <ui:Label name="label-steuer-bezeichnung" text="MwSt. (19 %)" style="font-size: 13px; color: rgb(180, 180, 180);"/>
+                            <ui:Label name="label-steuer" text="0,00 EUR" style="font-size: 13px; color: rgb(220, 220, 220);"/>
+                        </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: row; justify-content: space-between; border-top-width: 1px; border-top-color: rgb(128, 207, 149); padding-top: 8px; margin-top: 4px;">
-                            <ui:Label text="Gesamtpreis (EUR)" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                            <ui:Label text="Gesamtpreis inkl. MwSt. (EUR)" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             <ui:Label name="label-gesamt-total" text="0,00 EUR" style="font-size: 14px; -unity-font-style: bold; color: rgb(128, 207, 149); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -101,7 +105,7 @@
                         <ui:Label text="Details &amp; Notizen" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
                             <ui:Label text="Rabatt-Typ" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                            <ui:DropdownField name="dropdown-rabatt-typ" style="width: 100%; margin-left: 0;"/>
+                            <ui:DropdownField name="dropdown-rabatt-typ" style="width: 100%;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
                             <ui:Label text="Rabatt (Wert in %)" style="font-size: 11px; color: rgb(180, 180, 180);"/>
