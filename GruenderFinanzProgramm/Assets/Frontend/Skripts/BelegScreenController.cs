@@ -57,7 +57,7 @@ public abstract class BelegScreenController : MonoBehaviour
     private string _ausgewaehlterKunde = "";
     private int _ausgewaehlterKundeId = 0;
     private string _ausgewaehlterKundeAdresse = "";
-    private Button _umwandelnButton;
+    private Button  _umwandelnButton;
     private bool _buttonsRegistriert = false;
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
     private VisualElement _anhangBereich;
@@ -1062,8 +1062,9 @@ public abstract class BelegScreenController : MonoBehaviour
         var boxen = Root.Query(className: "angebot-address-box").ToList();
         if (boxen.Count > 0)
         {
-            SetzeAdresse(boxen[0], "Rechnungsempf\u00e4nger:", KundenAdresse(kunde));
+            SetzeAdresse(boxen[0], "Kunde:", _ausgewaehlterKundeAdresse);
         }
+            //SetzeAdresse(boxen[0], "Rechnungsempf\u00e4nger:", KundenAdresse(kunde));
     }
 
     // ============================================================
@@ -1219,15 +1220,14 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void SpeichernGeklickt()
 {
+    if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
+        return;
+
+    if (!PflichtfelderGefuellt())
+        return;
+
     try
     {
-        bool wurdeGespeichert = false;
-        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
-            return;
-
-        if (!PflichtfelderGefuellt())
-            return;
-
         DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
 
         if (db == null)
@@ -1237,7 +1237,18 @@ public abstract class BelegScreenController : MonoBehaviour
         }
 
         float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
-        float rabatt = ParseBetrag(_rabattLabel != null ? _rabattLabel.text : "0");
+        float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+        string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
+        float rabatt = 0f;
+
+        if (rabattTyp == "Prozent")
+        {
+            rabatt = netto * rabattWert / 100f;
+        }
+        else if (rabattTyp == "Festbetrag")
+        {
+            rabatt = rabattWert;
+        }
         float mwstSatz = HoleMwstSatz();
 
         float steuerBasis = netto - rabatt;
@@ -1249,49 +1260,49 @@ public abstract class BelegScreenController : MonoBehaviour
         int userId = int.Parse(rawUserId);
 
         if (BelegTyp == "Angebot")
+{
+    Offer offer = new Offer
+    {
+        customerId = _ausgewaehlterKundeId,
+        customerName = _ausgewaehlterKunde,
+        customerAddress = _ausgewaehlterKundeAdresse,
+        companyName = HoleCompanyName(db),
+        companyAddress = HoleCompanyAddress(db),
+        offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
+        date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+        validUntil = _fristFeld != null ? _fristFeld.value : "",
+        status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+        subtotal = netto,
+        discount = rabatt,
+        tax = steuer,
+        total = finalTotal,
+        notes = _notizenFeld != null ? _notizenFeld.value : "",
+        bookedToCashbook = false,
+        cashbookEntryId = 0,
+        bookingDate = ""
+    };
+
+    int offerId = db.createOffer(offer);
+
+    List<OfferItem> items = new List<OfferItem>();
+
+    foreach (var zeile in _zeilen.ToList())
+    {
+        OfferItem item = new OfferItem
         {
-            Offer offer = new Offer
-            {
-                customerId = _ausgewaehlterKundeId,
-                customerName = _ausgewaehlterKunde,
-                customerAddress = _ausgewaehlterKundeAdresse,
-                companyName = HoleCompanyName(db),
-                companyAddress = HoleCompanyAddress(db),
-                offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
-                date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
-                validUntil = _fristFeld != null ? _fristFeld.value : "",
-                status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
-                subtotal = netto,
-                discount = rabatt,
-                tax = steuer,
-                total = finalTotal,
-                notes = _notizenFeld != null ? _notizenFeld.value : "",
-                bookedToCashbook = false,
-                cashbookEntryId = 0,
-                bookingDate = ""
-            };
+            offerId = offerId,
+            articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+            description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+            quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
+            unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+        };
 
-            int offerId = db.createOffer(offer);
+        db.createOfferItem(item);
+        items.Add(item);
+    }
 
-            foreach (var zeile in _zeilen)
-            {
-                OfferItem item = new OfferItem
-                {
-                    offerId = offerId,
-                    articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
-                    description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                    quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-                    unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
-                };
-
-                db.createOfferItem(item);
-            }
-
-            List<OfferItem> items = db.getItemsByOffer(offerId);
-            OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
-            wurdeGespeichert = true;
-            Debug.Log("[Reset-Test] Angebot wurde gespeichert, Reset folgt.");
-        }
+    OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
+}
         else if (BelegTyp == "Rechnung")
         {
             Invoice invoice = new Invoice
@@ -1317,7 +1328,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
             int invoiceId = db.createInvoice(invoice);
 
-            foreach (var zeile in _zeilen)
+            foreach (var zeile in _zeilen.ToList())
             {
                 InvoiceItem item = new InvoiceItem
                 {
@@ -1333,15 +1344,10 @@ public abstract class BelegScreenController : MonoBehaviour
 
             List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
             InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
-            wurdeGespeichert = true;
-            Debug.Log("[Reset-Test] Rechnung wurde gespeichert, Reset folgt.");
         }
-        
-        if (wurdeGespeichert)
-        {
-            ResetBelegFormular();
-            FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
-        }
+
+        ResetBelegFormular();
+        FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
     }
     catch (Exception e)
     {
@@ -1690,7 +1696,21 @@ public abstract class BelegScreenController : MonoBehaviour
 
         Company company = companies[companies.Count - 1];
 
-        return LiesFeld(company, "location", "ort", "adresse", "address");
+        string strasse = LiesFeld(company,"strasseuHausNR", "street", "strasse", "adresse", "address");
+        string plz = LiesFeld(company, "zip", "plz", "postleitzahl");
+        string ort = LiesFeld(company, "city", "stadt", "ort", "location");
+
+        List<string> zeilen = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(strasse))
+            zeilen.Add(strasse);
+
+        string plzOrt = (plz + " " + ort).Trim();
+
+        if (!string.IsNullOrWhiteSpace(plzOrt))
+            zeilen.Add(plzOrt);
+
+        return string.Join("\n", zeilen);
     }
 
     private void ResetBelegFormular()
@@ -1730,7 +1750,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return steuersatz / 100f;
     }
 
-private List<VoraussetzungsBereich> PruefePflichtdaten()
+    private List<VoraussetzungsBereich> PruefePflichtdaten()
 {
     var fehlend = new List<VoraussetzungsBereich>();
 
