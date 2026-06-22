@@ -45,12 +45,15 @@ EditorBuildSettings:
     path: Assets/Scenes/Wissensdatenbank.unity
     guid: 474dc193bf588144ba8da8dc6f0e91ba
   - enabled: 1
-    path: Assets/Scenes/Finanzen2.unity
+    path: Assets/Scenes/Finanzen3.unity
     guid: 57cddbfbcdb438a498f511e4b13b3a20
-  - enabled: 1
-    path: Assets/Scenes/Finanzen1.unity
-    guid: a51c8199123c06643974a1a4fa276e7b
   - enabled: 1
     path: Assets/Scenes/Finanzdashboard.unity
     guid: 488f105f3a4ef46439521e4a400878dc
+  - enabled: 1
+    path: Assets/Scenes/Finanzen1.unity
+    guid: c4745a707f6c0c94c9476b354bd38d41
+  - enabled: 1
+    path: Assets/Scenes/Finanzen2.unity
+    guid: 269efaecfcd32984ab5a1e39f6ed3eb1
   m_configObjects: {}
