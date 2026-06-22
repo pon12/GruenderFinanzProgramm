@@ -4,16 +4,22 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using iTextSharp.text; // Für den PDF-Export benötigt
+using System.Linq;
+using System.Globalization;
 
 
 public class KassenbuchController : MonoBehaviour
 {
     private VisualElement _overlay;
+    private DropdownField dropJahrField;
     private VisualElement tableInput; // Repräsentiert deinen 'tableBody'
     private VisualTreeAsset outputTemplate;
 
 
     private Label balanceLabel;
+    private Label letzteAktualLabel;
+
+    private Label fehlerLabel;
    
     private VisualElement datumKlickLabel;          
     private VisualElement meinUxmlKalender;
@@ -43,6 +49,8 @@ public class KassenbuchController : MonoBehaviour
     private string _aktuellerTyp;
     private DataBase db;
 
+    private DropdownField artDropdown;
+
 
     // ==========================================
     // UNSERE PLATZHALTER-TEXTE
@@ -53,8 +61,19 @@ public class KassenbuchController : MonoBehaviour
 
     void OnEnable()
     {
+
+        
         // Holt die aktive Nutzer-Datenbank laut Dokumentation
         db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        if (db == null)
+        {
+            Debug.LogError("[Kassenbuch] Keine aktive Nutzer-Datenbank gefunden.");
+            return;
+        }
+
+        db.setupKassenbuchTable();
+
         outputTemplate = Resources.Load<VisualTreeAsset>("Kassenbuch_Field");
 
 
@@ -67,6 +86,19 @@ public class KassenbuchController : MonoBehaviour
         tableInput = root.Q<VisualElement>("tableBody") ?? root.Q<VisualElement>("unity-content-container");
        
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
+        letzteAktualLabel = root.Q<Label>("letzteAktual");
+
+        if (_overlay != null)
+{
+    fehlerLabel = _overlay.Q<Label>("FehlerText");
+
+    if (fehlerLabel != null)
+    {
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
+        fehlerLabel.style.color = UnityEngine.Color.red;
+    }
+}
 
 
         // --- DASHBOARD LABELS ZUWEISEN ---
@@ -110,7 +142,7 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // INITIALISIERUNG DES EXPORT-DROPDOWNS (100 JAHRE)
         // ==========================================
-        var dropJahrField = root.Q<DropdownField>("dropJahr");
+        dropJahrField = root.Q<DropdownField>("dropJahr");
         if (dropJahrField != null)
         {
             List<string> jahre = new List<string>();
@@ -120,6 +152,10 @@ public class KassenbuchController : MonoBehaviour
             }
             dropJahrField.choices = jahre;
             dropJahrField.value = today.Year.ToString();
+
+            // FIX: Ohne diesen Callback passierte beim Jahreswechsel
+            // im Dropdown nichts – Tabelle und Kontostand blieben statisch.
+            dropJahrField.RegisterValueChangedCallback(_ => createList());
         }
 
 
@@ -175,18 +211,43 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // EXPORT BUTTON EVENT VERKNÜPFEN
         // ==========================================
-        var btnExport = root.Q<Button>("btn-export") ?? root.Q<Button>("Export");
+        var btnExport = root.Q<Button>("FinanzExport") ?? root.Q<Button>("btn-export") ?? root.Q<Button>("Export");
+        Debug.Log($"[DEBUG-Export] Export-Button gefunden: {btnExport != null}");
         if (btnExport != null)
         {
             btnExport.clicked += () =>
             {
+                Debug.Log("[DEBUG-Export] Button wurde geklickt!");
                 var dj = root.Q<DropdownField>("dropJahr");
+                Debug.Log($"[DEBUG-Export] dropJahr gefunden: {dj != null}, Wert: '{dj?.value}'");
                 if (dj != null)
                 {
                     ExportJahrAlsPdf(dj.value);
                 }
             };
         }
+
+        artDropdown = _overlay.Q<DropdownField>("Art");
+
+    if (artDropdown != null)
+    {
+        artDropdown.choices = new List<string>()
+        {
+            "Marketing",
+            "Reisekosten",
+            "Sonstige Kosten",
+            "Barentnahme / Privatentnahme",
+            "Privateinzahlung",
+            "Sonstige Einzahlung",
+            "Darlehen",
+            "Tilgungsraten",
+            "Finanzamt",
+            "Steuern",
+            "Gehälter"
+        };
+
+        artDropdown.value = "Marketing";
+    }
 
 
         createList();
@@ -204,6 +265,26 @@ public class KassenbuchController : MonoBehaviour
     }
 
 
+    // ==========================================
+    // FEHLERANZEIGE IM POPUP
+    //
+    // Zeigt 'nachricht' im fehlerLabel an (im Erstell-Popup).
+    // Blendet sich nach 3 Sekunden automatisch wieder aus.
+    // ==========================================
+    private void ShowFehler(string nachricht)
+    {
+        if (fehlerLabel == null) return;
+
+        fehlerLabel.text = nachricht;
+        fehlerLabel.style.display = DisplayStyle.Flex;
+
+        fehlerLabel.schedule.Execute(() =>
+        {
+            fehlerLabel.style.display = DisplayStyle.None;
+        }).ExecuteLater(3000);
+    }
+
+
     private void SetupBetragInputAnpassung(TextField field, string placeholder)
     {
         if (field == null) return;
@@ -218,28 +299,42 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        field.RegisterValueChangedCallback(evt =>
+       field.RegisterValueChangedCallback(evt =>
+{
+    string original = evt.newValue;
+
+    // Cursorposition merken
+    int cursorPos = field.cursorIndex;
+
+    // Nur Zahlen behalten
+    string zahlen = "";
+    foreach (char c in original)
+    {
+        if (char.IsDigit(c))
+            zahlen += c;
+    }
+
+    if (string.IsNullOrEmpty(zahlen))
+    {
+        field.SetValueWithoutNotify("");
+        return;
+    }
+
+    if (long.TryParse(zahlen, out long wert))
+    {
+        string formatiert = wert.ToString("N0")
+            .Replace(",", ".");
+
+        field.SetValueWithoutNotify(formatiert);
+
+        // Cursor ans Ende setzen
+        field.schedule.Execute(() =>
         {
-            string neueEingabe = evt.newValue;
-            string bereinigt = neueEingabe.Replace("€", "").Trim();
-
-
-            string gefiltert = "";
-            foreach (char c in bereinigt)
-            {
-                if (char.IsDigit(c) || c == ',' || c == '.')
-                {
-                    gefiltert += c;
-                }
-            }
-
-
-            if (bereinigt != gefiltert)
-            {
-                field.value = gefiltert;
-            }
+            field.cursorIndex = formatiert.Length;
+            field.selectIndex = formatiert.Length;
         });
-
+    }
+});
 
         field.RegisterCallback<FocusInEvent>(evt => {
             if (field.value == placeholder)
@@ -486,8 +581,7 @@ public class KassenbuchController : MonoBehaviour
         _overlay.style.display = DisplayStyle.Flex;
     }
 
-
-    private void ClosePopup()
+       private void ClosePopup()
     {
         if (_overlay == null) return;
 
@@ -517,36 +611,168 @@ public class KassenbuchController : MonoBehaviour
         _overlay.style.display = DisplayStyle.None;
     }
 
+ private void Fehleranzeigen(string text)
+    {
+        if (fehlerLabel == null)
+            return;
+
+        fehlerLabel.text = text;
+        fehlerLabel.style.display = DisplayStyle.Flex;
+    }
 
     private void OnSpeichern()
+{
+    if (fehlerLabel != null)
     {
-        if (_overlay == null) return;
-
-
-        string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
-        string zweck      = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
-        string datum      = _overlay.Q<TextField>("input-datum").value.Trim();
-
-
-        if (betragText == PLACEHOLDER_BETRAG) betragText = "";
-        if (zweck == PLACEHOLDER_ZWECK) zweck = "";
-
-
-        betragText = betragText.Replace("€", "").Trim();
-
-
-        if (!float.TryParse(betragText, out float betrag) || string.IsNullOrEmpty(zweck) || string.IsNullOrEmpty(datum))
-        {
-            Debug.LogWarning("[Kassenbuch] Ungültige Eingabe beim Speichern.");
-            return;
-        }
-
-
-        var eintrag = new KassenbuchEintrag(_aktuellerTyp, betrag, zweck, datum);
-        SpeichereEintrag(eintrag);
-        ClosePopup();
-        createList();
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
     }
+
+    if (_overlay == null)
+        return;
+
+    if (fehlerLabel != null)
+    {
+        fehlerLabel.text = "";
+        fehlerLabel.style.display = DisplayStyle.None;
+    }
+
+    string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
+    string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
+    string datum = _overlay.Q<TextField>("input-datum").value.Trim();
+
+    if (betragText == PLACEHOLDER_BETRAG)
+        betragText = "";
+
+    if (zweck == PLACEHOLDER_ZWECK)
+        zweck = "";
+
+    betragText = betragText.Replace("€", "").Trim();
+
+    // ==========================
+    // BETRAG PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(betragText))
+    {
+        Fehleranzeigen("Bitte einen Betrag eingeben.");
+        return;
+    }
+
+    betragText = betragText.Replace(".", "");
+betragText = betragText.Replace("€", "").Trim();
+
+    if (!float.TryParse(
+            betragText.Replace(",", "."),
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out float betrag))
+    {
+        ShowFehler("Ungültiger Betrag.");
+        return;
+    }
+
+    // ==========================
+    // ZWECK PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(zweck))
+    {
+        Fehleranzeigen("Bitte einen Verwendungszweck eingeben.");
+        return;
+    }
+
+    // ==========================
+    // DATUM PRÜFEN
+    // ==========================
+
+    if (string.IsNullOrWhiteSpace(datum))
+    {
+        ShowFehler("Bitte ein Datum auswählen.");
+        return;
+    }
+
+    if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
+    {
+        ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
+        return;
+    }
+    datum = normalisiertesDatum;
+
+    // ==========================
+    // SPEICHERN
+    // ==========================
+
+    var eintrag = new KassenbuchEintrag(
+        _aktuellerTyp,
+        betrag,
+        zweck,
+        datum
+    );
+
+    Debug.Log("Betrag: '" + betragText + "'");
+Debug.Log("Zweck: '" + zweck + "'");
+
+    if (betragText == PLACEHOLDER_BETRAG)
+    betragText = "";
+
+    if (zweck == PLACEHOLDER_ZWECK)
+    zweck = "";
+
+    // Beide fehlen
+    if (string.IsNullOrWhiteSpace(betragText) &&
+        string.IsNullOrWhiteSpace(zweck))
+    {
+        ShowFehler("Bitte Betrag und Verwendungszweck eingeben.");
+        return;
+    }
+
+    // Nur Betrag fehlt
+    if (string.IsNullOrWhiteSpace(betragText))
+    {
+        ShowFehler("Bitte einen Betrag eingeben.");
+        return;
+    }
+
+    // Nur Zweck fehlt
+    if (string.IsNullOrWhiteSpace(zweck))
+    {
+        ShowFehler("Bitte einen Verwendungszweck eingeben.");
+        return;
+    }
+
+    SpeichereEintrag(eintrag);
+
+    ClosePopup();
+    createList();
+}
+
+// ==========================================
+// DATUM-VALIDIERUNG
+//
+// Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
+// normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
+// Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
+// unbemerkt in der DB landen und spätere Berechnungen verfälschen.
+// ==========================================
+private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
+{
+    normalisiert = "";
+
+    string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
+    var inv  = System.Globalization.CultureInfo.InvariantCulture;
+    var none = System.Globalization.DateTimeStyles.None;
+
+    if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
+        return false;
+
+    // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
+    if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
+        return false;
+
+    normalisiert = ergebnis.ToString("dd.MM.yyyy");
+    return true;
+}
 
 
     private void SpeichereEintrag(KassenbuchEintrag eintrag)
@@ -554,10 +780,12 @@ public class KassenbuchController : MonoBehaviour
         if (db == null) return;
 
 
-        if (eintrag.Typ == "Einnahme")
+        if (eintrag.Typ == "Einnahme") {
             db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
-        else
+        }
+        else {
             db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
+    }
     }
 
 
@@ -576,8 +804,16 @@ public class KassenbuchController : MonoBehaviour
     {
         if (db == null || tableInput == null) return;
 
+        // Aktuell gewähltes Jahr aus dem Export/Filter-Dropdown lesen.
+        // Falls noch kein Wert gesetzt ist, alle Jahre zeigen (kein Filter).
+        bool jahresFilterAktiv = dropJahrField != null && !string.IsNullOrEmpty(dropJahrField.value)
+                                  && int.TryParse(dropJahrField.value, out _);
+        int gewaehltesJahr = jahresFilterAktiv ? int.Parse(dropJahrField.value) : DateTime.Today.Year;
 
-        float differenz = db.getDifferenz();
+        // Kontostand: gefiltert auf das gewählte Jahr statt immer die Gesamtdifferenz
+        float differenz = jahresFilterAktiv
+            ? BerechneKontostandFuerJahr(gewaehltesJahr)
+            : db.getDifferenz();
 
 
         if (balanceLabel != null)
@@ -589,9 +825,20 @@ public class KassenbuchController : MonoBehaviour
                 : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
         }
 
+        // FIX: 'Letzte Aktualisierung' war bisher ein fester Platzhalter
+        // ("02.02.2222") und wurde nie aktualisiert. Zeigt jetzt das
+        // aktuelle Datum/Uhrzeit, sobald die Liste neu geladen wird.
+        if (letzteAktualLabel != null)
+        {
+            letzteAktualLabel.text = "Letzte Aktualisierung: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+        }
+
 
         // ==========================================
         // APP-EVENT-MANAGER LOGIK FÜR DAS DASHBOARD (Aus Code 2)
+        // Bleibt bewusst beim heutigen Jahr, unabhängig vom Kassenbuch-
+        // Filter-Dropdown – das Dashboard hat seinen eigenen Jahres-
+        // Kalender und soll davon nicht beeinflusst werden.
         // ==========================================
         {
             var heute = System.DateTime.Today;
@@ -638,7 +885,16 @@ public class KassenbuchController : MonoBehaviour
 
 
         List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();  
+        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();
+
+        // Tabelle nach gewähltem Jahr filtern, falls ein gültiges Jahr gewählt ist
+        if (jahresFilterAktiv)
+        {
+            einkommenList = einkommenList?.FindAll(e =>
+                TryParseDatum(e.getDatum(), out DateTime d) && d.Year == gewaehltesJahr);
+            ausgabenList = ausgabenList?.FindAll(a =>
+                TryParseDatum(a.getDatum(), out DateTime d) && d.Year == gewaehltesJahr);
+        }
 
 
         // Einnahmen
@@ -659,7 +915,14 @@ public class KassenbuchController : MonoBehaviour
 
 
                 nameLabel.text       = currentEinkommen.getDescription();
-                betragLabel.text     = currentEinkommen.getAmount() + " €";
+                if (float.TryParse(currentEinkommen.getAmount(), out float betrag))
+                {
+                    betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
+                }
+                else
+                {
+                    betragLabel.text = currentEinkommen.getAmount() + " €";
+                }
                 erstellTagLabel.text = currentEinkommen.getDatum();
                 typLabel.text        = "Einkommen";
                
@@ -713,7 +976,14 @@ public class KassenbuchController : MonoBehaviour
 
 
                 nameLabel.text       = currentAusgaben.getDescription();
-                betragLabel.text     = currentAusgaben.getAmount() + " €";
+               if (float.TryParse(currentAusgaben.getAmount(), out float betrag))
+                    {
+                        betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
+                    }
+                    else
+                    {
+                        betragLabel.text = currentAusgaben.getAmount() + " €";
+                    }
                 erstellTagLabel.text = currentAusgaben.getDatum();
                 typLabel.text        = "Ausgabe";
                
@@ -771,6 +1041,29 @@ public class KassenbuchController : MonoBehaviour
             || System.DateTime.TryParse(text, deDe, none, out erg);
     }
 
+    // ===============================
+    // KONTOSTAND FÜR EIN BESTIMMTES JAHR
+    // Summiert nur Einkommen/Ausgaben mit Datum in diesem Jahr.
+    // ===============================
+    private float BerechneKontostandFuerJahr(int jahr)
+    {
+        float summe = 0f;
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+            foreach (var e in einkommen)
+                if (TryParseDatum(e.getDatum(), out DateTime d) && d.Year == jahr)
+                    summe += e.Amount;
+
+        var ausgaben = db.getAllAusgabenEntries();
+        if (ausgaben != null)
+            foreach (var a in ausgaben)
+                if (TryParseDatum(a.getDatum(), out DateTime d) && d.Year == jahr)
+                    summe -= a.Amount;
+
+        return summe;
+    }
+
 
     public void deleteEntry(int id)
     {
@@ -787,15 +1080,35 @@ public class KassenbuchController : MonoBehaviour
         }
     }
 
+    private List<KassenbuchEintrag> getCombinedEntries()
+    {
+        List<KassenbuchEintrag> entries = new List<KassenbuchEintrag>();
+        return entries;
+    }
 
     public void ExportJahrAlsPdf(string jahr)
     {
+        Debug.Log($"[DEBUG-Export] ExportJahrAlsPdf wurde aufgerufen mit Jahr='{jahr}'");
+
         if (db == null)
         {
             Debug.LogError("[Export] Keine Datenbankverbindung vorhanden!");
+            ShowFehler("Keine Datenbankverbindung vorhanden.");
             return;
         }
 
+        /* AUSKOMMENTIERT NACH MERGE CONFLICT DA ENTRIES CONTEXT FEHLT - Pontus
+        foreach (Ausgaben ausgabe in db.getAllAusgabenEntries())
+        {
+            entries.Add(new KassenbuchEintrag(
+                ausgabe.getId(),
+                "Ausgabe",
+                ausgabe.Amount,
+                ausgabe.Description,
+                ausgabe.Datum
+            ));
+        }
+        */ 
 
         var einkommen = db.getAllEinkommenEntries();
         var ausgaben  = db.getAllAusgabenEntries();  
@@ -825,6 +1138,7 @@ public class KassenbuchController : MonoBehaviour
         if (gefundeneEintraege == 0)
         {
             Debug.LogWarning($"[Export Abgebrochen] Es sind keine Einträge in der Datenbank für das Jahr {jahr} vorhanden.");
+            ShowFehler($"Keine Einträge im Jahr {jahr} gefunden.");
             return;
         }
 
@@ -869,10 +1183,26 @@ public class KassenbuchController : MonoBehaviour
                 doc.Close();
             }
             Debug.Log("PDF erfolgreich exportiert unter: " + filePath);
+
+            // Datei direkt öffnen, damit der Erfolg auch sichtbar ist
+            // (ohne das würde der Export lautlos im Hintergrund passieren)
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName        = filePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception oeffnenEx)
+            {
+                Debug.LogWarning("[Export] PDF erstellt, konnte aber nicht automatisch geöffnet werden: " + oeffnenEx.Message);
+            }
         }
         catch (Exception ex)
         {
             Debug.LogError("Fehler beim PDF-Export: " + ex.Message);
+            ShowFehler("Export fehlgeschlagen: " + ex.Message);
         }
     }
 }
@@ -880,17 +1210,28 @@ public class KassenbuchController : MonoBehaviour
 
 public class KassenbuchEintrag
 {
+    public int Id;
     public string Typ;
-    public float  Betrag;
+    public float Betrag;
     public string Beschreibung;
     public string Datum;
 
 
    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
     {
-        Typ          = typ;
-        Betrag       = betrag;
+        Id = 0;
+        Typ = typ;
+        Betrag = betrag;
         Beschreibung = beschreibung;
-        Datum        = datum;
+        Datum = datum;
+    }
+
+    public KassenbuchEintrag(int id, string typ, float betrag, string beschreibung, string datum)
+    {
+        Id = id;
+        Typ = typ;
+        Betrag = betrag;
+        Beschreibung = beschreibung;
+        Datum = datum;
     }
 }

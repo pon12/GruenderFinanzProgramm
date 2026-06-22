@@ -4,20 +4,23 @@ using System.Linq;
 
 public class DataBase : DatabaseManager
 {
-public void setupDatabase()
-{
-    createTable<Company>();
-    createTable<Customer>();
-    createTable<Service>();
-    createTable<UserDocument>();
-    createTable<UserPDFDocument>();
-    createTable<Ausgaben>();
-    createTable<Einkommen>();
-    createTable<Offer>();
-    createTable<OfferItem>();
-    createTable<Invoice>();
-    createTable<InvoiceItem>();
-}
+    public void setupDatabase()
+    {
+        createTable<Company>();
+        createTable<Customer>();
+        createTable<Service>();
+        createTable<UserDocument>();
+        createTable<UserPDFDocument>();
+        createTable<TextDocumentMeta>();
+        createTable<Ausgaben>();
+        createTable<Einkommen>();
+        createTable<Dauerauftrag>();
+        createTable<GruenderpfadEintrag>();
+        createTable<Offer>();
+        createTable<OfferItem>();
+        createTable<Invoice>();
+        createTable<InvoiceItem>();
+    }
     public void setupAuthDB()
 
     {
@@ -25,7 +28,7 @@ public void setupDatabase()
     }
 
 
-//User Auth DB
+    //User Auth DB
     public UserDB getUserById(int userId)
     {
         return getById<UserDB>(userId);
@@ -60,36 +63,44 @@ public void setupDatabase()
     {
         return delete<UserDB>(userId);
     }
-//Company
-public Company getCompanyById(int companyId)
-{
-    return getById<Company>(companyId);
-}
-public List<Company> getAllCompanies()
-{
-    return getAll<Company>();
-}
-public int createCompany(string name, int legalForm, int industry, string location)
+    //Company
+    public Company getCompanyById(int companyId)
+    {
+        return getById<Company>(companyId);
+    }
+    public List<Company> getAllCompanies()
+    {
+        return getAll<Company>();
+    }
+ public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, int plz, string ustIdNr, string email, string handyNr)
 {
     Company newCompany = new Company
     {
         name = name,
         legalForm = legalForm,
         industry = industry,
-        location = location
+        location = location,
+        steuerNr = steuerNr,
+        gruendungsJahr = gruendungsJahr,    
+        handelsReg = handelsReg,
+        strasseuHausNr = strasseuHausNr,
+        plz = plz,
+        ustIdNr = ustIdNr,
+        email = email,
+        handyNr = handyNr
     };
     return insert(newCompany);
 }
-public int updateCompany(Company company)
-{
-    return update(company);
-}
-public int deleteCompany(int companyId)
-{
-    return delete<Company>(companyId);
-}
+    public int updateCompany(Company company)
+    {
+        return update(company);
+    }
+    public int deleteCompany(int companyId)
+    {
+        return delete<Company>(companyId);
+    }
 
-//Login/Auth
+    //Login/Auth
 
     public List<UserDB> findUsersByName(string name)
     {
@@ -121,7 +132,7 @@ public int deleteCompany(int companyId)
         createTable<Offer>();
         createTable<OfferItem>();
     }
- // --- Rechnungen ---
+    // --- Rechnungen ---
 
 public int createInvoice(Invoice invoice)
 {
@@ -162,48 +173,48 @@ public int deleteInvoiceItem(int id)
     return delete<InvoiceItem>(id);
 }
 
-// --- Angebote ---
+    // --- Angebote ---
 
-public int createOffer(Offer offer)
-{
-    return insertAndGetId(offer);
-}
-public int updateOffer(Offer offer)
-{
-    return update(offer);
-}
-public int deleteOffer(int id)
-{
-    return delete<Offer>(id);
-}
-public List<Offer> getAllOffers()
-{
-    return getAll<Offer>();
-}
-public Offer getOfferById(int id)
-{
-    return getById<Offer>(id);
-}
-public List<OfferItem> getItemsByOffer(int offerId)
-{
-    return query<OfferItem>(
-        $"SELECT * FROM OfferItem WHERE offerId = {offerId}"
-    );
-}
-public int createOfferItem(OfferItem item)
-{
-    return insert(item);
-}
-public int updateOfferItem(OfferItem item)
-{
-    return update(item);
-}
-public int deleteOfferItem(int id)
-{
-    return delete<OfferItem>(id);
-}
+    public int createOffer(Offer offer)
+    {
+        return insert(offer);
+    }
+    public int updateOffer(Offer offer)
+    {
+        return update(offer);
+    }
+    public int deleteOffer(int id)
+    {
+        return delete<Offer>(id);
+    }
+    public List<Offer> getAllOffers()
+    {
+        return getAll<Offer>();
+    }
+    public Offer getOfferById(int id)
+    {
+        return getById<Offer>(id);
+    }
+    public List<OfferItem> getItemsByOffer(int offerId)
+    {
+        return query<OfferItem>(
+            $"SELECT * FROM OfferItem WHERE offerId = {offerId}"
+        );
+    }
+    public int createOfferItem(OfferItem item)
+    {
+        return insert(item);
+    }
+    public int updateOfferItem(OfferItem item)
+    {
+        return update(item);
+    }
+    public int deleteOfferItem(int id)
+    {
+        return delete<OfferItem>(id);
+    }
 
- // ---Customer---
+    // ---Customer---
     public void setupCustomerTable()
     {
         createTable<Customer>();
@@ -296,13 +307,14 @@ public int deleteOfferItem(int id)
         return delete<LookupEntry>(id);
     }
 
-  
+
     //Kassenbuch
 
     public void setupKassenbuchTable()
     {
         createTable<Einkommen>();
         createTable<Ausgaben>();
+        createTable<Dauerauftrag>();
     }
 
     public int createEinkommen(float amount, string description, string datum)
@@ -323,7 +335,7 @@ public int deleteOfferItem(int id)
     {
         return getAll<Ausgaben>();
     }
-    
+
     public int deleteEinkommen(int id)
     {
         return delete<Einkommen>(id);
@@ -349,14 +361,14 @@ public int deleteOfferItem(int id)
 
     public List<Ausgaben> getAusgabebyDatum(string datum)
     {
-    return query<Ausgaben>($"SELECT * FROM Ausgaben WHERE Datum = '{datum}'");
+        return query<Ausgaben>($"SELECT * FROM Ausgaben WHERE Datum = '{datum}'");
     }
     public List<Einkommen> getEinkommenbyDatum(string datum)
     {
         return query<Einkommen>($"SELECT * FROM Einkommen WHERE Datum = '{datum}'");
     }
 
-    
+
 
     //Documents
     public int createUserDocument(int documentType, string title, string text)
@@ -414,40 +426,433 @@ public int deleteOfferItem(int id)
         return count;
     }
 
-// --- User PDFs ---
+    // --- User PDFs ---
 
-public int createUserPDFDocument(UserPDFDocument document)
+    public int createUserPDFDocument(UserPDFDocument document)
+    {
+        document.uploadedAt = System.DateTime.Now;
+        return insert(document);
+    }
+
+    public UserPDFDocument getUserPDFDocumentById(int pdfId, int userId)
+    {
+        UserPDFDocument document = getById<UserPDFDocument>(pdfId);
+
+        if (document == null || document.userId != userId)
+            return null;
+
+        return document;
+    }
+
+    public List<UserPDFDocument> getPDFDocumentsByUser(int userId)
+    {
+        return query<UserPDFDocument>(
+            $"SELECT * FROM UserPDFDocument WHERE userId = {userId} ORDER BY uploadedAt DESC"
+        );
+    }
+
+    public int deleteUserPDFDocument(int pdfId, int userId)
+    {
+        UserPDFDocument document = getUserPDFDocumentById(pdfId, userId);
+
+        if (document == null)
+            return 0;
+
+        return delete<UserPDFDocument>(pdfId);
+    }
+
+
+
+
+    // Änderungen Alex
+    // --- Daueraufträge ---
+
+    public int createDauerauftrag(string typ, float amount, string description, string startDatum, string naechstesDatum, int intervallTyp)
+    {
+        Dauerauftrag dauerauftrag = new Dauerauftrag
+        {
+            typ = typ,
+            amount = amount,
+            description = description,
+            startDatum = startDatum,
+            naechstesDatum = naechstesDatum,
+            intervallTyp = intervallTyp,
+            isActive = true,
+            lastUpdated = System.DateTime.Now
+        };
+
+        return insert(dauerauftrag);
+    }
+
+    public int createDauerauftrag(Dauerauftrag dauerauftrag)
+    {
+        dauerauftrag.lastUpdated = System.DateTime.Now;
+        return insert(dauerauftrag);
+    }
+
+    public List<Dauerauftrag> getAllDauerauftraege()
+    {
+        return getAll<Dauerauftrag>();
+    }
+
+    public Dauerauftrag getDauerauftragById(int id)
+    {
+        return getById<Dauerauftrag>(id);
+    }
+
+    public int updateDauerauftrag(Dauerauftrag dauerauftrag)
+    {
+        dauerauftrag.lastUpdated = System.DateTime.Now;
+        return update(dauerauftrag);
+    }
+
+    public int deleteDauerauftrag(int id)
+    {
+        return delete<Dauerauftrag>(id);
+    }
+
+    public List<Dauerauftrag> getActiveDauerauftraege()
+    {
+        return query<Dauerauftrag>("SELECT * FROM Dauerauftrag WHERE isActive = 1");
+    }
+
+    public int deactivateDauerauftrag(int id)
+    {
+        Dauerauftrag dauerauftrag = getDauerauftragById(id);
+
+        if (dauerauftrag == null)
+        {
+            Debug.LogWarning("[Dauerauftrag] Kein Dauerauftrag mit ID " + id + " gefunden.");
+            return 0;
+        }
+
+        dauerauftrag.isActive = false;
+        dauerauftrag.lastUpdated = System.DateTime.Now;
+
+        return update(dauerauftrag);
+    }
+
+
+    public void uebernehmeFaelligeDauerauftraegeInsKassenbuch()
+    {
+        List<Dauerauftrag> aktiveDauerauftraege = getActiveDauerauftraege();
+        System.DateTime heute = System.DateTime.Today;
+
+        foreach (Dauerauftrag dauerauftrag in aktiveDauerauftraege)
+        {
+            if (!tryParseKassenbuchDatum(dauerauftrag.naechstesDatum, out System.DateTime naechstesDatum))
+            {
+                Debug.LogWarning("[Dauerauftrag] Ungültiges nächstes Datum bei Dauerauftrag ID " + dauerauftrag.id);
+                continue;
+            }
+
+            if (naechstesDatum > heute)
+            {
+                continue;
+            }
+
+            string buchungsDatum = naechstesDatum.ToString("dd.MM.yyyy");
+
+            if (dauerauftrag.typ == "Einnahme")
+            {
+                createEinkommen(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+            }
+            else if (dauerauftrag.typ == "Ausgabe")
+            {
+                createAusgaben(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+            }
+            else
+            {
+                Debug.LogWarning("[Dauerauftrag] Unbekannter Typ bei Dauerauftrag ID " + dauerauftrag.id + ": " + dauerauftrag.typ);
+                continue;
+            }
+
+            dauerauftrag.naechstesDatum = berechneNaechstesDauerauftragDatum(naechstesDatum, dauerauftrag.intervallTyp);
+            dauerauftrag.lastUpdated = System.DateTime.Now;
+
+            updateDauerauftrag(dauerauftrag);
+
+            Debug.Log("[Dauerauftrag] Übernommen: " + dauerauftrag.description + " am " + buchungsDatum);
+        }
+    }
+
+    private string berechneNaechstesDauerauftragDatum(System.DateTime aktuellesDatum, int intervallTyp)
+    {
+        System.DateTime neuesDatum;
+
+        switch (intervallTyp)
+        {
+            case 1:
+                neuesDatum = aktuellesDatum.AddMonths(1);
+                break;
+
+            case 2:
+                neuesDatum = aktuellesDatum.AddYears(1);
+                break;
+
+            default:
+                Debug.LogWarning("[Dauerauftrag] Unbekannter IntervallTyp: " + intervallTyp + ". Es wird monatlich verwendet.");
+                neuesDatum = aktuellesDatum.AddMonths(1);
+                break;
+        }
+
+        return neuesDatum.ToString("dd.MM.yyyy");
+    }
+
+    private bool tryParseKassenbuchDatum(string datum, out System.DateTime parsedDate)
+    {
+        return System.DateTime.TryParseExact(
+            datum,
+            "dd.MM.yyyy",
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None,
+            out parsedDate
+        );
+    }
+
+    // --- Gründerpfad ---
+
+    public int createGruenderpfadEintrag(int meilenstein, string beschreibung, bool erledigt)
+    {
+        GruenderpfadEintrag eintrag = new GruenderpfadEintrag
+        {
+            meilenstein = meilenstein,
+            beschreibung = beschreibung,
+            erledigt = erledigt,
+            lastUpdated = System.DateTime.Now
+        };
+
+        return insert(eintrag);
+    }
+
+    public List<GruenderpfadEintrag> getAllGruenderpfadEintraege()
+    {
+        return getAll<GruenderpfadEintrag>();
+    }
+
+    public GruenderpfadEintrag getGruenderpfadEintragById(int id)
+    {
+        return getById<GruenderpfadEintrag>(id);
+    }
+
+    public int updateGruenderpfadEintrag(GruenderpfadEintrag eintrag)
+    {
+        eintrag.lastUpdated = System.DateTime.Now;
+        return update(eintrag);
+    }
+
+    public int deleteGruenderpfadEintrag(int id)
+    {
+        return delete<GruenderpfadEintrag>(id);
+    }
+
+    public List<GruenderpfadEintrag> getOffeneGruenderpfadEintraege()
+    {
+        return query<GruenderpfadEintrag>("SELECT * FROM GruenderpfadEintrag WHERE erledigt = 0");
+    }
+
+    public List<GruenderpfadEintrag> getErledigteGruenderpfadEintraege()
+    {
+        return query<GruenderpfadEintrag>("SELECT * FROM GruenderpfadEintrag WHERE erledigt = 1");
+    }
+
+    public int setGruenderpfadEintragErledigt(int id, bool erledigt)
+    {
+        GruenderpfadEintrag eintrag = getGruenderpfadEintragById(id);
+
+        if (eintrag == null)
+        {
+            Debug.LogWarning("[Gruenderpfad] Kein Eintrag mit ID " + id + " gefunden.");
+            return 0;
+        }
+
+        eintrag.erledigt = erledigt;
+        eintrag.lastUpdated = System.DateTime.Now;
+
+        return update(eintrag);
+    }
+
+
+
+    // --- Textdokumente ---
+
+    public int createTextDocumentMeta(TextDocumentMeta document)
+    {
+        document.createdAt = System.DateTime.Now;
+        document.lastUpdated = System.DateTime.Now;
+
+        return insert(document);
+    }
+
+    public TextDocumentMeta getTextDocumentMetaById(int documentId, int userId)
+    {
+        TextDocumentMeta document = getById<TextDocumentMeta>(documentId);
+
+        if (document == null || document.userId != userId)
+        {
+            return null;
+        }
+
+        return document;
+    }
+
+    public List<TextDocumentMeta> getTextDocumentsByUser(int userId)
+    {
+        return query<TextDocumentMeta>(
+            $"SELECT * FROM TextDocumentMeta WHERE userId = {userId} ORDER BY lastUpdated DESC"
+        );
+    }
+
+    public List<TextDocumentMeta> getTextDocumentsByUserAndType(int userId, string documentType)
+    {
+        return query<TextDocumentMeta>(
+            $"SELECT * FROM TextDocumentMeta WHERE userId = {userId} AND documentType = '{documentType}' ORDER BY lastUpdated DESC"
+        );
+    }
+
+    public int updateTextDocumentMeta(TextDocumentMeta document)
+    {
+        document.lastUpdated = System.DateTime.Now;
+        return update(document);
+    }
+
+    public int deleteTextDocumentMeta(int documentId, int userId)
+    {
+        TextDocumentMeta document = getTextDocumentMetaById(documentId, userId);
+
+        if (document == null)
+        {
+            return 0;
+        }
+
+        return delete<TextDocumentMeta>(documentId);
+    }
+
+
+// Settings
+
+public int createSettings(string rechnungsNrPräfix, string startNr, string zahlungsziel, int waehrung, int dtmFormat,  
+bool ustRechnung, bool autoNummer, string zahlungshinweis, string kontoInhaber, string iban, string bic, string kreditinstitut, 
+bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter )
 {
-    document.uploadedAt = System.DateTime.Now;
-    return insert(document);
+    Settings newSettings = new Settings
+    {
+        rechnungsNrPräfix = rechnungsNrPräfix,
+        startNr = startNr,
+        zahlungsziel = zahlungsziel,
+        waehrung = waehrung,
+        dtmFormat = dtmFormat,
+        ustRechnung = ustRechnung,
+        autoNummer = autoNummer,
+        zahlungshinweis = zahlungshinweis,
+        kontoInhaber = kontoInhaber,
+        iban = iban,
+        bic = bic,
+        kreditinstitut = kreditinstitut,
+        ibanRechnung = ibanRechnung,
+        logo = logo,
+        seitenzahl = seitenzahl,
+        exportpfad = exportpfad,
+        steuersatz = steuersatz,
+        Begleiter = Begleiter
+    };
+    return insert(newSettings);
 }
 
-public UserPDFDocument getUserPDFDocumentById(int pdfId, int userId)
+public List<Settings> getAllSettings()
 {
-    UserPDFDocument document = getById<UserPDFDocument>(pdfId);
-
-    if (document == null || document.userId != userId)
-        return null;
-
-    return document;
+    return getAll<Settings>();
 }
 
-public List<UserPDFDocument> getPDFDocumentsByUser(int userId)
+public int deleteSettings(int id)
 {
-    return query<UserPDFDocument>(
-        $"SELECT * FROM UserPDFDocument WHERE userId = {userId} ORDER BY uploadedAt DESC"
-    );
+    return delete<Settings>(id);
 }
 
-public int deleteUserPDFDocument(int pdfId, int userId)
+public int updateSettings(Settings settings)
 {
-    UserPDFDocument document = getUserPDFDocumentById(pdfId, userId);
-
-    if (document == null)
-        return 0;
-
-    return delete<UserPDFDocument>(pdfId);
+    return update(settings);
 }
+
+
+//Finanzdaten 
+
+public int createFinanzdaten(int monat,int ausgaben,int einahmenTotal,int erstellteAng ,int angenommenAng, int erstellteRech ,int angenommenRech)
+{
+    Finanzdaten newFinanzdaten = new Finanzdaten
+    {
+        monat = monat,
+        ausgaben = ausgaben,
+        einahmenTotal = einahmenTotal,
+        erstellteAng = erstellteAng,
+        angenommenAng = angenommenAng,
+        erstellteRech = erstellteRech,
+        angenommenRech = angenommenRech
+    };
+    return insert(newFinanzdaten);
+}
+
+public List<Finanzdaten> getAllFinanzdaten()
+{
+    return getAll<Finanzdaten>();
+}
+
+public int deleteFinanzdatenMonat(int monat)
+{
+    return delete<Finanzdaten>(monat);
+}
+
+public int updateFinanzdaten(Finanzdaten finanzdaten)
+{
+    return update(finanzdaten);
+}
+
+public Finanzdaten  getFinanzdatenMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+
+}
+
+public List<Finanzdaten> orderFinanzdatenASC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat ASC");
+}
+
+public List<Finanzdaten> orderFinanzdatenDESC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat DESC");
+}
+
+public Finanzdaten getAusgabenbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getEinahmenTotalbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
 
 
 }

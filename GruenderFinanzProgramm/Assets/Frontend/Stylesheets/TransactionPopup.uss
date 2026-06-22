@@ -1,5 +1,19 @@
 /* TransactionPopup.uss */
 
+/* Globale Schriftart für den gesamten Kassenbuch-Screen: Poppins-Bold,
+   durchgängig für alle Texte (Wunsch: alles in Poppins Bold).
+   Direkt auf Element-Typen gesetzt statt nur auf #root zu vererben,
+   robuster gegen Konflikte mit GridSystem.uss, sidebar.uss,
+   Background.uss und USS-Main.uss. */
+#root,
+Label,
+Button,
+TextField,
+DropdownField,
+.unity-text-element {
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+
 /* Overlay: muss auf root-ebene liegen, ueberdeckt alles */
 .popup-overlay {
     position: absolute;
@@ -118,4 +132,289 @@
 
 .btn-secondary:hover {
     background-color: rgb(100, 100, 100);
+}
+
+/* ============================================
+   KASSENBUCH-KOPFZEILE: Jahr-Dropdown + Export-Button
+   Konsistent mit Styleguide: Primär #80CF95, Sekundär #646464
+   ============================================ */
+.jahr-dropdown {
+    height: 40px;
+    width: 160px;
+    margin-right: 12px;
+    background-color: rgb(58, 58, 58);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.jahr-dropdown:hover {
+    background-color: rgb(75, 75, 75);
+}
+.jahr-dropdown .unity-base-popup-field__text {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-text-align: middle-center;
+}
+.jahr-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+.jahr-dropdown .unity-base-field__input {
+    background-color: transparent;
+    border-width: 0;
+}
+.jahr-dropdown .unity-base-field__label {
+    display: none;
+}
+
+.btn-export-finanzamt {
+    height: 40px;
+    padding: 0 20px;
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-export-finanzamt:hover {
+    background-color: rgb(120, 120, 120);
+}
+.btn-export-finanzamt:active {
+    background-color: rgb(80, 80, 80);
+}
+
+/* ============================================
+   3ER-AKTIONSREIHE: Ausgaben / Einnahmen / Export
+   Alle drei gleich groß, klar als zusammengehörige
+   Aktionsgruppe erkennbar.
+   ============================================ */
+.btn-action-3er {
+    width: 220px;
+    height: 44px;
+    margin-left: 6px;
+    margin-right: 6px;
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-action-3er.btn-red {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+}
+.btn-action-3er.btn-red:hover {
+    background-color: rgb(208, 45, 57);
+}
+.btn-action-3er.btn-green {
+    background-color: rgb(128, 207, 149);
+    color: rgb(28, 28, 28);
+}
+.btn-action-3er.btn-green:hover {
+    background-color: rgb(107, 191, 130);
+}
+.btn-action-3er.btn-export-finanzamt {
+    width: 220px;
+    background-color: rgb(100, 100, 100);
+}
+
+/* Header-Zeile: Titel links, Jahr-Dropdown rechts */
+.header-row {
+    margin-bottom: 8px;
+}
+
+/* ============================================
+   KALENDER-WIDGET IM TRANSAKTIONS-POPUP
+   (übernommen aus DashboardStyles.uss – diese Klassen
+   fehlten hier komplett, deshalb sah der Kalender und
+   die Dropdowns im Popup wie unstyled Standard-Unity aus)
+   ============================================ */
+.panel-half {
+    background-color: rgb(40, 40, 40);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 8px;
+    flex-direction: column;
+}
+.kalender-nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.btn-cal-nav {
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    background-color: #383838;
+    border-color: #555555;
+    border-width: 1px;
+    color: #80CF95;
+    font-size: 18px;
+    padding: 0;
+    -unity-text-align: middle-center;
+    cursor: link;
+    transition-property: border-color, background-color;
+    transition-duration: 0.15s;
+}
+.btn-cal-nav:hover {
+    background-color: #4A4A4A;
+    border-color: #80CF95;
+}
+
+.cal-dropdown {
+    flex-grow: 1;
+    margin: 0 6px;
+    background-color: #646464;
+    border-color: #646464;
+    border-width: 1px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+    height: 30px;
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.cal-dropdown:hover {
+    background-color: #787878;
+    border-color: #80CF95;
+}
+.cal-dropdown > .unity-base-popup-field__text {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+}
+.cal-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: #ffffff;
+}
+.cal-dropdown .unity-base-field__input {
+    background-color: transparent;
+    border-width: 0;
+}
+
+.kalender-weekdays {
+    flex-direction: row;
+    margin-bottom: 4px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.cal-wd-label {
+    flex-grow: 1;
+    flex-basis: 0;
+    color: #888888;
+    font-size: 11px;
+    -unity-text-align: middle-center;
+    font-weight: bold;
+}
+
+.kalender-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    align-content: stretch;
+}
+.cal-day {
+    width: 13%;
+    flex-grow: 1;
+    flex-basis: 13%;
+    flex-shrink: 0;
+    margin: 2px;
+    padding: 0;
+    background-color: transparent;
+    border-width: 0;
+    border-radius: 6px;
+    color: #cccccc;
+    font-size: 13px;
+    font-weight: bold;
+    -unity-text-align: middle-center;
+    cursor: link;
+    min-height: 32px;
+}
+.cal-day:hover {
+    background-color: #3A3A3A;
+    color: #ffffff;
+}
+.cal-day-today {
+    background-color: #80CF95;
+    color: #1E1E1E;
+    font-weight: bold;
+    border-radius: 6px;
+}
+.cal-day-today:hover {
+    background-color: #6BBF82;
+    color: #1E1E1E;
+}
+.cal-day-other-month {
+    color: #3A3A3A;
+    font-weight: normal;
+}
+.cal-day-empty {
+    background-color: transparent;
+    color: transparent;
+}
+.cal-day-empty:hover {
+    background-color: transparent;
+}
+.cal-day-deadline {
+    border-width: 1px;
+    border-color: #E07A2F;
+}
+.cal-day-deadline:hover {
+    border-color: #ffffff;
+}
+
+/* ============================================
+   KATEGORIE-DROPDOWN ("Art") IM TRANSAKTIONS-POPUP
+   War im UXML ohne jede Klasse, dadurch unstyled
+   ============================================ */
+.art-dropdown {
+    background-color: rgb(70, 70, 70);
+    border-width: 0;
+    border-radius: 6px;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    height: 36px;
+    margin-bottom: 4px;
+    -unity-text-align: middle-left;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.art-dropdown:hover {
+    background-color: rgb(85, 85, 85);
+}
+.art-dropdown > .unity-base-popup-field__text {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    padding-left: 6px;
+}
+.art-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+.art-dropdown .unity-base-field__input {
+    background-color: transparent;
+    border-width: 0;
 }
