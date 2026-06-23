@@ -1254,19 +1254,10 @@ public abstract class BelegScreenController : MonoBehaviour
         float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
         float skonto = (netto - rabatt) * skontoProzent / 100f;
 
-        if (rabattTyp == "Prozent")
-        {
-            rabatt = netto * rabattWert / 100f;
-        }
-        else if (rabattTyp == "Festbetrag")
-        {
-            rabatt = rabattWert;
-        }
         float mwstSatz = HoleMwstSatz();
-
-        float steuerBasis = netto - rabatt;
+        float steuerBasis = netto - rabatt - skonto;
         float steuer = steuerBasis * mwstSatz;
-        float finalTotal = steuerBasis + steuer;
+            float finalTotal = steuerBasis + steuer;
 
         PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
         string rawUserId = currentUser.userId.Replace("user_", "");
@@ -1626,14 +1617,42 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     protected float ParseBetrag(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return 0f;
-        string bereinigt = text.Replace("EUR", "").Replace("\u20AC", "").Trim();
-        if (float.TryParse(bereinigt, NumberStyles.Float, De, out float wert)) return wert;
-        if (float.TryParse(bereinigt, NumberStyles.Float,
-            CultureInfo.InvariantCulture, out wert)) return wert;
-        return 0f;
-    }
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return 0f;
+
+            string bereinigt = text
+                .Replace("EUR", "")
+                .Replace("€", "")
+                .Replace("\u00A0", "")
+                .Trim();
+
+            if (float.TryParse(
+                bereinigt,
+                NumberStyles.Number,
+                De,
+                out float wert
+            ))
+            {
+        return wert;
+            }
+
+            bereinigt = bereinigt
+        .Replace(".", "")
+        .Replace(",", ".");
+
+            if (float.TryParse(
+                bereinigt,
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out wert
+            ))
+            {
+                return wert;
+            }
+
+            return 0f;
+        }
 
     protected string FormatBetrag(float wert)
     {

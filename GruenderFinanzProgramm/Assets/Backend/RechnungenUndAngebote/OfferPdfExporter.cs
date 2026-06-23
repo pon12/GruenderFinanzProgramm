@@ -186,10 +186,10 @@ public static class OfferPdfExporter
                     positionenGesamt += item.calculatedTotal;
                 }
                 double rabatt = offer.discount;
-                double sonstigeKosten = offer.extraCosts;
+                double skonto = offer.extraCosts;
                 int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
                 double mwstSatz = steuersatz / 100.0;
-                double zwischensumme = positionenGesamt - rabatt + sonstigeKosten;
+                double zwischensumme = positionenGesamt - rabatt - skonto;
                 double mwst = zwischensumme * mwstSatz;
                 double gesamt = zwischensumme + mwst;
                 
@@ -217,20 +217,20 @@ public static class OfferPdfExporter
                     );
                 AddBodyCell(
                     totals, 
-                    "+" + sonstigeKosten.ToString("0.00") + " €",
+                    "-" + rabatt.ToString("0.00") + " €",
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
 
                 AddBodyCell(
                     totals, 
-                    "Sonstige Kosten:", 
+                    "Skonto:", 
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
                 AddBodyCell(
                     totals, 
-                    "+" + sonstigeKosten.ToString("0.00") + " €",
+                    "-" + skonto.ToString("0.00") + " €",
                     normalFont, 
                     Element.ALIGN_RIGHT
                     );
