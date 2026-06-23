@@ -131,46 +131,52 @@
                     <ui:Label text="Unternehmensdaten" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
                     <ui:Button name="btn-close-unternehmen" text="&#10005;" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement style="margin-bottom: 14px;">
-                    <ui:Label text="Firmenname / Gr&#252;ndungsname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-firmenname" class="dark-input" style="height: 40px;"/>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
+                    <ui:VisualElement style="flex: 1; margin-right: 8px;">
+                        <ui:Label text="Firmenname / Gr&#252;ndungsname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField name="input-firmenname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex: 1;">
+                        <ui:Label text="Branche" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:DropdownField name="dropdown-branche" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Rechtsform" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:DropdownField name="dropdown-rechtsform" class="dark-input" style="height: 40px;"/>
+                        <ui:DropdownField name="dropdown-rechtsform" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 1;">
                         <ui:Label text="Gr&#252;ndungsjahr" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-gruendungsjahr" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-gruendungsjahr" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Steuernummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-steuernummer" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-steuernummer" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 1;">
                         <ui:Label text="Ust.-IdNr." style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-ustidnr" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-ustidnr" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="margin-bottom: 14px;">
                     <ui:Label text="Handelsregisternummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-handelsreg" class="dark-input" style="height: 40px;"/>
+                    <ui:TextField name="input-handelsreg" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="margin-bottom: 14px;">
                     <ui:Label text="Stra&#223;e und Hausnummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-strasse" class="dark-input" style="height: 40px;"/>
+                    <ui:TextField name="input-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 28px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Postleitzahl" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-plz" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 2;">
                         <ui:Label text="Stadt" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-stadt" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-stadt" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; justify-content: flex-end;">

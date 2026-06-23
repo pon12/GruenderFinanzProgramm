@@ -1,5 +1,5 @@
 // EinstellungenController.cs
-// Auf UIManager in der Einstellungen-Scene platzieren
+// Auf UIManager in der Einstellungen-Szene platzieren
 
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -69,7 +69,7 @@ public class EinstellungenController : MonoBehaviour
     private const int MAX_ZAHLZIEL    = 4;
 
     // ═══════════════════════════════════════════════════════════
-    // UI ELEMENTE
+    // UI-ELEMENTE
     // ═══════════════════════════════════════════════════════════
     private VisualElement _root;
 
@@ -109,6 +109,7 @@ public class EinstellungenController : MonoBehaviour
 
     private VisualElement _popupUnternehmen;
     private TextField     _inputFirmenname;
+    private DropdownField _dropdownBranche;
     private DropdownField _dropdownRechtsform;
     private TextField     _inputGruendungsjahr;
     private TextField     _inputSteuernummer;
@@ -187,6 +188,13 @@ public class EinstellungenController : MonoBehaviour
         "UG (haftungsbeschränkt)", "Einzelunternehmen", "GmbH & Co. KG", "eG"
     };
 
+    private readonly List<string> _brancheOptions = new List<string>
+    {
+        "IT & Software", "Handel", "Handwerk", "Beratung", "Marketing & Medien",
+        "Finanzen & Versicherung", "Gastronomie", "Gesundheit & Pflege",
+        "Bildung", "Immobilien", "Logistik", "Sonstiges"
+    };
+
     private static readonly Color COLOR_GREEN    = new Color(128f / 255f, 207f / 255f, 149f / 255f);
     private static readonly Color COLOR_INACTIVE = new Color( 50f / 255f,  50f / 255f,  50f / 255f);
 
@@ -198,9 +206,9 @@ public class EinstellungenController : MonoBehaviour
     {
         authService = new AuthService();
 
-        if (uiDocument == null)             uiDocument             = GetComponent<UIDocument>();
-        if (passKeyAuthController == null)  passKeyAuthController  = FindAnyObjectByType<PassKeyAuthController>();
-        if (mainLogoutController == null)   mainLogoutController   = FindAnyObjectByType<MainLogoutController>();
+        if (uiDocument == null)            uiDocument            = GetComponent<UIDocument>();
+        if (passKeyAuthController == null) passKeyAuthController  = FindAnyObjectByType<PassKeyAuthController>();
+        if (mainLogoutController == null)  mainLogoutController   = FindAnyObjectByType<MainLogoutController>();
 
         _root = uiDocument.rootVisualElement;
 
@@ -256,6 +264,7 @@ public class EinstellungenController : MonoBehaviour
 
         _popupUnternehmen      = _root.Q<VisualElement>("popup-unternehmen");
         _inputFirmenname       = _root.Q<TextField>("input-firmenname");
+        _dropdownBranche       = _root.Q<DropdownField>("dropdown-branche");
         _dropdownRechtsform    = _root.Q<DropdownField>("dropdown-rechtsform");
         _inputGruendungsjahr   = _root.Q<TextField>("input-gruendungsjahr");
         _inputSteuernummer     = _root.Q<TextField>("input-steuernummer");
@@ -304,9 +313,9 @@ public class EinstellungenController : MonoBehaviour
         _btnCancelBezahlweise     = _root.Q<Button>("btn-cancel-bezahlweise");
         _btnSaveBezahlweise       = _root.Q<Button>("btn-save-bezahlweise");
 
-        _popupCredits      = _root.Q<VisualElement>("popup-credits");
-        _btnCloseCredits   = _root.Q<Button>("btn-close-credits");
-        _popupMitwirkende  = _root.Q<VisualElement>("popup-mitwirkende");
+        _popupCredits        = _root.Q<VisualElement>("popup-credits");
+        _btnCloseCredits     = _root.Q<Button>("btn-close-credits");
+        _popupMitwirkende    = _root.Q<VisualElement>("popup-mitwirkende");
         _btnCloseMitwirkende = _root.Q<Button>("btn-close-mitwirkende");
 
         _dialogOverlay    = _root.Q<VisualElement>("dialog-overlay");
@@ -320,8 +329,8 @@ public class EinstellungenController : MonoBehaviour
         _labelNewPasskeyPlain = _root.Q<Label>("label-new-passkey-plain");
         _btnClosePasskeyPopup = _root.Q<Button>("btn-close-passkey-popup");
 
-        _popupGespeichert    = _root.Q<VisualElement>("popup-gespeichert");
-        _labelGespeichertText = _root.Q<Label>("label-gespeichert-text");
+        _popupGespeichert       = _root.Q<VisualElement>("popup-gespeichert");
+        _labelGespeichertText   = _root.Q<Label>("label-gespeichert-text");
         _btnCloseGespeichert    = _root.Q<Button>("btn-close-gespeichert");
         _popupZurueckgesetzt    = _root.Q<VisualElement>("popup-zurueckgesetzt");
         _btnCloseZurueckgesetzt = _root.Q<Button>("btn-close-zurueckgesetzt");
@@ -334,39 +343,36 @@ public class EinstellungenController : MonoBehaviour
     private void SetupFeldBeschraenkungen()
     {
         // Unternehmen-Popup
-        SetzeMaxLaenge(_inputFirmenname,     MAX_NAME);
-        SetzeMaxLaenge(_inputStrasse,        MAX_STRASSE);
-        SetzeMaxLaenge(_inputStadt,          MAX_ORT);
-        SetzeMaxLaenge(_inputSteuernummer,   MAX_STEUERNR);
-        SetzeMaxLaenge(_inputUstidnr,        MAX_USTIDNR);
-        SetzeMaxLaenge(_inputHandelsreg,     MAX_HANDELSREG);
-        SetzeMaxLaengeNurZahlen(_inputPlz,   MAX_PLZ);
+        SetzeMaxLaenge(_inputFirmenname,          MAX_NAME);
+        SetzeMaxLaenge(_inputStrasse,             MAX_STRASSE);
+        SetzeMaxLaenge(_inputStadt,               MAX_ORT);
+        SetzeMaxLaenge(_inputSteuernummer,        MAX_STEUERNR);
+        SetzeMaxLaenge(_inputUstidnr,             MAX_USTIDNR);
+        SetzeMaxLaenge(_inputHandelsreg,          MAX_HANDELSREG);
+        SetzeMaxLaengeNurZahlen(_inputPlz,        MAX_PLZ);
         SetzeMaxLaengeNurZahlen(_inputGruendungsjahr, MAX_JAHR);
 
         // Bank-Popup
-        SetzeMaxLaenge(_inputKontoinhaber,   MAX_KONTOINHAB);
-        SetzeMaxLaenge(_inputIban,           MAX_IBAN);
-        SetzeMaxLaenge(_inputBic,            MAX_BIC);
-        SetzeMaxLaenge(_inputKreditinstitut, MAX_KREDITINST);
+        SetzeMaxLaenge(_inputKontoinhaber,  MAX_KONTOINHAB);
+        SetzeMaxLaenge(_inputIban,          MAX_IBAN);
+        SetzeMaxLaenge(_inputBic,           MAX_BIC);
+        SetzeMaxLaenge(_inputKreditinstitut,MAX_KREDITINST);
 
         // Rechnungsformat-Popup
-        SetzeMaxLaenge(_inputRechnrPraefix,  MAX_PRAEFIX);
+        SetzeMaxLaenge(_inputRechnrPraefix,          MAX_PRAEFIX);
         SetzeMaxLaengeNurZahlen(_inputStartnummer,   MAX_STARTNR);
         SetzeMaxLaengeNurZahlen(_inputZahlungsziel,  MAX_ZAHLZIEL);
 
-        // Recovery Key: Copy-Paste explizit erlaubt (kein Tastatur-Filter)
-        // Das Feld bleibt offen – max. 16 Zeichen, nur Ziffern per Eingabefilter
+        // Recovery Key: nur Ziffern, max. 16 Stellen, Copy/Paste erlaubt
         SetzeMaxLaengeNurZahlen(_inputSuperkeyReset, 16);
     }
 
-    // Setzt max-length und optional einen Eingabefilter (nur Text)
     private static void SetzeMaxLaenge(TextField feld, int maxLaenge)
     {
         if (feld == null) return;
         feld.maxLength = maxLaenge;
     }
 
-    // Setzt max-length + erlaubt nur Ziffern per KeyDown-Filter
     private static void SetzeMaxLaengeNurZahlen(TextField feld, int maxLaenge)
     {
         if (feld == null) return;
@@ -390,13 +396,14 @@ public class EinstellungenController : MonoBehaviour
 
     private void SetupDropdowns()
     {
+        if (_dropdownBranche      != null) _dropdownBranche.choices      = _brancheOptions;
         if (_dropdownRechtsform   != null) _dropdownRechtsform.choices   = _rechtsformOptions;
         if (_dropdownWaehrung     != null) _dropdownWaehrung.choices     = new List<string> { "Euro €", "Dollar $", "Pfund £", "Franken CHF" };
         if (_dropdownDatumsformat != null) _dropdownDatumsformat.choices = new List<string> { "DD.MM.YYYY", "MM/DD/YYYY", "YYYY-MM-DD" };
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BUTTON REGISTRIERUNG
+    // BUTTON-REGISTRIERUNG
     // ═══════════════════════════════════════════════════════════
 
     private void RegisterButtons()
@@ -404,12 +411,12 @@ public class EinstellungenController : MonoBehaviour
         if (_btnSave  != null) _btnSave.clicked  += () => { SaveSettings(); ShowGespeichertPopup(); };
         if (_btnReset != null) _btnReset.clicked += () => { LoadSettings(); ShowPopup(_popupZurueckgesetzt); };
 
-        if (_btnOpenUnternehmen  != null) _btnOpenUnternehmen.clicked  += () => ShowPopup(_popupUnternehmen);
-        if (_btnOpenBank         != null) _btnOpenBank.clicked         += () => ShowPopup(_popupBank);
-        if (_btnOpenRechnung     != null) _btnOpenRechnung.clicked     += () => ShowPopup(_popupRechnung);
-        if (_btnOpenBezahlweise  != null) _btnOpenBezahlweise.clicked  += () => { LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
-        if (_btnOpenCredits      != null) _btnOpenCredits.clicked      += () => ShowPopup(_popupCredits);
-        if (_btnOpenMitwirkende  != null) _btnOpenMitwirkende.clicked  += () => ShowPopup(_popupMitwirkende);
+        if (_btnOpenUnternehmen != null) _btnOpenUnternehmen.clicked += () => ShowPopup(_popupUnternehmen);
+        if (_btnOpenBank        != null) _btnOpenBank.clicked        += () => ShowPopup(_popupBank);
+        if (_btnOpenRechnung    != null) _btnOpenRechnung.clicked    += () => ShowPopup(_popupRechnung);
+        if (_btnOpenBezahlweise != null) _btnOpenBezahlweise.clicked += () => { LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
+        if (_btnOpenCredits     != null) _btnOpenCredits.clicked     += () => ShowPopup(_popupCredits);
+        if (_btnOpenMitwirkende != null) _btnOpenMitwirkende.clicked += () => ShowPopup(_popupMitwirkende);
 
         if (_btnCloseUnternehmen  != null) _btnCloseUnternehmen.clicked  += () => HidePopup(_popupUnternehmen);
         if (_btnCancelUnternehmen != null) _btnCancelUnternehmen.clicked += () => HidePopup(_popupUnternehmen);
@@ -461,13 +468,13 @@ public class EinstellungenController : MonoBehaviour
         if (_btnDialogCancel  != null) _btnDialogCancel.clicked  += HideDeleteDialog;
         if (_btnDialogConfirm != null) _btnDialogConfirm.clicked += ConfirmDeleteProfile;
 
-        if (_btnClosePasskeyPopup != null) _btnClosePasskeyPopup.clicked += () => HidePopup(_popupNewPasskey);
+        if (_btnClosePasskeyPopup   != null) _btnClosePasskeyPopup.clicked   += () => HidePopup(_popupNewPasskey);
         if (_btnCloseGespeichert    != null) _btnCloseGespeichert.clicked    += () => HidePopup(_popupGespeichert);
         if (_btnCloseZurueckgesetzt != null) _btnCloseZurueckgesetzt.clicked += () => HidePopup(_popupZurueckgesetzt);
     }
 
     // ═══════════════════════════════════════════════════════════
-    // POPUP HILFSMETHODEN
+    // POPUP-HILFSMETHODEN
     // ═══════════════════════════════════════════════════════════
 
     private void ShowPopup(VisualElement popup)
@@ -508,15 +515,16 @@ public class EinstellungenController : MonoBehaviour
         if (companies == null || companies.Count == 0) return;
 
         _currentCompany = companies[0];
-        if (_inputFirmenname    != null) _inputFirmenname.value    = _currentCompany.name         ?? "";
+        if (_inputFirmenname    != null) _inputFirmenname.value    = _currentCompany.name             ?? "";
+        if (_dropdownBranche    != null) _dropdownBranche.index    = _currentCompany.industry;
         if (_dropdownRechtsform != null) _dropdownRechtsform.index = _currentCompany.legalForm;
-        if (_inputStadt         != null) _inputStadt.value         = _currentCompany.location     ?? "";
-        if (_inputStrasse       != null) _inputStrasse.value       = _currentCompany.strasseuHausNr ?? "";
+        if (_inputStadt         != null) _inputStadt.value         = _currentCompany.location         ?? "";
+        if (_inputStrasse       != null) _inputStrasse.value       = _currentCompany.strasseuHausNr   ?? "";
         if (_inputPlz           != null) _inputPlz.value           = _currentCompany.plz.ToString() == "0" ? "" : _currentCompany.plz.ToString();
-        if (_inputSteuernummer  != null) _inputSteuernummer.value  = _currentCompany.steuerNr     ?? "";
-        if (_inputUstidnr       != null) _inputUstidnr.value       = _currentCompany.ustIdNr      ?? "";
-        if (_inputHandelsreg    != null) _inputHandelsreg.value    = _currentCompany.handelsReg   ?? "";
-        if (_inputGruendungsjahr!= null) _inputGruendungsjahr.value= _currentCompany.gruendungsJahr ?? "";
+        if (_inputSteuernummer  != null) _inputSteuernummer.value  = _currentCompany.steuerNr         ?? "";
+        if (_inputUstidnr       != null) _inputUstidnr.value       = _currentCompany.ustIdNr          ?? "";
+        if (_inputHandelsreg    != null) _inputHandelsreg.value    = _currentCompany.handelsReg       ?? "";
+        if (_inputGruendungsjahr!= null) _inputGruendungsjahr.value= _currentCompany.gruendungsJahr   ?? "";
     }
 
     private void LoadLocalSettings()
@@ -595,7 +603,7 @@ public class EinstellungenController : MonoBehaviour
         string name           = _inputFirmenname?.value     ?? "";
         int    legalForm      = _dropdownRechtsform?.index  ?? 0;
         string location       = _inputStadt?.value          ?? "";
-        int    industry       = 3;
+        int    industry       = _dropdownBranche?.index     ?? 0;
         string steuerNr       = _inputSteuernummer?.value   ?? "";
         string ustIdNr        = _inputUstidnr?.value        ?? "";
         string handelsReg     = _inputHandelsreg?.value     ?? "";
@@ -615,21 +623,20 @@ public class EinstellungenController : MonoBehaviour
         }
         else
         {
-            _currentCompany.name            = name;
-            _currentCompany.legalForm       = legalForm;
-            _currentCompany.location        = location;
-            _currentCompany.industry        = industry;
-            _currentCompany.steuerNr        = steuerNr;
-            _currentCompany.ustIdNr         = ustIdNr;
-            _currentCompany.handelsReg      = handelsReg;
-            _currentCompany.gruendungsJahr  = gruendungsJahr;
-            _currentCompany.plz             = plz;
-            _currentCompany.strasseuHausNr  = strasseHausNr;
+            _currentCompany.name           = name;
+            _currentCompany.legalForm      = legalForm;
+            _currentCompany.location       = location;
+            _currentCompany.industry       = industry;
+            _currentCompany.steuerNr       = steuerNr;
+            _currentCompany.ustIdNr        = ustIdNr;
+            _currentCompany.handelsReg     = handelsReg;
+            _currentCompany.gruendungsJahr = gruendungsJahr;
+            _currentCompany.plz            = plz;
+            _currentCompany.strasseuHausNr = strasseHausNr;
             db.updateCompany(_currentCompany);
             Debug.Log("[Einstellungen] Firma aktualisiert: " + name);
         }
 
-        // Unternehmensdaten in Dokumente synchronisieren
         SyncUnternehmenToDokumente();
     }
 
@@ -728,7 +735,9 @@ public class EinstellungenController : MonoBehaviour
     // DOKUMENT-SYNCHRONISATION
     // ═══════════════════════════════════════════════════════════
 
-    // Schreibt Unternehmensdaten in passende Dokumente
+    // Schreibt Unternehmensdaten in das Pflichtdokument "Unternehmensstammdaten"
+    // (Kategorie "Gründung"). Nur die vier im Dokument definierten Felder:
+    // firma, rechtsform, branche, standort.
     private void SyncUnternehmenToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -737,27 +746,29 @@ public class EinstellungenController : MonoBehaviour
         var saveData = DocumentDashboard.GetSavedDocuments();
         if (saveData?.savedDocs == null) return;
 
+        string rechtsformText = _dropdownRechtsform != null && _dropdownRechtsform.index >= 0
+            ? _dropdownRechtsform.value ?? ""
+            : "";
+
+        string brancheText = _dropdownBranche != null && _dropdownBranche.index >= 0
+            ? _dropdownBranche.value ?? ""
+            : "";
+
         foreach (var doc in saveData.savedDocs)
         {
             if (doc.strukturFelder == null) continue;
+            if (doc.category != "Gründung" || doc.title != "Unternehmensstammdaten") continue;
 
-            if (doc.category == "Unternehmen")
-            {
-                SetStrukturFeld(doc, "firmenname",     _inputFirmenname?.value     ?? "");
-                SetStrukturFeld(doc, "strasse",        _inputStrasse?.value        ?? "");
-                SetStrukturFeld(doc, "plz",            _inputPlz?.value            ?? "");
-                SetStrukturFeld(doc, "ort",            _inputStadt?.value          ?? "");
-                SetStrukturFeld(doc, "steuernummer",   _inputSteuernummer?.value   ?? "");
-                SetStrukturFeld(doc, "ustidnr",        _inputUstidnr?.value        ?? "");
-                SetStrukturFeld(doc, "handelsreg",     _inputHandelsreg?.value     ?? "");
-                SetStrukturFeld(doc, "gruendungsjahr", _inputGruendungsjahr?.value ?? "");
-            }
+            SetStrukturFeld(doc, "firma",     _inputFirmenname?.value ?? "");
+            SetStrukturFeld(doc, "rechtsform", rechtsformText);
+            SetStrukturFeld(doc, "branche",   brancheText);
+            SetStrukturFeld(doc, "standort",  _inputStadt?.value      ?? "");
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
     }
 
-    // Schreibt Bankdaten in passende Dokumente
+    // Schreibt Bankdaten in das Pflichtdokument "Kontodaten (IBAN/BIC)"
     private void SyncBankToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -769,15 +780,12 @@ public class EinstellungenController : MonoBehaviour
         foreach (var doc in saveData.savedDocs)
         {
             if (doc.strukturFelder == null) continue;
-            if (doc.category != "Bezahlweise") continue;
+            if (doc.category != "Bezahlweise" || doc.title != "Kontodaten (IBAN/BIC)") continue;
 
-            if (doc.title == "Kontodaten (IBAN/BIC)")
-            {
-                SetStrukturFeld(doc, "iban",         _inputIban?.value          ?? "");
-                SetStrukturFeld(doc, "bic",          _inputBic?.value           ?? "");
-                SetStrukturFeld(doc, "bank",         _inputKreditinstitut?.value ?? "");
-                SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value  ?? "");
-            }
+            SetStrukturFeld(doc, "iban",         _inputIban?.value           ?? "");
+            SetStrukturFeld(doc, "bic",          _inputBic?.value            ?? "");
+            SetStrukturFeld(doc, "bank",         _inputKreditinstitut?.value  ?? "");
+            SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value   ?? "");
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
@@ -805,7 +813,7 @@ public class EinstellungenController : MonoBehaviour
             else if (titelKlein.Contains("bar"))
                 doc.inhalt = _inputBarzahlung?.value ?? "";
             else if (titelKlein.Contains("überweisung") || titelKlein.Contains("uberweisung")
-                     || titelKlein.Contains("iban") || titelKlein.Contains("konto"))
+                     || titelKlein.Contains("iban")      || titelKlein.Contains("konto"))
                 doc.inhalt = _inputUeberweisung?.value ?? "";
         }
 
