@@ -1239,7 +1239,20 @@ public abstract class BelegScreenController : MonoBehaviour
         float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
         float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
         string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
+
         float rabatt = 0f;
+
+        if (rabattTyp == "Prozent")
+        {
+            rabatt = netto * rabattWert / 100f;
+        }
+        else if (rabattTyp == "Festbetrag")
+        {
+            rabatt = rabattWert;
+        }
+
+        float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+        float skonto = (netto - rabatt) * skontoProzent / 100f;
 
         if (rabattTyp == "Prozent")
         {
@@ -1274,6 +1287,7 @@ public abstract class BelegScreenController : MonoBehaviour
         status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
         subtotal = netto,
         discount = rabatt,
+        extraCosts = skonto,
         tax = steuer,
         total = finalTotal,
         notes = _notizenFeld != null ? _notizenFeld.value : "",
@@ -1318,6 +1332,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
                 subtotal = netto,
                 discount = rabatt,
+                extraCosts = skonto,
                 tax = steuer,
                 total = finalTotal,
                 notes = _notizenFeld != null ? _notizenFeld.value : "",

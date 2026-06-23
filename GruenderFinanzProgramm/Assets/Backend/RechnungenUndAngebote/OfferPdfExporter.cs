@@ -90,11 +90,6 @@ public static class OfferPdfExporter
 
                 kundeCell.AddElement(new Paragraph("Kunde", headerFont));
 
-                if (!string.IsNullOrEmpty(offer.customerName))
-                {
-                    kundeCell.AddElement(new Paragraph(offer.customerName, normalFont));
-                }
-
                 if (!string.IsNullOrEmpty(offer.customerAddress))
                 {
                     kundeCell.AddElement(new Paragraph(offer.customerAddress, normalFont));

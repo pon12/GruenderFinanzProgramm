@@ -98,11 +98,6 @@ public static class InvoicePdfExporter
                 kundeCell.Border = Rectangle.NO_BORDER;
                 kundeCell.AddElement(new Paragraph("Kunde", headerFont));
 
-                if (!string.IsNullOrEmpty(invoice.customerName))
-                {
-                    kundeCell.AddElement(new Paragraph(invoice.customerName, normalFont));
-                }
-
                 if (!string.IsNullOrEmpty(invoice.customerAddress))
                 {
                     kundeCell.AddElement(new Paragraph(invoice.customerAddress, normalFont));
