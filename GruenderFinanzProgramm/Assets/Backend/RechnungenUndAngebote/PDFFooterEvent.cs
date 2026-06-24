@@ -9,17 +9,20 @@ public class PdfFooterEvent : PdfPageEventHelper
     private readonly string adresse;
     private readonly iTextSharp.text.Font footerFont;
 
-    public PdfFooterEvent(string firma, string adresse)
-    {
-        this.firma = firma;
-        this.adresse = adresse;
+    private readonly bool showBankData;
 
-        footerFont = FontFactory.GetFont(
-            FontFactory.HELVETICA,
-            8,
-            iTextSharp.text.Color.BLACK
-        );
-    }
+public PdfFooterEvent(string firma, string adresse, bool showBankData)
+{
+    this.firma = firma;
+    this.adresse = adresse;
+    this.showBankData = showBankData;
+
+    footerFont = FontFactory.GetFont(
+        FontFactory.HELVETICA,
+        8,
+        iTextSharp.text.Color.BLACK
+    );
+}
 
     public override void OnEndPage(PdfWriter writer, Document document)
     {
@@ -33,13 +36,24 @@ public class PdfFooterEvent : PdfPageEventHelper
             footerFont
         );
 
+        bool ibanAufRechnung =
+            PlayerPrefs.GetInt("settings_iban_rechnung", 0) == 1;
+
+        string bankText = "";
+
+        if (showBankData && ibanAufRechnung)
+        {
+            bankText =
+                "Bankverbindung\n" +
+                PlayerPrefs.GetString("settings_kreditinstitut", "") + "\n" +
+                "IBAN: " + PlayerPrefs.GetString("settings_iban", "") + "\n" +
+                "BIC: " + PlayerPrefs.GetString("settings_bic", "") + "\n" +
+                "Konto-Inh.: " + PlayerPrefs.GetString("settings_kontoinhaber", "");
+        }
+
         AddFooterCell(
             footerTable,
-            "Bankverbindung\n" +
-            PlayerPrefs.GetString("settings_kreditinstitut", "") + "\n" +
-            "IBAN: " + PlayerPrefs.GetString("settings_iban", "") + "\n" +
-            "BIC: " + PlayerPrefs.GetString("settings_bic", "") + "\n" +
-            "Konto-Inh.: " + PlayerPrefs.GetString("settings_kontoinhaber", ""),
+            bankText,
             footerFont
         );
 

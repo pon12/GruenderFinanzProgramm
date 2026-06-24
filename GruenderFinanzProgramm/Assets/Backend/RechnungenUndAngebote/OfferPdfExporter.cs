@@ -37,8 +37,9 @@ public static class OfferPdfExporter
                 PdfWriter writer = PdfWriter.GetInstance(doc, fs);
                 writer.PageEvent = new PdfFooterEvent(
                 offer.companyName,
-                offer.companyAddress
-            );
+                offer.companyAddress,
+                false
+                );
 
                 doc.AddAuthor("Ventoriq");
                 
@@ -189,89 +190,33 @@ public static class OfferPdfExporter
                 double skonto = offer.extraCosts;
                 int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
                 double mwstSatz = steuersatz / 100.0;
-                double zwischensumme = positionenGesamt - rabatt - skonto;
-                double mwst = zwischensumme * mwstSatz;
-                double gesamt = zwischensumme + mwst;
+                double steuerBasis = positionenGesamt - rabatt;
+                double mwst = steuerBasis * mwstSatz;
+                double zwischensumme = steuerBasis + mwst;
+                double gesamt = zwischensumme - skonto;
                 
                 PdfPTable totals = new PdfPTable(2);
                 totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
                 
-                AddBodyCell(
-                    totals, "Netto:", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    positionenGesamt.ToString("0.00") + " €", 
-                    normalFont, Element.ALIGN_RIGHT
-                    );
-                
-                AddBodyCell(
-                    totals, 
-                    "Rabatt:", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    "-" + rabatt.ToString("0.00") + " €",
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Netto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, positionenGesamt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Skonto:", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    "-" + skonto.ToString("0.00") + " €",
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Rabatt:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + rabatt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Zwischensumme:", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    zwischensumme.ToString("0.00") + " €", 
-                    headerFont, Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "MwSt (" + steuersatz + "%):", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, mwst.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "MwSt (" + steuersatz + "%):",
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    mwst.ToString("0.00") + " €", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Zwischenbetrag:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, zwischensumme.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Brutto:", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    gesamt.ToString("0.00") + " €", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Skonto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + skonto.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
+
+                AddBodyCell(totals, "Brutto:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, gesamt.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
                 doc.Add(totals);
 
@@ -281,6 +226,34 @@ public static class OfferPdfExporter
                     doc.Add(new Paragraph("Anmerkungen:", headerFont));
                     doc.Add(new Paragraph(offer.notes, normalFont));
                 }
+
+                PdfPTable closingTable = new PdfPTable(1);
+                closingTable.WidthPercentage = 100f;
+                closingTable.SplitRows = false;
+                closingTable.KeepTogether = true;
+
+                PdfPCell closingCell = new PdfPCell();
+                closingCell.Border = Rectangle.NO_BORDER;
+
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                "Wir freuen uns auf eine erfolgreiche Zusammenarbeit und stehen bei Fragen jederzeit gerne zur Verfügung.",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                    "Mit freundlichen Grüßen",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingTable.AddCell(closingCell);
+
+                doc.Add(closingTable);
 
                 doc.Add(new Paragraph(" "));
                 doc.Add(new Paragraph(" "));

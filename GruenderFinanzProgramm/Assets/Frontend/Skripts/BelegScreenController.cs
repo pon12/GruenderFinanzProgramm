@@ -1237,27 +1237,28 @@ public abstract class BelegScreenController : MonoBehaviour
         }
 
         float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+
         float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
         string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
 
         float rabatt = 0f;
 
         if (rabattTyp == "Prozent")
-        {
             rabatt = netto * rabattWert / 100f;
-        }
         else if (rabattTyp == "Festbetrag")
-        {
             rabatt = rabattWert;
-        }
-
-        float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-        float skonto = (netto - rabatt) * skontoProzent / 100f;
 
         float mwstSatz = HoleMwstSatz();
-        float steuerBasis = netto - rabatt - skonto;
+
+        float steuerBasis = netto - rabatt;
         float steuer = steuerBasis * mwstSatz;
-            float finalTotal = steuerBasis + steuer;
+
+        float zwischenbetrag = steuerBasis + steuer;
+
+        float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+        float skonto = zwischenbetrag * skontoProzent / 100f;
+
+        float finalTotal = zwischenbetrag - skonto;
 
         PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
         string rawUserId = currentUser.userId.Replace("user_", "");
