@@ -45,7 +45,8 @@ public class GruendungspfadController : MonoBehaviour
     {
         public List<string>    erledigteIds       = new List<string>();
         public List<PfadSchritt> eigeneSchritte   = new List<PfadSchritt>();
-        public float[]         segmentFortschritt = new float[5]; // für Dashboard-Balken
+        public float[]         segmentFortschritt = new float[5];
+        public float           gesamtFortschritt  = 0f; // identisch mit Gründungspfad-Balken
     }
 
     // ============================================================
@@ -159,21 +160,12 @@ public class GruendungspfadController : MonoBehaviour
 
         string json = JsonUtility.ToJson(speicherDaten, false);
 
-        if (savedDocId >= 0)
-        {
-            var docs = db.getAllUserDocuments();
-            var existing = docs?.FirstOrDefault(d => d.id == savedDocId);
-            if (existing != null)
-            {
-                existing.text = json;
-                // UserDocument update nicht direkt verfügbar – neu anlegen
-                db.createUserDocument(SAVE_DOCUMENT_TYPE, "GruendungspfadSave", json);
-            }
-        }
-        else
-        {
-            savedDocId = db.createUserDocument(SAVE_DOCUMENT_TYPE, "GruendungspfadSave", json);
-        }
+        // FIX: Da kein updateUserDocument existiert, löschen wir zuerst
+        // ALLE alten Saves mit diesem Typ, dann legen wir einen neuen an.
+        // Ohne diesen Fix akkumulieren sich Saves in der DB und es wird
+        // immer der älteste (falsche) beim nächsten Start geladen.
+        db.deleteAllUserDocumentsByType(SAVE_DOCUMENT_TYPE);
+        savedDocId = db.createUserDocument(SAVE_DOCUMENT_TYPE, "GruendungspfadSave", json);
 
         MeldeFortshrittAnDashboard();
     }
@@ -193,21 +185,33 @@ public class GruendungspfadController : MonoBehaviour
     {
         float[] segmente = new float[5];
 
+        int gesamtAlle    = 0;
+        int gesamtErledigt = 0;
+
         for (int i = 0; i < Mathf.Min(phasen.Count, 5); i++)
         {
-            var phase = phasen[i];
+            var phase  = phasen[i];
             var eigene = speicherDaten.eigeneSchritte
                 .Where(s => s.id.StartsWith(phase.name + "_eigen_")).ToList();
             var alle = phase.schritte.Concat(eigene).ToList();
 
-            int gesamt   = alle.Count;
-            int erledigt = alle.Count(s => s.erledigt);
-            segmente[i]  = gesamt > 0 ? (float)erledigt / gesamt : 0f;
+            int g = alle.Count;
+            int e = alle.Count(s => s.erledigt);
+            segmente[i]    = g > 0 ? (float)e / g : 0f;
+            gesamtAlle    += g;
+            gesamtErledigt += e;
         }
 
-        // Im Speicher ablegen damit Dashboard beim nächsten Start
-        // den Fortschritt lesen kann ohne Gründungspfad-Screen zu öffnen
+        // Eigene Schritte ohne Phase mitzählen
+        var eigeneOhnePhase = speicherDaten.eigeneSchritte
+            .Where(s => !phasen.Any(p => s.id.StartsWith(p.name + "_eigen_"))).ToList();
+        gesamtAlle    += eigeneOhnePhase.Count;
+        gesamtErledigt += eigeneOhnePhase.Count(s => s.erledigt);
+
+        float gesamt = gesamtAlle > 0 ? (float)gesamtErledigt / gesamtAlle : 0f;
+
         speicherDaten.segmentFortschritt = segmente;
+        speicherDaten.gesamtFortschritt  = gesamt;
 
         AppEventManager.DokumenteFortschrittGeaendert(
             segmente[0], segmente[1], segmente[2], segmente[3], segmente[4]);

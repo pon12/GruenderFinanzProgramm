@@ -43,10 +43,10 @@ public class DashboardController : MonoBehaviour
         SetupCalendar();
         SetupChart();
 
-        // Beim Start einmalig direkt aus DB laden (Fallback)
-        LadeInitialDaten();
-        LadeDeadlines();
-        RenderKalender(); // Kalender neu zeichnen damit Deadline-Marker sichtbar sind
+        // Kleiner Delay damit SQLite-Transaktionen aus dem vorherigen Screen
+        // (z.B. GruendungspfadController.SpeichereFortschritt) vollständig
+        // committed sind bevor wir lesen.
+        StartCoroutine(LadeNachFrame());
 
         // Ab jetzt auf Events hören
         AppEventManager.OnKundenAnzahlGeaendert         += OnKunden;
@@ -54,6 +54,14 @@ public class DashboardController : MonoBehaviour
         AppEventManager.OnRechnungenAnzahlGeaendert      += OnRechnungen;
         AppEventManager.OnKassenbuchGeaendert            += OnKassenbuch;
         AppEventManager.OnDokumenteFortschrittGeaendert  += OnDokumenteFortschritt;
+    }
+
+    private System.Collections.IEnumerator LadeNachFrame()
+    {
+        yield return null; // einen Frame warten
+        LadeInitialDaten();
+        LadeDeadlines();
+        RenderKalender();
     }
 
     void OnDisable()
@@ -76,40 +84,94 @@ public class DashboardController : MonoBehaviour
     }
 
     // ============================================================
-    // GRÜNDUNGSPFAD-FORTSCHRITT LADEN
-    // Liest den gespeicherten Fortschritt direkt aus der DB,
-    // damit der Dashboard-Balken auch beim ersten Öffnen stimmt
-    // (ohne dass der Gründungspfad-Screen zuerst besucht werden muss).
+    // GRÜNDUNGSPFAD-FORTSCHRITT
+    // Berechnet den Fortschritt exakt gleich wie GruendungspfadController,
+    // direkt aus der DB — kein JSON-Parsing-Problem, kein Sync-Problem.
     // ============================================================
     private void LadeGruendungspfadFortschritt()
     {
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db == null) return;
+            if (db == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
 
             var docs = db.getAllUserDocuments();
-            var save = docs?.FirstOrDefault(d => d.documentType == 9001);
-            if (save == null) return;
+            var save = docs?.OrderByDescending(d => d.id)
+                           .FirstOrDefault(d => d.documentType == 9001);
+
+            if (save == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
 
             var data = JsonUtility.FromJson<GruendungspfadSpeicher>(save.text);
-            if (data == null) return;
+            if (data == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
 
-            // Gleiche Segment-Zuordnung wie im GruendungspfadController
-            float[] seg = data.segmentFortschritt ?? new float[5];
-            if (seg.Length >= 5)
+            var erledigteIds  = data.erledigteIds  ?? new List<string>();
+            var eigeneSchritte = data.eigeneSchritte ?? new List<EigenerSchritt>();
+
+            // Exakt dieselben Phasendefinitionen wie im GruendungspfadController
+            var phasenDef = new (string name, string[] ids)[]
             {
-                SetzeSegmente(seg[0], seg[1], seg[2], seg[3], seg[4]);
+                ("Vorbereitung", new[] { "vorb_1","vorb_2","vorb_3","vorb_4","vorb_5" }),
+                ("Anmeldung",    new[] { "anm_1","anm_2","anm_3","anm_4","anm_5" }),
+                ("Finanzen",     new[] { "fin_1","fin_2","fin_3","fin_4" }),
+                ("Betrieb",      new[] { "betr_1","betr_2","betr_3","betr_4" }),
+                ("Sonstiges",    new[] { "sonst_1","sonst_2","sonst_3" }),
+            };
+
+            float[] segmente    = new float[5];
+            int     gesamtAlle  = 0;
+            int     gesamtErled = 0;
+
+            for (int i = 0; i < phasenDef.Length; i++)
+            {
+                var (phaseName, pflichtIds) = phasenDef[i];
+
+                // Pflichtschritte zählen
+                int g = pflichtIds.Length;
+                int e = pflichtIds.Count(id => erledigteIds.Contains(id));
+
+                // Eigene Schritte dieser Phase dazuzählen
+                var eigene = eigeneSchritte
+                    .Where(s => s.id != null && s.id.StartsWith(phaseName + "_eigen_"))
+                    .ToList();
+                g += eigene.Count;
+                e += eigene.Count(s => erledigteIds.Contains(s.id));
+
+                segmente[i]  = g > 0 ? (float)e / g : 0f;
+                gesamtAlle  += g;
+                gesamtErled += e;
             }
+
+            // Eigene Schritte ohne Phase
+            var eigeneOhnePhase = eigeneSchritte
+                .Where(s => s.id != null && !phasenDef.Any(p => s.id.StartsWith(p.name + "_eigen_")))
+                .ToList();
+            gesamtAlle  += eigeneOhnePhase.Count;
+            gesamtErled += eigeneOhnePhase.Count(s => erledigteIds.Contains(s.id));
+
+            float gesamt = gesamtAlle > 0 ? (float)gesamtErled / gesamtAlle : 0f;
+
+            SetzeSegmente(segmente[0], segmente[1], segmente[2], segmente[3], segmente[4]);
+
+            var pctLabel = _root.Q<Label>("lbl-progress-percent");
+            if (pctLabel != null)
+                pctLabel.text = Mathf.RoundToInt(gesamt * 100f) + "%";
         }
-        catch { /* kein Gründungspfad-Save vorhanden, Balken bleibt bei 0 */ }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("[Dashboard] LadeGruendungspfadFortschritt: " + ex.Message);
+            SetzeSegmente(0f, 0f, 0f, 0f, 0f);
+        }
     }
 
-    // Minimale Datenklasse zum Deserialisieren des Gründungspfad-Speichers
+    // Minimale Klassen zum Deserialisieren des Gründungspfad-Saves
+    [System.Serializable]
+    private class EigenerSchritt { public string id; }
+
     [System.Serializable]
     private class GruendungspfadSpeicher
     {
-        public float[] segmentFortschritt;
+        public List<string>       erledigteIds;
+        public List<EigenerSchritt> eigeneSchritte;
     }
 
     private void LadeJahresDaten(int jahr)
@@ -336,7 +398,12 @@ public class DashboardController : MonoBehaviour
     }
 
     void OnDokumenteFortschritt(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
-        => SetzeSegmente(stammdaten, vertraege, steuer, rechnungen, sonstiges);
+    {
+        // Segmente live aktualisieren
+        SetzeSegmente(stammdaten, vertraege, steuer, rechnungen, sonstiges);
+        // Prozentzahl live neu berechnen — gleiche Logik wie beim Start
+        LadeGruendungspfadFortschritt();
+    }
 
     void SetzeSegmente(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
     {
@@ -345,16 +412,18 @@ public class DashboardController : MonoBehaviour
         SetSegment("seg-fill-steuer",     steuer);
         SetSegment("seg-fill-rechnungen", rechnungen);
         SetSegment("seg-fill-sonstiges",  sonstiges);
-
-        float gesamt = (stammdaten + vertraege + steuer + rechnungen + sonstiges) / 5f;
-        var pctLabel = _root.Q<Label>("lbl-fortschritt-gesamt");
-        if (pctLabel != null) pctLabel.text = Mathf.RoundToInt(gesamt * 100f) + "%";
     }
 
     void SetSegment(string name, float wert)
     {
         var fill = _root.Q<VisualElement>(name);
         if (fill == null) return;
+
+        // Hardcodierte Klassen entfernen die CSS-Vorrang haben würden
+        fill.RemoveFromClassList("seg-full");
+        fill.RemoveFromClassList("seg-partial");
+        fill.RemoveFromClassList("seg-empty");
+
         fill.style.width = new StyleLength(new Length(Mathf.Clamp01(wert) * 100f, LengthUnit.Percent));
     }
 

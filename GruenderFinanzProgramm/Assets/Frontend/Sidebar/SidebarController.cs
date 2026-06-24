@@ -46,6 +46,7 @@ public class SidebarController : MonoBehaviour
         { "nav-item-dashboard",        "Dashboard"        },
         { "nav-item-guide",            "Fortschritt"      },
         { "nav-item-wissensdatenbank", "Wissensdatenbank"  },
+        { "nav-item-gruendungspfad",   "Fortschritt"       },
         { "nav-item-finanz",           "Finanzboard"      },
         { "nav-item-angebot",          "Angebot"          },
         { "nav-item-rechnung",         "Rechnung"         },
@@ -73,6 +74,7 @@ public class SidebarController : MonoBehaviour
     private static readonly HashSet<string> FortschrittSubItems = new()
     {
         "nav-item-wissensdatenbank",
+        "nav-item-gruendungspfad",
     };
 
     void OnEnable()
