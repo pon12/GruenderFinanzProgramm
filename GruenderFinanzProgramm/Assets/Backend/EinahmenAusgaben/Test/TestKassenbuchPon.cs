@@ -34,12 +34,12 @@ public class TestKassenbuchPon : MonoBehaviour
 
     private void createSampleKassenbuchEntries()
     {
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(1000, "Gehalt" , "01.01.2025");
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(200, "Freelance Projekt", "12.02.2025");
-        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(500, "Freelance Projekt 2", "01.03.2025");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(300, "Miete", "23.01.2025");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(150, "Lebensmittel", "01.02.2025");
-        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(1500, "Lebensmittel 2", "01.03.2025");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(1000, "Gehalt" , "01.01.2025", "Gehalt");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(200, "Freelance Projekt", "12.02.2025", "Freelance");
+        UserDatabaseAccess.getCurrentUserDatabase().createEinkommen(500, "Freelance Projekt 2", "01.03.2025", "Freelance");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(300, "Miete", "23.01.2025", "Miete");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(150, "Lebensmittel", "01.02.2025", "Lebensmittel");
+        UserDatabaseAccess.getCurrentUserDatabase().createAusgaben(1500, "Lebensmittel 2", "01.03.2025", "Lebensmittel");
 
         Debug.Log("Beispiel-Einträge hinzugefügt.");
     }

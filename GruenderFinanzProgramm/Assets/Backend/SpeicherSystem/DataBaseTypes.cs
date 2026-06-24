@@ -158,6 +158,10 @@ public class Settings
     public bool exportpfad { get; set; }
     public int steuersatz { get; set; }
     public bool Begleiter { get; set; }
+    public string emailFirma { get; set; }
+    public string teleponNrFirma { get; set; }
+    public string websitefrima { get; set; }
+    public string nutzer { get; set; }
 }
 
 public class Finanzdaten

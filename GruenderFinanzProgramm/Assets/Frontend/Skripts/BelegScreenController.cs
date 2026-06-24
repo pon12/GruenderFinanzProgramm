@@ -847,7 +847,7 @@ public abstract class BelegScreenController : MonoBehaviour
                             ? _datumFeld.value
                             : DateTime.Now.ToString("dd.MM.yyyy");
 
-            db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum);
+            db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum, "Platzhalterd");
         }
         catch (Exception e)
         {
