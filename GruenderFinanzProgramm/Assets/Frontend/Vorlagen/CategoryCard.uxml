@@ -1,6 +1,6 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
-    <ui:VisualElement class="doc-card category-card">
+    <ui:VisualElement class="doc-card category-card" style="background-color: rgb(44, 44, 44);">
         <ui:VisualElement class="category-header-row">
             <ui:VisualElement name="Btn-Show-List" class="category-icon-tile">
                 <ui:Label text="📁" class="category-icon-glyph"/>
