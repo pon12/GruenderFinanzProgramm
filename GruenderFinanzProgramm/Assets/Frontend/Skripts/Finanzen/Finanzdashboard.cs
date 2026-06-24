@@ -32,6 +32,8 @@ public class Finanzdashboard : MonoBehaviour
     LadeGewinn();        
     LadeDienstleistungsRanking();
 
+    LadeOffeneRechnungen();
+
     RegistriereButtons();
 }
 
@@ -572,5 +574,44 @@ private void OeffneFinanzen1()
             return $"{sign}€{(abs / 1000f):0.#}k";
 
         return $"{sign}€{abs:0}";
+    }
+
+    private void LadeOffeneRechnungen()
+    {
+        Label label = Root.Q<Label>("OffeneRechnungen");
+
+        if (label == null)
+        {
+            Debug.LogWarning("[Finanzdashboard] OffeneRechnungen Label nicht gefunden");
+            return;
+        }
+
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        if (db == null)
+        {
+            label.text = "0";
+            return;
+        }
+
+        var invoices = db.getAllInvoices();
+
+        if (invoices == null)
+        {
+            label.text = "0";
+            return;
+        }
+
+        int count = 0;
+
+        foreach (var r in invoices)
+        {
+            if (r != null && r.status == "Angenommen")
+            {
+                count++;
+            }
+        }
+
+        label.text = count.ToString();
     }
 }

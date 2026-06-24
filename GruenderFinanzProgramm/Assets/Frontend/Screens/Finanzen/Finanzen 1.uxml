@@ -15,11 +15,11 @@
                     <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-top: 20px; flex-basis: auto; align-items: stretch; flex-wrap: nowrap; -unity-text-align: upper-left; text-overflow: clip; visibility: visible; overflow: visible; display: flex; opacity: 1;">
                         <ui:VisualElement name="Umsatz" style="flex-grow: 1; justify-content: flex-start; height: auto; background-color: rgb(44, 44, 44); margin-right: 10px; margin-left: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
                             <ui:Label text=" Aktuelle Liquidität&#10; " style="color: rgb(255, 255, 255); font-size: 26px; -unity-text-align: upper-center;"/>
-                            <ui:Label text="0 €" name="Liquidwert" style="color: rgb(255, 255, 255); -unity-text-align: upper-center; font-size: 20px;"/>
+                            <ui:Label text="0 €" name="LiquAktuell" style="color: rgb(255, 255, 255); -unity-text-align: upper-center; font-size: 20px;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Gewinn" style="flex-grow: 1; height: auto; background-color: rgb(44, 44, 44); margin-left: 10px; margin-right: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
-                            <ui:Label text="Monatlicher Cashflow" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
-                            <ui:Label text="0%" name="gewinnWert" style="font-size: 20px; -unity-text-align: upper-center; color: rgb(255, 255, 255);"/>
+                            <ui:Label text=" Cashflow" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
+                            <ui:Label text="0€" name="mntlCashflow" style="font-size: 20px; -unity-text-align: upper-center; color: rgb(255, 255, 255);"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Gewinn" style="flex-grow: 1; height: auto; background-color: rgb(44, 44, 44); margin-left: 10px; margin-right: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
                             <ui:Label text="Verfügbare Mittel" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
@@ -29,7 +29,7 @@
                     <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
                         <ui:VisualElement style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-bottom: 10px; padding-left: 15px; padding-top: 15px; padding-right: 15px; padding-bottom: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-top: 10px; margin-left: 0; margin-right: 10px;">
                             <ui:Label text="Liquidität zu Geschäftsbeginn" style="color: rgb(255, 255, 255); font-size: 26px;"/>
-                            <ui:VisualElement name="werte" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
+                            <ui:VisualElement name="GruendungTabelle" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
