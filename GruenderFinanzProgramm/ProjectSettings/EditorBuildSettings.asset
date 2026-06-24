@@ -44,7 +44,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Wissensdatenbank.unity
     guid: 474dc193bf588144ba8da8dc6f0e91ba
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Finanzen3.unity
     guid: 57cddbfbcdb438a498f511e4b13b3a20
   - enabled: 1
