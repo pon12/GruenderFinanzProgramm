@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a46dd647c18df7241a6480f29427298d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GruendungspfadController
-  uiDocument: {fileID: 0}
+  uiDocument: {fileID: 1149013152}
   phasen:
   - name: Vorbereitung
     icon: "\U0001F4CB"
