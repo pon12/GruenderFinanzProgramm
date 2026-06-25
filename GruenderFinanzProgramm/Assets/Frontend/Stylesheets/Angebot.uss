@@ -139,11 +139,11 @@
 }
 
 .angebot-btn-primary:hover {
-    background-color: rgb(100, 180, 120);
+    background-color: rgb(179, 226, 196);
 }
 
 .angebot-btn-secondary {
-    background-color: rgb(75, 185, 102);
+    background-color: rgb(100, 100, 100);
     color: rgb(20, 20, 20);
     border-top-width: 0;
     border-right-width: 0;
@@ -164,7 +164,7 @@
 }
 
 .angebot-btn-secondary:hover {
-    background-color: rgb(55, 160, 82);
+    background-color: rgb(142, 141, 141);
 }
 
 .angebot-btn-danger {
