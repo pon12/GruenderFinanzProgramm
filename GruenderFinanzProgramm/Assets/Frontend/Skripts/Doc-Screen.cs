@@ -89,13 +89,14 @@ public class DocumentDashboard : MonoBehaviour
 
     private readonly List<KategorieDefinition> kategorien = new List<KategorieDefinition>
     {
-        new KategorieDefinition { name = "Gründung",   istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Handelsregisterauszug" } },
-        new KategorieDefinition { name = "Bezahlweise", istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung" } },
-        new KategorieDefinition { name = "Finanzen",    istFest = false, pflichtDocs = new List<string>() },
-        new KategorieDefinition { name = "Marketing",   istFest = false, pflichtDocs = new List<string>() },
-        new KategorieDefinition { name = "Steuern",     istFest = false, pflichtDocs = new List<string>() },
-        new KategorieDefinition { name = "Personal",    istFest = false, pflichtDocs = new List<string>() },
-        new KategorieDefinition { name = "Recht",       istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde / Gesellschaftsvertrag", "Handelsregisterauszug", "Gewerbeanmeldung", "Gesellschafterliste" } },
+        new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung" } },
+        new KategorieDefinition { name = "Finanzen",               istFest = false, pflichtDocs = new List<string> { "Eröffnungsbilanz" } },
+        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum" } },
+        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
+        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
+        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur" } },
+        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string>() },
     };
 
     // ============================================================
@@ -601,12 +602,15 @@ public class DocumentDashboard : MonoBehaviour
             nameLabel.AddToClassList("list-row-label");
             row.Add(nameLabel);
 
-            string vorschau = BildeInhaltVorschau(doc);
-            if (!string.IsNullOrEmpty(vorschau))
+            if (!doc.istPflichtdokument)
             {
-                Label inhaltLabel = new Label(vorschau);
-                inhaltLabel.AddToClassList("list-row-inhalt-preview");
-                row.Add(inhaltLabel);
+                string vorschau = BildeInhaltVorschau(doc);
+                if (!string.IsNullOrEmpty(vorschau))
+                {
+                    Label inhaltLabel = new Label(vorschau);
+                    inhaltLabel.AddToClassList("list-row-inhalt-preview");
+                    row.Add(inhaltLabel);
+                }
             }
 
             VisualElement btnGroup = new VisualElement();
