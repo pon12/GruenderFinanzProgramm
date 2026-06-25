@@ -382,6 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GruendungspfadController
   uiDocument: {fileID: 1149013152}
+  helpIconTexture: {fileID: 2800000, guid: 1ea511ec5bd6a8148ab87a586b001f57, type: 3}
   phasen:
   - name: Vorbereitung
     icon: "\U0001F4CB"
