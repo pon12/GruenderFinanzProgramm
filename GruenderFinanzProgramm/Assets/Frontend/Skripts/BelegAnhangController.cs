@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.draw;
+using Color = UnityEngine.Color;
 
 public static class BelegAnhangController
 {
+    // Exakte Dokumenttitel wie sie in DocumentDashboard als Pflichtdokumente angelegt sind
     public static readonly List<string> AnhangSchluessel = new List<string>
     {
         "AGB",
         "Disclaimer",
         "Barzahlung",
-        "Überweisung",
-        "Bezahlweise"
+        "\u00dcberweisung"
     };
 
+    // Prüft welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
     {
         var ergebnis = new Dictionary<string, bool>();
@@ -26,25 +31,10 @@ public static class BelegAnhangController
 
             foreach (var doc in alle.savedDocs)
             {
-                string titelKlein = (doc.title ?? "").ToLowerInvariant();
-
-                if (titelKlein.Contains("agb") || titelKlein.Contains("allgemeine geschäftsbedingungen"))
-                    ergebnis["AGB"] = true;
-
-                if (titelKlein.Contains("disclaimer") || titelKlein.Contains("haftungsausschluss"))
-                    ergebnis["Disclaimer"] = true;
-
-                if (doc.category == "Bezahlweise" && titelKlein.Contains("bar"))
-                    ergebnis["Barzahlung"] = true;
-
-                if (doc.category == "Bezahlweise" &&
-                    (titelKlein.Contains("überweisung") || titelKlein.Contains("uberweisung")
-                     || titelKlein.Contains("konto") || titelKlein.Contains("iban")
-                     || titelKlein.Contains("zahlung")))
-                    ergebnis["Überweisung"] = true;
-
-                if (doc.category == "Bezahlweise")
-                    ergebnis["Bezahlweise"] = true;
+                if (doc.category != "Bezahlweise") continue;
+                if (!AnhangSchluessel.Contains(doc.title)) continue;
+                if (!string.IsNullOrWhiteSpace(doc.inhalt))
+                    ergebnis[doc.title] = true;
             }
         }
         catch (Exception e)
@@ -55,100 +45,38 @@ public static class BelegAnhangController
         return ergebnis;
     }
 
-    public static DocumentDashboard.DocumentData HoleDokument(string schluessel)
+    // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF
+    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt)
     {
+        if (ausgewaehlt == null || ausgewaehlt.Count == 0) return;
+
         try
         {
             var alle = DocumentDashboard.GetSavedDocuments();
-            if (alle?.savedDocs == null) return null;
+            if (alle?.savedDocs == null) return;
 
-            foreach (var doc in alle.savedDocs)
+            var titelFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
+            var textFont  = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+            var linie     = new LineSeparator();
+
+            foreach (string key in ausgewaehlt)
             {
-                string titelKlein = (doc.title ?? "").ToLowerInvariant();
+                var doc = alle.savedDocs.Find(d =>
+                    d.category == "Bezahlweise" && d.title == key);
 
-                switch (schluessel)
-                {
-                    case "AGB":
-                        if (titelKlein.Contains("agb") || titelKlein.Contains("allgemeine geschäftsbedingungen"))
-                            return doc;
-                        break;
-                    case "Disclaimer":
-                        if (titelKlein.Contains("disclaimer") || titelKlein.Contains("haftungsausschluss"))
-                            return doc;
-                        break;
-                    case "Barzahlung":
-                        if (doc.category == "Bezahlweise" && titelKlein.Contains("bar"))
-                            return doc;
-                        break;
-                    case "Überweisung":
-                        if (doc.category == "Bezahlweise" &&
-                            (titelKlein.Contains("überweisung") || titelKlein.Contains("uberweisung")
-                             || titelKlein.Contains("konto") || titelKlein.Contains("iban")
-                             || titelKlein.Contains("zahlung")))
-                            return doc;
-                        break;
-                    case "Bezahlweise":
-                        if (doc.category == "Bezahlweise")
-                            return doc;
-                        break;
-                }
+                if (doc == null || string.IsNullOrWhiteSpace(doc.inhalt)) continue;
+
+                document.NewPage();
+                document.Add(new Paragraph(doc.title, titelFont));
+                document.Add(new Paragraph(" "));
+                document.Add(new Chunk(linie));
+                document.Add(new Paragraph(" "));
+                document.Add(new Paragraph(doc.inhalt, textFont));
             }
         }
         catch (Exception e)
         {
-            Debug.LogWarning("[BelegAnhang] Dokument nicht gefunden: " + e.Message);
-        }
-        return null;
-    }
-
-    public static void SchreibeAnhaenge(
-        iTextSharp.text.Document document,
-        List<string> ausgewaehlteSchluessel)
-    {
-        if (ausgewaehlteSchluessel == null || ausgewaehlteSchluessel.Count == 0) return;
-
-        var titelFont = iTextSharp.text.FontFactory.GetFont(
-            iTextSharp.text.FontFactory.HELVETICA_BOLD, 14);
-        var textFont = iTextSharp.text.FontFactory.GetFont(
-            iTextSharp.text.FontFactory.HELVETICA, 11);
-        var subFont = iTextSharp.text.FontFactory.GetFont(
-            iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
-
-        foreach (string schluessel in ausgewaehlteSchluessel)
-        {
-            var doc = HoleDokument(schluessel);
-            if (doc == null)
-            {
-                Debug.LogWarning("[BelegAnhang] Kein Dokument für Schlüssel: " + schluessel);
-                continue;
-            }
-
-            try
-            {
-                document.NewPage();
-                document.Add(new iTextSharp.text.Paragraph(schluessel, titelFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Kategorie: " + doc.category + "  |  " + DateTime.Now.ToString("dd.MM.yyyy"), subFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                var linie = new iTextSharp.text.pdf.draw.LineSeparator();
-                document.Add(new iTextSharp.text.Chunk(linie));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-
-                string inhalt = !string.IsNullOrWhiteSpace(doc.inhalt) ? doc.inhalt : doc.title;
-                string[] zeilen = inhalt.Split(new[] { '\n', '\r' }, StringSplitOptions.None);
-
-                foreach (string zeile in zeilen)
-                {
-                    if (string.IsNullOrEmpty(zeile.Trim()))
-                        document.Add(new iTextSharp.text.Paragraph(" "));
-                    else
-                        document.Add(new iTextSharp.text.Paragraph(zeile, textFont));
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("[BelegAnhang] Fehler beim Schreiben von " + schluessel + ": " + e.Message);
-            }
+            Debug.LogWarning("[BelegAnhang] PDF-Anhang fehlgeschlagen: " + e.Message);
         }
     }
 }

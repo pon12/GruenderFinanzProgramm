@@ -90,7 +90,7 @@ public class DocumentDashboard : MonoBehaviour
     private readonly List<KategorieDefinition> kategorien = new List<KategorieDefinition>
     {
         new KategorieDefinition { name = "Gründung",   istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Handelsregisterauszug" } },
-        new KategorieDefinition { name = "Bezahlweise", istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen" } },
+        new KategorieDefinition { name = "Bezahlweise", istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung" } },
         new KategorieDefinition { name = "Finanzen",    istFest = false, pflichtDocs = new List<string>() },
         new KategorieDefinition { name = "Marketing",   istFest = false, pflichtDocs = new List<string>() },
         new KategorieDefinition { name = "Steuern",     istFest = false, pflichtDocs = new List<string>() },
@@ -928,6 +928,15 @@ public class DocumentDashboard : MonoBehaviour
     {
         var alle = GetSavedDocuments();
         return alle.savedDocs.FindAll(d => d.category == "Bezahlweise");
+    }
+
+    // Gibt den inhalt eines Bezahlweise-Dokuments anhand des Titels zurück.
+    public static string GetBezahlweiseInhalt(string titel)
+    {
+        var alle = GetSavedDocuments();
+        var doc  = alle.savedDocs.FirstOrDefault(d =>
+            d.category == "Bezahlweise" && d.title == titel);
+        return doc?.inhalt ?? "";
     }
 
     // ─────────────────────────────────────────

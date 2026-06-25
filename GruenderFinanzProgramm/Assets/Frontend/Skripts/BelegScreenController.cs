@@ -103,6 +103,7 @@ public abstract class BelegScreenController : MonoBehaviour
         RegistriereKundensuche();
         RegistriereKalenderButtons();
         RegistriereAnhaenge();
+        RegistriereHelpTooltips();
 
         var session = BelegSessionDaten.Lade(BelegTyp);
         if (session != null)
@@ -117,6 +118,42 @@ public abstract class BelegScreenController : MonoBehaviour
 
         BerechneSummen();
         AktualisiereUmwandelnButton();
+    }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(Root, "btn-help-seitentitel",
+            BelegTyp == "Angebot"
+                ? "Hier erstellst du ein neues Angebot f\u00fcr einen Kunden. " +
+                  "F\u00fclle alle Bereiche aus und speichere am Ende. " +
+                  "Ein gespeichertes Angebot kann sp\u00e4ter in eine Rechnung umgewandelt werden."
+                : "Hier erstellst du eine neue Rechnung f\u00fcr einen Kunden. " +
+                  "F\u00fclle alle Bereiche aus und speichere am Ende. " +
+                  "Sobald die Rechnung bezahlt wurde, kannst du sie als \u201eBezahlt\u201c markieren.");
+
+        HelpTooltip.Registriere(Root, "btn-help-partner",
+            BelegTyp == "Angebot"
+                ? "W\u00e4hle hier den Kunden aus, f\u00fcr den das Angebot gilt. " +
+                  "Tippe den Namen in die Suche und w\u00e4hle den passenden Eintrag. " +
+                  "Links erscheint der Angebotsempf\u00e4nger, rechts dein Unternehmen als Angebotssteller."
+                : "W\u00e4hle hier den Kunden aus, an den die Rechnung geht. " +
+                  "Tippe den Namen in die Suche und w\u00e4hle den passenden Eintrag. " +
+                  "Links erscheint der Rechnungsempf\u00e4nger, rechts dein Unternehmen als Rechnungssteller.");
+
+        HelpTooltip.Registriere(Root, "btn-help-grunddaten",
+            "Hier vergibst du die Nummer, das Datum und den aktuellen Status. " +
+            "Die Nummer wird automatisch generiert, kann aber angepasst werden. " +
+            "Mit dem Kalender-Symbol \u00f6ffnest du eine Datumsauswahl.");
+
+        HelpTooltip.Registriere(Root, "btn-help-positionen",
+            "F\u00fcge hier Dienstleistungen oder Artikel als Positionen hinzu (+ Button). " +
+            "Jede Position enth\u00e4lt Artikel, Beschreibung, Menge, Einheit und Preis. " +
+            "Netto, Rabatt, Skonto und MwSt. werden automatisch berechnet.");
+
+        HelpTooltip.Registriere(Root, "btn-help-details",
+            "Hier kannst du einen Rabatt (prozentual oder als Festbetrag) " +
+            "und Skonto (Nachlass bei fr\u00fcher Zahlung) festlegen. " +
+            "Im Notizfeld kannst du interne Hinweise hinterlegen (max. 150 Zeichen).");
     }
 
     private void OnDisable()

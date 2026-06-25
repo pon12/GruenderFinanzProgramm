@@ -414,7 +414,7 @@ public class EinstellungenController : MonoBehaviour
         if (_btnOpenUnternehmen != null) _btnOpenUnternehmen.clicked += () => ShowPopup(_popupUnternehmen);
         if (_btnOpenBank        != null) _btnOpenBank.clicked        += () => ShowPopup(_popupBank);
         if (_btnOpenRechnung    != null) _btnOpenRechnung.clicked    += () => ShowPopup(_popupRechnung);
-        if (_btnOpenBezahlweise != null) _btnOpenBezahlweise.clicked += () => { LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
+        if (_btnOpenBezahlweise != null) _btnOpenBezahlweise.clicked += () => { LadeBezahlweiseAusDokumenten(); LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
         if (_btnOpenCredits     != null) _btnOpenCredits.clicked     += () => ShowPopup(_popupCredits);
         if (_btnOpenMitwirkende != null) _btnOpenMitwirkende.clicked += () => ShowPopup(_popupMitwirkende);
 
@@ -564,6 +564,34 @@ public class EinstellungenController : MonoBehaviour
         SetField(_inputDisclaimer,  PREF_DISCLAIMER,  "");
         SetField(_inputBarzahlung,  PREF_BARZAHLUNG,  "");
         SetField(_inputUeberweisung,PREF_UEBERWEISUNG,"");
+    }
+
+    private void LadeBezahlweiseAusDokumenten()
+    {
+        // Felder aus dem Dokumenten-Pool lesen und in PlayerPrefs + UI schreiben
+        var mapping = new System.Collections.Generic.Dictionary<string, (string pref, TextField feld)>
+        {
+            { "AGB",              (PREF_AGB,         _inputAgb)         },
+            { "Disclaimer",       (PREF_DISCLAIMER,  _inputDisclaimer)  },
+            { "Barzahlung",       (PREF_BARZAHLUNG,  _inputBarzahlung)  },
+            { "Überweisung", (PREF_UEBERWEISUNG,_inputUeberweisung)},
+        };
+
+        bool geaendert = false;
+        foreach (var kvp in mapping)
+        {
+            string inhalt = DocumentDashboard.GetBezahlweiseInhalt(kvp.Key);
+            if (string.IsNullOrEmpty(inhalt)) continue;
+
+            string bisheriger = PlayerPrefs.GetString(kvp.Value.pref, "");
+            if (inhalt == bisheriger) continue;
+
+            PlayerPrefs.SetString(kvp.Value.pref, inhalt);
+            if (kvp.Value.feld != null) kvp.Value.feld.SetValueWithoutNotify(inhalt);
+            geaendert = true;
+        }
+
+        if (geaendert) PlayerPrefs.Save();
     }
 
     private void LoadBezahlweiseStatus()
@@ -800,21 +828,20 @@ public class EinstellungenController : MonoBehaviour
         var saveData = DocumentDashboard.GetSavedDocuments();
         if (saveData?.savedDocs == null) return;
 
+        // Mapping: Dokumenttitel → Feldwert
+        var mapping = new System.Collections.Generic.Dictionary<string, string>
+        {
+            { "AGB",           _inputAgb?.value         ?? "" },
+            { "Disclaimer",    _inputDisclaimer?.value  ?? "" },
+            { "Barzahlung",    _inputBarzahlung?.value  ?? "" },
+            { "Überweisung", _inputUeberweisung?.value ?? "" },
+        };
+
         foreach (var doc in saveData.savedDocs)
         {
             if (doc.category != "Bezahlweise") continue;
-
-            string titelKlein = (doc.title ?? "").ToLowerInvariant();
-
-            if (titelKlein.Contains("agb") || titelKlein.Contains("allgemeine"))
-                doc.inhalt = _inputAgb?.value ?? "";
-            else if (titelKlein.Contains("disclaimer") || titelKlein.Contains("haftung"))
-                doc.inhalt = _inputDisclaimer?.value ?? "";
-            else if (titelKlein.Contains("bar"))
-                doc.inhalt = _inputBarzahlung?.value ?? "";
-            else if (titelKlein.Contains("überweisung") || titelKlein.Contains("uberweisung")
-                     || titelKlein.Contains("iban")      || titelKlein.Contains("konto"))
-                doc.inhalt = _inputUeberweisung?.value ?? "";
+            if (mapping.TryGetValue(doc.title, out string wert))
+                doc.inhalt = wert;
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
