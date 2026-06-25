@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 486d1813731c02d45b82c93e7f58c578
+guid: 57a768e6f1713a244ba41f9785744c4e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2169558684739103172
-    second: Benutzer-Bild_0
+      213: -7497526151829913395
+    second: KDB Icon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Benutzer-Bild_0
+      name: KDB Icon_0
       rect:
         serializedVersion: 2
         x: 20
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c3613ccfedd24e1e0800000000000000
-      internalID: -2169558684739103172
+      spriteID: dc00af140bf63f790800000000000000
+      internalID: -7497526151829913395
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Benutzer-Bild_0: -2169558684739103172
+      KDB Icon_0: -7497526151829913395
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
