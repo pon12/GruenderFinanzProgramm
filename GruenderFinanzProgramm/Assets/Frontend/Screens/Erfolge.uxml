@@ -1,0 +1,27 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Erfolge.uss?fileID=7433441132597879392&amp;guid=62fd74cb81a5b8140ace45c9059abf7d&amp;type=3#Erfolge"/>
+    <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgb(30, 30, 30);">
+        <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 20px 430px;">
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <ui:VisualElement>
+                    <ui:Label text="Erfolge" class="page-title"/>
+                    <ui:Label text="Deine Meilensteine und Errungenschaften" class="page-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label name="lbl-gesamt-prozent" text="0%" class="gesamt-prozent-label"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="gesamt-fortschritt-box" style="background-color: rgb(44, 44, 44);">
+                <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+                    <ui:Label text="Gesamtfortschritt" class="fortschritt-header-label"/>
+                    <ui:Label name="lbl-gesamt-text" text="0 von 0 Erfolgen" class="fortschritt-prozent-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="fortschritt-balken-bg">
+                    <ui:VisualElement name="gesamt-balken-fill" class="fortschritt-balken-fill" style="width: 0%;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView style="flex-grow: 1; margin-top: 16px;">
+                <ui:VisualElement name="erfolge-grid" class="erfolge-grid"/>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
