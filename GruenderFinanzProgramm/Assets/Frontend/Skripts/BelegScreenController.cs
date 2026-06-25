@@ -321,9 +321,14 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (_statusDropdown != null)
         {
-            _statusDropdown.choices = StatusOptionen;
-            _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
-            _statusDropdown.RegisterValueChangedCallback(_ => AktualisiereUmwandelnButton());
+            // Verzögert setzen damit das Layout vollständig gebaut ist
+            // bevor die Dropdown-Optionen zugewiesen werden
+            _statusDropdown.schedule.Execute(() =>
+            {
+                _statusDropdown.choices = new List<string>(StatusOptionen);
+                _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
+                _statusDropdown.RegisterValueChangedCallback(_ => AktualisiereUmwandelnButton());
+            }).ExecuteLater(50);
         }
 
         if (_rabattTypDropdown != null)
@@ -1281,8 +1286,9 @@ public abstract class BelegScreenController : MonoBehaviour
         _anhangAusgewaehlt.Clear();
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
+        var alleTitel  = BelegAnhangController.HoleAlleBezahlweiseTitel();
 
-        foreach (string key in BelegAnhangController.AnhangSchluessel)
+        foreach (string key in alleTitel)
         {
             bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
             _anhangAusgewaehlt[key] = false;
@@ -1987,7 +1993,8 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (_statusDropdown != null && !string.IsNullOrEmpty(snap.Status)
             && StatusOptionen.Contains(snap.Status))
-            _statusDropdown.SetValueWithoutNotify(snap.Status);
+            _statusDropdown.schedule.Execute(() =>
+                _statusDropdown.SetValueWithoutNotify(snap.Status)).ExecuteLater(80);
 
         if (_rabattTypDropdown != null && !string.IsNullOrEmpty(snap.RabattTyp))
             _rabattTypDropdown.SetValueWithoutNotify(snap.RabattTyp);

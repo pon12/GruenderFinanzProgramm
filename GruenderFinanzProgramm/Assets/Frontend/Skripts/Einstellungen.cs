@@ -37,7 +37,6 @@ public class EinstellungenController : MonoBehaviour
     private const string PREF_EXPORTPFAD           = "settings_exportpfad";
     private const string PREF_UST_RECHNUNG         = "settings_ust_rechnung";
     private const string PREF_AUTO_NUMMER          = "settings_auto_nummer";
-    private const string PREF_IBAN_RECHNUNG        = "settings_iban_rechnung";
     private const string PREF_STEUERNUMMER         = "settings_steuernummer";
     private const string PREF_USTIDNR              = "settings_ustidnr";
     private const string PREF_HANDELSREG           = "settings_handelsreg";
@@ -127,7 +126,6 @@ public class EinstellungenController : MonoBehaviour
     private TextField     _inputIban;
     private TextField     _inputBic;
     private TextField     _inputKreditinstitut;
-    private Toggle        _toggleIbanRechnung;
     private Button        _btnCloseBank;
     private Button        _btnCancelBank;
     private Button        _btnSaveBank;
@@ -218,9 +216,6 @@ public class EinstellungenController : MonoBehaviour
         SetupFeldBeschraenkungen();
         LoadSettings();
 
-        RegistriereHelpTooltips();
-        ButtonHoverController.RegistriereAlle(_root);
-
         _root.schedule.Execute(() =>
         {
             if (_popupUnternehmen == null || _popupGespeichert == null || _popupZurueckgesetzt == null)
@@ -285,7 +280,6 @@ public class EinstellungenController : MonoBehaviour
         _inputIban             = _root.Q<TextField>("input-iban");
         _inputBic              = _root.Q<TextField>("input-bic");
         _inputKreditinstitut   = _root.Q<TextField>("input-kreditinstitut");
-        _toggleIbanRechnung    = _root.Q<Toggle>("toggle-iban-rechnung");
         _btnCloseBank          = _root.Q<Button>("btn-close-bank");
         _btnCancelBank         = _root.Q<Button>("btn-cancel-bank");
         _btnSaveBank           = _root.Q<Button>("btn-save-bank");
@@ -546,7 +540,6 @@ public class EinstellungenController : MonoBehaviour
         SetField(_inputIban,          PREF_IBAN,           "");
         SetField(_inputBic,           PREF_BIC,            "");
         SetField(_inputKreditinstitut,PREF_KREDITINSTITUT, "");
-        if (_toggleIbanRechnung != null) _toggleIbanRechnung.value = PlayerPrefs.GetInt(PREF_IBAN_RECHNUNG, 0) == 1;
 
         if (_toggleLogo       != null) _toggleLogo.value       = PlayerPrefs.GetInt(PREF_LOGO_RECHNUNG, 1) == 1;
         if (_toggleSeitenzahl != null) _toggleSeitenzahl.value = PlayerPrefs.GetInt(PREF_SEITENZAHL, 1) == 1;
@@ -687,7 +680,6 @@ public class EinstellungenController : MonoBehaviour
         SaveField(PREF_IBAN,          _inputIban);
         SaveField(PREF_BIC,           _inputBic);
         SaveField(PREF_KREDITINSTITUT,_inputKreditinstitut);
-        if (_toggleIbanRechnung != null) PlayerPrefs.SetInt(PREF_IBAN_RECHNUNG, _toggleIbanRechnung.value ? 1 : 0);
 
         if (_toggleLogo       != null) PlayerPrefs.SetInt(PREF_LOGO_RECHNUNG, _toggleLogo.value       ? 1 : 0);
         if (_toggleSeitenzahl != null) PlayerPrefs.SetInt(PREF_SEITENZAHL,    _toggleSeitenzahl.value ? 1 : 0);
@@ -726,8 +718,6 @@ public class EinstellungenController : MonoBehaviour
         SaveField(PREF_IBAN,          _inputIban);
         SaveField(PREF_BIC,           _inputBic);
         SaveField(PREF_KREDITINSTITUT,_inputKreditinstitut);
-        if (_toggleIbanRechnung != null)
-            PlayerPrefs.SetInt(PREF_IBAN_RECHNUNG, _toggleIbanRechnung.value ? 1 : 0);
         PlayerPrefs.Save();
         SyncBankToDokumente();
         HidePopup(_popupBank);
@@ -984,51 +974,4 @@ public class EinstellungenController : MonoBehaviour
     {
         if (field != null) PlayerPrefs.SetString(key, field.value);
     }
-
-    private void RegistriereHelpTooltips()
-    {
-        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
-            "Hier verwaltest du alle grundlegenden Einstellungen deines Unternehmens. " +
-            "Änderungen wirken sich auf Rechnungen, Angebote und PDF-Exporte aus. " +
-            "Speichere am Ende, damit alle Änderungen übernommen werden.");
-
-        HelpTooltip.Registriere(_root, "btn-help-unternehmen",
-            "Hinterlege hier Firmenname, Rechtsform, Adresse und Steuerdaten. " +
-            "Diese Daten erscheinen auf allen erstellten Rechnungen und Angeboten " +
-            "als Absenderinformationen.");
-
-        HelpTooltip.Registriere(_root, "btn-help-bank",
-            "Trage hier deine Bankverbindung ein: IBAN, BIC, Kontoinhaber und Kreditinstitut. " +
-            "Die Daten werden auf Wunsch im Fußbereich von Rechnungen angezeigt.");
-
-        HelpTooltip.Registriere(_root, "btn-help-rechnungsformat",
-            "Lege fest wie deine Rechnungen nummeriert und aufgebaut werden. " +
-            "Hier stellst du Nummernkreis, Zahlungsziel, Währung " +
-            "und Standardtexte für Kopf- und Fußzeile ein.");
-
-        HelpTooltip.Registriere(_root, "btn-help-bezahlweise",
-            "Verwalte hier Dokumente, die als Anhänge an Rechnungen angehängt werden: " +
-            "AGB, Disclaimer, Barzahlungs- und Überweisungshinweis.");
-
-        HelpTooltip.Registriere(_root, "btn-help-version",
-            "Zeigt die aktuell installierte Programmversion. " +
-            "Hier kannst du nach Updates suchen sowie Credits und Mitwirkende einsehen.");
-
-        HelpTooltip.Registriere(_root, "btn-help-pdf",
-            "Steuere hier das Erscheinungsbild deiner PDF-Exporte: " +
-            "Logo, Seitenzahl und letzten Exportpfad aktivieren oder deaktivieren.");
-
-        HelpTooltip.Registriere(_root, "btn-help-steuersaetze",
-            "Wähle den Standard-Mehrwertsteuersatz für deine Dienstleistungen. " +
-            "Der ausgewählte Satz wird beim Erstellen neuer Belege automatisch vorausgewählt.");
-
-        HelpTooltip.Registriere(_root, "btn-help-layout",
-            "Wechsle hier zwischen Hell- und Dunkelmodus. " +
-            "Die Einstellung gilt sofort für die gesamte Anwendung.");
-
-        HelpTooltip.Registriere(_root, "btn-help-sicherheit",
-            "Setze hier deinen Passkey zurück, gebe dazu deinen RevoeryKey ein. " +
-            "Das Löschen des Kontos ist endgültig und kann nicht rükgängig gemacht werden.");
-    }
-
 }
