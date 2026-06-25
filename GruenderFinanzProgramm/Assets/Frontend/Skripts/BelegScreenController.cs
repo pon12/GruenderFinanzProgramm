@@ -47,16 +47,16 @@ public abstract class BelegScreenController : MonoBehaviour
     protected VisualElement Root;
 
     private ScrollView _positionenListe;
-    private readonly List<PositionsZeile> _zeilen = new List<PositionsZeile>();
+    protected readonly List<PositionsZeile> _zeilen = new List<PositionsZeile>();
 
-    private Label     _nettoLabel, _rabattLabel, _skontoLabel, _gesamtLabel;
-    private TextField _kundensuche, _nummerFeld, _datumFeld, _fristFeld,
+    protected Label     _nettoLabel, _rabattLabel, _skontoLabel, _gesamtLabel;
+    protected TextField _kundensuche, _nummerFeld, _datumFeld, _fristFeld,
                       _rabattWertFeld, _skontoWertFeld, _notizenFeld;
-    private DropdownField _statusDropdown, _rabattTypDropdown;
+    protected DropdownField _statusDropdown, _rabattTypDropdown;
     private VisualElement _suchErgebnisListe;
-    private string _ausgewaehlterKunde = "";
-    private int _ausgewaehlterKundeId = 0;
-    private string _ausgewaehlterKundeAdresse = "";
+    protected string _ausgewaehlterKunde = "";
+    protected int _ausgewaehlterKundeId = 0;
+    protected string _ausgewaehlterKundeAdresse = "";
     private Button  _umwandelnButton;
     private bool _buttonsRegistriert = false;
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
@@ -77,7 +77,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected abstract List<string> StatusOptionen { get; }
     protected virtual  void         RegistriereZusatzButtons() { }
 
-    private class PositionsZeile
+    protected class PositionsZeile
     {
         public VisualElement Wurzel;
         public Label         Artikel, Beschreibung, Einheit, Preis, Gesamt;
@@ -97,6 +97,7 @@ public abstract class BelegScreenController : MonoBehaviour
         }
         LeereDemoInhalte();
         SetzeStandardwerte();
+        UebernimmTransferDatenFallsVorhanden();
         LadeAbsenderdaten();
         LadeDienstleistungen();
         RegistriereSummenEingaben();
@@ -187,6 +188,51 @@ public abstract class BelegScreenController : MonoBehaviour
             _rabattTypDropdown.RegisterValueChangedCallback(_ => BerechneSummen());
         }
     }
+
+    protected void UebernimmTransferDatenFallsVorhanden()
+    {
+        if (BelegTyp != "Rechnung")
+            return;
+
+        if (!BelegTransferData.hasTransfer)
+            return;
+
+        _ausgewaehlterKundeId = BelegTransferData.customerId;
+        _ausgewaehlterKunde = BelegTransferData.customerName;
+        _ausgewaehlterKundeAdresse = BelegTransferData.customerAddress;
+
+        _kundensuche?.SetValueWithoutNotify(_ausgewaehlterKunde);
+
+    var boxen = Root.Query(className: "angebot-address-box").ToList();
+
+    if (boxen.Count > 0)
+        SetzeAdresse(boxen[0], "Kunde:", _ausgewaehlterKundeAdresse);
+
+    _datumFeld?.SetValueWithoutNotify(BelegTransferData.date);
+    _fristFeld?.SetValueWithoutNotify(BelegTransferData.dueDate);
+    _notizenFeld?.SetValueWithoutNotify(BelegTransferData.notes);
+
+    foreach (var item in BelegTransferData.items)
+    {
+        Service service = new Service
+        {
+            name = item.articleNumber,
+            description = item.description,
+            priceModel = "Stück",
+            price = item.unitPrice
+        };
+
+        FuegeZeileAusDienstleistungHinzu(service, item.quantity);
+    }
+
+    BerechneSummen();
+
+    BelegTransferData.Clear();
+}
+
+
+
+
 
     // Erzeugt eine fortlaufende Nummer im Format PREFIX-0001
     // Kann in Unterklassen überschrieben werden um eine andere Zählliste zu verwenden
@@ -605,7 +651,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // ============================================================
 
     // Prüft ob Pflichtfelder (Kunde + Unternehmensdaten) gefüllt sind
-    private bool PflichtfelderGefuellt()
+    protected bool PflichtfelderGefuellt()
 {
     if (string.IsNullOrWhiteSpace(_ausgewaehlterKunde))
     {
@@ -828,7 +874,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // POSITIONSZEILEN
     // ============================================================
 
-    private void FuegeZeileAusDienstleistungHinzu(Service service, int menge)
+    protected void FuegeZeileAusDienstleistungHinzu(Service service, int menge)
     {
         if (_positionenListe == null) return;
 
@@ -1710,7 +1756,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return string.Join("\n", zeilen);
     }
 
-    private string HoleCompanyName(DataBase db)
+    protected string HoleCompanyName(DataBase db)
     {
         List<Company> companies = db.getAllCompanies();
 
@@ -1722,7 +1768,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return LiesFeld(company, "name");
     }
 
-    private string HoleCompanyAddress(DataBase db)
+    protected string HoleCompanyAddress(DataBase db)
     {
         List<Company> companies = db.getAllCompanies();
 
@@ -1779,13 +1825,13 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 }
 
-    private float HoleMwstSatz()
+    protected float HoleMwstSatz()
     {
         int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
         return steuersatz / 100f;
     }
 
-    private List<VoraussetzungsBereich> PruefePflichtdaten()
+    protected List<VoraussetzungsBereich> PruefePflichtdaten()
 {
     var fehlend = new List<VoraussetzungsBereich>();
 
