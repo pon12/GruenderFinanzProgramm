@@ -95,8 +95,7 @@ public abstract class BelegScreenController : MonoBehaviour
         SammleElemente();
         _zeilen.Clear();
         if (_positionenListe != null) _positionenListe.Clear();
-        LeereDemoInhalte();
-        SetzeStandardwerte();
+
         LadeAbsenderdaten();
         LadeDienstleistungen();
         RegistriereSummenEingaben();
@@ -104,8 +103,26 @@ public abstract class BelegScreenController : MonoBehaviour
         RegistriereKundensuche();
         RegistriereKalenderButtons();
         RegistriereAnhaenge();
+
+        var session = BelegSessionDaten.Lade(BelegTyp);
+        if (session != null)
+        {
+            WiederherstelleSession(session);
+        }
+        else
+        {
+            LeereDemoInhalte();
+            SetzeStandardwerte();
+        }
+
         BerechneSummen();
         AktualisiereUmwandelnButton();
+    }
+
+    private void OnDisable()
+    {
+        SpeichereSession();
+        _buttonsRegistriert = false;
     }
 
     private void SammleElemente()
@@ -140,8 +157,19 @@ public abstract class BelegScreenController : MonoBehaviour
         Root.Query<TextField>().ForEach(f => f.SetValueWithoutNotify(""));
 
         var boxen = Root.Query(className: "angebot-address-box").ToList();
+        NormalisiereAdressBoxen(boxen);
         if (boxen.Count > 0) SetzeAdressePlatzhalter(boxen[0], HoleEmpfaengerBezeichnung());
         if (boxen.Count > 1) SetzeAdressePlatzhalter(boxen[1], HoleSenderBezeichnung());
+    }
+
+    private static void NormalisiereAdressBoxen(System.Collections.Generic.List<VisualElement> boxen)
+    {
+        foreach (var box in boxen)
+        {
+            box.style.flexGrow      = 1f;
+            box.style.alignSelf     = Align.Stretch;
+            box.style.flexShrink    = 0f;
+        }
     }
 
     private void SetzeAdressePlatzhalter(VisualElement box, string ueberschrift)
@@ -280,6 +308,7 @@ public abstract class BelegScreenController : MonoBehaviour
     private void LadeAbsenderdaten()
     {
         var boxen     = Root.Query(className: "angebot-address-box").ToList();
+        NormalisiereAdressBoxen(boxen);
         var senderBox = boxen.Count > 1 ? boxen[1] : null;
 
         try
@@ -296,16 +325,23 @@ public abstract class BelegScreenController : MonoBehaviour
                 string plz    = LiesFeld(f, "plz");
                 string ort    = LiesFeld(f, "location", "ort", "stadt");
                 string plzOrt = (plz + " " + ort).Trim();
-                string steuer = LiesFeld(f, "steuerNr", "steuernummer");
-                string ustId  = LiesFeld(f, "ustIdNr", "ustidnr");
+                string[] brancheOptionen = {
+                    "IT & Software", "Handel", "Handwerk", "Beratung", "Marketing & Medien",
+                    "Finanzen & Versicherung", "Gastronomie", "Gesundheit & Pflege",
+                    "Bildung", "Immobilien", "Logistik", "Sonstiges"
+                };
+                string brancheIndex = LiesFeld(f, "industry");
+                int    brancheIdx   = 0;
+                int.TryParse(brancheIndex, out brancheIdx);
+                string branche = (brancheIdx >= 0 && brancheIdx < brancheOptionen.Length)
+                    ? brancheOptionen[brancheIdx] : "";
 
                 var felder = new (string, string)[]
                 {
-                    ("Name",      name),
-                    ("Stra\u00dfe",    strasse),
-                    ("Ort",       plzOrt),
-                    ("St.-Nr.",   steuer),
-                    ("USt-IdNr.", ustId),
+                    ("Name",    name),
+                    ("Stra\u00dfe",  strasse),
+                    ("Ort",     plzOrt),
+                    ("Branche", branche),
                 };
 
                 if (senderBox != null)
@@ -649,7 +685,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // Pflichtfeld-Pr\u00fcfung
     // ============================================================
 
-    private bool PflichtfelderGefuellt()
+    protected bool PflichtfelderGefuellt()
     {
         if (string.IsNullOrWhiteSpace(_ausgewaehlterKunde))
         {
@@ -965,7 +1001,7 @@ public abstract class BelegScreenController : MonoBehaviour
         BerechneSummen();
     }
 
-    private Label ErstelleZeilenLabel(string text, bool bold)
+    protected Label ErstelleZeilenLabel(string text, bool bold)
     {
         var label = new Label(text);
         label.style.fontSize                    = 13;
@@ -1109,6 +1145,7 @@ public abstract class BelegScreenController : MonoBehaviour
         _suchErgebnisListe.style.display = DisplayStyle.None;
 
         var boxen = Root.Query(className: "angebot-address-box").ToList();
+        NormalisiereAdressBoxen(boxen);
         if (boxen.Count > 0)
         {
             SetzeAdresseStrukturiert(boxen[0], HoleEmpfaengerBezeichnung(),
@@ -1135,11 +1172,11 @@ public abstract class BelegScreenController : MonoBehaviour
         _anhangBereich.Clear();
         _anhangAusgewaehlt.Clear();
 
-        var ueberschrift = new Label("Anh\u00e4nge");
-        ueberschrift.style.fontSize                 = 13;
-        ueberschrift.style.unityFontStyleAndWeight  = FontStyle.Bold;
-        ueberschrift.style.color                    = Color.white;
-        ueberschrift.style.marginBottom             = 6;
+        var ueberschrift = new Label("Anhänge");
+        ueberschrift.style.fontSize                = 14;
+        ueberschrift.style.unityFontStyleAndWeight = FontStyle.Bold;
+        ueberschrift.style.color                   = Color.white;
+        ueberschrift.style.marginBottom            = 8;
         _anhangBereich.Add(ueberschrift);
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
@@ -1398,7 +1435,7 @@ public abstract class BelegScreenController : MonoBehaviour
         }
     }
 
-    private void StatusGeklickt(bool angenommen)
+    protected virtual void StatusGeklickt(bool angenommen)
     {
         if (angenommen && !VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
         if (angenommen && !PflichtfelderGefuellt()) return;
@@ -1414,7 +1451,7 @@ public abstract class BelegScreenController : MonoBehaviour
             angenommen ? FeedbackTyp.Erfolg : FeedbackTyp.Fehler);
     }
 
-    private void UebernimmInsKassenbuch()
+    protected void UebernimmInsKassenbuch()
     {
         try
         {
@@ -1525,7 +1562,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // Eingabe-Hilfsmethoden
     // ============================================================
 
-    private static void NurGanzeZahlen(TextField feld)
+    protected static void NurGanzeZahlen(TextField feld)
     {
         if (feld == null) return;
         feld.RegisterCallback<KeyDownEvent>(evt =>
@@ -1588,7 +1625,7 @@ public abstract class BelegScreenController : MonoBehaviour
         });
     }
 
-    private TextField NeuesTextFeld()
+    protected TextField NeuesTextFeld()
     {
         var feld = new TextField();
         feld.AddToClassList("angebot-input");
@@ -1646,7 +1683,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return "";
     }
 
-    private string KundenAnzeige(object kunde)
+    protected string KundenAnzeige(object kunde)
     {
         string vorname  = LiesFeld(kunde, "vorname", "firstName");
         string nachname = LiesFeld(kunde, "nachname", "lastName", "name", "firma");
@@ -1696,8 +1733,201 @@ public abstract class BelegScreenController : MonoBehaviour
         return string.Join("\n", zeilen);
     }
 
+    private void SpeichereSession()
+    {
+        var snap = new BelegSessionDaten.BelegSnapshot
+        {
+            Nummer     = _nummerFeld       != null ? _nummerFeld.value       : "",
+            Status     = _statusDropdown   != null ? _statusDropdown.value   : "",
+            Datum      = _datumFeld        != null ? _datumFeld.value        : "",
+            Frist      = _fristFeld        != null ? _fristFeld.value        : "",
+            Referenz   = Root.Q<TextField>(ReferenzFeldName)?.value          ?? "",
+            RabattTyp  = _rabattTypDropdown!= null ? _rabattTypDropdown.value: "",
+            RabattWert = _rabattWertFeld   != null ? _rabattWertFeld.value   : "",
+            SkontoWert = _skontoWertFeld   != null ? _skontoWertFeld.value   : "",
+            Notiz      = _notizenFeld      != null ? _notizenFeld.value      : "",
+            KundeId    = _ausgewaehlterKundeId,
+            KundeName  = _ausgewaehlterKunde,
+            KundeAdresse = _ausgewaehlterKundeAdresse,
+            AusgewaehlteAnhaenge = HoleAusgewaehlteAnhaenge(),
+        };
+
+        foreach (var zeile in _zeilen)
+        {
+            snap.Positionen.Add(new BelegSessionDaten.PositionsEintrag
+            {
+                Artikel      = zeile.Artikel      != null ? zeile.Artikel.text      : "",
+                Beschreibung = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                Menge        = zeile.Menge        != null ? zeile.Menge.value       : "1",
+                Einheit      = zeile.Einheit      != null ? zeile.Einheit.text      : "",
+                Preis        = zeile.Preis        != null ? zeile.Preis.text        : "",
+            });
+        }
+
+        BelegSessionDaten.Speichere(BelegTyp, snap);
+    }
+
+    private void WiederherstelleSession(BelegSessionDaten.BelegSnapshot snap)
+    {
+        // Felder befüllen
+        _nummerFeld?.SetValueWithoutNotify(snap.Nummer);
+        _datumFeld?.SetValueWithoutNotify(snap.Datum);
+        _fristFeld?.SetValueWithoutNotify(snap.Frist);
+        Root.Q<TextField>(ReferenzFeldName)?.SetValueWithoutNotify(snap.Referenz);
+        _notizenFeld?.SetValueWithoutNotify(snap.Notiz);
+
+        if (_statusDropdown != null && !string.IsNullOrEmpty(snap.Status)
+            && StatusOptionen.Contains(snap.Status))
+            _statusDropdown.SetValueWithoutNotify(snap.Status);
+
+        if (_rabattTypDropdown != null && !string.IsNullOrEmpty(snap.RabattTyp))
+            _rabattTypDropdown.SetValueWithoutNotify(snap.RabattTyp);
+
+        _rabattWertFeld?.SetValueWithoutNotify(
+            string.IsNullOrEmpty(snap.RabattWert) ? "0" : snap.RabattWert);
+        _skontoWertFeld?.SetValueWithoutNotify(
+            string.IsNullOrEmpty(snap.SkontoWert) ? "0" : snap.SkontoWert);
+
+        // Anhänge-Auswahl wiederherstellen
+        foreach (var key in snap.AusgewaehlteAnhaenge)
+            if (_anhangAusgewaehlt.ContainsKey(key))
+                _anhangAusgewaehlt[key] = true;
+
+        // Positionen wiederherstellen
+        foreach (var eintrag in snap.Positionen)
+        {
+            if (_positionenListe == null) break;
+
+            var zeile  = new PositionsZeile();
+            var wurzel = new VisualElement();
+            wurzel.AddToClassList("angebot-position-row");
+            wurzel.style.flexDirection = FlexDirection.Row;
+            wurzel.style.alignItems    = Align.Center;
+            wurzel.style.paddingTop    = 6;
+            wurzel.style.paddingBottom = 6;
+
+            var punkt = new VisualElement();
+            punkt.style.width                    = 10; punkt.style.height = 10;
+            punkt.style.borderTopLeftRadius      = 5;  punkt.style.borderTopRightRadius    = 5;
+            punkt.style.borderBottomLeftRadius   = 5;  punkt.style.borderBottomRightRadius = 5;
+            punkt.style.backgroundColor          = Gruen;
+            punkt.style.flexShrink               = 0;
+            punkt.style.marginRight              = 8;
+
+            zeile.Artikel              = ErstelleZeilenLabel(eintrag.Artikel, true);
+            zeile.Artikel.style.flexGrow = 1;
+            zeile.Artikel.style.minWidth = 120;
+
+            zeile.Beschreibung              = ErstelleZeilenLabel(eintrag.Beschreibung, false);
+            zeile.Beschreibung.style.width       = 220;
+            zeile.Beschreibung.style.marginRight = 8;
+
+            zeile.Menge = NeuesTextFeld();
+            zeile.Menge.style.width       = 70;
+            zeile.Menge.style.marginRight = 8;
+            zeile.Menge.SetValueWithoutNotify(eintrag.Menge);
+            NurGanzeZahlen(zeile.Menge);
+
+            zeile.Einheit              = ErstelleZeilenLabel(eintrag.Einheit, false);
+            zeile.Einheit.style.width       = 110;
+            zeile.Einheit.style.marginRight = 8;
+
+            zeile.Preis              = ErstelleZeilenLabel(eintrag.Preis, false);
+            zeile.Preis.style.width       = 110;
+            zeile.Preis.style.marginRight = 8;
+
+            float preisWert = ParseBetrag(eintrag.Preis);
+            int   mengeWert = 1;
+            int.TryParse(eintrag.Menge, out mengeWert);
+            if (mengeWert < 1) mengeWert = 1;
+
+            zeile.Gesamt = new Label(FormatBetrag(mengeWert * preisWert));
+            zeile.Gesamt.style.width          = 110;
+            zeile.Gesamt.style.fontSize       = 13;
+            zeile.Gesamt.style.color          = new Color(0.86f, 0.86f, 0.86f);
+            zeile.Gesamt.style.unityTextAlign = TextAnchor.MiddleRight;
+
+            var loeschen = new Button { text = "\u2715" };
+            loeschen.style.width             = 26; loeschen.style.height = 26;
+            loeschen.style.marginLeft        = 8;
+            loeschen.style.backgroundColor   = Color.clear;
+            loeschen.style.color             = new Color(0.6f, 0.6f, 0.6f);
+            loeschen.style.fontSize          = 12;
+            loeschen.style.borderTopWidth    = 0; loeschen.style.borderRightWidth   = 0;
+            loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth    = 0;
+            loeschen.RegisterCallback<MouseEnterEvent>(_ => loeschen.style.color = Rot);
+            loeschen.RegisterCallback<MouseLeaveEvent>(_ =>
+                loeschen.style.color = new Color(0.6f, 0.6f, 0.6f));
+
+            var lokalZeile  = zeile;
+            var lokalWurzel = wurzel;
+            loeschen.RegisterCallback<ClickEvent>(_ =>
+            {
+                lokalWurzel.RemoveFromHierarchy();
+                _zeilen.Remove(lokalZeile);
+                BerechneSummen();
+            });
+
+            float preisProEinheit = preisWert;
+            zeile.Menge.RegisterValueChangedCallback(_ =>
+            {
+                int m = 1;
+                int.TryParse(zeile.Menge.value, out m);
+                if (m < 1) m = 1;
+                zeile.Gesamt.text = FormatBetrag(m * preisProEinheit);
+                BerechneSummen();
+            });
+
+            wurzel.Add(punkt);
+            wurzel.Add(zeile.Artikel);
+            wurzel.Add(zeile.Beschreibung);
+            wurzel.Add(zeile.Menge);
+            wurzel.Add(zeile.Einheit);
+            wurzel.Add(zeile.Preis);
+            wurzel.Add(zeile.Gesamt);
+            wurzel.Add(loeschen);
+
+            zeile.Wurzel = wurzel;
+            _zeilen.Add(zeile);
+            _positionenListe.Add(wurzel);
+        }
+
+        // Kunden-Adressbox wiederherstellen
+        if (!string.IsNullOrEmpty(snap.KundeName))
+        {
+            _ausgewaehlterKunde        = snap.KundeName;
+            _ausgewaehlterKundeId      = snap.KundeId;
+            _ausgewaehlterKundeAdresse = snap.KundeAdresse;
+            _kundensuche?.SetValueWithoutNotify(snap.KundeName);
+
+            try
+            {
+                var boxen = Root.Query(className: "angebot-address-box").ToList();
+                NormalisiereAdressBoxen(boxen);
+                if (boxen.Count > 0)
+                {
+                    var db    = UserDatabaseAccess.getCurrentUserDatabase();
+                    var kunden = db.getAllCustomers();
+                    var kunde  = kunden?.Find(k => k.id == snap.KundeId);
+                    if (kunde != null)
+                        SetzeAdresseStrukturiert(boxen[0], HoleEmpfaengerBezeichnung(),
+                            new (string, string)[]
+                            {
+                                ("Name",    KundenAnzeige(kunde)),
+                                ("Stra\u00dfe",  LiesFeld(kunde, "strasse", "adresse", "address", "street")),
+                                ("Ort",     (LiesFeld(kunde, "plz", "postleitzahl", "zip") + " " +
+                                             LiesFeld(kunde, "ort", "stadt", "city", "location")).Trim()),
+                                ("E-Mail",  LiesFeld(kunde, "email", "mail")),
+                            });
+                }
+            }
+            catch { }
+        }
+    }
+
     private void ResetBelegFormular()
     {
+        BelegSessionDaten.Leere(BelegTyp);
         _zeilen.Clear();
         _positionenListe?.Clear();
         Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
@@ -1742,7 +1972,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return PlayerPrefs.GetInt("settings_steuersatz", 19).ToString();
     }
 
-    private List<VoraussetzungsBereich> PruefePflichtdaten()
+    protected List<VoraussetzungsBereich> PruefePflichtdaten()
     {
         var fehlend = new List<VoraussetzungsBereich>();
 

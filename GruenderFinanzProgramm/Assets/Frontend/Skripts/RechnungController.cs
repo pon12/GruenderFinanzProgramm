@@ -21,9 +21,9 @@ public class RechnungController : BelegScreenController
     {
         try
         {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            var db         = UserDatabaseAccess.getCurrentUserDatabase();
             var rechnungen = db.getAllInvoices();
-            int naechste = (rechnungen != null ? rechnungen.Count : 0) + 1;
+            int naechste   = (rechnungen != null ? rechnungen.Count : 0) + 1;
             return string.Format("{0}-{1:D4}", NummernPrefix, naechste);
         }
         catch
@@ -35,21 +35,40 @@ public class RechnungController : BelegScreenController
     protected override void RegistriereZusatzButtons()
     {
         var btnBezahlt = Root.Q<Button>("btn-bezahlt");
-        if (btnBezahlt == null)
-        {
+        if (btnBezahlt != null)
+            btnBezahlt.RegisterCallback<ClickEvent>(_ => BezahltGeklickt());
+        else
             Debug.LogWarning("[Rechnung] Bezahlt-Button nicht gefunden.");
-            return;
-        }
+    }
 
-        btnBezahlt.RegisterCallback<ClickEvent>(_ => BezahltGeklickt());
+    private void VersendetGeklickt()
+    {
+        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
+        if (!PflichtfelderGefuellt()) return;
+
+        var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
+        statusDropdown?.SetValueWithoutNotify("Versendet");
+
+        FeedbackPopup.Show(Root, "Rechnung versendet", FeedbackTyp.Erfolg);
+    }
+
+    private void StorniertGeklickt()
+    {
+        var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
+        statusDropdown?.SetValueWithoutNotify("Abgelehnt");
+
+        FeedbackPopup.Show(Root, "Rechnung storniert", FeedbackTyp.Fehler);
     }
 
     private void BezahltGeklickt()
     {
-        var statusDropdown = Root.Q<DropdownField>("dropdown-status");
-        if (statusDropdown != null)
-            statusDropdown.SetValueWithoutNotify("Bezahlt");
+        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
+        if (!PflichtfelderGefuellt()) return;
 
+        var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
+        statusDropdown?.SetValueWithoutNotify("Bezahlt");
+
+        UebernimmInsKassenbuch();
         FeedbackPopup.Show(Root, "Rechnung als bezahlt markiert", FeedbackTyp.Erfolg);
     }
 }
