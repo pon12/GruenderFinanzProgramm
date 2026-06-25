@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FortschrittController
   uiDocument: {fileID: 0}
+  helpIconTexture: {fileID: 2800000, guid: 1ea511ec5bd6a8148ab87a586b001f57, type: 3}
 --- !u!114 &1507894395
 MonoBehaviour:
   m_ObjectHideFlags: 0

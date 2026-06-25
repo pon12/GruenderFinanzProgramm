@@ -6,11 +6,6 @@
 //   2. Gründerpfad-Phasen mit Mini-Balken
 //   3. Nächste offene Schritte
 //   4. Letzte Erfolge
-//
-// EINRICHTUNG IN UNITY:
-//   1. Neues GameObject in der Fortschritt-Scene
-//   2. Script + UIDocument drauf
-//   3. UIDocument im Inspector zuweisen
 // ================================================================
 using System.Collections.Generic;
 using System.Linq;
@@ -22,31 +17,33 @@ public class FortschrittController : MonoBehaviour
     [Header("UI Document")]
     [SerializeField] private UIDocument uiDocument;
 
-    // ─── Phasen-Definition (muss mit GruendungspfadController übereinstimmen) ───
+    [Header("Help Icon (Help circle.png zuweisen)")]
+    [SerializeField] private Texture2D helpIconTexture;
+
+    // Phasen-Definition (muss mit GruendungspfadController übereinstimmen)
     private static readonly (string name, string icon, string[] schrittIds)[] Phasen =
     {
-        ("Vorbereitung", "📋", new[] { "vorb_1","vorb_2","vorb_3","vorb_4","vorb_5" }),
-        ("Anmeldung",    "📝", new[] { "anm_1","anm_2","anm_3","anm_4","anm_5"     }),
-        ("Finanzen",     "💰", new[] { "fin_1","fin_2","fin_3","fin_4"              }),
-        ("Betrieb",      "🚀", new[] { "betr_1","betr_2","betr_3","betr_4"         }),
-        ("Sonstiges",    "✅", new[] { "sonst_1","sonst_2","sonst_3"               }),
+        ("Vorbereitung", "\U0001f4cb", new[] { "vorb_1","vorb_2","vorb_3","vorb_4","vorb_5" }),
+        ("Anmeldung",    "\U0001f4dd", new[] { "anm_1","anm_2","anm_3","anm_4","anm_5"     }),
+        ("Finanzen",     "\U0001f4b0", new[] { "fin_1","fin_2","fin_3","fin_4"              }),
+        ("Betrieb",      "\U0001f680", new[] { "betr_1","betr_2","betr_3","betr_4"         }),
+        ("Sonstiges",    "\u2705",     new[] { "sonst_1","sonst_2","sonst_3"               }),
     };
 
-    // Schritt-Titel für Anzeige in "Nächste Schritte"
     private static readonly Dictionary<string, string> SchrittTitel = new()
     {
-        { "vorb_1", "Geschäftsidee ausarbeiten"   }, { "vorb_2", "Marktanalyse durchführen"    },
-        { "vorb_3", "Businessplan erstellen"       }, { "vorb_4", "Rechtsform wählen"           },
-        { "vorb_5", "Finanzierung klären"          },
-        { "anm_1",  "Gewerbeanmeldung"             }, { "anm_2",  "Notar beauftragen"           },
-        { "anm_3",  "Handelsregistereintrag"       }, { "anm_4",  "Steuernummer beantragen"     },
-        { "anm_5",  "IHK/HWK Mitgliedschaft"       },
-        { "fin_1",  "Geschäftskonto eröffnen"      }, { "fin_2",  "Buchhaltung einrichten"      },
-        { "fin_3",  "Versicherungen abschließen"   }, { "fin_4",  "Startkapital verwalten"      },
-        { "betr_1", "Erste Kunden akquirieren"     }, { "betr_2", "Website & Branding"          },
-        { "betr_3", "Prozesse dokumentieren"       }, { "betr_4", "Jahresabschluss vorbereiten" },
-        { "sonst_1","Team aufbauen"                }, { "sonst_2","Fördermittel beantragen"     },
-        { "sonst_3","Skalierung planen"            },
+        { "vorb_1", "Geschäftsidee ausarbeiten"    }, { "vorb_2", "Marktanalyse durchführen"    },
+        { "vorb_3", "Businessplan erstellen"        }, { "vorb_4", "Rechtsform wählen"           },
+        { "vorb_5", "Finanzierung klären"           },
+        { "anm_1",  "Gewerbeanmeldung"              }, { "anm_2",  "Notar beauftragen"           },
+        { "anm_3",  "Handelsregistereintrag"        }, { "anm_4",  "Steuernummer beantragen"     },
+        { "anm_5",  "IHK/HWK Mitgliedschaft"        },
+        { "fin_1",  "Geschäftskonto eröffnen"       }, { "fin_2",  "Buchhaltung einrichten"      },
+        { "fin_3",  "Versicherungen abschließen"    }, { "fin_4",  "Startkapital verwalten"      },
+        { "betr_1", "Erste Kunden akquirieren"      }, { "betr_2", "Website & Branding"          },
+        { "betr_3", "Prozesse dokumentieren"        }, { "betr_4", "Jahresabschluss vorbereiten" },
+        { "sonst_1","Team aufbauen"                 }, { "sonst_2","Fördermittel beantragen"     },
+        { "sonst_3","Skalierung planen"             },
     };
 
     [System.Serializable]
@@ -55,7 +52,7 @@ public class FortschrittController : MonoBehaviour
         public List<string> erledigteIds = new List<string>();
     }
 
-    // ─── UI Refs ───
+    // UI-Referenzen
     private VisualElement root;
     private Label         lblGesamtProzent;
     private Label         lblGesamtText;
@@ -79,6 +76,7 @@ public class FortschrittController : MonoBehaviour
         letzteErfolgeContainer    = root.Q<VisualElement>("letzte-erfolge-container");
 
         BaueUI();
+        RegistriereHelpTooltips();
     }
 
     // ============================================================
@@ -120,13 +118,12 @@ public class FortschrittController : MonoBehaviour
 
     private void BaueUI()
     {
-        var erledigt = LadeErledigteSchritte();
+        var erledigt       = LadeErledigteSchritte();
         int dokAusgefuellt = LadeAnzahlAusgefuelltePflichtDoks();
 
-        // Gesamtfortschritt: Gründerpfad-Schritte + Pflichtdoks
         int pfadGesamt   = Phasen.Sum(p => p.schrittIds.Length);
         int pfadErledigt = Phasen.Sum(p => p.schrittIds.Count(id => erledigt.Contains(id)));
-        int dokGesamt    = 21; // Pflichtdoks gesamt
+        int dokGesamt    = 21;
         int gesamt       = pfadGesamt + dokGesamt;
         int erledigtGes  = pfadErledigt + dokAusgefuellt;
         float prozent    = gesamt > 0 ? (float)erledigtGes / gesamt : 0f;
@@ -136,7 +133,6 @@ public class FortschrittController : MonoBehaviour
         if (lblGesamtText != null)
             lblGesamtText.text = $"{erledigtGes} von {gesamt} Schritten";
 
-        // Segment-Balken befüllen
         string[] segNames = { "vorbereitung", "anmeldung", "finanzen", "betrieb", "sonstiges" };
         for (int i = 0; i < Phasen.Length && i < segNames.Length; i++)
         {
@@ -170,7 +166,7 @@ public class FortschrittController : MonoBehaviour
             karte.AddToClassList("phase-karte");
             if (done) karte.AddToClassList("phase-karte--komplett");
 
-            var iconLabel = new Label(done ? "✅" : icon);
+            var iconLabel = new Label(done ? "\u2705" : icon);
             iconLabel.AddToClassList("phase-icon");
             karte.Add(iconLabel);
 
@@ -240,8 +236,8 @@ public class FortschrittController : MonoBehaviour
 
         if (angezeigt == 0)
         {
-            var done = new Label("🎉 Alle Schritte erledigt!");
-            done.style.color    = new StyleColor(new Color(128f/255f, 207f/255f, 149f/255f));
+            var done = new Label("\U0001f389 Alle Schritte erledigt!");
+            done.style.color    = new StyleColor(new Color(128f / 255f, 207f / 255f, 149f / 255f));
             done.style.fontSize = 14;
             done.style.marginTop = 12;
             naechsteSchritteContainer.Add(done);
@@ -253,31 +249,27 @@ public class FortschrittController : MonoBehaviour
         if (letzteErfolgeContainer == null) return;
         letzteErfolgeContainer.Clear();
 
-        // Erfolge die abgehakt sind – aus ErfolgeController-Logik ableiten
         var letzteErfolge = new List<(string icon, string titel, string kat)>();
 
-        // Aus Gründerpfad
-        if (erledigt.Contains("vorb_1")) letzteErfolge.Add(("📋", "Geschäftsidee ausgearbeitet", "Gründerpfad"));
-        if (erledigt.Contains("vorb_2")) letzteErfolge.Add(("🔍", "Marktanalyse durchgeführt",   "Gründerpfad"));
-        if (erledigt.Contains("vorb_3")) letzteErfolge.Add(("📊", "Businessplan erstellt",        "Gründerpfad"));
-        if (erledigt.Contains("anm_1"))  letzteErfolge.Add(("🏛", "Gewerbe angemeldet",           "Gründerpfad"));
-        if (erledigt.Contains("anm_3"))  letzteErfolge.Add(("📜", "Handelsregistereintrag",       "Gründerpfad"));
-        if (erledigt.Contains("fin_1"))  letzteErfolge.Add(("🏦", "Geschäftskonto eröffnet",      "Gründerpfad"));
-        if (erledigt.Contains("fin_2"))  letzteErfolge.Add(("📂", "Buchhaltung eingerichtet",     "Gründerpfad"));
-        if (erledigt.Contains("betr_2")) letzteErfolge.Add(("🎨", "Website & Branding erstellt",  "Gründerpfad"));
+        if (erledigt.Contains("vorb_1")) letzteErfolge.Add(("\U0001f4cb", "Geschäftsidee ausgearbeitet",  "Gründerpfad"));
+        if (erledigt.Contains("vorb_2")) letzteErfolge.Add(("\U0001f50d", "Marktanalyse durchgeführt",    "Gründerpfad"));
+        if (erledigt.Contains("vorb_3")) letzteErfolge.Add(("\U0001f4ca", "Businessplan erstellt",         "Gründerpfad"));
+        if (erledigt.Contains("anm_1"))  letzteErfolge.Add(("\U0001f3db", "Gewerbe angemeldet",            "Gründerpfad"));
+        if (erledigt.Contains("anm_3"))  letzteErfolge.Add(("\U0001f4dc", "Handelsregistereintrag",        "Gründerpfad"));
+        if (erledigt.Contains("fin_1"))  letzteErfolge.Add(("\U0001f3e6", "Geschäftskonto eröffnet",       "Gründerpfad"));
+        if (erledigt.Contains("fin_2"))  letzteErfolge.Add(("\U0001f4c2", "Buchhaltung eingerichtet",      "Gründerpfad"));
+        if (erledigt.Contains("betr_2")) letzteErfolge.Add(("\U0001f3a8", "Website & Branding erstellt",   "Gründerpfad"));
 
-        // Aus Dokumenten
-        if (dokAusgefuellt >= 1)  letzteErfolge.Add(("📄", "Erstes Dokument ausgefüllt",    "Dokumente"));
-        if (dokAusgefuellt >= 5)  letzteErfolge.Add(("📁", "5 Dokumente ausgefüllt",         "Dokumente"));
-        if (dokAusgefuellt >= 10) letzteErfolge.Add(("🗂", "10 Dokumente ausgefüllt",        "Dokumente"));
+        if (dokAusgefuellt >= 1)  letzteErfolge.Add(("\U0001f4c4", "Erstes Dokument ausgefüllt",  "Dokumente"));
+        if (dokAusgefuellt >= 5)  letzteErfolge.Add(("\U0001f4c1", "5 Dokumente ausgefüllt",       "Dokumente"));
+        if (dokAusgefuellt >= 10) letzteErfolge.Add(("\U0001f5c2", "10 Dokumente ausgefüllt",      "Dokumente"));
 
-        // Max 6 anzeigen
-        foreach (var (icon, titel, kat) in letzteErfolge.TakeLast(6))
+        foreach (var (chipIcon, titel, kat) in letzteErfolge.TakeLast(6))
         {
             var chip = new VisualElement();
             chip.AddToClassList("erfolg-chip");
 
-            var iconLabel = new Label(icon);
+            var iconLabel = new Label(chipIcon);
             iconLabel.AddToClassList("erfolg-chip-icon");
             chip.Add(iconLabel);
 
@@ -299,9 +291,40 @@ public class FortschrittController : MonoBehaviour
         if (!letzteErfolge.Any())
         {
             var hinweis = new Label("Noch keine Erfolge freigeschaltet – leg los!");
-            hinweis.style.color    = new StyleColor(new Color(140f/255f, 140f/255f, 140f/255f));
+            hinweis.style.color    = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
             hinweis.style.fontSize = 13;
             letzteErfolgeContainer.Add(hinweis);
         }
+    }
+
+    // ============================================================
+    // HELP TOOLTIPS
+    // ============================================================
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier siehst du deinen gesamten Gründungsfortschritt auf einen Blick. " +
+            "Der Balken kombiniert Gründerpfad-Schritte und ausgefüllte Pflichtdokumente. " +
+            "Je mehr du erledigst, desto weiter füllt er sich.");
+
+        HelpTooltip.Registriere(root, "btn-help-fortschritt",
+            "Der Gesamtfortschritt setzt sich aus Gründerpfad-Schritten (21) " +
+            "und Pflichtdokumenten (21) zusammen. " +
+            "Jeder abgehakte Schritt und jedes ausgefüllte Dokument zählt.");
+
+        HelpTooltip.Registriere(root, "btn-help-gruenderpfad",
+            "Zeigt den Fortschritt der fünf Gründerpfad-Phasen. " +
+            "Gehe zum Gründerpfad-Screen um einzelne Schritte abzuhaken " +
+            "und den Balken weiter zu füllen.");
+
+        HelpTooltip.Registriere(root, "btn-help-naechste-schritte",
+            "Die nächsten offenen Schritte im Gründerpfad. " +
+            "Erledige sie der Reihe nach um den Fortschritt voranzutreiben. " +
+            "Die Liste aktualisiert sich automatisch.");
+
+        HelpTooltip.Registriere(root, "btn-help-letzte-erfolge",
+            "Zuletzt freigeschaltete Errungenschaften aus Gründerpfad und Dokumenten. " +
+            "Den vollständigen Überblick findest du im Erfolge-Screen.");
     }
 }

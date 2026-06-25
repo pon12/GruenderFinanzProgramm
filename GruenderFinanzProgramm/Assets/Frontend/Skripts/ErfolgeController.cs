@@ -53,15 +53,15 @@ public class ErfolgeController : MonoBehaviour
         {
             new ErfolgsKategorie
             {
-                name = "Gr\u00fcndung", icon = "\U0001f3e2",
+                name = "Gründung", icon = "\U0001f3e2",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_stammdaten",   titel = "Stammdaten hinterlegt",      beschreibung = "Unternehmensstammdaten ausgef\u00fcllt",                      icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_gewerbe",      titel = "Gewerbe angemeldet",          beschreibung = "Gewerbeanmeldung im Dok-Pool hinterlegt",                     icon = "\U0001f3db", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_handelsreg",   titel = "Handelsregistereintrag",      beschreibung = "Handelsregisterauszug hochgeladen",                           icon = "\U0001f4dc", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_businessplan", titel = "Businessplan erstellt",       beschreibung = "Businessplan im Dok-Pool hinterlegt",                         icon = "\U0001f4ca", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_marktanalyse", titel = "Marktanalyse durchgef\u00fchrt", beschreibung = "Markt- & Wettbewerbsanalyse hinterlegt",                  icon = "\U0001f50d", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_gesellschaft", titel = "Gesellschaft gegr\u00fcndet", beschreibung = "Gr\u00fcndungsurkunde oder Gesellschaftsvertrag hinterlegt",  icon = "\U0001f91d", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_stammdaten",   titel = "Stammdaten hinterlegt",       beschreibung = "Unternehmensstammdaten ausgefüllt",                          icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_gewerbe",      titel = "Gewerbe angemeldet",           beschreibung = "Gewerbeanmeldung im Dok-Pool hinterlegt",                    icon = "\U0001f3db", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_handelsreg",   titel = "Handelsregistereintrag",       beschreibung = "Handelsregisterauszug hochgeladen",                          icon = "\U0001f4dc", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_businessplan", titel = "Businessplan erstellt",        beschreibung = "Businessplan im Dok-Pool hinterlegt",                        icon = "\U0001f4ca", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_marktanalyse", titel = "Marktanalyse durchgeführt",    beschreibung = "Markt- & Wettbewerbsanalyse hinterlegt",                     icon = "\U0001f50d", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_gesellschaft", titel = "Gesellschaft gegründet",       beschreibung = "Gründungsurkunde oder Gesellschaftsvertrag hinterlegt",      icon = "\U0001f91d", typ = ErfolgTyp.Einmalig },
                 }
             },
             new ErfolgsKategorie
@@ -69,10 +69,10 @@ public class ErfolgeController : MonoBehaviour
                 name = "Finanzen", icon = "\U0001f4b0",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_konto",      titel = "Gesch\u00e4ftskonto er\u00f6ffnet", beschreibung = "Kontodaten im Dok-Pool hinterlegt",        icon = "\U0001f3e6", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_bilanz",     titel = "Er\u00f6ffnungsbilanz erstellt",     beschreibung = "Er\u00f6ffnungsbilanz hinterlegt",         icon = "\U0001f4c8", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_umsatz_1k",  titel = "Erster Umsatz",                      beschreibung = "Kassenbuch-Umsatz: \u20ac1k / \u20ac10k / \u20ac100k erreicht", icon = "\U0001f4b5", typ = ErfolgTyp.Stackable, stufen = new[] { 1000, 10000, 100000 } },
-                    new Erfolg { id = "e_kontostand", titel = "Kontostand aktuell",                  beschreibung = "Kassenbuch-Kontostand hinterlegt",         icon = "\U0001f4b3", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_konto",      titel = "Geschäftskonto eröffnet",    beschreibung = "Kontodaten im Dok-Pool hinterlegt",                 icon = "\U0001f3e6", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_bilanz",     titel = "Eröffnungsbilanz erstellt",  beschreibung = "Eröffnungsbilanz hinterlegt",                       icon = "\U0001f4c8", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_umsatz_1k",  titel = "Erster Umsatz",              beschreibung = "Kassenbuch-Umsatz: €1k / €10k / €100k erreicht",   icon = "\U0001f4b5", typ = ErfolgTyp.Stackable, stufen = new[] { 1000, 10000, 100000 } },
+                    new Erfolg { id = "e_kontostand", titel = "Kontostand aktuell",          beschreibung = "Kassenbuch-Kontostand hinterlegt",                  icon = "\U0001f4b3", typ = ErfolgTyp.Einmalig },
                 }
             },
             new ErfolgsKategorie
@@ -80,10 +80,10 @@ public class ErfolgeController : MonoBehaviour
                 name = "Buchhaltung", icon = "\U0001f4c2",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_kunden",     titel = "Kunden hinterlegt",         beschreibung = "1 / 5 / 10 / 100 Kunden im System",  icon = "\U0001f465", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 5, 10, 100 } },
-                    new Erfolg { id = "e_angebote",   titel = "Angebote erstellt",          beschreibung = "1 / 10 / 50 Angebote erstellt",       icon = "\U0001f4c4", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 10, 50 } },
-                    new Erfolg { id = "e_rechnungen", titel = "Rechnungen gestellt",        beschreibung = "1 / 25 / 100 Rechnungen gestellt",    icon = "\U0001f9fe", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 25, 100 } },
-                    new Erfolg { id = "e_export",     titel = "Erste Rechnung exportiert",  beschreibung = "Eine Rechnung als PDF exportiert",    icon = "\U0001f4e4", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_kunden",     titel = "Kunden hinterlegt",          beschreibung = "1 / 5 / 10 / 100 Kunden im System",   icon = "\U0001f465", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 5, 10, 100 } },
+                    new Erfolg { id = "e_angebote",   titel = "Angebote erstellt",           beschreibung = "1 / 10 / 50 Angebote erstellt",        icon = "\U0001f4c4", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 10, 50 } },
+                    new Erfolg { id = "e_rechnungen", titel = "Rechnungen gestellt",         beschreibung = "1 / 25 / 100 Rechnungen gestellt",     icon = "\U0001f9fe", typ = ErfolgTyp.Stackable, stufen = new[] { 1, 25, 100 } },
+                    new Erfolg { id = "e_export",     titel = "Erste Rechnung exportiert",   beschreibung = "Eine Rechnung als PDF exportiert",     icon = "\U0001f4e4", typ = ErfolgTyp.Einmalig },
                 }
             },
             new ErfolgsKategorie
@@ -91,22 +91,22 @@ public class ErfolgeController : MonoBehaviour
                 name = "Dokumente", icon = "\U0001f5c2",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_agb",          titel = "AGBs erstellt",                beschreibung = "AGB im Dok-Pool hinterlegt",               icon = "\U0001f4d1", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_dsgvo",         titel = "DSGVO-konform",               beschreibung = "Datenschutzerkl\u00e4rung hinterlegt",     icon = "\U0001f512", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_impressum",     titel = "Impressum erstellt",          beschreibung = "Impressum im Dok-Pool hinterlegt",         icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_alle_dok",      titel = "Alle Dokumente vollst\u00e4ndig", beschreibung = "Alle Pflichtdokumente ausgef\u00fcllt", icon = "\u2705",     typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_agb",      titel = "AGBs erstellt",                 beschreibung = "AGB im Dok-Pool hinterlegt",                icon = "\U0001f4d1", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_dsgvo",    titel = "DSGVO-konform",                 beschreibung = "Datenschutzerklärung hinterlegt",          icon = "\U0001f512", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_impressum",titel = "Impressum erstellt",             beschreibung = "Impressum im Dok-Pool hinterlegt",         icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_alle_dok", titel = "Alle Dokumente vollständig",     beschreibung = "Alle Pflichtdokumente ausgefüllt",         icon = "\u2705",     typ = ErfolgTyp.Einmalig },
                 }
             },
             new ErfolgsKategorie
             {
-                name = "Gr\u00fcnderpfad", icon = "\U0001f5fa",
+                name = "Gründerpfad", icon = "\U0001f5fa",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_pfad_vorbereitung", titel = "Vorbereitung abgeschlossen", beschreibung = "Alle Schritte der Vorbereitung erledigt",    icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_pfad_anmeldung",    titel = "Anmeldung abgeschlossen",    beschreibung = "Alle Anmeldeschritte erledigt",              icon = "\U0001f4dd", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_pfad_finanzen",     titel = "Finanzen abgeschlossen",     beschreibung = "Alle Finanzschritte erledigt",               icon = "\U0001f4b0", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_pfad_betrieb",      titel = "Betrieb gestartet",          beschreibung = "Alle Betriebsschritte erledigt",             icon = "\U0001f680", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_pfad_komplett",     titel = "Gr\u00fcnderpfad komplett",  beschreibung = "Alle 21 Schritte des Gr\u00fcnderpfads erledigt", icon = "\U0001f3c6", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_pfad_vorbereitung", titel = "Vorbereitung abgeschlossen", beschreibung = "Alle Schritte der Vorbereitung erledigt",         icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_pfad_anmeldung",    titel = "Anmeldung abgeschlossen",    beschreibung = "Alle Anmeldeschritte erledigt",                   icon = "\U0001f4dd", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_pfad_finanzen",     titel = "Finanzen abgeschlossen",     beschreibung = "Alle Finanzschritte erledigt",                    icon = "\U0001f4b0", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_pfad_betrieb",      titel = "Betrieb gestartet",          beschreibung = "Alle Betriebsschritte erledigt",                  icon = "\U0001f680", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_pfad_komplett",     titel = "Gründerpfad komplett",       beschreibung = "Alle 21 Schritte des Gründerpfads erledigt",      icon = "\U0001f3c6", typ = ErfolgTyp.Einmalig },
                 }
             },
             new ErfolgsKategorie
@@ -114,10 +114,10 @@ public class ErfolgeController : MonoBehaviour
                 name = "Weitere", icon = "\u2b50",
                 erfolge = new List<Erfolg>
                 {
-                    new Erfolg { id = "e_erster_login",   titel = "Erste Schritte",              beschreibung = "Ventoriq zum ersten Mal gestartet",          icon = "\U0001f44b", typ = ErfolgTyp.Einmalig, erledigt = true },
-                    new Erfolg { id = "e_ci",             titel = "Corporate Identity",           beschreibung = "CI Manual im Dok-Pool hinterlegt",           icon = "\U0001f3a8", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_team",           titel = "Team aufgebaut",               beschreibung = "Muster-Arbeitsvertrag hinterlegt",           icon = "\U0001f468\u200d\U0001f4bc", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_dienstleistung", titel = "Dienstleistungen definiert",   beschreibung = "Dienstleistungskatalog hinterlegt",          icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_erster_login",   titel = "Erste Schritte",              beschreibung = "Ventoriq zum ersten Mal gestartet",      icon = "\U0001f44b", typ = ErfolgTyp.Einmalig, erledigt = true },
+                    new Erfolg { id = "e_ci",             titel = "Corporate Identity",           beschreibung = "CI Manual im Dok-Pool hinterlegt",       icon = "\U0001f3a8", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_team",           titel = "Team aufgebaut",               beschreibung = "Muster-Arbeitsvertrag hinterlegt",       icon = "\U0001f468\u200d\U0001f4bc", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_dienstleistung", titel = "Dienstleistungen definiert",   beschreibung = "Dienstleistungskatalog hinterlegt",      icon = "\U0001f4cb", typ = ErfolgTyp.Einmalig },
                 }
             },
         };
@@ -130,26 +130,12 @@ public class ErfolgeController : MonoBehaviour
     private static readonly Dictionary<string, string> KategorieTooltips =
         new Dictionary<string, string>
     {
-        ["Gr\u00fcndung"]    =
-            "Erfolge rund um die offizielle Gr\u00fcndung deines Unternehmens. " +
-            "Hinterlege Stammdaten, Gewerbeanmeldung und Businessplan " +
-            "um diese Erfolge freizuschalten.",
-        ["Finanzen"]      =
-            "Finanzielle Meilensteine: Gesch\u00e4ftskonto, Bilanz und Ums\u00e4tze. " +
-            "Stufige Erfolge steigen mit deinem Kassenbuch-Umsatz.",
-        ["Buchhaltung"]   =
-            "Erfolge f\u00fcr deine t\u00e4gliche Gesch\u00e4ftst\u00e4tigkeit: " +
-            "Kunden anlegen, Angebote und Rechnungen erstellen. " +
-            "Stufige Erfolge wachsen mit der Anzahl.",
-        ["Dokumente"]     =
-            "Erfolge f\u00fcr vollst\u00e4ndig ausgef\u00fcllte Dokumente im Dokumenten-Pool. " +
-            "F\u00fclle Pflichtfelder im Dokumente-Screen aus um sie freizuschalten.",
-        ["Gr\u00fcnderpfad"] =
-            "Erfolge basierend auf deinem Fortschritt im Gr\u00fcnderpfad. " +
-            "Hake Schritte im Gr\u00fcnderpfad ab um diese Erfolge zu erhalten.",
-        ["Weitere"]       =
-            "Besondere Errungenschaften au\u00dferhalb der Hauptkategorien. " +
-            "Einige werden automatisch freigeschaltet, andere erfordern spezifische Aktionen.",
+        ["Gründung"]    = "Erfolge rund um die offizielle Gründung deines Unternehmens. Hinterlege Stammdaten, Gewerbeanmeldung und Businessplan um diese Erfolge freizuschalten.",
+        ["Finanzen"]    = "Finanzielle Meilensteine: Geschäftskonto, Bilanz und Umsätze. Stufige Erfolge steigen mit deinem Kassenbuch-Umsatz.",
+        ["Buchhaltung"] = "Erfolge für deine tägliche Geschäftstätigkeit: Kunden anlegen, Angebote und Rechnungen erstellen. Stufige Erfolge wachsen mit der Anzahl.",
+        ["Dokumente"]   = "Erfolge für vollständig ausgefüllte Dokumente im Dokumenten-Pool. Fülle Pflichtfelder im Dokumente-Screen aus um sie freizuschalten.",
+        ["Gründerpfad"] = "Erfolge basierend auf deinem Fortschritt im Gründerpfad. Hake Schritte im Gründerpfad ab um diese Erfolge zu erhalten.",
+        ["Weitere"]     = "Besondere Errungenschaften außerhalb der Hauptkategorien. Einige werden automatisch freigeschaltet, andere erfordern spezifische Aktionen.",
     };
 
     // ============================================================
@@ -212,12 +198,12 @@ public class ErfolgeController : MonoBehaviour
             { "Handelsregisterauszug",                   "e_handelsreg"     },
             { "Businessplan",                            "e_businessplan"   },
             { "Markt- & Wettbewerbsanalyse",             "e_marktanalyse"   },
-            { "Gr\u00fcndungsurkunde / Gesellschaftsvertrag", "e_gesellschaft" },
+            { "Gründungsurkunde / Gesellschaftsvertrag", "e_gesellschaft"   },
             { "Gesellschafterliste",                     "e_gesellschaft"   },
             { "Kontodaten (IBAN/BIC)",                   "e_konto"          },
-            { "Er\u00f6ffnungsbilanz",                   "e_bilanz"         },
+            { "Eröffnungsbilanz",                        "e_bilanz"         },
             { "AGB",                                     "e_agb"            },
-            { "Datenschutzerkl\u00e4rung (DSGVO)",       "e_dsgvo"          },
+            { "Datenschutzerklärung (DSGVO)",            "e_dsgvo"          },
             { "Impressum",                               "e_impressum"      },
             { "Corporate Identity Manual",               "e_ci"             },
             { "Muster-Arbeitsvertrag",                   "e_team"           },
@@ -228,7 +214,7 @@ public class ErfolgeController : MonoBehaviour
             if (dokZuErfolg.TryGetValue(titel, out string erfolgId))
                 SetzeErfolg(erfolgId, true);
 
-        int pflichtGesamt     = gespeichert.savedDocs.Count(d => d.istPflichtdokument);
+        int pflichtGesamt      = gespeichert.savedDocs.Count(d => d.istPflichtdokument);
         int pflichtAusgefuellt = ausgefuellte.Count;
         if (pflichtGesamt > 0 && pflichtAusgefuellt >= pflichtGesamt)
             SetzeErfolg("e_alle_dok", true);
@@ -354,7 +340,7 @@ public class ErfolgeController : MonoBehaviour
 
         float prozent = gesamtErfolge > 0 ? (float)erledigtGesamt / gesamtErfolge : 0f;
         if (lblGesamtProzent != null)
-            lblGesamtProzent.text = string.Format("{0}%", Mathf.RoundToInt(prozent * 100));
+            lblGesamtProzent.text = $"{Mathf.RoundToInt(prozent * 100)}%";
         if (gesamtBalkenFill != null)
             gesamtBalkenFill.style.width = new StyleLength(new Length(prozent * 100f, LengthUnit.Percent));
     }
@@ -376,13 +362,13 @@ public class ErfolgeController : MonoBehaviour
         header.Add(nameLabel);
 
         float katProzent = gesamt > 0 ? (float)erledigt / gesamt : 0f;
-        var prozentLabel = new Label(string.Format("{0}%", Mathf.RoundToInt(katProzent * 100)));
+        var prozentLabel = new Label($"{Mathf.RoundToInt(katProzent * 100)}%");
         prozentLabel.AddToClassList("kategorie-prozent");
         header.Add(prozentLabel);
 
         // Hilfe-Icon rechts im Header
         var helpIcon = new VisualElement();
-        helpIcon.name = "btn-help-kat-" + kat.name.ToLower().Replace("\u00fc", "ue");
+        helpIcon.name = "btn-help-kat-" + kat.name.ToLower();
         HelpTooltip.SetzeBasisStilOeffentlich(helpIcon);
         var tex = helpIconTexture != null
             ? helpIconTexture
@@ -426,8 +412,8 @@ public class ErfolgeController : MonoBehaviour
         iconBox.AddToClassList("erfolg-icon-box");
         if (e.erledigt) iconBox.AddToClassList("erfolg-icon-box--erledigt");
         var iconLabel = new Label(e.icon);
-        iconLabel.style.fontSize        = 18;
-        iconLabel.style.unityTextAlign  = TextAnchor.MiddleCenter;
+        iconLabel.style.fontSize       = 18;
+        iconLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         iconBox.Add(iconLabel);
         kachel.Add(iconBox);
 
@@ -447,8 +433,7 @@ public class ErfolgeController : MonoBehaviour
         {
             var badge = new Label("Stufig");
             badge.AddToClassList("erfolg-stackable-badge");
-            badge.style.color = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
-            badge.style.backgroundColor = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f, 0.15f));
+            badge.style.color = new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
             titelRow.Add(badge);
         }
 
@@ -482,10 +467,8 @@ public class ErfolgeController : MonoBehaviour
                 ? e.stufen[e.aktuellerStufenIndex]
                 : e.stufen[gesamtStufen - 1];
             string stufenText = e.aktuellerStufenIndex >= gesamtStufen
-                ? string.Format("{0} \u2013 Alle Stufen erreicht!", e.aktuellerWert)
-                : string.Format("{0} von {1} \u2013 Stufe {2} von {3}",
-                    e.aktuellerWert, naechsteZiel,
-                    e.aktuellerStufenIndex + 1, gesamtStufen);
+                ? $"{e.aktuellerWert} – Alle Stufen erreicht!"
+                : $"{e.aktuellerWert} von {naechsteZiel} – Stufe {e.aktuellerStufenIndex + 1} von {gesamtStufen}";
             var countLabel = new Label(stufenText);
             countLabel.AddToClassList("stackable-count-label");
             countLabel.style.color = new StyleColor(new UnityEngine.Color(0.6f, 0.6f, 0.6f));
@@ -496,7 +479,7 @@ public class ErfolgeController : MonoBehaviour
 
         if (e.erledigt)
         {
-            var check = new Label("\u2713");
+            var check = new Label("✓");
             check.AddToClassList("erfolg-check");
             kachel.Add(check);
         }
@@ -513,11 +496,11 @@ public class ErfolgeController : MonoBehaviour
         HelpTooltip.Registriere(root, "btn-help-seitentitel",
             "Hier siehst du alle deine Errungenschaften. " +
             "Erfolge werden automatisch freigeschaltet wenn du " +
-            "Dokumente hinterlegst, Kunden anlegst oder Ums\u00e4tze erzielst.");
+            "Dokumente hinterlegst, Kunden anlegst oder Umsätze erzielst.");
 
         HelpTooltip.Registriere(root, "btn-help-fortschritt",
             "Zeigt wie viele Erfolge du insgesamt bereits freigeschaltet hast. " +
-            "Der Balken f\u00fcllt sich mit jedem neuen Erfolg.");
+            "Der Balken füllt sich mit jedem neuen Erfolg.");
     }
 
     private void RegistriereKarteTooltip(VisualElement helpIcon, string kategorieName)

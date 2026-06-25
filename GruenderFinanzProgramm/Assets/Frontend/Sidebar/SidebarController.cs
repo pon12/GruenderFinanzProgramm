@@ -53,7 +53,7 @@ public class SidebarController : MonoBehaviour
         { "nav-item-kassenbuch",       "Kassenbuch"       },
         { "nav-item-export",           "Export-Screen"    },
         { "nav-item-liquidität",        "Finanzen1"        },
-        { "nav-item-rentabilität",       "Finanzen2"        },
+        { "nav-item-rentabilität",      "Finanzen2"        },
         { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };

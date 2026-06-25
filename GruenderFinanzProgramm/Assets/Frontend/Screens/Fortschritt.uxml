@@ -1,22 +1,25 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
-    <Style src="project://database/Assets/Frontend/Stylesheets/Fortschritt.uss"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Fortschritt.uss?fileID=7433441132597879392&amp;guid=0d2bb2b07b45aad439f28349b8b5fcf4&amp;type=3#Fortschritt"/>
     <ui:VisualElement name="root-container" style="flex-grow: 1; background-color: rgb(30, 30, 30);">
         <ui:ScrollView name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 20px 430px;">
-
-            <!-- Header -->
             <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <ui:VisualElement>
-                    <ui:Label text="Fortschritt" class="page-title"/>
-                    <ui:Label text="Dein Überblick über den gesamten Gründungsfortschritt" class="page-subtitle"/>
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement>
+                        <ui:Label text="Fortschritt" class="page-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:Label text="Dein Überblick über den gesamten Gründungsfortschritt" class="page-subtitle" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 213px; bottom: 18px; left: -196px;"/>
                 </ui:VisualElement>
                 <ui:Label name="lbl-gesamt-prozent" text="0%" class="gesamt-prozent-label"/>
             </ui:VisualElement>
-
-            <!-- Segmentierter Fortschrittsbalken wie Dashboard -->
             <ui:VisualElement class="progress-section">
                 <ui:VisualElement class="progress-header">
-                    <ui:Label text="Gesamtfortschritt Gründung" class="section-title"/>
+                    <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Gesamtfortschritt Gründung" class="section-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:VisualElement name="btn-help-fortschritt" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
+                    </ui:VisualElement>
                     <ui:Label name="lbl-gesamt-text" text="0 von 0 Schritten" class="progress-percent"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="progress-segments-row" class="progress-segments-row">
@@ -52,30 +55,29 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-
-            <!-- Mittlere Reihe mit gleicher Höhe -->
             <ui:VisualElement style="flex-direction: row; margin-bottom: 24px; align-items: stretch;">
-
-                <!-- Gründerpfad Phasen -->
                 <ui:VisualElement class="panel-box" style="flex-grow: 1; margin-right: 16px;">
-                    <ui:Label text="Gründerpfad" class="panel-title" style="margin-bottom: 12px;"/>
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
+                        <ui:Label text="Gründerpfad" class="panel-title" style="margin-bottom: 0; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:VisualElement name="btn-help-gruenderpfad" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
+                    </ui:VisualElement>
                     <ui:VisualElement name="phasen-container" style="flex-direction: column; flex-grow: 1;"/>
                 </ui:VisualElement>
-
-                <!-- Nächste Schritte -->
                 <ui:VisualElement class="panel-box" style="flex-grow: 1;">
-                    <ui:Label text="Nächste Schritte" class="panel-title" style="margin-bottom: 12px;"/>
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
+                        <ui:Label text="Nächste Schritte" class="panel-title" style="margin-bottom: 0; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:VisualElement name="btn-help-naechste-schritte" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
+                    </ui:VisualElement>
                     <ui:VisualElement name="naechste-schritte-container" style="flex-direction: column; flex-grow: 1;"/>
                 </ui:VisualElement>
-
             </ui:VisualElement>
-
-            <!-- Letzte Erfolge -->
             <ui:VisualElement class="panel-box" style="margin-bottom: 24px;">
-                <ui:Label text="Letzte Erfolge" class="panel-title" style="margin-bottom: 12px;"/>
+                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
+                    <ui:Label text="Letzte Erfolge" class="panel-title" style="margin-bottom: 0; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:VisualElement name="btn-help-letzte-erfolge" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
+                </ui:VisualElement>
                 <ui:VisualElement name="letzte-erfolge-container" style="flex-direction: row; flex-wrap: wrap;"/>
             </ui:VisualElement>
-
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>
