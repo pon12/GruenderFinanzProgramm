@@ -1,39 +1,36 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
-    <Style src="project://database/Assets/Frontend/Stylesheets/HelpTooltip.uss"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <ui:VisualElement name="root-container" class="screen-root" style="width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0 430px; overflow: hidden;">
             <ui:VisualElement name="page-header-row" style="flex-direction: row; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <ui:VisualElement style="flex-direction: row; align-items: center;">
                     <ui:VisualElement>
                         <ui:Label text="Dokumente" name="page-title" class="page-title"/>
-                        <ui:Label text="Zentrale Dokumentablage &#8211; feste und individuelle Kategorien" class="page-subtitle"/>
+                        <ui:Label text="Zentrale Dokumentablage – feste und individuelle Kategorien" class="page-subtitle"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                    <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 180px; bottom: 15px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="btn-help-alle-loeschen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                    <ui:Button text="Alle l&#246;schen" name="Delete-Button" class="doc-btn-danger-outline" style="margin-left: 8px;"/>
+                    <ui:VisualElement name="btn-help-alle-loeschen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; top: 20px;"/>
+                    <ui:Button text="Alle löschen" name="Delete-Button" class="doc-btn-danger-outline" style="margin-left: 8px; bottom: 0; top: 20px;"/>
                 </ui:VisualElement>
-                <ui:Button text="Alle löschen" name="Delete-Button" class="doc-btn-danger-outline" style="color: rgb(255, 255, 255); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-color: rgb(230, 57, 70);"/>
             </ui:VisualElement>
             <ui:ScrollView name="Main-Scroll-View" style="flex-grow: 1;">
                 <ui:VisualElement name="Grid-Container" class="grid-container"/>
             </ui:ScrollView>
         </ui:VisualElement>
-
-        <!-- Popup: Neues Dokument erstellen -->
         <ui:VisualElement name="Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Popup-Window" class="doc-card popup-window">
                 <ui:VisualElement name="Popup-Header" class="popup-header-row">
                     <ui:VisualElement>
                         <ui:Label text="Neues Dokument" class="card-title"/>
-                        <ui:Label text="Titel und Kategorie w&#228;hlen" class="card-subtitle"/>
+                        <ui:Label text="Titel und Kategorie wählen" class="card-subtitle"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="btn-help-popup-erstellen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                        <ui:Button text="&#8592; Zur&#252;ck" name="Btn-Cancel" class="doc-btn-secondary" style="margin-left: 8px;"/>
+                        <ui:Button text="← Zurück" name="Btn-Cancel" class="doc-btn-secondary" style="margin-left: 8px;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="Form-Group-1" class="form-group">
@@ -46,7 +43,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="Form-Group-3" class="form-group">
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
-                        <ui:Label text="Vorlage w&#228;hlen" class="field-label" style="margin-bottom: 0;"/>
+                        <ui:Label text="Vorlage wählen" class="field-label" style="margin-bottom: 0;"/>
                         <ui:VisualElement name="btn-help-vorlage" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="Template-Grid" class="template-grid">
@@ -61,15 +58,13 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <!-- Popup: Dokumenten-Liste (Detail) -->
         <ui:VisualElement name="Detail-Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Detail-Menu-Container" class="doc-card detail-popup-box">
                 <ui:VisualElement name="Detail-Header" class="popup-header-row">
                     <ui:Label text="Dokumenten-Liste" name="Detail-Popup-Title" class="card-title" style="flex-grow: 1;"/>
                     <ui:VisualElement style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="btn-help-detail-liste" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                        <ui:Button text="Schlie&#223;en" name="Btn-Detail-Close" class="doc-btn-secondary" style="margin-left: 8px;"/>
+                        <ui:Button text="Schließen" name="Btn-Detail-Close" class="doc-btn-secondary" style="margin-left: 8px;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="Detail-Split-Body" class="split-body-layout">
@@ -85,15 +80,13 @@
                 <ui:Button text="+ Neues Dokument erstellen" name="Btn-List-Create-New" class="doc-btn-primary" style="margin-top: 16px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <!-- Popup: Dokument bearbeiten -->
         <ui:VisualElement name="Edit-Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Edit-Popup-Container" class="doc-card edit-popup-box">
                 <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px;">
                     <ui:Label text="Dokument bearbeiten" class="card-title" style="margin-bottom: 0;"/>
                     <ui:VisualElement name="btn-help-popup-bearbeiten" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                 </ui:VisualElement>
-                <ui:Label text="&#128274; Pflichtdokument &#8211; Werte &#228;nderbar, aber nicht l&#246;schbar" name="Edit-Locked-Hint" class="locked-hint" style="display: none;"/>
+                <ui:Label text="🔒 Pflichtdokument – Werte änderbar, aber nicht löschbar" name="Edit-Locked-Hint" class="locked-hint" style="display: none;"/>
                 <ui:VisualElement class="form-group" style="margin-top: 12px;">
                     <ui:Label text="Titel" class="field-label"/>
                     <ui:TextField label="" placeholder-text="Dokumenttitel" name="Edit-Doc-Name-Input"/>
@@ -122,19 +115,17 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <!-- Popup: Alle Dokumente löschen bestätigen -->
         <ui:VisualElement name="Delete-Confirm-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Delete-Confirm-Container" class="doc-card delete-confirm-box">
                 <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px;">
-                    <ui:Label text="&#9888; Alle Dokumente l&#246;schen?" class="card-title" style="margin-bottom: 0;"/>
+                    <ui:Label text="⚠ Alle Dokumente löschen?" class="card-title" style="margin-bottom: 0;"/>
                     <ui:VisualElement name="btn-help-popup-loeschen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                 </ui:VisualElement>
                 <ui:Label text="" name="Delete-Confirm-Hint" class="delete-confirm-hint" style="margin-top: 10px; margin-bottom: 4px;"/>
                 <ui:Label text="Diese Aktion kann nicht widerrufen werden." class="card-subtitle" style="margin-bottom: 16px;"/>
                 <ui:VisualElement class="popup-footer-row">
                     <ui:Button text="Abbrechen" name="Btn-Delete-Confirm-Cancel" class="doc-btn-secondary"/>
-                    <ui:Button text="Endg&#252;ltig l&#246;schen" name="Btn-Delete-Confirm-Yes" class="doc-btn-danger-outline"/>
+                    <ui:Button text="Endgültig löschen" name="Btn-Delete-Confirm-Yes" class="doc-btn-danger-outline"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
