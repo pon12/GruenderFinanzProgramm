@@ -1,4 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Row-Template.uss?fileID=7433441132597879392&amp;guid=9678bb8acbf77654590b8c70e51f738c&amp;type=3#Row-Template"/>
     <ui:VisualElement name="row-item" class="row-item" style="flex-grow: 0; background-size: 80px 100%; flex-shrink: 0; background-color: rgb(0, 0, 0);">
         <ui:Label text="Label" name="row-bezeichnung" class="row-text-sub col-bezeichnung" style="-unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255);"/>
@@ -8,6 +9,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="actions-container" class="col-pfad" style="flex-grow: 1; flex-direction: row; align-items: center;">
             <ui:Button text="" name="btn-open-folder" class="btn-folder" style="background-image: resource(&quot;Icons/folder&quot;); background-size: 60% 60%;"/>
+            <ui:VisualElement name="btn-help-export-btn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px; right: 7px;"/>
             <ui:Button text="Exportieren" name="btn-export" class="btn-export" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); color: rgb(255, 255, 255); background-color: rgb(129, 207, 149);"/>
         </ui:VisualElement>
     </ui:VisualElement>

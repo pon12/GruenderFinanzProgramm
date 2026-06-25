@@ -59,6 +59,8 @@ public class KassenbuchController : MonoBehaviour
     private const string PLACEHOLDER_ZWECK = "z. B. Einkauf, Tanken, Gehalt...";
 
 
+    private VisualElement _root;
+
     void OnEnable()
     {
 
@@ -78,6 +80,7 @@ public class KassenbuchController : MonoBehaviour
 
 
         var root = GetComponent<UIDocument>().rootVisualElement;
+        _root = root;
 
 
         _overlay = root.Q<VisualElement>("popup-overlay");
@@ -251,8 +254,59 @@ public class KassenbuchController : MonoBehaviour
 
 
         createList();
+        RegistriereHelpTooltips(root);
     }
 
+
+
+    private void RegistriereHelpTooltips(VisualElement root)
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Das Kassenbuch erfasst alle Einnahmen und Ausgaben deines Unternehmens. " +
+            "Wähle oben rechts das Jahr, um Einträge jahresweise zu filtern. " +
+            "Der Kontostand berechnet sich automatisch aus allen Buchungen.");
+
+        HelpTooltip.Registriere(root, "btn-help-kontostand",
+            "Zeigt den aktuellen Saldo: alle Einnahmen minus alle Ausgaben. " +
+            "Klicke auf den Betrag um Details zu sehen. " +
+            "Der Wert wird bei jeder neuen Buchung automatisch aktualisiert.");
+
+        HelpTooltip.Registriere(root, "btn-help-ausgaben",
+            "Erfasst eine neue Ausgabe im Kassenbuch. " +
+            "Gib Betrag, Verwendungszweck, Art und Datum ein. " +
+            "Ausgaben reduzieren deinen Kontostand.");
+
+        HelpTooltip.Registriere(root, "btn-help-einnahmen",
+            "Erfasst eine neue Einnahme im Kassenbuch. " +
+            "Gib Betrag, Verwendungszweck, Art und Datum ein. " +
+            "Einnahmen erhöhen deinen Kontostand.");
+
+        HelpTooltip.Registriere(root, "btn-help-finanzexport",
+            "Exportiert alle Kassenbucheinträge des gewählten Jahres als PDF. " +
+            "Die Datei kann direkt an das Finanzamt weitergegeben werden. " +
+            "Das Jahr wählst du über das Dropdown oben rechts.");
+
+        HelpTooltip.Registriere(root, "btn-help-spalte-name",
+            "Name und Verwendungszweck des Buchungseintrags. " +
+            "Beschreibt wofür die Zahlung bestimmt war.");
+
+        HelpTooltip.Registriere(root, "btn-help-spalte-datum",
+            "Datum an dem die Buchung stattgefunden hat. " +
+            "Format: TT.MM.JJJJ");
+
+        HelpTooltip.Registriere(root, "btn-help-spalte-betrag",
+            "Betrag der Buchung in Euro. " +
+            "Einnahmen werden grün, Ausgaben rot dargestellt.");
+
+        HelpTooltip.Registriere(root, "btn-help-spalte-typ",
+            "Gibt an ob es sich um eine Einnahme oder Ausgabe handelt. " +
+            "Außerdem die gewählte Art der Buchung (z. B. Marketing, Steuern).");
+
+        HelpTooltip.Registriere(root, "btn-help-popup",
+            "Trage hier die Details der Buchung ein. " +
+            "Betrag, Verwendungszweck, Art und Datum sind Pflichtfelder. " +
+            "Das Datum kann über den Kalender ausgewählt werden.");
+    }
 
     void OnDisable()
     {

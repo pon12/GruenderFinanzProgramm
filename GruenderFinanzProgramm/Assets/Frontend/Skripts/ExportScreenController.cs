@@ -11,6 +11,7 @@ public class ExportScreenController : MonoBehaviour
     [Header("UI Templates & Container")]
     [SerializeField] private VisualTreeAsset exportZeileTemplate;
 
+    private VisualElement _root;
     private ScrollView exportListContainer;
 
     private DataBase currentDb;
@@ -34,9 +35,11 @@ public class ExportScreenController : MonoBehaviour
         if (uiDocument == null) { Debug.LogError("[Export] UIDocument nicht gefunden."); return; }
 
         VisualElement root = uiDocument.rootVisualElement;
+        _root = root;
         exportListContainer = root.Q<ScrollView>("export-list-container");
 
         LadeAlleDaten();
+        RegistriereHelpTooltips(root);
     }
 
     // ─────────────────────────────────────────
@@ -165,6 +168,14 @@ public class ExportScreenController : MonoBehaviour
             if (btnExport != null)
                 btnExport.clicked += () => ExportierePDF(lokalerEintrag);
 
+            // Hilfe-Icon pro Zeile registrieren
+            var zeilenHelp = neueZeile.Q<VisualElement>("btn-help-export-btn");
+            if (zeilenHelp != null)
+                HelpTooltip.RegistriereInKarte(_root, zeilenHelp,
+                    "Exportiert dieses Dokument als PDF auf deinen Desktop. " +
+                    "Die Datei wird automatisch geöffnet. " +
+                    "Mit dem Ordner-Symbol links öffnest du den Speicherort.");
+
             exportListContainer.Add(neueZeile);
         }
     }
@@ -292,4 +303,29 @@ public class ExportScreenController : MonoBehaviour
             document.Close();
         }
     }
+
+    private void RegistriereHelpTooltips(VisualElement root)
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier exportierst du alle deine Dokumente und PDFs. " +
+            "Jeder Eintrag kann einzeln als PDF gespeichert werden. " +
+            "Mit dem Ordner-Button öffnest du den letzten Speicherort.");
+
+        HelpTooltip.Registriere(root, "btn-help-bezeichnung",
+            "Name des Dokuments oder der Datei. " +
+            "Entspricht dem Titel wie er in der Dokumentenablage hinterlegt ist.");
+
+        HelpTooltip.Registriere(root, "btn-help-art",
+            "Kategorie des Dokuments, z. B. Gründung, Finanzen oder Bezahlweise. " +
+            "Gibt an woher das Dokument stammt.");
+
+        HelpTooltip.Registriere(root, "btn-help-format",
+            "Dateiformat des Exports. " +
+            "Aktuell werden alle Dokumente als PDF exportiert.");
+
+        HelpTooltip.Registriere(root, "btn-help-pfad",
+            "Letzter Speicherort der exportierten Datei. " +
+            "Klicke den Ordner-Button in einer Zeile um den Ordner zu öffnen.");
+    }
+
 }

@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/Frontend/Stylesheets/HelpTooltip.uss"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Angebot.uss?fileID=7433441132597879392&amp;guid=4b488f833bdc4bf43ac3915e80664efc&amp;type=3#Angebot"/>
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
@@ -52,7 +52,7 @@
                         </ui:VisualElement>
                         <ui:VisualElement style="flex: 0; flex-direction: column; gap: 4px; min-width: 70px;">
                             <ui:Label text="Währung" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                            <ui:Label text="EUR" style="font-size: 12px; color: rgb(255, 255, 255); background-color: rgb(70, 70, 70); border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; padding-top: 12px; padding-bottom: 12px; padding-left: 16px; padding-right: 10px; height: 35px; margin-left: 8px; align-content: center; align-items: center;"/>
+                            <ui:Label text="EUR" style="font-size: 12px; color: rgb(255, 255, 255); background-color: rgb(70, 70, 70); border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; padding-top: 10px; padding-bottom: 5px; padding-left: 16px; padding-right: 10px; height: 35px; margin-left: 8px; align-content: center; align-items: center;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex-direction: row; gap: 10px;">
@@ -72,9 +72,9 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                                <ui:VisualElement name="card-anhaenge" class="angebot-card" style="flex: 1; flex-direction: column; padding: 14px 16px; background-color: rgb(44, 44, 44); margin-left: 8px;">
+                <ui:VisualElement name="card-anhaenge" class="angebot-card" style="flex: 1; flex-direction: column; padding: 14px 16px; background-color: rgb(44, 44, 44); margin-left: 8px;">
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Anh&#228;nge" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:Label text="Anhänge" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                         <ui:VisualElement style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-anhaenge" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                     </ui:VisualElement>
@@ -135,7 +135,7 @@
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
                             <ui:Label text="Rabatt (Wert in %)" style="font-size: 11px; color: rgb(180, 180, 180);"/>
-                            <ui:TextField name="input-rabatt-wert" style="width: 239px;"/>
+                            <ui:TextField name="input-rabatt-wert" style="width: 239px; padding-top: 0; padding-right: 3px; padding-bottom: 0; padding-left: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
                             <ui:Label text="Skonto (Wert in %)" style="font-size: 11px; color: rgb(180, 180, 180);"/>
