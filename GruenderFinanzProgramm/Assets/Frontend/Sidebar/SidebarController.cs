@@ -43,7 +43,7 @@ public class SidebarController : MonoBehaviour
         { "nav-item-buchhaltung",      "Buchhaltung"      },
         { "nav-item-finanzen",         "Finanzdashboard"         },
         { "nav-item-dokumente",        "Dokument-Screen"  },
-        { "nav-item-gr\u00fcndungspfad", "Gr\u00fcndungspfad"    },
+        { "nav-item-gründerpfad",    "Gründungspfad"    },
         { "nav-item-wissensdatenbank", "Wissensdatenbank" },
         { "nav-item-erfolge",          "Erfolge"          },
         { "nav-item-angebot",          "Angebot"          },
@@ -52,15 +52,15 @@ public class SidebarController : MonoBehaviour
         { "nav-item-dienstleistungen", "Dienstleistungen" },
         { "nav-item-kassenbuch",       "Kassenbuch"       },
         { "nav-item-export",           "Export-Screen"    },
-        { "nav-item-liquidit\u00e4t",  "Finanzen1"        },
-        { "nav-item-rentabilit\u00e4t","Finanzen2"        },
+        { "nav-item-liquidität",        "Finanzen1"        },
+        { "nav-item-rentabilität",       "Finanzen2"        },
         { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
 
     private static readonly HashSet<string> FortschrittSubItems = new()
     {
-        "nav-item-gr\u00fcnderpfad",
+        "nav-item-gründerpfad",
         "nav-item-wissensdatenbank",
         "nav-item-erfolge",
     };
