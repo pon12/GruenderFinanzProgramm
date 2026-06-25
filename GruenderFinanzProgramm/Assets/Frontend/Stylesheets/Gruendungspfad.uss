@@ -196,8 +196,8 @@
     transition-property: background-color;
     transition-duration: 0.1s;
 }
-.pfad-btn-primary:hover { background-color: rgb(107, 191, 130); }
-.pfad-btn-primary:active { background-color: rgb(90, 170, 112); }
+.pfad-btn-primary:hover { background-color: rgb(179, 226, 196); }
+.pfad-btn-primary:active { background-color: rgb(102, 165, 119); }
 
 .pfad-btn-secondary {
     background-color: rgb(100, 100, 100);
@@ -209,7 +209,7 @@
     transition-property: background-color;
     transition-duration: 0.1s;
 }
-.pfad-btn-secondary:hover { background-color: rgb(120, 120, 120); }
+.pfad-btn-secondary:hover { background-color: rgb(142, 141, 141); }
 
 /* POPUP */
 .popup-overlay {

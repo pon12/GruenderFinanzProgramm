@@ -12,11 +12,11 @@
   <component name="ChangeListManager">
     <list default="true" id="c9b04849-62dd-48ee-a981-e0371bfeb1a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/SidebarController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Sidebar/SidebarController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Fortschritt.unity" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Fortschritt.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/sidebar.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Sidebar/sidebar.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Gruendungspfad.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Gruendungspfad.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +32,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -54,7 +54,7 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;neue-sidebar&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Alina-will-nicht-mehr&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -178,6 +178,8 @@
       <workItem from="1782403506776" duration="171000" />
       <workItem from="1782403715043" duration="1463000" />
       <workItem from="1782405219831" duration="1374000" />
+      <workItem from="1782408583911" duration="191000" />
+      <workItem from="1782409050193" duration="1329000" />
     </task>
     <servers />
   </component>

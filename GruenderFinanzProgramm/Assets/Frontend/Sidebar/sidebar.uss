@@ -76,6 +76,10 @@
     white-space: nowrap;
 }
 
+#nav-item-logout:hover {
+    background-color: rgba(255, 0, 0, 0.15); /* gleiche Opacity wie das Grün */
+    border-color: rgba(255, 0, 0, 0.15);
+}
 
 
 
