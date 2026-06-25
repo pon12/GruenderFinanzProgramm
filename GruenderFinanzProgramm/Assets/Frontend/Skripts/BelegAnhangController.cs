@@ -31,7 +31,7 @@ public static class BelegAnhangController
 
             foreach (var doc in alle.savedDocs)
             {
-                if (doc.category != "Bezahlweise") continue;
+                if (!AnhangSchluessel.Contains(doc.title)) continue;
                 if (!AnhangSchluessel.Contains(doc.title)) continue;
                 if (!string.IsNullOrWhiteSpace(doc.inhalt))
                     ergebnis[doc.title] = true;
@@ -61,8 +61,7 @@ public static class BelegAnhangController
 
             foreach (string key in ausgewaehlt)
             {
-                var doc = alle.savedDocs.Find(d =>
-                    d.category == "Bezahlweise" && d.title == key);
+                var doc = alle.savedDocs.Find(d => d.title == key);
 
                 if (doc == null || string.IsNullOrWhiteSpace(doc.inhalt)) continue;
 

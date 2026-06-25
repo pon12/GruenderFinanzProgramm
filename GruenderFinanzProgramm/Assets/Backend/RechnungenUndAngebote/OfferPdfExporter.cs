@@ -11,8 +11,9 @@ public static class OfferPdfExporter
         Offer offer,
         List<OfferItem> items,
         int userId,
-        DataBase db
-    )
+        DataBase db,
+        List<string> anhaenge = null
+)
     {
         string folderPath = Path.Combine(
             Application.persistentDataPath,
@@ -262,6 +263,8 @@ public static class OfferPdfExporter
                     "Erstellt am " + DateTime.Now.ToString("dd.MM.yyyy"),
                     footerFont
                 );
+
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge);
 
                 doc.Close();
             }

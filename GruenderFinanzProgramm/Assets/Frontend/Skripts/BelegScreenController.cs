@@ -1501,7 +1501,7 @@ public abstract class BelegScreenController : MonoBehaviour
                     items.Add(item);
                 }
 
-                OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db);
+                OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db, HoleAusgewaehlteAnhaenge());
             }
             else if (BelegTyp == "Rechnung")
             {
@@ -1544,7 +1544,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 }
 
                 List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
-                InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db);
+                InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db, HoleAusgewaehlteAnhaenge());
             }
 
             ResetBelegFormular();

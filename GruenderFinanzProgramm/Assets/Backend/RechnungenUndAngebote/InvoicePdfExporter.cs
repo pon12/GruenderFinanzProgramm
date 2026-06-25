@@ -11,7 +11,8 @@ public static class InvoicePdfExporter
         Invoice invoice,
         List<InvoiceItem> items,
         int userId,
-        DataBase db
+        DataBase db,
+        List<string> anhaenge = null
     )
     {
         string folderPath = Path.Combine(
@@ -325,6 +326,8 @@ public static class InvoicePdfExporter
                     DateTime.Now.ToString("dd.MM.yyyy"),
                     footerFont
                 );
+
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge);
 
                 doc.Close();
             }
