@@ -97,6 +97,9 @@ public static class HelpTooltip
         }, TrickleDown.TrickleDown);
     }
 
+    // Öffentlich zugänglich für Controller die Icons per C# erstellen
+    public static void SetzeBasisStilOeffentlich(VisualElement icon) => SetzeBasisStil(icon);
+
     private static void SetzeBasisStil(VisualElement icon)
     {
         icon.pickingMode                         = PickingMode.Position;

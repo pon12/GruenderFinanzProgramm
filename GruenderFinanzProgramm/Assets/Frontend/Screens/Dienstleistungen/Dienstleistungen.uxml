@@ -2,16 +2,35 @@
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Dienstleistungen.uss?fileID=7433441132597879392&amp;guid=01fec56cd8896774fab0da40d32297db&amp;type=3#Dienstleistungen"/>
-    <ui:VisualElement name="root" style="width: 1920px; height: 1080px; flex-direction: column; background-color: rgb(30, 30, 30);">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
+    <ui:VisualElement name="root" style="width: 100%; height: 100%; flex-direction: column; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex-grow: 1; flex-direction: column; padding-left: 430px; padding-right: 40px; padding-top: 40px; padding-bottom: 40px;">
-            <ui:Label text="Dienstleistungen" class="page-title"/>
-            <ui:Button name="btn-neu" text="+ Neue Dienstleistung" class="add-btn"/>
+            <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 16px;">
+                <ui:Label text="Dienstleistungen" class="page-title" style="margin-bottom: 0;"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: flex-end; margin-bottom: 16px;">
+                <ui:Button name="btn-neu" text="+ Neue Dienstleistung" class="add-btn" style="margin-bottom: 0;"/>
+                <ui:VisualElement name="btn-help-neu" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+            </ui:VisualElement>
             <ui:VisualElement name="tabelle-wrapper" class="tabelle-wrapper">
                 <ui:VisualElement name="tabelle-header" class="tabelle-header" style="background-color: rgb(44, 44, 44);">
-                    <ui:Label text="Name" class="tabelle-header-zelle col-titel"/>
-                    <ui:Label text="Beschreibung" class="tabelle-header-zelle col-beschreibung" style="-unity-text-align: middle-center;"/>
-                    <ui:Label text="Preismodell" class="tabelle-header-zelle col-preismodell" style="-unity-text-align: middle-center;"/>
-                    <ui:Label text="Betrag" class="tabelle-header-zelle col-betrag" style="-unity-text-align: middle-center;"/>
+                    <ui:VisualElement class="col-titel" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Name" class="tabelle-header-zelle" style="flex-grow: 1; justify-content: center; align-self: center; align-content: center; align-items: center; -unity-text-align: middle-center; margin-right: -121px;"/>
+                        <ui:VisualElement name="btn-help-name" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 4px; margin-right: 69px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col-beschreibung" style="flex-direction: row; align-items: center; justify-content: center;">
+                        <ui:Label text="Beschreibung" class="tabelle-header-zelle" style="-unity-text-align: middle-center;"/>
+                        <ui:VisualElement name="btn-help-beschreibung" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 4px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col-preismodell" style="flex-direction: row; align-items: center; justify-content: center;">
+                        <ui:Label text="Preismodell" class="tabelle-header-zelle" style="-unity-text-align: middle-center;"/>
+                        <ui:VisualElement name="btn-help-preismodell" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 4px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col-betrag" style="flex-direction: row; align-items: center; justify-content: center;">
+                        <ui:Label text="Betrag" class="tabelle-header-zelle" style="-unity-text-align: middle-center;"/>
+                        <ui:VisualElement name="btn-help-betrag" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 4px;"/>
+                    </ui:VisualElement>
                     <ui:Label text="Aktionen" class="tabelle-header-zelle col-aktionen" style="-unity-text-align: middle-center; display: none;"/>
                 </ui:VisualElement>
                 <ui:ScrollView name="tabelle-body" style="flex-grow: 1;"/>

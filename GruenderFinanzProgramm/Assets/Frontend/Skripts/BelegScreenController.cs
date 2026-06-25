@@ -120,42 +120,44 @@ public abstract class BelegScreenController : MonoBehaviour
         AktualisiereUmwandelnButton();
     }
 
+
     private void RegistriereHelpTooltips()
     {
         HelpTooltip.Registriere(Root, "btn-help-seitentitel",
             BelegTyp == "Angebot"
-                ? "Hier erstellst du ein neues Angebot f\u00fcr einen Kunden. " +
-                  "F\u00fclle alle Bereiche aus und speichere am Ende. " +
-                  "Ein gespeichertes Angebot kann sp\u00e4ter in eine Rechnung umgewandelt werden."
-                : "Hier erstellst du eine neue Rechnung f\u00fcr einen Kunden. " +
-                  "F\u00fclle alle Bereiche aus und speichere am Ende. " +
-                  "Sobald die Rechnung bezahlt wurde, kannst du sie als \u201eBezahlt\u201c markieren.");
+                ? "Hier erstellst du ein neues Angebot für einen Kunden. " +
+                  "Fülle alle Bereiche aus und speichere am Ende. " +
+                  "Ein Angebot kann später in eine Rechnung umgewandelt werden."
+                : "Hier erstellst du eine neue Rechnung für einen Kunden. " +
+                  "Fülle alle Bereiche aus und speichere am Ende. " +
+                  "Bezahlte Rechnungen können als „Bezahlt“ markiert werden.");
 
         HelpTooltip.Registriere(Root, "btn-help-partner",
             BelegTyp == "Angebot"
-                ? "W\u00e4hle hier den Kunden aus, f\u00fcr den das Angebot gilt. " +
-                  "Tippe den Namen in die Suche und w\u00e4hle den passenden Eintrag. " +
-                  "Links erscheint der Angebotsempf\u00e4nger, rechts dein Unternehmen als Angebotssteller."
-                : "W\u00e4hle hier den Kunden aus, an den die Rechnung geht. " +
-                  "Tippe den Namen in die Suche und w\u00e4hle den passenden Eintrag. " +
-                  "Links erscheint der Rechnungsempf\u00e4nger, rechts dein Unternehmen als Rechnungssteller.");
+                ? "Wähle den Kunden aus, für den das Angebot gilt. " +
+                  "Links erscheint der Angebotsempfänger, rechts dein Unternehmen."
+                : "Wähle den Kunden aus, an den die Rechnung geht. " +
+                  "Links erscheint der Rechnungsempfänger, rechts dein Unternehmen.");
 
         HelpTooltip.Registriere(Root, "btn-help-grunddaten",
-            "Hier vergibst du die Nummer, das Datum und den aktuellen Status. " +
+            "Vergib hier Nummer, Datum und Status. " +
             "Die Nummer wird automatisch generiert, kann aber angepasst werden. " +
-            "Mit dem Kalender-Symbol \u00f6ffnest du eine Datumsauswahl.");
+            "Mit dem Kalender-Symbol öffnest du eine Datumsauswahl.");
+
+        HelpTooltip.Registriere(Root, "btn-help-anhaenge",
+            "Wähle optionale Anhänge aus, die dem PDF hinzugefügt werden. " +
+            "Verfügbare Anhänge (z. B. AGB, Disclaimer, Zahlungsbedingungen) " +
+            "werden automatisch aus den hinterlegten Dokumenten geladen.");
 
         HelpTooltip.Registriere(Root, "btn-help-positionen",
-            "F\u00fcge hier Dienstleistungen oder Artikel als Positionen hinzu (+ Button). " +
-            "Jede Position enth\u00e4lt Artikel, Beschreibung, Menge, Einheit und Preis. " +
+            "Füge Dienstleistungen als Positionen hinzu (+ Button). " +
+            "Jede Position enthält Artikel, Beschreibung, Menge, Einheit und Preis. " +
             "Netto, Rabatt, Skonto und MwSt. werden automatisch berechnet.");
 
         HelpTooltip.Registriere(Root, "btn-help-details",
-            "Hier kannst du einen Rabatt (prozentual oder als Festbetrag) " +
-            "und Skonto (Nachlass bei fr\u00fcher Zahlung) festlegen. " +
+            "Lege Rabatt und Skonto fest. " +
             "Im Notizfeld kannst du interne Hinweise hinterlegen (max. 150 Zeichen).");
     }
-
     private void OnDisable()
     {
         SpeichereSession();
@@ -1203,18 +1205,11 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void RegistriereAnhaenge()
     {
-        _anhangBereich = Root.Q<VisualElement>(AnhangKarteName);
+        _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
         if (_anhangBereich == null) return;
 
         _anhangBereich.Clear();
         _anhangAusgewaehlt.Clear();
-
-        var ueberschrift = new Label("Anhänge");
-        ueberschrift.style.fontSize                = 14;
-        ueberschrift.style.unityFontStyleAndWeight = FontStyle.Bold;
-        ueberschrift.style.color                   = Color.white;
-        ueberschrift.style.marginBottom            = 8;
-        _anhangBereich.Add(ueberschrift);
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
 

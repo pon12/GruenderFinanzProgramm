@@ -218,6 +218,9 @@ public class EinstellungenController : MonoBehaviour
         SetupFeldBeschraenkungen();
         LoadSettings();
 
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(_root);
+
         _root.schedule.Execute(() =>
         {
             if (_popupUnternehmen == null || _popupGespeichert == null || _popupZurueckgesetzt == null)
@@ -981,4 +984,51 @@ public class EinstellungenController : MonoBehaviour
     {
         if (field != null) PlayerPrefs.SetString(key, field.value);
     }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
+            "Hier verwaltest du alle grundlegenden Einstellungen deines Unternehmens. " +
+            "Änderungen wirken sich auf Rechnungen, Angebote und PDF-Exporte aus. " +
+            "Speichere am Ende, damit alle Änderungen übernommen werden.");
+
+        HelpTooltip.Registriere(_root, "btn-help-unternehmen",
+            "Hinterlege hier Firmenname, Rechtsform, Adresse und Steuerdaten. " +
+            "Diese Daten erscheinen auf allen erstellten Rechnungen und Angeboten " +
+            "als Absenderinformationen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bank",
+            "Trage hier deine Bankverbindung ein: IBAN, BIC, Kontoinhaber und Kreditinstitut. " +
+            "Die Daten werden auf Wunsch im Fußbereich von Rechnungen angezeigt.");
+
+        HelpTooltip.Registriere(_root, "btn-help-rechnungsformat",
+            "Lege fest wie deine Rechnungen nummeriert und aufgebaut werden. " +
+            "Hier stellst du Nummernkreis, Zahlungsziel, Währung " +
+            "und Standardtexte für Kopf- und Fußzeile ein.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bezahlweise",
+            "Verwalte hier Dokumente, die als Anhänge an Rechnungen angehängt werden: " +
+            "AGB, Disclaimer, Barzahlungs- und Überweisungshinweis.");
+
+        HelpTooltip.Registriere(_root, "btn-help-version",
+            "Zeigt die aktuell installierte Programmversion. " +
+            "Hier kannst du nach Updates suchen sowie Credits und Mitwirkende einsehen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-pdf",
+            "Steuere hier das Erscheinungsbild deiner PDF-Exporte: " +
+            "Logo, Seitenzahl und letzten Exportpfad aktivieren oder deaktivieren.");
+
+        HelpTooltip.Registriere(_root, "btn-help-steuersaetze",
+            "Wähle den Standard-Mehrwertsteuersatz für deine Dienstleistungen. " +
+            "Der ausgewählte Satz wird beim Erstellen neuer Belege automatisch vorausgewählt.");
+
+        HelpTooltip.Registriere(_root, "btn-help-layout",
+            "Wechsle hier zwischen Hell- und Dunkelmodus. " +
+            "Die Einstellung gilt sofort für die gesamte Anwendung.");
+
+        HelpTooltip.Registriere(_root, "btn-help-sicherheit",
+            "Setze hier deinen Passkey zurück, gebe dazu deinen RevoeryKey ein. " +
+            "Das Löschen des Kontos ist endgültig und kann nicht rükgängig gemacht werden.");
+    }
+
 }

@@ -12,6 +12,7 @@ public class DocumentDashboard : MonoBehaviour
 
     [Header("Templates")]
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
+    [SerializeField] private Texture2D helpIconTexture;
 
     // UI-Elemente Hauptbildschirm
     private VisualElement root;
@@ -140,6 +141,31 @@ public class DocumentDashboard : MonoBehaviour
         },
     };
 
+
+    private static readonly Dictionary<string, string> kategorieTooltips =
+        new Dictionary<string, string>
+    {
+        ["Gr\u00fcndung"]    = "Enth\u00e4lt Pflichtdokumente zur Unternehmensgr\u00fcndung. " +
+                               "F\u00fclle Stammdaten, Gr\u00fcndungsurkunde und Handelsregister aus. " +
+                               "Diese Kategorie ist gesch\u00fctzt und kann nicht gel\u00f6scht werden.",
+        ["Bezahlweise"]       = "Enth\u00e4lt Pflichtdokumente f\u00fcr Zahlungsabwicklung und Rechnungsanh\u00e4nge. " +
+                               "AGB, Disclaimer, Barzahlung und \u00dcberweisung werden als PDF-Anh\u00e4nge verwendet. " +
+                               "Diese Kategorie ist gesch\u00fctzt und kann nicht gel\u00f6scht werden.",
+        ["Finanzen"]          = "Flexible Kategorie f\u00fcr finanzielle Dokumente wie Budgetpl\u00e4ne oder Kalkulationen. " +
+                               "Du kannst hier eigene Dokumente anlegen und l\u00f6schen.",
+        ["Marketing"]         = "Flexible Kategorie f\u00fcr Marketingmaterial wie Konzepte oder Kampagnenpl\u00e4ne. " +
+                               "Du kannst hier eigene Dokumente anlegen und l\u00f6schen.",
+        ["Steuern"]           = "Flexible Kategorie f\u00fcr steuerrelevante Dokumente wie Belege oder Bescheide. " +
+                               "Du kannst hier eigene Dokumente anlegen und l\u00f6schen.",
+        ["Personal"]          = "Flexible Kategorie f\u00fcr Personaldokumente wie Vertr\u00e4ge oder Zeugnisse. " +
+                               "Du kannst hier eigene Dokumente anlegen und l\u00f6schen.",
+        ["Recht"]             = "Flexible Kategorie f\u00fcr rechtliche Dokumente wie Vertr\u00e4ge oder Datenschutzerkl\u00e4rungen. " +
+                               "Du kannst hier eigene Dokumente anlegen und l\u00f6schen.",
+    };
+
+    private const string defaultFest = "Gesch\u00fctzte Pflichtdokument-Kategorie. " +
+                                        "Dokumente k\u00f6nnen bearbeitet, aber nicht gel\u00f6scht werden.";
+    private const string defaultFlex = "Flexible Kategorie \u2013 du kannst hier eigene Dokumente anlegen und l\u00f6schen.";
     private bool IstKategorieFest(string kategorieName)
         => kategorien.Find(k => k.name == kategorieName)?.istFest ?? false;
 
@@ -271,6 +297,7 @@ public class DocumentDashboard : MonoBehaviour
         LoadDataLocally();
         SicherePflichtdokumente();
         SpawnAllCardsAtStart();
+        RegistriereHelpTooltips();
     }
 
     // ─────────────────────────────────────────
@@ -506,6 +533,30 @@ public class DocumentDashboard : MonoBehaviour
                 }
             }
 
+            // Hilfe-Icon in die Kategorie-Karte einfügen
+            var karteHelpIcon = new VisualElement();
+            karteHelpIcon.name = "btn-help-karte";
+            HelpTooltip.SetzeBasisStilOeffentlich(karteHelpIcon);
+            // Icon-Textur setzen (helpIconTexture im Inspector zuweisen)
+            if (helpIconTexture != null)
+            {
+                karteHelpIcon.style.backgroundImage              = new StyleBackground(helpIconTexture);
+                karteHelpIcon.style.unityBackgroundImageTintColor = new StyleColor(
+                    new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
+            }
+
+            var headerRow = cardInstance.Q<VisualElement>(className: "category-header-row");
+            if (headerRow != null)
+                headerRow.Add(karteHelpIcon);
+            else
+                cardInstance.Add(karteHelpIcon);
+
+            string karteTooltip;
+            if (!kategorieTooltips.TryGetValue(kategorie.name, out karteTooltip))
+                karteTooltip = kategorie.istFest ? defaultFest : defaultFlex;
+
+            HelpTooltip.RegistriereInKarte(root, karteHelpIcon, karteTooltip);
+
             gridContainer.Add(cardInstance);
         }
     }
@@ -712,6 +763,15 @@ public class DocumentDashboard : MonoBehaviour
 
         if (editTemplateGroup != null)
             editTemplateGroup.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
+
+        // Vorlagen-Hilfe-Icon nur bei nicht-Pflichtdokumenten anzeigen
+        var vorlagenHelpIcon = editPopupOverlay?.Q<VisualElement>("btn-help-vorlagen-edit");
+        if (vorlagenHelpIcon != null)
+            vorlagenHelpIcon.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
+        // Vorlagen-Label-Zeile ebenfalls ausblenden
+        var vorlagenLabelZeile = vorlagenHelpIcon?.parent;
+        if (vorlagenLabelZeile != null)
+            vorlagenLabelZeile.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
 
         var inhaltGroup = editInhaltInput?.parent;
         if (inhaltGroup != null)
@@ -955,4 +1015,51 @@ public class DocumentDashboard : MonoBehaviour
             case "Checklist": checklist?.AddToClassList("selected-template"); break;
         }
     }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier verwaltest du alle deine Dokumente. " +
+            "Feste Kategorien (Gr\u00fcndung, Bezahlweise) sind gesch\u00fctzt. " +
+            "Eigene Kategorien und Dokumente kannst du frei anlegen.");
+
+        HelpTooltip.Registriere(root, "btn-help-alle-loeschen",
+            "L\u00f6scht alle selbst erstellten Dokumente endg\u00fcltig. " +
+            "Pflichtdokumente bleiben erhalten. " +
+            "Diese Aktion kann nicht r\u00fckg\u00e4ngig gemacht werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-erstellen",
+            "Lege ein neues Dokument an. " +
+            "Gib einen Titel ein, w\u00e4hle eine Kategorie und eine Vorlage. " +
+            "Das Dokument erscheint danach in der gew\u00e4hlten Kategorie.");
+
+        HelpTooltip.Registriere(root, "btn-help-vorlage",
+            "Standard: Freitextdokument.\n" +
+            "Diagramm: Strukturiertes Dokument.\n" +
+            "Checklist: Abhakbare Liste.");
+
+        HelpTooltip.Registriere(root, "btn-help-detail-liste",
+            "Links: alle Dokumente dieser Kategorie. " +
+            "Rechts: globale Liste aller Dokumente. " +
+            "Nicht-Pflichtdokumente k\u00f6nnen per \"Hinzuf\u00fcgen\" in diese Kategorie verschoben werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-bearbeiten",
+            "Bearbeite Titel, Inhalt und Typ des Dokuments. " +
+            "Pflichtdokumente haben strukturierte Felder " +
+            "und k\u00f6nnen nicht gel\u00f6scht werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-strukturfelder",
+            "Vordefinierte Felder f\u00fcr Pflichtdokumente (z.\u00a0B. IBAN, Firmenname). " +
+            "Die Daten werden automatisch in Rechnungen und Angeboten verwendet.");
+
+        HelpTooltip.Registriere(root, "btn-help-vorlagen-edit",
+            "Standard: Freitext. Diagramm: Strukturiert. Checklist: Abhakbar. " +
+            "Der Typ beeinflusst das Layout, nicht den Inhalt.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-loeschen",
+            "L\u00f6scht alle nicht gesch\u00fctzten Dokumente endg\u00fcltig. " +
+            "Pflichtdokumente bleiben erhalten. " +
+            "Nicht r\u00fckg\u00e4ngig machbar.");
+    }
+
 }
