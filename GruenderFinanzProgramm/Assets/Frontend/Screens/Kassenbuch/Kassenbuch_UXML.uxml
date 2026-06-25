@@ -53,7 +53,7 @@
                 <ui:ScrollView name="tableBody" class="table-body" style="flex-grow: 1; border-bottom-width: 0;"/>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="popup-overlay" class="popup-overlay" style="display: none; top: 2px; left: -2px;">
+        <ui:VisualElement name="popup-overlay" class="popup-overlay" style="display: flex; top: 2px; left: -2px;">
             <ui:VisualElement name="popup-container" class="popup-container card" style="display: flex;">
                 <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 16px;">
                     <ui:Label name="popup-title" text="Transaktion" class="popup-title h2" style="color: rgb(255, 255, 255); font-size: 28px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
