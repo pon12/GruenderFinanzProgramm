@@ -1,12 +1,16 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Doc-Screen.uss?fileID=7433441132597879392&amp;guid=7f80ac4667a2566429f65c50cc73fc61&amp;type=3#Doc-Screen"/>
     <ui:VisualElement name="root-container" class="screen-root" style="width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0 430px; overflow: hidden;">
             <ui:VisualElement name="page-header-row" style="flex-direction: row; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
-                <ui:VisualElement>
-                    <ui:Label text="Wissensdatenbank" name="page-title" class="page-title"/>
-                    <ui:Label text="Anleitungen und Erklärungen rund um deine Gründung" class="page-subtitle"/>
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement>
+                        <ui:Label text="Wissensdatenbank" name="page-title" class="page-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:Label text="Anleitungen und Erklärungen rund um deine Gründung" class="page-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 8px; width: 36px; height: 36px; min-width: 36px; min-height: 36px; bottom: 16px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:ScrollView name="Main-Scroll-View" style="flex-grow: 1;">
@@ -16,7 +20,8 @@
         <ui:VisualElement name="Detail-Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="Detail-Menu-Container" class="doc-card detail-popup-box" style="height: auto; max-height: 80%;">
                 <ui:VisualElement name="Detail-Header" class="popup-header-row">
-                    <ui:Label text="Wissens-Einträge" name="Detail-Popup-Title" class="card-title" style="flex-grow: 1;"/>
+                    <ui:Label text="Wissens-Einträge" name="Detail-Popup-Title" class="card-title" style="flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:VisualElement name="btn-help-detail-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 8px; width: 28px; height: 28px; min-width: 28px; min-height: 28px;"/>
                     <ui:Button text="Schließen" name="Btn-Detail-Close" class="doc-btn-secondary"/>
                 </ui:VisualElement>
                 <ui:ScrollView name="Detail-List-Container" class="scroll-list-box" style="max-height: 420px;"/>
@@ -24,7 +29,10 @@
         </ui:VisualElement>
         <ui:VisualElement name="View-Popup-Overlay" class="popup-overlay" style="display: none;">
             <ui:VisualElement name="View-Popup-Container" class="doc-card view-popup-box">
-                <ui:Label text="Titel" name="View-Popup-Title" class="card-title" style="margin-bottom: 14px;"/>
+                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 14px;">
+                    <ui:Label text="Titel" name="View-Popup-Title" class="card-title" style="flex-grow: 1; margin-bottom: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:VisualElement name="btn-help-view-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 8px; width: 28px; height: 28px; min-width: 28px; min-height: 28px;"/>
+                </ui:VisualElement>
                 <ui:ScrollView style="max-height: 360px; margin-bottom: 16px;">
                     <ui:Label text="" name="View-Popup-Inhalt" class="view-popup-text"/>
                 </ui:ScrollView>
