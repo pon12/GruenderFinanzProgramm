@@ -1,0 +1,17 @@
+/* HelpTooltip.uss
+   Basis-Layout für das Hilfe-Icon.
+   Radius und Hover werden per C# inline gesetzt. */
+
+.help-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: rgb(70, 70, 70);
+    margin-left: 8px;
+    flex-shrink: 0;
+}

@@ -10,105 +10,117 @@ public class SidebarController : MonoBehaviour
 
     public static event System.Action<bool> OnToggled;
 
-    [System.Serializable]
-    public struct SceneMapping
-    {
-        public string buttonName;
-        public string sceneName;
-    }
-
-    [Header("Zuweisungen")]
-    [SerializeField] private List<SceneMapping> navigationConfig;
-
     private const float WIDTH_EXPANDED = 390f;
     private const float WIDTH_COLLAPSED = 100f;
     private const float ANIM_DURATION = 0.2f;
 
-    private const string PREF_COLLAPSED = "sidebar_collapsed";
+    private const string PREF_COLLAPSED        = "sidebar_collapsed";
     private const string PREF_FORTSCHRITT_OPEN = "sidebar_fortschritt_open";
-    private const string PREF_FINANZ_OPEN = "sidebar_finanz_open";
+    private const string PREF_BUCHHALTUNG_OPEN = "sidebar_buchhaltung_open";
+    private const string PREF_FINANZEN_OPEN    = "sidebar_finanzen_open";
 
     private VisualElement _root;
     private VisualElement _sidebar;
     private Button _toggleButton;
     private bool _isCollapsed = false;
 
-    private VisualElement _finanzSubmenu;
-    private Button _finanzToggleBtn;
-    private bool _finanzOpen = false;
-    
     private VisualElement _fortschrittSubmenu;
     private Button _fortschrittToggleBtn;
     private bool _fortschrittOpen = false;
 
+    private VisualElement _buchhaltungSubmenu;
+    private Button _buchhaltungToggleBtn;
+    private bool _buchhaltungOpen = false;
+
+    private VisualElement _finanzenSubmenu;
+    private Button _finanzenToggleBtn;
+    private bool _finanzenOpen = false;
+
     private static readonly Dictionary<string, string> NavToScene = new()
     {
         { "nav-item-dashboard",        "Dashboard"        },
-        { "nav-item-guide",            "Fortschritt"      },
-        { "nav-item-wissensdatenbank", "Wissensdatenbank"  },
-        { "nav-item-finanz",           "Finanzboard"      },
+        { "nav-item-fortschritt",      "Fortschritt"      },
+        { "nav-item-buchhaltung",      "Buchhaltung"      },
+        { "nav-item-finanzen",         "Finanzen"         },
+        { "nav-item-dokumente",        "Dokument-Screen"  },
+        { "nav-item-gründerpfad",      "Gründungspfad"      },
+        { "nav-item-wissensdatenbank", "Wissensdatenbank" },
+        { "nav-item-erfolge",          "Erfolge"          },
         { "nav-item-angebot",          "Angebot"          },
         { "nav-item-rechnung",         "Rechnung"         },
         { "nav-item-kunden",           "KundenDB"         },
         { "nav-item-dienstleistungen", "Dienstleistungen" },
         { "nav-item-kassenbuch",       "Kassenbuch"       },
         { "nav-item-export",           "Export-Screen"    },
-        { "nav-item-finanzen1",        "Finanzen1"        }, 
-        { "nav-item-finanzen2",        "Finanzen2"        },
-        { "nav-item-dokumente",        "Dokument-Screen"  },
+        { "nav-item-liquidität",       "Finanzen1"        },
+        { "nav-item-rentabilität",     "Finanzen2"        },
+        { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
 
-    private static readonly HashSet<string> FinanzSubItems = new()
+    private static readonly HashSet<string> FortschrittSubItems = new()
+    {
+        "nav-item-gründerpfad",
+        "nav-item-wissensdatenbank",
+        "nav-item-erfolge",
+    };
+    private static readonly HashSet<string> BuchhaltungSubItems = new()
     {
         "nav-item-angebot",
         "nav-item-rechnung",
         "nav-item-kunden",
         "nav-item-dienstleistungen",
-        "nav-item-kassenbuch",
-        "nav-item-finanzen1",
-        "nav-item-finanzen2",
     };
-    
-    private static readonly HashSet<string> FortschrittSubItems = new()
+    private static readonly HashSet<string> FinanzenSubItems = new()
     {
-        "nav-item-wissensdatenbank",
+        "nav-item-kassenbuch",
+        "nav-item-export",
+        "nav-item-liquidität",
+        "nav-item-rentabilität",
+        "nav-item-kennzahlen",
     };
+    private static readonly HashSet<string> DropdownParents = new()
+    {
+        "nav-item-fortschritt",
+        "nav-item-buchhaltung",
+        "nav-item-finanzen",
+    };
+
+    // ─────────────────────────────────────────────────
+    // UNITY LIFECYCLE
+    // ─────────────────────────────────────────────────
 
     void OnEnable()
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
-
-        _root = uiDocument.rootVisualElement;
+        _root    = uiDocument.rootVisualElement;
         _sidebar = _root.Q<VisualElement>("sidebar");
-        _toggleButton = _root.Q<Button>("toggle-button");
-        
-        _fortschrittSubmenu = _root.Q<VisualElement>("fortschritt-submenu");
+        _toggleButton         = _root.Q<Button>("toggle-button");
+        _fortschrittSubmenu   = _root.Q<VisualElement>("fortschritt-submenu");
         _fortschrittToggleBtn = _root.Q<Button>("btn-fortschritt-toggle");
+        _buchhaltungSubmenu   = _root.Q<VisualElement>("buchhaltung-submenu");
+        _buchhaltungToggleBtn = _root.Q<Button>("btn-buchhaltung-toggle");
+        _finanzenSubmenu      = _root.Q<VisualElement>("finanzen-submenu");
+        _finanzenToggleBtn    = _root.Q<Button>("btn-finanzen-toggle");
 
-        _finanzSubmenu = _root.Q<VisualElement>("finanz-submenu");
-        _finanzToggleBtn = _root.Q<Button>("btn-finanz-toggle");
-        
-        if (_toggleButton != null) _toggleButton.clicked += ToggleSidebar;
-        if (_fortschrittToggleBtn != null)
-            _fortschrittToggleBtn.clicked += ToggleFortschrittSubmenu;
-        if (_finanzToggleBtn != null)
-        _finanzToggleBtn.clicked += ToggleFinanzSubmenu;
+        if (_toggleButton != null)         _toggleButton.clicked         += ToggleSidebar;
+        if (_fortschrittToggleBtn != null) _fortschrittToggleBtn.clicked += ToggleFortschrittSubmenu;
+        if (_buchhaltungToggleBtn != null) _buchhaltungToggleBtn.clicked += ToggleBuchhaltungSubmenu;
+        if (_finanzenToggleBtn != null)    _finanzenToggleBtn.clicked    += ToggleFinanzenSubmenu;
 
         RegisterNavigation();
         RegisterLogout();
-
         RestoreState();
         SetActiveNavItem();
     }
 
     void OnDisable()
     {
-        if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
-        if (_fortschrittToggleBtn != null)
-            _fortschrittToggleBtn.clicked -= ToggleFortschrittSubmenu;
-        if (_finanzToggleBtn != null) _finanzToggleBtn.clicked -= ToggleFinanzSubmenu;
+        if (_toggleButton != null)         _toggleButton.clicked         -= ToggleSidebar;
+        if (_fortschrittToggleBtn != null) _fortschrittToggleBtn.clicked -= ToggleFortschrittSubmenu;
+        if (_buchhaltungToggleBtn != null) _buchhaltungToggleBtn.clicked -= ToggleBuchhaltungSubmenu;
+        if (_finanzenToggleBtn != null)    _finanzenToggleBtn.clicked    -= ToggleFinanzenSubmenu;
 
         foreach (var kvp in NavToScene)
         {
@@ -116,7 +128,6 @@ public class SidebarController : MonoBehaviour
             if (item != null)
                 item.UnregisterCallback<ClickEvent>(OnNavItemClicked);
         }
-
         var logoutItem = _root?.Q<VisualElement>("nav-item-logout");
         if (logoutItem != null)
             logoutItem.UnregisterCallback<ClickEvent>(OnLogoutClicked);
@@ -129,35 +140,38 @@ public class SidebarController : MonoBehaviour
     private void RestoreState()
     {
         _isCollapsed = PlayerPrefs.GetInt(PREF_COLLAPSED, 0) == 1;
-
         if (_sidebar != null)
             _sidebar.style.width = _isCollapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED;
-
         if (_toggleButton != null)
             _toggleButton.text = _isCollapsed ? "+" : "-";
-
         UpdateNavLabelsVisibility();
 
-        _finanzOpen = PlayerPrefs.GetInt(PREF_FINANZ_OPEN, 0) == 1;
-
-        if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_finanzToggleBtn != null)
-        _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
-        
         _fortschrittOpen = PlayerPrefs.GetInt(PREF_FORTSCHRITT_OPEN, 0) == 1;
-        if (_fortschrittSubmenu != null)
-            _fortschrittSubmenu.style.display = _fortschrittOpen ? DisplayStyle.Flex : DisplayStyle.None;
-        if (_fortschrittToggleBtn != null)
-            _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(_fortschrittOpen ? 90f : 0f));
+        ApplySubmenuState(_fortschrittSubmenu, _fortschrittToggleBtn, _fortschrittOpen);
+
+        _buchhaltungOpen = PlayerPrefs.GetInt(PREF_BUCHHALTUNG_OPEN, 0) == 1;
+        ApplySubmenuState(_buchhaltungSubmenu, _buchhaltungToggleBtn, _buchhaltungOpen);
+
+        _finanzenOpen = PlayerPrefs.GetInt(PREF_FINANZEN_OPEN, 0) == 1;
+        ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, _finanzenOpen);
 
         OnToggled?.Invoke(_isCollapsed);
-    }
+    } // ← diese Klammer fehlte / war falsch platziert
+
+    private void ApplySubmenuState(VisualElement submenu, Button toggleBtn, bool isOpen)
+    {
+        if (submenu != null)
+            submenu.style.display = isOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (toggleBtn != null)
+            toggleBtn.style.rotate = new StyleRotate(new Rotate(isOpen ? 90f : 0f));
+    } // ← ApplySubmenuState gehört auf Klassenebene, nicht in RestoreState
 
     private void SaveState()
     {
-        PlayerPrefs.SetInt(PREF_COLLAPSED, _isCollapsed ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_COLLAPSED,        _isCollapsed     ? 1 : 0);
         PlayerPrefs.SetInt(PREF_FORTSCHRITT_OPEN, _fortschrittOpen ? 1 : 0);
-        PlayerPrefs.SetInt(PREF_FINANZ_OPEN, _finanzOpen ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_BUCHHALTUNG_OPEN, _buchhaltungOpen ? 1 : 0);
+        PlayerPrefs.SetInt(PREF_FINANZEN_OPEN,    _finanzenOpen    ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -168,12 +182,9 @@ public class SidebarController : MonoBehaviour
     private void ToggleSidebar()
     {
         _isCollapsed = !_isCollapsed;
-
         StartCoroutine(AnimateWidth(_isCollapsed ? WIDTH_COLLAPSED : WIDTH_EXPANDED));
-
         if (_toggleButton != null)
             _toggleButton.text = _isCollapsed ? "+" : "-";
-
         UpdateNavLabelsVisibility();
         OnToggled?.Invoke(_isCollapsed);
         SaveState();
@@ -189,10 +200,8 @@ public class SidebarController : MonoBehaviour
     private IEnumerator AnimateWidth(float targetWidth)
     {
         if (_sidebar == null) yield break;
-
         float startWidth = _sidebar.resolvedStyle.width;
         float elapsed = 0f;
-
         while (elapsed < ANIM_DURATION)
         {
             elapsed += Time.deltaTime;
@@ -201,36 +210,34 @@ public class SidebarController : MonoBehaviour
             _sidebar.style.width = Mathf.Lerp(startWidth, targetWidth, eased);
             yield return null;
         }
-
         _sidebar.style.width = targetWidth;
     }
 
     // ─────────────────────────────────────────────────
-    // FORTSCHRITT UND FINANZBOARD DROPDOWN
+    // SUBMENU TOGGLES
     // ─────────────────────────────────────────────────
 
-   private void ToggleFinanzSubmenu()
-{
-    _finanzOpen = !_finanzOpen;
+    private void ToggleFortschrittSubmenu()
+    {
+        _fortschrittOpen = !_fortschrittOpen;
+        ApplySubmenuState(_fortschrittSubmenu, _fortschrittToggleBtn, _fortschrittOpen);
+        SaveState();
+    }
 
-    if (_finanzSubmenu != null) _finanzSubmenu.style.display = _finanzOpen ? DisplayStyle.Flex : DisplayStyle.None;
+    private void ToggleBuchhaltungSubmenu()
+    {
+        _buchhaltungOpen = !_buchhaltungOpen;
+        ApplySubmenuState(_buchhaltungSubmenu, _buchhaltungToggleBtn, _buchhaltungOpen);
+        SaveState();
+    }
 
-    // Icon rotieren: 0° = zugeklappt, 90° = aufgeklappt
-    if (_finanzToggleBtn != null)
-        _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
+    private void ToggleFinanzenSubmenu()
+    {
+        _finanzenOpen = !_finanzenOpen;
+        ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, _finanzenOpen);
+        SaveState();
+    }
 
-    SaveState();
-}
-   
-private void ToggleFortschrittSubmenu()
-{
-    _fortschrittOpen = !_fortschrittOpen;
-    if (_fortschrittSubmenu != null)
-        _fortschrittSubmenu.style.display = _fortschrittOpen ? DisplayStyle.Flex : DisplayStyle.None;
-    if (_fortschrittToggleBtn != null)
-        _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(_fortschrittOpen ? 90f : 0f));
-    SaveState();
-}
     // ─────────────────────────────────────────────────
     // ACTIVE NAV ITEM HIGHLIGHTING
     // ─────────────────────────────────────────────────
@@ -238,39 +245,34 @@ private void ToggleFortschrittSubmenu()
     private void SetActiveNavItem()
     {
         string currentScene = SceneManager.GetActiveScene().name;
-
         foreach (var navName in NavToScene.Keys)
         {
             var item = _root.Q<VisualElement>(navName);
             if (item != null)
                 item.RemoveFromClassList("nav-item--active");
         }
-
         foreach (var kvp in NavToScene)
         {
             if (kvp.Value != currentScene) continue;
-
             var item = _root.Q<VisualElement>(kvp.Key);
             if (item != null)
                 item.AddToClassList("nav-item--active");
 
-            if (FinanzSubItems.Contains(kvp.Key) && !_finanzOpen)
-            {
-                _finanzOpen = true;
-                if (_finanzSubmenu != null) _finanzSubmenu.style.display = DisplayStyle.Flex;
-                if (_finanzToggleBtn != null)
-                _finanzToggleBtn.style.rotate = new StyleRotate(new Rotate(_finanzOpen ? 90f : 0f));
-            }
-            
             if (FortschrittSubItems.Contains(kvp.Key) && !_fortschrittOpen)
             {
                 _fortschrittOpen = true;
-                if (_fortschrittSubmenu != null)
-                    _fortschrittSubmenu.style.display = DisplayStyle.Flex;
-                if (_fortschrittToggleBtn != null)
-                    _fortschrittToggleBtn.style.rotate = new StyleRotate(new Rotate(90f));
+                ApplySubmenuState(_fortschrittSubmenu, _fortschrittToggleBtn, true);
             }
-
+            if (BuchhaltungSubItems.Contains(kvp.Key) && !_buchhaltungOpen)
+            {
+                _buchhaltungOpen = true;
+                ApplySubmenuState(_buchhaltungSubmenu, _buchhaltungToggleBtn, true);
+            }
+            if (FinanzenSubItems.Contains(kvp.Key) && !_finanzenOpen)
+            {
+                _finanzenOpen = true;
+                ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, true);
+            }
             break;
         }
     }
@@ -281,7 +283,6 @@ private void ToggleFortschrittSubmenu()
 
     private void RegisterNavigation()
     {
-        
         foreach (var kvp in NavToScene)
         {
             string sceneName = kvp.Value;
@@ -291,26 +292,29 @@ private void ToggleFortschrittSubmenu()
                 Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
                 continue;
             }
-            
-            if (kvp.Key == "nav-item-guide")
+            if (kvp.Key == "nav-item-fortschritt")
             {
                 item.RegisterCallback<ClickEvent>(evt => ToggleFortschrittSubmenu());
                 if (_fortschrittToggleBtn != null)
                     _fortschrittToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
                 continue;
             }
-
-          if (kvp.Key == "nav-item-finanz")
-{
-            item.RegisterCallback<ClickEvent>(evt => ToggleFinanzSubmenu());
-             // Button-Klick nicht nach oben weitergeben
-            if (_finanzToggleBtn != null)
-            _finanzToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-            continue;
-}
-
+            if (kvp.Key == "nav-item-buchhaltung")
+            {
+                item.RegisterCallback<ClickEvent>(evt => ToggleBuchhaltungSubmenu());
+                if (_buchhaltungToggleBtn != null)
+                    _buchhaltungToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+                continue;
+            }
+            if (kvp.Key == "nav-item-finanzen")
+            {
+                item.RegisterCallback<ClickEvent>(evt => ToggleFinanzenSubmenu());
+                if (_finanzenToggleBtn != null)
+                    _finanzenToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+                continue;
+            }
             item.RegisterCallback<ClickEvent>(evt =>
-            {   
+            {
                 bool sceneExists = false;
                 for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
                 {
@@ -321,7 +325,6 @@ private void ToggleFortschrittSubmenu()
                         break;
                     }
                 }
-                
                 if (sceneExists)
                     SceneManager.LoadScene(sceneName);
                 else
@@ -334,7 +337,6 @@ private void ToggleFortschrittSubmenu()
     {
         var item = evt.currentTarget as VisualElement;
         if (item == null) return;
-
         foreach (var kvp in NavToScene)
         {
             if (kvp.Key == item.name)
@@ -364,9 +366,10 @@ private void ToggleFortschrittSubmenu()
         else
             Debug.LogWarning("[Sidebar] MainLogoutController nicht gefunden.");
 
-        PlayerPrefs.DeleteKey("sidebar_collapsed");
-        PlayerPrefs.DeleteKey("sidebar_fortschritt_open");
-        PlayerPrefs.DeleteKey("sidebar_finanz_open");
+        PlayerPrefs.DeleteKey(PREF_COLLAPSED);
+        PlayerPrefs.DeleteKey(PREF_FORTSCHRITT_OPEN);
+        PlayerPrefs.DeleteKey(PREF_BUCHHALTUNG_OPEN);
+        PlayerPrefs.DeleteKey(PREF_FINANZEN_OPEN);
         PlayerPrefs.Save();
 
         SceneManager.LoadScene(0);

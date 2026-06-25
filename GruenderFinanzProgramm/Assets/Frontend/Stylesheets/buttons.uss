@@ -1,6 +1,6 @@
 .green-button {
 	background-color: #80CF95;
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 20px;
     justify-content: center;
     align-items: center;
@@ -26,7 +26,7 @@
 
 .grey-button {
     background-color: #5C5A5A;
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 20px;
     justify-content: center;
     align-items: center;
@@ -34,8 +34,6 @@
     font-weight: bold;
     color: white;
     -unity-font: url("project://database/Assets/Fonts/Poppins-Bold.ttf");
-    border-width: 2px;
-    border-color: #80CF95;
 }
 
 .grey-button:hover {

@@ -3,66 +3,76 @@
     <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
     <ui:VisualElement name="Background" class="fullscreen-bg" style="flex-grow: 1;"/>
     <ui:VisualElement style="flex-grow: 1;">
-        <ui:VisualElement style="flex-grow: 1; -unity-text-align: upper-left; justify-content: center; align-items: center; flex-direction: row;">
-            <ui:Button text="Zurück" name="btnclose" selectable="true" style="align-items: flex-start; -unity-text-align: middle-center; background-position-y: center; white-space: pre; background-position-x: center; position: absolute; left: auto; top: 0; color: rgb(255, 255, 255); background-color: rgb(51, 51, 51); border-left-color: rgb(51, 51, 51); border-right-color: rgb(51, 51, 51); border-top-color: rgb(51, 51, 51); border-bottom-color: rgb(51, 51, 51); border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; background-image: none; right: 0; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px;"/>
-            <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" style="top: auto; left: auto; width: 200px; height: 144px; align-items: auto; justify-content: flex-start; align-self: center; align-content: auto;"/>
+
+        <ui:VisualElement style="flex-grow: 1; justify-content: center; align-items: center; flex-direction: row;">
+            <ui:Button text="Zur&#252;ck" name="btnclose" style="position: absolute; right: 40px; top: 20px; width: 160px; height: 56px; font-size: 24px; -unity-font-style: bold; -unity-text-align: middle-center; color: rgb(255, 255, 255); background-color: rgb(70, 70, 70); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px;"/>
+            <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" style="width: 200px; height: 144px; align-self: center;"/>
         </ui:VisualElement>
+
         <ui:VisualElement style="flex-grow: 1; align-items: center; height: auto; justify-content: center;">
-            <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift" style="top: auto; left: auto; width: 573px; height: 91px;"/>
+            <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift" style="width: 573px; height: 91px;"/>
         </ui:VisualElement>
+
         <ui:VisualElement style="flex-grow: 1; align-items: center; height: auto; justify-content: center;">
-            <ui:Label text="Profilname" name="Profilname" class="Profilname" style="width: 335px; height: 52px; top: auto; left: auto; font-size: 32px; align-items: auto;"/>
-            <ui:TextField label="" placeholder-text="" name="Profileingabe" style="top: auto; left: auto; width: 984px; height: 102px; font-size: 36px; color: rgb(26, 26, 26);"/>
+            <ui:Label text="Profilname" name="Profilname" class="Profilname" style="width: 335px; height: 52px; font-size: 32px;"/>
+            <ui:TextField label="" placeholder-text="" name="Profileingabe" style="width: 984px; height: 102px; font-size: 36px; color: rgb(255, 255, 255); border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;"/>
         </ui:VisualElement>
+
         <ui:VisualElement style="flex-grow: 1; align-items: center; height: auto; justify-content: space-around; top: -30px;">
-            <ui:Label text="Sicher mit Passkey&#10;" name="Ueberschrift2" class="Ueberschrift2" style="top: auto; left: auto; align-items: auto;"/>
+            <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>
         </ui:VisualElement>
-        <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: column; align-items: center; height: auto; -unity-text-align: upper-left; justify-content: center; top: -50px;">
-            <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder las dir eine starke PIN erstellen" name="text" class="text" style="top: auto; left: auto; align-items: auto;"/>
-            <ui:Button text="Power-Passkey-generieren" name="btnKeyGenerieren" enabled="true" class="Key-button" style="top: auto; left: auto; width: 476px; height: 98px;"/>
+
+        <ui:VisualElement style="flex-grow: 1; flex-direction: column; align-items: center; height: auto; justify-content: center; top: -50px;">
+            <ui:Label text="Kein Passwort n&#246;tig - Gib deine PIN ein oder lass dir eine starke PIN erstellen" name="text" class="text"/>
+            <ui:Button text="Power-Passkey-generieren" name="btnKeyGenerieren" class="Key-button" style="width: 476px; height: 98px;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="VisualElement" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; right: -3px; bottom: 124px; left: 4px; top: 909px; position: absolute;">
+
+        <ui:VisualElement style="flex-grow: 1; display: flex; align-items: center; justify-content: center; position: absolute; right: -3px; bottom: 124px; left: 4px; top: 909px;">
             <ui:Label text="" name="lblError" style="font-size: 26px;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; align-items: center; align-self: stretch; justify-content: center;">
-            <ui:Toggle label="" name="Toggle" style="top: auto; left: auto; width: 50px; height: 50px;"/>
-            <ui:Label text="Ich akzeptiere die " name="normalerText" selectable="true" focusable="true" class="text2" style="top: auto; left: auto;"/>
-            <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2" style="top: auto; left: auto;"/>
-            <ui:Label text="und die" name="normalerText" selectable="true" focusable="true" class="text2" style="top: auto; left: auto;"/>
-            <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2" style="top: auto; left: auto;"/>
+
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; align-self: stretch; justify-content: center; background-color: rgba(0, 0, 0, 0);">
+            <ui:Toggle label="" name="Toggle" style="width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0);"/>
+            <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
+            <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2"/>
+            <ui:Label text=" und die " name="normalerText2" class="text2"/>
+            <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2"/>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+
+    <ui:VisualElement picking-mode="Position" name="popuppasskey" style="flex-grow: 1; position: absolute; width: 1920px; height: 1080px; align-items: center; justify-content: center; display: none; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.5);">
+        <ui:VisualElement style="width: 900px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; padding-top: 36px; padding-bottom: 36px; padding-left: 40px; padding-right: 40px;">
+            <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                <ui:Label text="Dein Power-Passkey" style="font-size: 32px; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+                <ui:Button text="&#x2715;" name="btnpopupclose" style="-unity-text-align: middle-center; background-color: rgba(0, 0, 0, 0); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; color: rgb(180, 180, 180); font-size: 22px; width: 36px; height: 36px; border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0;"/>
+            </ui:VisualElement>
+            <ui:VisualElement style="background-color: rgb(70, 70, 70); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 16px; padding-bottom: 16px; padding-left: 20px; padding-right: 20px; margin-bottom: 16px;">
+                <ui:Label text="" name="lblPasskey" style="font-size: 28px; color: rgb(255, 255, 255); white-space: normal;"/>
+            </ui:VisualElement>
+            <ui:Button text="Entschl&#252;sseln" name="btnEntschluesseln" style="height: 56px; background-color: rgb(70, 70, 70); color: rgb(255, 255, 255); font-size: 18px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; margin-bottom: 16px;"/>
+            <ui:Label text="Bitte notiere deinen Passkey und Recovery-Key sicher." style="font-size: 18px; color: rgb(160, 160, 160); -unity-text-align: upper-center; margin-bottom: 28px; white-space: normal;"/>
+            <ui:Button text="Zur Anmeldung" name="btnZurAnmeldung" style="height: 64px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 22px; -unity-font-style: bold; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 12px; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement picking-mode="Position" name="popuppasskey" style="flex-grow: 1; position: absolute; width: 1920px; height: 1080px; align-items: center; justify-content: center; display: none; top: 0; left: 1px;">
-        <ui:VisualElement style="flex-grow: 1; width: 892px; height: 338px; position: absolute; justify-content: flex-start; align-items: stretch; background-color: rgb(56, 56, 56); border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; border-left-color: rgb(179, 226, 196); border-right-color: rgb(179, 226, 196); border-top-color: rgb(179, 226, 196); border-bottom-color: rgb(179, 226, 196); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px;">
-            <ui:VisualElement name="Kopfzeile" style="flex-grow: 1; align-items: center; justify-content: center; left: auto;">
-                <ui:Label text="Dein Power-Passkey" style="font-size: 48px; color: rgb(174, 174, 174); -unity-text-align: upper-center;"/>
-                <ui:Button text="" name="btnpopupclose" style="align-items: flex-start; -unity-text-align: middle-center; background-position-y: center; white-space: pre; background-position-x: center; position: absolute; left: 829px; top: 0; color: rgb(51, 51, 51); background-color: rgb(56, 56, 56); border-left-color: rgb(56, 56, 56); border-right-color: rgb(56, 56, 56); border-top-color: rgb(56, 56, 56); border-bottom-color: rgb(56, 56, 56); border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close&quot;); right: 0; width: 50px; height: 50px; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px;"/>
-            </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; justify-content: center; align-items: center; flex-direction: row;">
-                <ui:Label text="&#10;" name="lblPasskey" style="-unity-text-align: upper-left; width: 600px; height: 80px; margin-right: 15px; font-size: 36px; color: rgb(255, 255, 255);"/>
-                <ui:Button text="Entschlüsseln" name="btnEntschluesseln" style="border-left-width: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px;"/>
-            </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; -unity-text-align: upper-center; justify-content: center; align-items: center;">
-                <ui:Label text="-&gt; Mach am besten einen Screenshot oder schreibe den Passkey auf" style="font-size: 24px; color: rgb(174, 174, 174);"/>
-            </ui:VisualElement>
-        </ui:VisualElement>
-    </ui:VisualElement>
+
     <ui:VisualElement name="PopUpAGB" style="flex-grow: 1; position: absolute; width: 1920px; height: 1080px; justify-content: center; align-items: center; display: none;">
-        <ui:VisualElement style="flex-grow: 1; width: 560px; height: 997px; background-color: rgb(56, 56, 56); border-left-color: rgb(179, 226, 196); border-right-color: rgb(179, 226, 196); border-top-color: rgb(179, 226, 196); border-bottom-color: rgb(179, 226, 196); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; color: rgb(255, 255, 255); align-items: flex-start; flex-direction: column; background-position-y: center;">
-            <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; width: 560px;">
-                <ui:Label text="AGB" style="height: auto; font-size: 36px; -unity-text-align: middle-left; white-space: pre-wrap; text-overflow: clip; align-items: auto; align-content: auto; width: 460px;"/>
-                <ui:Button text="" name="btnAGBclose" style="-unity-text-align: middle-center; align-items: auto; height: 30px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close&quot;); right: 0; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; border-left-color: rgb(26, 26, 26); border-right-color: rgb(26, 26, 26); border-top-color: rgb(26, 26, 26); border-bottom-color: rgb(26, 26, 26); background-color: rgb(51, 51, 51);"/>
+        <ui:VisualElement style="flex-grow: 1; width: 560px; height: 997px; background-color: rgb(56, 56, 56); border-left-color: rgb(179, 226, 196); border-right-color: rgb(179, 226, 196); border-top-color: rgb(179, 226, 196); border-bottom-color: rgb(179, 226, 196); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; color: rgb(255, 255, 255); align-items: flex-start; flex-direction: column;">
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; width: 560px;">
+                <ui:Label text="AGB" style="height: auto; font-size: 36px; -unity-text-align: middle-left; white-space: pre-wrap; width: 460px;"/>
+                <ui:Button text="" name="btnAGBclose" style="height: 30px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close&quot;); border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; border-left-color: rgb(26, 26, 26); border-right-color: rgb(26, 26, 26); border-top-color: rgb(26, 26, 26); border-bottom-color: rgb(26, 26, 26); background-color: rgb(51, 51, 51);"/>
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1;">
                 <ui:Label text="Lol hier ist eigentlich so n Text" enable-rich-text="true" style="-unity-text-align: upper-left; white-space: nowrap; width: 560px; height: 997px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
+
     <ui:VisualElement name="PopUpDatenschutz" style="flex-grow: 1; position: absolute; width: 1920px; height: 1080px; justify-content: center; align-items: center; display: none;">
-        <ui:VisualElement style="flex-grow: 1; width: 560px; height: 997px; background-color: rgb(56, 56, 56); border-left-color: rgb(179, 226, 196); border-right-color: rgb(179, 226, 196); border-top-color: rgb(179, 226, 196); border-bottom-color: rgb(179, 226, 196); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; color: rgb(255, 255, 255); align-items: flex-start; flex-direction: column; background-position-y: center;">
+        <ui:VisualElement style="flex-grow: 1; width: 560px; height: 997px; background-color: rgb(56, 56, 56); border-left-color: rgb(179, 226, 196); border-right-color: rgb(179, 226, 196); border-top-color: rgb(179, 226, 196); border-bottom-color: rgb(179, 226, 196); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; color: rgb(255, 255, 255); align-items: flex-start; flex-direction: column;">
             <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-around; width: 560px;">
-                <ui:Label text="Datenschutzrichtlinie" style="height: auto; font-size: 36px; -unity-text-align: middle-left; white-space: pre-wrap; text-overflow: clip; align-items: auto; align-content: auto; width: 460px;"/>
-                <ui:Button text="" name="btnDatenschutzclose" style="-unity-text-align: middle-center; align-items: auto; height: 30px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close&quot;); right: 0; border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; border-left-color: rgb(26, 26, 26); border-right-color: rgb(26, 26, 26); border-top-color: rgb(26, 26, 26); border-bottom-color: rgb(26, 26, 26); background-color: rgb(51, 51, 51);"/>
+                <ui:Label text="Datenschutzrichtlinie" style="height: auto; font-size: 36px; -unity-text-align: middle-left; white-space: pre-wrap; width: 460px;"/>
+                <ui:Button text="" name="btnDatenschutzclose" style="height: 30px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close&quot;); border-top-left-radius: 30px; border-top-right-radius: 30px; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; border-left-color: rgb(26, 26, 26); border-right-color: rgb(26, 26, 26); border-top-color: rgb(26, 26, 26); border-bottom-color: rgb(26, 26, 26); background-color: rgb(51, 51, 51);"/>
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1;">
                 <ui:Label text="Lol hier ist eigentlich so n Text" enable-rich-text="true" style="-unity-text-align: upper-left; white-space: nowrap; width: 560px; height: 997px;"/>

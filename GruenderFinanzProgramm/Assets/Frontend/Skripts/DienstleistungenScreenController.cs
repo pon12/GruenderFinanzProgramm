@@ -8,6 +8,7 @@ public class DienstleistungenScreenController : MonoBehaviour
     [SerializeField] private VisualTreeAsset popupAsset;
 
     private List<Service> daten = new List<Service>();
+    private VisualElement rootElement;
 
     private ScrollView tabelleBody;
     private VisualElement popupOverlay;
@@ -16,6 +17,7 @@ public class DienstleistungenScreenController : MonoBehaviour
     private void OnEnable()
     {
         var root = uiDocument.rootVisualElement;
+        rootElement  = root;
         tabelleBody  = root.Query<ScrollView>("tabelle-body").First();
         popupOverlay = root.Query<VisualElement>("popup-overlay").First();
 
@@ -27,16 +29,7 @@ public class DienstleistungenScreenController : MonoBehaviour
 
         LadeDienstleistungenAusDatenbank();
         TabelleAktualisieren();
-    }
-
-    private void BeispieldatenLaden()
-    {
-        if (daten.Count > 0) return;
-        daten.Add(new Service { name = "Beratung",       description = "Professionelle Unternehmensberatung", priceModel = "Festpreis",   price = 500.0 });
-        daten.Add(new Service { name = "Webdesign",      description = "Modernes und responsives Webdesign",  priceModel = "Stundensatz", price = 80.0  });
-        daten.Add(new Service { name = "Programmierung", description = "Individuelle Softwareentwicklung",    priceModel = "Festpreis",   price = 120.0 });
-        daten.Add(new Service { name = "Logo",           description = "Kreative Logogestaltung",             priceModel = "Pauschal",    price = 300.0 });
-        daten.Add(new Service { name = "Lizenskey",      description = "Softwarelizenzen & Aktivierungskeys", priceModel = "Festpreis",   price = 50.0  });
+        RegistriereHelpTooltips(root);
     }
 
     private void TabelleAktualisieren()
@@ -51,10 +44,10 @@ public class DienstleistungenScreenController : MonoBehaviour
             var zeile = new VisualElement();
             zeile.AddToClassList("tabelle-zeile");
 
-            zeile.Add(Zelle(d.name,                         "col-titel"));
-            zeile.Add(Zelle(d.description,                  "col-beschreibung"));
-            zeile.Add(Zelle(d.priceModel,                   "col-preismodell"));
-            zeile.Add(Zelle(d.price.ToString("F2") + " €", "col-betrag"));
+            zeile.Add(Zelle(d.name,                        "col-titel"));
+            zeile.Add(Zelle(d.description,                 "col-beschreibung"));
+            zeile.Add(Zelle(d.priceModel,                  "col-preismodell"));
+            zeile.Add(Zelle(d.price.ToString("F2") + " \u20ac", "col-betrag"));
 
             var aktionen = new VisualElement();
             aktionen.AddToClassList("col-aktionen");
@@ -66,20 +59,17 @@ public class DienstleistungenScreenController : MonoBehaviour
             var btnDel = new Button(() =>
             {
                 DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
                 if (db == null)
                 {
                     Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
                     return;
                 }
-
                 db.deleteService(daten[index].id);
-
                 LadeDienstleistungenAusDatenbank();
                 TabelleAktualisieren();
             });
-            
-            btnDel.text = "Löschen";
+
+            btnDel.text = "L\u00f6schen";
             btnDel.AddToClassList("zeile-btn");
             btnDel.AddToClassList("zeile-btn-loeschen");
 
@@ -108,10 +98,10 @@ public class DienstleistungenScreenController : MonoBehaviour
 
         var d = index >= 0 ? daten[index] : new Service { name = "", description = "", priceModel = "Festpreis", price = 0.0 };
 
-        popup.Q<TextField>("feld-titel").value              = d.name;
-        popup.Q<TextField>("feld-beschreibung").value       = d.description;
-        popup.Q<DropdownField>("feld-preismodell").value    = d.priceModel;
-        popup.Q<TextField>("feld-betrag").value             = d.price.ToString("F2");
+        popup.Q<TextField>("feld-titel").value           = d.name;
+        popup.Q<TextField>("feld-beschreibung").value    = d.description;
+        popup.Q<DropdownField>("feld-preismodell").value = d.priceModel;
+        popup.Q<TextField>("feld-betrag").value          = d.price.ToString("F2");
 
         popup.Q<Button>("btn-fertig").clicked += () =>
         {
@@ -131,7 +121,6 @@ public class DienstleistungenScreenController : MonoBehaviour
             };
 
             DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
             if (db == null)
             {
                 Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
@@ -149,13 +138,13 @@ public class DienstleistungenScreenController : MonoBehaviour
             }
 
             LadeDienstleistungenAusDatenbank();
-
             SchliessPopup();
             TabelleAktualisieren();
         };
 
         popupOverlay.Add(popup);
         popupOverlay.style.display = DisplayStyle.Flex;
+        RegistrierePopupTooltips(popup, rootElement);
     }
 
     private void SchliessPopup()
@@ -170,16 +159,13 @@ public class DienstleistungenScreenController : MonoBehaviour
         try
         {
             DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
             if (db == null)
             {
                 Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
                 daten = new List<Service>();
                 return;
             }
-
             daten = db.getAllServices() ?? new List<Service>();
-
             Debug.Log("[Dienstleistungen] Geladen: " + daten.Count);
         }
         catch (System.Exception e)
@@ -188,5 +174,55 @@ public class DienstleistungenScreenController : MonoBehaviour
             daten = new List<Service>();
         }
     }
-}
 
+    // =========================================================
+    // HELP TOOLTIPS
+    // =========================================================
+
+    private void RegistriereHelpTooltips(VisualElement root)
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier verwaltest du alle deine Dienstleistungen und Produkte. " +
+            "Angelegte Eintr\u00e4ge stehen beim Erstellen von Angeboten und Rechnungen zur Auswahl. " +
+            "Du kannst Eintr\u00e4ge jederzeit bearbeiten oder l\u00f6schen.");
+
+        HelpTooltip.Registriere(root, "btn-help-neu",
+            "Legt eine neue Dienstleistung oder ein neues Produkt an. " +
+            "F\u00fclle Name, Beschreibung, Preismodell und Betrag aus. " +
+            "Der Eintrag ist danach sofort in Angeboten und Rechnungen verf\u00fcgbar.");
+
+        HelpTooltip.Registriere(root, "btn-help-name",
+            "Der Name der Dienstleistung oder des Produkts. " +
+            "Er erscheint als Artikelbezeichnung in Angeboten und Rechnungen.");
+
+        HelpTooltip.Registriere(root, "btn-help-beschreibung",
+            "Eine kurze Beschreibung der Leistung. " +
+            "Sie wird in der Positionsbeschreibung auf Angeboten und Rechnungen angezeigt.");
+
+        HelpTooltip.Registriere(root, "btn-help-preismodell",
+            "Festpreis: fixer Gesamtpreis f\u00fcr die Leistung. " +
+            "Stundensatz: Preis pro geleistete Arbeitsstunde. " +
+            "Pauschal: Pauschalpreis unabh\u00e4ngig vom Aufwand.");
+
+        HelpTooltip.Registriere(root, "btn-help-betrag",
+            "Der Preis der Dienstleistung in Euro. " +
+            "Bei Stundensatz gilt der Wert pro Stunde, " +
+            "bei Festpreis und Pauschal als Gesamtbetrag.");
+    }
+
+    private void RegistrierePopupTooltips(VisualElement popup, VisualElement root)
+    {
+        var popupHelp = popup.Q<VisualElement>("btn-help-popup");
+        if (popupHelp != null)
+            HelpTooltip.RegistriereInKarte(root, popupHelp,
+                "F\u00fclle hier die Daten der Dienstleistung aus und best\u00e4tige mit Fertig. " +
+                "Der Eintrag wird gespeichert und ist danach in Angeboten und Rechnungen verf\u00fcgbar.");
+
+        var preisHelp = popup.Q<VisualElement>("btn-help-preismodell-popup");
+        if (preisHelp != null)
+            HelpTooltip.RegistriereInKarte(root, preisHelp,
+                "Festpreis: fixer Gesamtpreis. " +
+                "Stundensatz: Preis pro Stunde. " +
+                "Pauschal: Pauschalpreis unabh\u00e4ngig vom Aufwand.");
+    }
+}

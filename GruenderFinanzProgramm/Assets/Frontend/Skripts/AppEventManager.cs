@@ -26,4 +26,13 @@ public static class AppEventManager
     public static event System.Action<float, float, float[]> OnKassenbuchGeaendert;
     public static void KassenbuchGeaendert(float umsatzJahr, float kontostand, float[] monate)
         => OnKassenbuchGeaendert?.Invoke(umsatzJahr, kontostand, monate);
+
+    // Gründungspfad-Fortschritt – gefeuert von GruendungspfadController
+    // 5 Werte (0.0–1.0) für die 5 Dashboard-Segmente:
+    // stammdaten=Vorbereitung, vertraege=Anmeldung, steuer=Finanzen,
+    // rechnungen=Betrieb, sonstiges=Sonstiges
+    public static event System.Action<float, float, float, float, float> OnDokumenteFortschrittGeaendert;
+    public static void DokumenteFortschrittGeaendert(
+        float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
+        => OnDokumenteFortschrittGeaendert?.Invoke(stammdaten, vertraege, steuer, rechnungen, sonstiges);
 }

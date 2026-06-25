@@ -1,13 +1,16 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/HelpTooltip.uss"/>
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
     <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
     <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Einstellungen%20USS.uss?fileID=7433441132597879392&amp;guid=c4a9726888d324748923be9caf3a73ab&amp;type=3#Einstellungen USS"/>
-    <ui:VisualElement name="root" class="root fullscreen-bg" style="flex-grow: 1; width: 100%; height: 100%; background-color: rgb(28, 28, 28);">
+    <ui:VisualElement name="root" class="root fullscreen-bg" style="flex-grow: 1; width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex-grow: 1; padding-left: 430px; padding-right: 32px; padding-top: 24px; padding-bottom: 24px; flex-direction: column;">
-            <ui:VisualElement name="header" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-shrink: 0;">
+            <ui:VisualElement name="header" style="flex-direction: row; align-items: center; margin-bottom: 24px; flex-shrink: 0;">
                 <ui:Label text="Einstellungen" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 48px; color: rgb(255, 255, 255);"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                <ui:VisualElement style="flex-grow: 1;"/>
                 <ui:VisualElement name="header-buttons" style="flex-direction: row;">
                     <ui:Button text="zurücksetzen" name="btn-reset" style="background-color: rgb(38, 38, 38); color: rgb(200, 200, 200); border-left-color: rgb(100, 100, 100); border-right-color: rgb(100, 100, 100); border-top-color: rgb(100, 100, 100); border-bottom-color: rgb(100, 100, 100); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 18px; margin-right: 12px;"/>
                     <ui:Button text="speichern" name="btn-save" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 18px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
@@ -16,42 +19,52 @@
             <ui:ScrollView name="settings-scroll" style="flex-grow: 1;">
                 <ui:VisualElement name="columns" style="flex-direction: row; flex-wrap: nowrap; align-items: flex-start;">
                     <ui:VisualElement name="col-left" style="flex: 1; margin-right: 16px; flex-direction: column;">
-                        <ui:VisualElement name="card-unternehmen" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-unternehmen" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Unternehmen" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-unternehmen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="Firmenname, Rechtsform, Adresse und Steuerdaten" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 16px;"/>
                             <ui:Button text="Unternehmensdaten bearbeiten" name="btn-open-unternehmen" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 44px; font-size: 15px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-bank" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-bank" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(100, 149, 237); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Bankverbindung" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-bank" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="IBAN, BIC, Kontoinhaber und Kreditinstitut" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 16px;"/>
                             <ui:Button text="Bankdaten bearbeiten" name="btn-open-bank" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 44px; font-size: 15px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-rechnung-btn" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-rechnung-btn" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(255, 165, 60); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Rechnungsformat" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-rechnungsformat" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="Nummernkreis, Zahlungsziel, Währung und Standardtexte" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 16px;"/>
                             <ui:Button text="Rechnungsformat bearbeiten" name="btn-open-rechnung" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 44px; font-size: 15px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-bezahlweise" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-bezahlweise" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Bezahlweise" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-bezahlweise" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="AGB, Disclaimer, Barzahlung und Überweisungshinweis" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 16px;"/>
                             <ui:Button text="Dokumente verwalten" name="btn-open-bezahlweise" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 44px; font-size: 15px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-version" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px;">
+                        <ui:VisualElement name="card-version" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 16px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Version" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-version" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <ui:Label name="label-version" text="Version 1.0.0" style="font-size: 16px; color: rgb(160, 160, 160);"/>
@@ -64,19 +77,23 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="col-right" style="flex: 1; flex-direction: column;">
-                        <ui:VisualElement name="card-pdf" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-pdf" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(100, 149, 237); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="PDF Export und Layout" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-pdf" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Toggle name="toggle-logo" label="Logo auf der Rechnung anzeigen" style="font-size: 16px; margin-bottom: 12px;"/>
                             <ui:Toggle name="toggle-seitenzahl" label="Seitenzahl im Fußbereich" style="font-size: 16px; margin-bottom: 12px;"/>
                             <ui:Toggle name="toggle-exportpfad" label="Letzten Exportpfad merken" style="font-size: 16px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-steuersaetze" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-steuersaetze" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(255, 165, 60); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Steuersätze" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-steuersaetze" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="Standardsteuersatz für Dienstleistungen" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 10px;"/>
                             <ui:VisualElement style="flex-direction: row; margin-bottom: 12px;">
@@ -90,10 +107,12 @@
                                 <ui:TextField name="input-steuer-custom" value="0" class="dark-input" style="width: 100px; height: 40px;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-layout" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                        <ui:VisualElement name="card-layout" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(180, 100, 220); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Layout und Design" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-layout" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:Label text="Anzeigemodus" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 10px;"/>
                             <ui:VisualElement style="flex-direction: row; margin-bottom: 16px;">
@@ -102,10 +121,12 @@
                             </ui:VisualElement>
                             <ui:Toggle name="toggle-begleiter" label="Begleiter / Assistent aktiv" style="font-size: 16px;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-sicherheit" style="background-color: rgb(38, 38, 38); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px;">
+                        <ui:VisualElement name="card-sicherheit" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px;">
                             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                                 <ui:VisualElement style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(220, 80, 80); margin-right: 10px; flex-shrink: 0;"/>
                                 <ui:Label text="Konto und Sicherheit" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-sicherheit" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                             </ui:VisualElement>
                             <ui:VisualElement style="flex-direction: column; margin-bottom: 16px; background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px;">
                                 <ui:Label text="Passkey zurücksetzen" style="font-size: 16px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); margin-bottom: 4px;"/>
@@ -129,48 +150,54 @@
             <ui:VisualElement style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 720px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
                 <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
                     <ui:Label text="Unternehmensdaten" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
-                    <ui:Button name="btn-close-unternehmen" text="X" style="background-color: rgba(0, 0, 0, 0); color: rgb(160, 160, 160); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
+                    <ui:Button name="btn-close-unternehmen" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement style="margin-bottom: 14px;">
-                    <ui:Label text="Firmenname / Gründungsname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-firmenname" class="dark-input" style="height: 40px;"/>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
+                    <ui:VisualElement style="flex: 1; margin-right: 8px;">
+                        <ui:Label text="Firmenname / Gründungsname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField name="input-firmenname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex: 1;">
+                        <ui:Label text="Branche" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:DropdownField name="dropdown-branche" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Rechtsform" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:DropdownField name="dropdown-rechtsform" class="dark-input" style="height: 40px;"/>
+                        <ui:DropdownField name="dropdown-rechtsform" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 1;">
                         <ui:Label text="Gründungsjahr" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-gruendungsjahr" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-gruendungsjahr" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Steuernummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-steuernummer" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-steuernummer" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 1;">
                         <ui:Label text="Ust.-IdNr." style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-ustidnr" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-ustidnr" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="margin-bottom: 14px;">
                     <ui:Label text="Handelsregisternummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-handelsreg" class="dark-input" style="height: 40px;"/>
+                    <ui:TextField name="input-handelsreg" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="margin-bottom: 14px;">
                     <ui:Label text="Straße und Hausnummer" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                    <ui:TextField name="input-strasse" class="dark-input" style="height: 40px;"/>
+                    <ui:TextField name="input-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 28px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Postleitzahl" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-plz" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex: 2;">
                         <ui:Label text="Stadt" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField name="input-stadt" class="dark-input" style="height: 40px;"/>
+                        <ui:TextField name="input-stadt" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; justify-content: flex-end;">
@@ -183,7 +210,7 @@
             <ui:VisualElement style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 680px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(100, 149, 237); border-right-color: rgb(100, 149, 237); border-bottom-color: rgb(100, 149, 237); border-left-color: rgb(100, 149, 237);">
                 <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
                     <ui:Label text="Bankverbindung" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
-                    <ui:Button name="btn-close-bank" text="X" style="background-color: rgba(0, 0, 0, 0); color: rgb(160, 160, 160); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
+                    <ui:Button name="btn-close-bank" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="margin-bottom: 14px;">
                     <ui:Label text="Kontoinhaber" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
@@ -214,7 +241,7 @@
             <ui:VisualElement style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 720px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(255, 165, 60); border-right-color: rgb(255, 165, 60); border-bottom-color: rgb(255, 165, 60); border-left-color: rgb(255, 165, 60);">
                 <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
                     <ui:Label text="Rechnungsformat" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
-                    <ui:Button name="btn-close-rechnung" text="X" style="background-color: rgba(0, 0, 0, 0); color: rgb(160, 160, 160); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
+                    <ui:Button name="btn-close-rechnung" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement style="flex: 1; margin-right: 8px;">
@@ -256,7 +283,7 @@
             <ui:VisualElement style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 760px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
                 <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <ui:Label text="Bezahlweise – Dokumente" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
-                    <ui:Button name="btn-close-bezahlweise" text="X" style="background-color: rgba(0, 0, 0, 0); color: rgb(160, 160, 160); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
+                    <ui:Button name="btn-close-bezahlweise" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
                 <ui:Label text="Diese Dokumente werden in den Dokumenten-Screen übernommen." style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 24px;"/>
                 <ui:VisualElement style="background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px; margin-bottom: 12px;">
@@ -341,9 +368,16 @@
         </ui:VisualElement>
         <ui:VisualElement name="popup-gespeichert" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
             <ui:VisualElement style="width: 520px; height: 240px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; align-items: center; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:Button name="btn-close-gespeichert" text="✕" style="position: absolute; top: 8px; right: 10px; height: 28px; width: 28px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); font-size: 16px;"/>
                 <ui:Image source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="width: 70px; height: 70px; margin-bottom: 20px;"/>
                 <ui:Label name="label-gespeichert-text" text="Einstellungen wurden gespeichert" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 20px;"/>
-                <ui:Button name="btn-close-gespeichert" text="" icon-image="project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&amp;guid=9cd0944736a9a324195ad03398faae90&amp;type=3#close" style="position: absolute; top: -6px; right: 0; height: 46px; width: 46px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0);"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="popup-zurueckgesetzt" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
+            <ui:VisualElement style="width: 520px; height: 240px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; align-items: center; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:Button name="btn-close-zurueckgesetzt" text="✕" style="position: absolute; top: 8px; right: 10px; height: 28px; width: 28px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); font-size: 16px;"/>
+                <ui:Image source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="width: 70px; height: 70px; margin-bottom: 20px;"/>
+                <ui:Label name="label-zurueckgesetzt-text" text="Einstellungen wurden zurückgesetzt" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 20px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

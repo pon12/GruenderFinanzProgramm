@@ -1,13 +1,9 @@
 // ================================================================
-// DashboardController.cs  – Frontend-Meeting-Fixes
-//
-// Änderungen:
-//  1. Y-Achse Chart: dynamische Eurowerte statt 1.0/0.5/0.0
-//  2. Kalender: keine Tage aus Vor-/Folgemonat mehr, nur leere Felder
-//  3. 5 Navigations-Buttons unter den 5 Stat-Kacheln statt 3 unter Chart
+// DashboardController.cs
 // ================================================================
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
@@ -20,7 +16,6 @@ public class DashboardController : MonoBehaviour
     private int              _currentMonth;
     private LineChartElement _chart;
 
-    // Deadlines: Key = "yyyy-MM-dd", Value = Liste von Beschreibungen für diesen Tag
     private Dictionary<string, List<string>> _deadlines = new Dictionary<string, List<string>>();
 
     private readonly string[] _monthNames =
@@ -41,34 +36,175 @@ public class DashboardController : MonoBehaviour
         SetupButtons();
         SetupCalendar();
         SetupChart();
+        RegistriereHelpTooltips();
 
-        // Beim Start einmalig direkt aus DB laden (Fallback)
+        StartCoroutine(LadeNachFrame());
+
+        AppEventManager.OnKundenAnzahlGeaendert         += OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert        += OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert      += OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert            += OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert  += OnDokumenteFortschritt;
+    }
+
+    private System.Collections.IEnumerator LadeNachFrame()
+    {
+        yield return null;
         LadeInitialDaten();
         LadeDeadlines();
-        RenderKalender(); // Kalender neu zeichnen damit Deadline-Marker sichtbar sind
-
-        // Ab jetzt auf Events hören
-        AppEventManager.OnKundenAnzahlGeaendert    += OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert   += OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert += OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert       += OnKassenbuch;
+        RenderKalender();
     }
 
     void OnDisable()
     {
-        AppEventManager.OnKundenAnzahlGeaendert    -= OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert   -= OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert -= OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert       -= OnKassenbuch;
+        AppEventManager.OnKundenAnzahlGeaendert         -= OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert        -= OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert      -= OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert            -= OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert  -= OnDokumenteFortschritt;
     }
 
     // ============================================================
-    // INITIALER DB-LOAD (beim ersten Öffnen UND bei Jahreswechsel
-    // im Kalender – lädt alle 5 Kacheln + Chart für ein bestimmtes Jahr)
+    // HELP TOOLTIPS
+    // ============================================================
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
+            "Das Dashboard gibt dir einen \u00dcberblick \u00fcber dein Unternehmen. " +
+            "Du siehst den Dokumenten-Fortschritt, deine wichtigsten Kennzahlen " +
+            "und einen Kalender mit anstehenden Fristen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-fortschritt",
+            "Zeigt wie vollst\u00e4ndig deine Gr\u00fcndungsunterlagen sind. " +
+            "Jeder Abschnitt (Stammdaten, Vertr\u00e4ge, Steuer, Rechnungen, Sonstiges) " +
+            "f\u00fcllt sich, wenn du die zugeh\u00f6rigen Dokumente hinterlegt hast. " +
+            "Ziel: 100\u00a0% in allen Bereichen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-kunden",
+            "Anzahl der Kunden, die du in diesem Jahr in der Kundendatenbank " +
+            "angelegt hast. Klicke auf \u201eKundendatenbank\u201c um Kunden zu verwalten.");
+
+        HelpTooltip.Registriere(_root, "btn-help-angebote",
+            "Anzahl der Angebote, die du in diesem Jahr erstellt hast. " +
+            "Klicke auf \u201eAngebot\u201c um ein neues Angebot zu erstellen. " +
+            "Angebote mit ablaufender G\u00fcltigkeit werden im Kalender markiert.");
+
+        HelpTooltip.Registriere(_root, "btn-help-rechnungen",
+            "Anzahl der Rechnungen, die du in diesem Jahr gestellt hast. " +
+            "Klicke auf \u201eRechnung\u201c um eine neue Rechnung zu erstellen. " +
+            "F\u00e4llige Rechnungen werden im Kalender markiert.");
+
+        HelpTooltip.Registriere(_root, "btn-help-kassenbuch-umsatz",
+            "Bilanz aus Einnahmen minus Ausgaben f\u00fcr das aktuell gew\u00e4hlte Jahr. " +
+            "Der Wert \u00e4ndert sich wenn du im Kalender das Jahr wechselst.");
+
+        HelpTooltip.Registriere(_root, "btn-help-kontostand",
+            "Dein kumulierter Kontostand bis zum Ende des gew\u00e4hlten Jahres \u2014 " +
+            "alle Einnahmen minus alle Ausgaben seit Beginn. " +
+            "Gr\u00fcn = positiv, Rot = negativ.");
+
+        HelpTooltip.Registriere(_root, "btn-help-kassenbuch-statistik",
+            "Zeigt die monatliche Bilanz (Einnahmen minus Ausgaben) als Linienchart. " +
+            "Punkte \u00fcber der Nulllinie sind Gewinnmonate, darunter Verlustmonate. " +
+            "Das Jahr w\u00e4hlst du \u00fcber den Kalender rechts.");
+
+        HelpTooltip.Registriere(_root, "btn-help-kalender",
+            "Farbig markierte Tage haben anstehende Fristen: " +
+            "Angebote deren G\u00fcltigkeit abl\u00e4uft (Erstelldatum + 14 Tage) " +
+            "und Rechnungen mit F\u00e4lligkeitsdatum. " +
+            "Fahre mit der Maus \u00fcber einen markierten Tag f\u00fcr Details.");
+    }
+
+    // ============================================================
+    // INITIALER DB-LOAD
     // ============================================================
     private void LadeInitialDaten()
     {
         LadeJahresDaten(_currentYear);
+        LadeGruendungspfadFortschritt();
+    }
+
+    // ============================================================
+    // GRÜNDUNGSPFAD-FORTSCHRITT
+    // ============================================================
+    private void LadeGruendungspfadFortschritt()
+    {
+        try
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+
+            var docs = db.getAllUserDocuments();
+            var save = docs?.OrderByDescending(d => d.id)
+                           .FirstOrDefault(d => d.documentType == 9001);
+
+            if (save == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+
+            var data = JsonUtility.FromJson<GruendungspfadSpeicher>(save.text);
+            if (data == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+
+            var erledigteIds   = data.erledigteIds   ?? new List<string>();
+            var eigeneSchritte = data.eigeneSchritte ?? new List<EigenerSchritt>();
+
+            var phasenDef = new (string name, string[] ids)[]
+            {
+                ("Vorbereitung", new[] { "vorb_1","vorb_2","vorb_3","vorb_4","vorb_5" }),
+                ("Anmeldung",    new[] { "anm_1","anm_2","anm_3","anm_4","anm_5" }),
+                ("Finanzen",     new[] { "fin_1","fin_2","fin_3","fin_4" }),
+                ("Betrieb",      new[] { "betr_1","betr_2","betr_3","betr_4" }),
+                ("Sonstiges",    new[] { "sonst_1","sonst_2","sonst_3" }),
+            };
+
+            float[] segmente   = new float[5];
+            int gesamtAlle     = 0;
+            int gesamtErled    = 0;
+
+            for (int i = 0; i < phasenDef.Length; i++)
+            {
+                var (phaseName, pflichtIds) = phasenDef[i];
+                int g = pflichtIds.Length;
+                int e = pflichtIds.Count(id => erledigteIds.Contains(id));
+
+                var eigene = eigeneSchritte
+                    .Where(s => s.id != null && s.id.StartsWith(phaseName + "_eigen_"))
+                    .ToList();
+                g += eigene.Count;
+                e += eigene.Count(s => erledigteIds.Contains(s.id));
+
+                segmente[i]  = g > 0 ? (float)e / g : 0f;
+                gesamtAlle  += g;
+                gesamtErled += e;
+            }
+
+            var eigeneOhnePhase = eigeneSchritte
+                .Where(s => s.id != null && !phasenDef.Any(p => s.id.StartsWith(p.name + "_eigen_")))
+                .ToList();
+            gesamtAlle  += eigeneOhnePhase.Count;
+            gesamtErled += eigeneOhnePhase.Count(s => erledigteIds.Contains(s.id));
+
+            float gesamt = gesamtAlle > 0 ? (float)gesamtErled / gesamtAlle : 0f;
+
+            SetzeSegmente(segmente[0], segmente[1], segmente[2], segmente[3], segmente[4]);
+
+            var pctLabel = _root.Q<Label>("lbl-progress-percent");
+            if (pctLabel != null)
+                pctLabel.text = Mathf.RoundToInt(gesamt * 100f) + "%";
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("[Dashboard] LadeGruendungspfadFortschritt: " + ex.Message);
+            SetzeSegmente(0f, 0f, 0f, 0f, 0f);
+        }
+    }
+
+    [System.Serializable]
+    private class EigenerSchritt { public string id; }
+
+    [System.Serializable]
+    private class GruendungspfadSpeicher
+    {
+        public List<string>        erledigteIds;
+        public List<EigenerSchritt> eigeneSchritte;
     }
 
     private void LadeJahresDaten(int jahr)
@@ -78,43 +214,33 @@ public class DashboardController : MonoBehaviour
             var db = UserDatabaseAccess.getCurrentUserDatabase();
             if (db == null) return;
 
-            // --- Kunden: gefiltert nach lastUpdated-Jahr ---
             var alleKunden = db.getAllCustomers();
             int kundenImJahr = 0;
             if (alleKunden != null)
-            {
                 foreach (var k in alleKunden)
                     if (k.lastUpdated.Year == jahr) kundenImJahr++;
-            }
             SetLabel("lbl-kunden", kundenImJahr.ToString());
 
-            // --- Angebote: gefiltert nach date-Jahr ---
             var alleAngebote = db.getAllOffers();
             int angeboteImJahr = 0;
             if (alleAngebote != null)
-            {
                 foreach (var a in alleAngebote)
                     if (TryParseDatum(a.date, out DateTime d) && d.Year == jahr) angeboteImJahr++;
-            }
             SetLabel("lbl-angebote", angeboteImJahr.ToString());
 
-            // --- Rechnungen: gefiltert nach date-Jahr ---
             var alleRechnungen = db.getAllInvoices();
             int rechnungenImJahr = 0;
             if (alleRechnungen != null)
-            {
                 foreach (var r in alleRechnungen)
                     if (TryParseDatum(r.date, out DateTime d) && d.Year == jahr) rechnungenImJahr++;
-            }
             SetLabel("lbl-rechnungen", rechnungenImJahr.ToString());
 
-            // --- Kassenbuch: Bilanz + Monatswerte + Kontostand, alles für 'jahr' ---
-            float umsatzJahr  = 0f;
-            float[] monate    = BerechneMonatsBilanz(db, jahr, out umsatzJahr);
-            float kontostandJahr = BerechneKontostandBisJahresende(db, jahr);
+            float umsatzJahr = 0f;
+            float[] monate   = BerechneMonatsBilanz(db, jahr, out umsatzJahr);
+            float kontostand = BerechneKontostandBisJahresende(db, jahr);
 
-            SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
-            SetKontostand(kontostandJahr);
+            SetLabel("lbl-kassenbuch", "\u20ac " + umsatzJahr.ToString("N0"));
+            SetKontostand(kontostand);
 
             _chart?.SetValues(monate);
             UpdateYAxisLabels(monate);
@@ -125,9 +251,6 @@ public class DashboardController : MonoBehaviour
         }
     }
 
-    // Kontostand "bis zum gewählten Jahr" = alle Einkommen/Ausgaben mit
-    // Datum <= 31.12.<jahr>. So bleibt der Kontostand bei Jahreswechsel
-    // konsistent mit dem, was bis dahin tatsächlich passiert ist.
     float BerechneKontostandBisJahresende(DataBase db, int jahr)
     {
         var stichtag = new DateTime(jahr, 12, 31);
@@ -157,26 +280,20 @@ public class DashboardController : MonoBehaviour
         return summe;
     }
 
-    // ============================================================
-    // KONTOSTAND  – Farbe + Vorzeichen
-    // ============================================================
     void SetKontostand(float wert)
     {
         var lbl = _root.Q<Label>("lbl-kontostand");
         if (lbl == null) return;
 
         string vorzeichen = wert < 0 ? "- " : "";
-        float betragAbs   = Mathf.Abs(wert);
-        lbl.text = "€ " + vorzeichen + betragAbs.ToString("N0");
+        float  betragAbs  = Mathf.Abs(wert);
+        lbl.text = "\u20ac " + vorzeichen + betragAbs.ToString("N0");
 
         lbl.RemoveFromClassList("stat-value-green");
         lbl.RemoveFromClassList("stat-value-red");
         lbl.AddToClassList(wert < 0 ? "stat-value-red" : "stat-value-green");
     }
 
-    // ============================================================
-    // MONATS-BILANZ  – Einkommen minus Ausgaben, pro Monat, für 1 Jahr
-    // ============================================================
     static readonly string[] DatumFormate =
         { "dd.MM.yyyy","d.M.yyyy","dd.M.yyyy","d.MM.yyyy","yyyy-MM-dd","yyyy/MM/dd" };
 
@@ -197,36 +314,19 @@ public class DashboardController : MonoBehaviour
 
         var einkommen = db.getAllEinkommenEntries();
         if (einkommen != null)
-        {
             foreach (var e in einkommen)
-            {
                 if (TryParseDatum(e.Datum, out DateTime d) && d.Year == jahr)
-                {
-                    bilanzProMonat[d.Month - 1] += e.Amount;
-                    summeJahr += e.Amount;
-                }
-            }
-        }
+                { bilanzProMonat[d.Month - 1] += e.Amount; summeJahr += e.Amount; }
 
         var ausgaben = db.getAllAusgabenEntries();
         if (ausgaben != null)
-        {
             foreach (var a in ausgaben)
-            {
                 if (TryParseDatum(a.Datum, out DateTime d) && d.Year == jahr)
-                {
-                    bilanzProMonat[d.Month - 1] -= a.Amount;
-                    summeJahr -= a.Amount;
-                }
-            }
-        }
+                { bilanzProMonat[d.Month - 1] -= a.Amount; summeJahr -= a.Amount; }
 
         return bilanzProMonat;
     }
 
-    // ============================================================
-    // Y-ACHSE  – dynamische Eurowert-Labels statt fixer 1.0/0.5/0.0
-    // ============================================================
     void UpdateYAxisLabels(float[] monatswerte)
     {
         var yAxisContainer = _root.Q<VisualElement>("chart-y-axis");
@@ -235,39 +335,33 @@ public class DashboardController : MonoBehaviour
         float maxV = float.MinValue, minV = float.MaxValue;
         foreach (var v in monatswerte) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
 
-        // Etwas Puffer wie im Chart selbst, damit die Linie nicht exakt am Rand klebt
         float range = Mathf.Max(maxV - minV, 1f);
         float vMin  = minV - range * 0.08f;
         float vMax  = maxV + range * 0.08f;
 
-        // 5 Labels von oben (vMax) nach unten (vMin), gleichmäßig verteilt
         var labels = yAxisContainer.Query<Label>().ToList();
         for (int i = 0; i < labels.Count; i++)
         {
-            float t      = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
-            float wert   = Mathf.Lerp(vMax, vMin, t);
+            float t    = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
+            float wert = Mathf.Lerp(vMax, vMin, t);
             labels[i].text = FormatiereEuroKompakt(wert);
         }
     }
 
-    // Formatiert z.B. 15000 -> "€15k", -500 -> "-€500", 1234567 -> "€1,2M"
     string FormatiereEuroKompakt(float wert)
     {
         string vorzeichen = wert < 0 ? "-" : "";
-        float abs = Mathf.Abs(wert);
+        float  abs        = Mathf.Abs(wert);
 
-        if (abs >= 1_000_000f)
-            return $"{vorzeichen}€{(abs / 1_000_000f).ToString("0.#")}M";
-        if (abs >= 1_000f)
-            return $"{vorzeichen}€{(abs / 1_000f).ToString("0.#")}k";
-        return $"{vorzeichen}€{abs.ToString("0")}";
+        if (abs >= 1_000_000f) return $"{vorzeichen}\u20ac{(abs / 1_000_000f).ToString("0.#")}M";
+        if (abs >= 1_000f)     return $"{vorzeichen}\u20ac{(abs / 1_000f).ToString("0.#")}k";
+        return $"{vorzeichen}\u20ac{abs.ToString("0")}";
     }
 
     // ============================================================
-    // EVENT-HANDLER  – werden von anderen Screens gefeuert
+    // EVENT-HANDLER
     // ============================================================
-    void OnKunden(int anzahl)
-        => SetLabel("lbl-kunden", anzahl.ToString());
+    void OnKunden(int anzahl)    => SetLabel("lbl-kunden", anzahl.ToString());
 
     void OnAngebote(int anzahl)
     {
@@ -285,7 +379,7 @@ public class DashboardController : MonoBehaviour
 
     void OnKassenbuch(float umsatzJahr, float kontostand, float[] monate)
     {
-        SetLabel("lbl-kassenbuch", "€ " + umsatzJahr.ToString("N0"));
+        SetLabel("lbl-kassenbuch", "\u20ac " + umsatzJahr.ToString("N0"));
         SetKontostand(kontostand);
         if (monate != null && monate.Length == 12)
         {
@@ -294,14 +388,34 @@ public class DashboardController : MonoBehaviour
         }
     }
 
+    void OnDokumenteFortschritt(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
+    {
+        SetzeSegmente(stammdaten, vertraege, steuer, rechnungen, sonstiges);
+        LadeGruendungspfadFortschritt();
+    }
+
+    void SetzeSegmente(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
+    {
+        SetSegment("seg-fill-stammdaten", stammdaten);
+        SetSegment("seg-fill-vertraege",  vertraege);
+        SetSegment("seg-fill-steuer",     steuer);
+        SetSegment("seg-fill-rechnungen", rechnungen);
+        SetSegment("seg-fill-sonstiges",  sonstiges);
+    }
+
+    void SetSegment(string name, float wert)
+    {
+        var fill = _root.Q<VisualElement>(name);
+        if (fill == null) return;
+
+        fill.RemoveFromClassList("seg-full");
+        fill.RemoveFromClassList("seg-partial");
+        fill.RemoveFromClassList("seg-empty");
+        fill.style.width = new StyleLength(new Length(Mathf.Clamp01(wert) * 100f, LengthUnit.Percent));
+    }
+
     // ============================================================
-    // BUTTONS  – 5 Stück, je einer unter den 5 Stat-Kacheln
-    //
-    // Layout:
-    //   unter "Kunden hinterlegt"      -> Kundendatenbank
-    //   unter "Angebote erstellt"      -> Angebot
-    //   unter "Rechnungen gestellt"    -> Rechnung
-    //   unter "Kassenbuch-Umsatz Jahr" + "Kontostand" (1 breiter Button) -> Kassenbuch
+    // BUTTONS
     // ============================================================
     void SetupButtons()
     {
@@ -317,18 +431,14 @@ public class DashboardController : MonoBehaviour
         {
             bool exists = false;
             for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-            {
                 if (SceneUtility.GetScenePathByBuildIndex(i).Contains(sceneName))
                 { exists = true; break; }
-            }
+
             if (exists) SceneManager.LoadScene(sceneName);
-            else Debug.LogWarning($"[Dashboard] Scene '{sceneName}' nicht gefunden.");
+            else        Debug.LogWarning($"[Dashboard] Scene '{sceneName}' nicht gefunden.");
         });
     }
 
-    // ============================================================
-    // HILFS-METHODE
-    // ============================================================
     void SetLabel(string name, string text)
     {
         var lbl = _root.Q<Label>(name);
@@ -350,6 +460,7 @@ public class DashboardController : MonoBehaviour
             dropMonat.RegisterValueChangedCallback(_ =>
             { _currentMonth = dropMonat.index + 1; RenderKalender(); });
         }
+
         if (dropJahr != null)
         {
             var jahre = new List<string>();
@@ -389,9 +500,9 @@ public class DashboardController : MonoBehaviour
         var dropJahr  = _root.Q<DropdownField>("dropdown-jahr");
         if (dropMonat != null) dropMonat.index = _currentMonth - 1;
         if (dropJahr  != null) dropJahr.value  = _currentYear.ToString();
+
         RenderKalender();
 
-        // Nur neu laden wenn sich das Jahr durch den Monatswechsel tatsächlich geändert hat
         if (_currentYear != vorherigesJahr)
         {
             LadeJahresDaten(_currentYear);
@@ -400,55 +511,38 @@ public class DashboardController : MonoBehaviour
     }
 
     // ============================================================
-    // DEADLINES  – aus Angeboten (date + 14 Tage) und Rechnungen (dueDate)
+    // DEADLINES
     // ============================================================
     private const int ANGEBOT_GUELTIGKEIT_TAGE = 14;
 
     void LadeDeadlines()
     {
         _deadlines.Clear();
-
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
             if (db == null) return;
 
-            // --- Angebote: Gültig bis = Erstellungsdatum + 14 Tage ---
             var angebote = db.getAllOffers();
             if (angebote != null)
-            {
                 foreach (var a in angebote)
-                {
                     if (TryParseDatum(a.date, out DateTime erstellt))
                     {
                         DateTime gueltigBis = erstellt.AddDays(ANGEBOT_GUELTIGKEIT_TAGE);
                         string key = gueltigBis.ToString("yyyy-MM-dd");
-
-                        if (!_deadlines.ContainsKey(key))
-                            _deadlines[key] = new List<string>();
-
-                        _deadlines[key].Add($"Angebot {a.offerNumber} gültig bis");
+                        if (!_deadlines.ContainsKey(key)) _deadlines[key] = new List<string>();
+                        _deadlines[key].Add($"Angebot {a.offerNumber} g\u00fcltig bis");
                     }
-                }
-            }
 
-            // --- Rechnungen: Fälligkeitsdatum direkt aus dueDate ---
             var rechnungen = db.getAllInvoices();
             if (rechnungen != null)
-            {
                 foreach (var r in rechnungen)
-                {
                     if (TryParseDatum(r.dueDate, out DateTime faellig))
                     {
                         string key = faellig.ToString("yyyy-MM-dd");
-
-                        if (!_deadlines.ContainsKey(key))
-                            _deadlines[key] = new List<string>();
-
-                        _deadlines[key].Add($"Rechnung {r.invoiceNumber} fällig");
+                        if (!_deadlines.ContainsKey(key)) _deadlines[key] = new List<string>();
+                        _deadlines[key].Add($"Rechnung {r.invoiceNumber} f\u00e4llig");
                     }
-                }
-            }
         }
         catch (Exception e)
         {
@@ -456,8 +550,6 @@ public class DashboardController : MonoBehaviour
         }
     }
 
-    // FIX: keine Tage aus Vor-/Folgemonat mehr anzeigen.
-    // Slots vor dem 1. des Monats und nach dem letzten Tag bleiben leer (kein Text, deaktiviert).
     void RenderKalender()
     {
         var today          = DateTime.Today;
@@ -480,7 +572,6 @@ public class DashboardController : MonoBehaviour
 
             if (!istImAktuellenMonat)
             {
-                // Leeres Feld statt Tag aus Vor-/Folgemonat
                 btn.text = "";
                 btn.AddToClassList("cal-day-empty");
                 btn.SetEnabled(false);
@@ -494,9 +585,7 @@ public class DashboardController : MonoBehaviour
             if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
                 btn.AddToClassList("cal-day-today");
 
-            var tagDatum = new DateTime(_currentYear, _currentMonth, tag);
-            string key = tagDatum.ToString("yyyy-MM-dd");
-
+            string key = new DateTime(_currentYear, _currentMonth, tag).ToString("yyyy-MM-dd");
             if (_deadlines.TryGetValue(key, out var eintraege))
             {
                 btn.AddToClassList("cal-day-deadline");
@@ -542,7 +631,9 @@ public class DashboardController : MonoBehaviour
             float maxV = float.MinValue, minV = float.MaxValue;
             foreach (var v in _values) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
             float range = Mathf.Max(maxV - minV, 1f);
-            float vMin = minV - range * 0.08f, vMax = maxV + range * 0.08f, vRange = vMax - vMin;
+            float vMin  = minV - range * 0.08f;
+            float vMax  = maxV + range * 0.08f;
+            float vRange = vMax - vMin;
 
             var p = ctx.painter2D;
             p.strokeColor = GridColor; p.lineWidth = 0.5f;
@@ -554,17 +645,20 @@ public class DashboardController : MonoBehaviour
 
             var pts = new Vector2[_values.Length];
             for (int i = 0; i < _values.Length; i++)
-                pts[i] = new Vector2(padX + (w - 2*padX)*i/(_values.Length-1),
-                                     padY + (h - 2*padY)*(1f-(_values[i]-vMin)/vRange));
+                pts[i] = new Vector2(
+                    padX + (w - 2*padX) * i / (_values.Length - 1),
+                    padY + (h - 2*padY) * (1f - (_values[i] - vMin) / vRange));
 
             p.fillColor = FillColor;
-            p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, h-padY));
+            p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, h - padY));
             foreach (var pt in pts) p.LineTo(pt);
-            p.LineTo(new Vector2(pts[pts.Length-1].x, h-padY)); p.ClosePath(); p.Fill();
+            p.LineTo(new Vector2(pts[pts.Length-1].x, h - padY));
+            p.ClosePath(); p.Fill();
 
             p.strokeColor = LineColor; p.lineWidth = 2f;
             p.BeginPath(); p.MoveTo(pts[0]);
-            for (int i = 1; i < pts.Length; i++) p.LineTo(pts[i]); p.Stroke();
+            for (int i = 1; i < pts.Length; i++) p.LineTo(pts[i]);
+            p.Stroke();
 
             p.fillColor = PointColor;
             foreach (var pt in pts) { p.BeginPath(); p.Arc(pt, 3.5f, 0f, 360f); p.Fill(); }

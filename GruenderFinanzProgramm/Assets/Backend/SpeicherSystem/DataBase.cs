@@ -388,6 +388,22 @@ public int deleteInvoiceItem(int id)
         return getAll<UserDocument>();
     }
 
+    public int deleteUserDocument(int id)
+    {
+        return delete<UserDocument>(id);
+    }
+
+    public int deleteAllUserDocumentsByType(int documentType)
+    {
+        var docs = getAllUserDocuments();
+        if (docs == null) return 0;
+        int count = 0;
+        foreach (var doc in docs)
+            if (doc.documentType == documentType)
+                count += delete<UserDocument>(doc.id);
+        return count;
+    }
+
 
     // --- Buissnesplan ---
 
