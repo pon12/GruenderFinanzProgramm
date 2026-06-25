@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b99ea01ba5e7eb47a44eddb850bcebe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Finanzen1Controller
+  uiDocument: {fileID: 1161213794}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
