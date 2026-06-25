@@ -1,18 +1,25 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Erfolge.uss?fileID=7433441132597879392&amp;guid=62fd74cb81a5b8140ace45c9059abf7d&amp;type=3#Erfolge"/>
     <ui:VisualElement name="main-content" style="flex-grow: 1; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 20px 430px;">
             <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <ui:VisualElement>
-                    <ui:Label text="Erfolge" class="page-title"/>
-                    <ui:Label text="Deine Meilensteine und Errungenschaften" class="page-subtitle"/>
+                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement>
+                        <ui:Label text="Erfolge" class="page-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:Label text="Deine Meilensteine und Errungenschaften" class="page-subtitle" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 177px; bottom: 18px; left: -172px;"/>
                 </ui:VisualElement>
                 <ui:Label name="lbl-gesamt-prozent" text="0%" class="gesamt-prozent-label"/>
             </ui:VisualElement>
             <ui:VisualElement class="gesamt-fortschritt-box" style="background-color: rgb(44, 44, 44);">
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
-                    <ui:Label text="Gesamtfortschritt" class="fortschritt-header-label"/>
+                    <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Gesamtfortschritt" class="fortschritt-header-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                        <ui:VisualElement name="btn-help-fortschritt" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
+                    </ui:VisualElement>
                     <ui:Label name="lbl-gesamt-text" text="0 von 0 Erfolgen" class="fortschritt-prozent-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="fortschritt-balken-bg">
