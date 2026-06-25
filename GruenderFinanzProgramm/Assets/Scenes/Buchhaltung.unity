@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 105901195}
   - component: {fileID: 105901194}
+  - component: {fileID: 105901196}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: Untagged
@@ -174,6 +175,88 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &105901196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105901193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 495e26ec935ed134d8c9d1d26dc0b5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuchhaltungScreenController
+  uiDocument: {fileID: 105901194}
+--- !u!1001 &543531894
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[4].sceneName
+      value: Rechnung
+      objectReference: {fileID: 0}
+    - target: {fileID: 858866203436760020, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: navigationConfig.Array.data[4].buttonName
+      value: nav-item-rechnung
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 934.71747
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 523.86115
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212426766267384220, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4968043093137667829, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
+      propertyPath: m_Name
+      value: Ui_Sidebar_Root
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 79a79dfc674065247b9c9e02ced1983e, type: 3}
 --- !u!1 &2134575553
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,3 +355,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 2134575556}
   - {fileID: 105901195}
+  - {fileID: 543531894}
