@@ -261,7 +261,73 @@ public class GruendungspfadController : MonoBehaviour
 
         LadeFortschritt();
         WendeFortschrittAn();
+        WendeDokumenteFortschrittAn();
         BaueUI();
+    }
+
+    // ============================================================
+    // DOKUMENTE → GRÜNDERPFAD MAPPING
+    // Pflichtdok-Titel (exakt wie im Doc-Screen) → Schritt-ID
+    // ============================================================
+    private static readonly System.Collections.Generic.Dictionary<string, string> DokZuSchrittId
+        = new System.Collections.Generic.Dictionary<string, string>
+    {
+        // Gründung
+        { "Unternehmensstammdaten",                  "vorb_1" },  // Geschäftsidee ausarbeiten
+        { "Gründungsurkunde / Gesellschaftsvertrag", "anm_2"  },  // Notar beauftragen
+        { "Handelsregisterauszug",                   "anm_3"  },  // Handelsregistereintrag
+        { "Gewerbeanmeldung",                        "anm_1"  },  // Gewerbeanmeldung
+        { "Gesellschafterliste",                     "anm_2"  },  // Notar beauftragen
+        // Bezahlweise
+        { "Kontodaten (IBAN/BIC)",                   "fin_1"  },  // Geschäftskonto eröffnen
+        { "Zahlungsbedingungen",                     "fin_1"  },  // Geschäftskonto eröffnen
+        { "AGB",                                     "betr_3" },  // Prozesse dokumentieren
+        { "Disclaimer",                              "betr_3" },  // Prozesse dokumentieren
+        { "SEPA-Basislastschrift-Mandat",            "fin_1"  },  // Geschäftskonto eröffnen
+        { "Widerrufsbelehrung",                      "betr_3" },  // Prozesse dokumentieren
+        // Strategie & Planung
+        { "Businessplan",                            "vorb_3" },  // Businessplan erstellen
+        { "Markt- & Wettbewerbsanalyse",             "vorb_2" },  // Marktanalyse
+        // Finanzen
+        { "Eröffnungsbilanz",                        "fin_2"  },  // Buchhaltung einrichten
+        // Recht & Steuern
+        { "Datenschutzerklärung (DSGVO)",            "betr_3" },  // Prozesse dokumentieren
+        { "Steuernummer-Bescheid / USt-IdNr",        "anm_4"  },  // Steuernummer beantragen
+        { "Impressum",                               "betr_2" },  // Website & Branding
+        // Marketing & Personal
+        { "Dienstleistungskatalog / Preisliste",     "betr_1" },  // Erste Kunden akquirieren
+        { "Corporate Identity Manual",               "betr_2" },  // Website & Branding
+        { "Muster-Arbeitsvertrag",                   "sonst_1"},  // Team aufbauen
+        // Vorlagen & Checklisten
+        { "Gründungs-Checkliste",                    "vorb_1" },  // Geschäftsidee ausarbeiten
+        { "Inventarliste",                           "fin_2"  },  // Buchhaltung einrichten
+        { "Inventur",                                "fin_2"  },  // Buchhaltung einrichten
+    };
+
+    private void WendeDokumenteFortschrittAn()
+    {
+        // Gespeicherte Dokumente laden und ausgefüllte Pflichtdoks ermitteln
+        var gespeichert = DocumentDashboard.GetSavedDocuments();
+        if (gespeichert?.savedDocs == null) return;
+
+        foreach (var doc in gespeichert.savedDocs)
+        {
+            if (!doc.istPflichtdokument) continue;
+
+            bool hatInhalt   = !string.IsNullOrWhiteSpace(doc.inhalt);
+            bool hatFeldwert = doc.strukturFelder != null &&
+                               doc.strukturFelder.Any(f => !string.IsNullOrWhiteSpace(f.wert));
+
+            if (!hatInhalt && !hatFeldwert) continue;
+            if (!DokZuSchrittId.TryGetValue(doc.title, out string schrittId)) continue;
+
+            foreach (var phase in phasen)
+            {
+                var schritt = phase.schritte.FirstOrDefault(s => s.id == schrittId);
+                if (schritt != null)
+                    schritt.erledigt = true;
+            }
+        }
     }
 
     private void BaueUI()
