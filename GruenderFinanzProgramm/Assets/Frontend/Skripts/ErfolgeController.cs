@@ -225,28 +225,25 @@ public class ErfolgeController : MonoBehaviour
         var db = UserDatabaseAccess.getCurrentUserDatabase();
         if (db == null) return;
 
-        // Kunden
-        int kundenAnzahl = db.getAllUserDocuments()
-            ?.Count(d => d.documentType == 1001) ?? 0; // Typ anpassen falls nötig
-        SetzeStackable("e_kunden", kundenAnzahl);
+        try
+        {
+            // getAllCustomers direkt – ohne Musterkunden-Fallback aus KundendatenbankController
+            var kundenRoh = db.getAllCustomers();
+            int kundenAnzahl = kundenRoh?.Count ?? 0;
+            int angeboteAnzahl = db.getAllOffers()?.Count    ?? 0;
+            int rechnungAnzahl = db.getAllInvoices()?.Count  ?? 0;
 
-        // Angebote & Rechnungen über AppEventManager-Counts
-        // (werden beim nächsten Event aktualisiert – hier erstmal aus DB lesen)
-        int angeboteAnzahl  = db.getAllUserDocuments()
-            ?.Count(d => d.documentType == 2001) ?? 0;
-        int rechnungAnzahl  = db.getAllUserDocuments()
-            ?.Count(d => d.documentType == 2002) ?? 0;
+            SetzeStackable("e_kunden",     kundenAnzahl);
+            SetzeStackable("e_angebote",   angeboteAnzahl);
+            SetzeStackable("e_rechnungen", rechnungAnzahl);
 
-        SetzeStackable("e_angebote",   angeboteAnzahl);
-        SetzeStackable("e_rechnungen", rechnungAnzahl);
-
-        if (rechnungAnzahl >= 1)
-            SetzeErfolg("e_export", true); // vereinfacht – falls Rechnung existiert
-
-        // Kassenbuch-Umsatz
-        // Kontostand aus AppEventManager-Daten ist nicht persistent –
-        // daher direkt aus DB lesen falls vorhanden
-        SetzeErfolg("e_kontostand", rechnungAnzahl > 0 || angeboteAnzahl > 0);
+            if (rechnungAnzahl >= 1) SetzeErfolg("e_export",     true);
+            if (rechnungAnzahl >= 1 || angeboteAnzahl >= 1) SetzeErfolg("e_kontostand", true);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("[Erfolge] LadeKundenbuchDaten: " + e.Message);
+        }
     }
 
     private void LadeGruendungspfadDaten()
@@ -462,8 +459,15 @@ public class ErfolgeController : MonoBehaviour
             barBg.Add(barFill);
             textBlock.Add(barBg);
 
-            string stufenText = string.Join(" / ", e.stufen.Select(s => s.ToString()));
-            var countLabel = new Label($"{e.aktuellerWert} / {stufenText}");
+            // Zeige: "5 von 10 – Stufe 2 von 4"
+            int gesamtStufen   = e.stufen.Length;
+            int naechsteZiel   = e.aktuellerStufenIndex < gesamtStufen
+                ? e.stufen[e.aktuellerStufenIndex]
+                : e.stufen[gesamtStufen - 1];
+            string stufenLabel = e.aktuellerStufenIndex >= gesamtStufen
+                ? $"{e.aktuellerWert} – Alle Stufen erreicht!"
+                : $"{e.aktuellerWert} von {naechsteZiel} – Stufe {e.aktuellerStufenIndex + 1} von {gesamtStufen}";
+            var countLabel = new Label(stufenLabel);
             countLabel.AddToClassList("stackable-count-label");
             textBlock.Add(countLabel);
         }

@@ -59,4 +59,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Buchhaltung.unity
     guid: 3223ecc4fc5f1a94da507ab8e65cfa31
+  - enabled: 1
+    path: Assets/Scenes/Erfolge.unity
+    guid: 0885218bb9ce838428b58ba8978f6dd7
   m_configObjects: {}
