@@ -327,7 +327,7 @@ public static class InvoicePdfExporter
                     footerFont
                 );
 
-                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge);
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge, invoice.status);
 
                 doc.Close();
             }
