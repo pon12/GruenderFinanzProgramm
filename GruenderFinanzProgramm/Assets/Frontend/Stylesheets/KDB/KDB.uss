@@ -31,3 +31,25 @@
     border-bottom-color: rgba(0, 0, 0, 0);
 }
 
+TextField > #unity-text-input {
+    background-color: rgb(70, 70, 70);
+}
+
+.textfield-styled > #unity-text-input {
+    background-color: rgb(70, 70, 70);
+    border-left-color: rgb(70, 70, 70);
+    border-right-color: rgb(70, 70, 70);
+    border-top-color: rgb(70, 70, 70);
+    border-bottom-color: rgb(70, 70, 70);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.textfield-styled > #unity-text-input:hover {
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}

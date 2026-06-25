@@ -43,7 +43,7 @@ public class SidebarController : MonoBehaviour
         { "nav-item-buchhaltung",      "Buchhaltung"      },
         { "nav-item-finanzen",         "Finanzen"         },
         { "nav-item-dokumente",        "Dokument-Screen"  },
-        { "nav-item-gründerpfad",      "Gründerpfad"      },
+        { "nav-item-gründerpfad",      "Gründungspfad"      },
         { "nav-item-wissensdatenbank", "Wissensdatenbank" },
         { "nav-item-erfolge",          "Erfolge"          },
         { "nav-item-angebot",          "Angebot"          },
