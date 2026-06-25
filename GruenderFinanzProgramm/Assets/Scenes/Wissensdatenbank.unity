@@ -190,7 +190,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WissensdatenbankController
   uiDocument: {fileID: 545996516}
   categoryCardTemplate: {fileID: 9197481963319205126, guid: 02c017225ddc5c249b5187f5249bae66, type: 3}
-  wissensEintraege: []
 --- !u!114 &545996519
 MonoBehaviour:
   m_ObjectHideFlags: 0
