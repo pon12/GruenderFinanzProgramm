@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System;
 using System.Collections.Generic;
-<<<<<<< Updated upstream
 
 public class Finanzen2 : MonoBehaviour
 {
@@ -21,17 +20,6 @@ public class Finanzen2 : MonoBehaviour
 
         _root = document.rootVisualElement;
     }
-=======
-using System.Linq;
-using System.Reflection;
-
-public class Finanzen2 : MonoBehaviour
-{
-    [SerializeField] private UIDocument uiDocument;
-    
-    private void OnEnable() { }
-    private void OnDisable() { }
->>>>>>> Stashed changes
 
     private void Start()
     {
@@ -70,152 +58,8 @@ public class Finanzen2 : MonoBehaviour
 
     public void SetDaten(float[] daten)
     {
-<<<<<<< Updated upstream
         if (_chart != null)
             _chart.SetValues(daten);
-=======
-        if (uiDocument == null || uiDocument.rootVisualElement == null) return;
-        
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null) return;
-
-        int baseYear = DateTime.Now.Year;
-        var alleAusgaben = db.getAllAusgabenEntries();
-
-        // 1. Bereich "Kosten"
-        VisualElement containerKosten = uiDocument.rootVisualElement.Q<VisualElement>("Kosten");
-        if (containerKosten != null)
-        {
-            containerKosten.Clear();
-            containerKosten.Add(CreateHeader());
-            string[] katKosten = { "Honorar", "Material" };
-
-            foreach (var kat in katKosten)
-            {
-                float y1 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, kat, baseYear);
-                float y2 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, kat, baseYear + 1);
-                containerKosten.Add(CreateRow(kat, y1, y2));
-            }
-        }
-
-        // 2. Bereich "Betriebsausgaben"
-        VisualElement containerBetriebsausgaben = uiDocument.rootVisualElement.Q<VisualElement>("Betriebsausgaben");
-        if (containerBetriebsausgaben != null)
-        {
-            containerBetriebsausgaben.Clear();
-            containerBetriebsausgaben.Add(CreateHeader());
-            // HINWEIS: Hier stehen jetzt die Namen, die vermutlich im Kassenbuch-Dropdown stehen
-            string[] katBetriebsausgaben = { "Auto", "Marketing", "Reisekosten" };
-            
-            float summeBetriebY1 = 0;
-            float summeBetriebY2 = 0;
-            
-            foreach (var kat in katBetriebsausgaben)
-            {
-                float y1 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, kat, baseYear);
-                float y2 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, kat, baseYear + 1);
-                summeBetriebY1 += y1;
-                summeBetriebY2 += y2;
-                containerBetriebsausgaben.Add(CreateRow(kat, y1, y2));
-            }
-            containerBetriebsausgaben.Add(CreateRow("Summe Betriebsausgaben", summeBetriebY1, summeBetriebY2, true));
-        }
-
-        // 3. Bereich "Dienstleistungen"
-        VisualElement containerDienstleistungen = uiDocument.rootVisualElement.Q<VisualElement>("Dienstleistungen");
-        if (containerDienstleistungen != null)
-        {
-            containerDienstleistungen.Clear();
-            containerDienstleistungen.Add(CreateHeader());
-            var alleServices = db.getAllServices() ?? new List<Service>();
-            var alleRechnungen = db.getAllInvoices();
-            float summeUmsatzY1 = 0;
-            float summeUmsatzY2 = 0;
-
-            foreach (var service in alleServices)
-            {
-                float y1 = BerechneDienstleistungUmsatz(service, alleRechnungen as IEnumerable, baseYear);
-                float y2 = BerechneDienstleistungUmsatz(service, alleRechnungen as IEnumerable, baseYear + 1);
-                summeUmsatzY1 += y1;
-                summeUmsatzY2 += y2;
-                containerDienstleistungen.Add(CreateRow(service.name, y1, y2));
-            }
-            containerDienstleistungen.Add(CreateRow("Summe Umsätze", summeUmsatzY1, summeUmsatzY2, true));
-            float direkteKostenY1 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, "Material", baseYear) + BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, "Honorar", baseYear);
-            float direkteKostenY2 = BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, "Material", baseYear + 1) + BerechneAusgabenNachKategorie(alleAusgaben as IEnumerable, "Honorar", baseYear + 1);
-            containerDienstleistungen.Add(CreateRow("Summe direkte Kosten", direkteKostenY1, direkteKostenY2)); 
-            float rohgewinnY1 = summeUmsatzY1 - direkteKostenY1;
-            float rohgewinnY2 = summeUmsatzY2 - direkteKostenY2;
-            containerDienstleistungen.Add(CreateRow("Rohgewinn", rohgewinnY1, rohgewinnY2, true)); 
-        }
-    }
-
-    private float BerechneAusgabenNachKategorie(IEnumerable alleAusgaben, string kategorie, int year)
-    {
-        float summe = 0;
-        if (alleAusgaben == null) return 0;
-
-        foreach (object a in alleAusgaben)
-        {
-            if (a == null) continue;
-            string status = HoleFeldOderProperty(a, "Status", "Kategorie")?.ToString() ?? "";
-            string datumStr = HoleFeldOderProperty(a, "Datum")?.ToString() ?? "";
-
-            // DEBUG: Hier siehst du in der Konsole, was gefunden wurde
-            if (status.Contains(kategorie) || kategorie.Contains(status)) { /* Debug.Log($"Match gefunden: {status} == {kategorie}"); */ }
-
-            if (status.Equals(kategorie, StringComparison.OrdinalIgnoreCase) && DateTime.TryParse(datumStr, out DateTime d) && d.Year == year)
-            {
-                object betragObj = HoleFeldOderProperty(a, "Amount", "Betrag", "Wert");
-                if (float.TryParse(betragObj?.ToString(), out float parsedBetrag)) summe += parsedBetrag; 
-            }
-        }
-        return summe;
-    }
-
-    private float BerechneDienstleistungUmsatz(Service service, IEnumerable alleRechnungen, int year)
-    {
-        float umsatz = 0;
-        if (alleRechnungen == null) return 0;
-        foreach (object r in alleRechnungen)
-        {
-            if (r == null) continue;
-            string status = HoleFeldOderProperty(r, "Status")?.ToString() ?? "";
-            string datumStr = HoleFeldOderProperty(r, "Datum")?.ToString() ?? "";
-            if (status == "Bezahlt" && DateTime.TryParse(datumStr, out DateTime d) && d.Year == year)
-            {
-                IEnumerable positionen = HoleFeldOderProperty(r, "Positionen", "Items") as IEnumerable;
-                if (positionen != null)
-                {
-                    foreach (object pos in positionen)
-                    {
-                        if (pos == null) continue;
-                        string artikelName = HoleFeldOderProperty(pos, "ArtikelName", "Name", "Artikel")?.ToString() ?? "";
-                        if (artikelName == service.name) 
-                        {
-                            object preisObj = HoleFeldOderProperty(pos, "GesamtPreis", "Preis", "Gesamt");
-                            if (float.TryParse(preisObj?.ToString(), out float parsedPreis)) umsatz += parsedPreis; 
-                        }
-                    }
-                }
-            }
-        }
-        return umsatz;
-    }
-
-    private object HoleFeldOderProperty(object obj, params string[] namen)
-    {
-        if (obj == null) return null;
-        Type t = obj.GetType();
-        foreach (string name in namen)
-        {
-            var prop = t.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (prop != null) return prop.GetValue(obj);
-            var feld = t.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (feld != null) return feld.GetValue(obj);
-        }
-        return null;
->>>>>>> Stashed changes
     }
 
     // =========================================================
@@ -348,7 +192,6 @@ public class Finanzen2 : MonoBehaviour
         return row;
     }
 
-<<<<<<< Updated upstream
     private VisualElement CreateRentRow(string name, float y1, float y2)
     {
         var row = new VisualElement();
@@ -364,9 +207,6 @@ public class Finanzen2 : MonoBehaviour
     }
 
     private VisualElement CreateRentRowBold(string name, float y1, float y2)
-=======
-    private VisualElement CreateRow(string name, float y1, float y2, bool isBold = false)
->>>>>>> Stashed changes
     {
         var row = CreateRentRow(name, y1, y2);
 
@@ -377,7 +217,6 @@ public class Finanzen2 : MonoBehaviour
         return row;
     }
 
-<<<<<<< Updated upstream
     // =========================================================
     // HELPERS
     // =========================================================
@@ -387,9 +226,6 @@ public class Finanzen2 : MonoBehaviour
     }
 
     private int GetBaseYear(List<Einkommen> einkommen, List<Ausgaben> ausgaben)
-=======
-    private VisualElement CreateCell(string text, bool isBold, int widthPercent)
->>>>>>> Stashed changes
     {
         DateTime min = DateTime.MaxValue;
 
@@ -525,10 +361,5 @@ public class Finanzen2 : MonoBehaviour
         return label;
     }
 
-<<<<<<< Updated upstream
     
-=======
-    private VisualElement CreateHeader2() => CreateHeader(); // Placeholder
-    private VisualElement CreateRow2(string name, float y1, bool isBold = false) => CreateRow(name, y1, 0, isBold);
->>>>>>> Stashed changes
 }
