@@ -10,9 +10,9 @@ public class SidebarController : MonoBehaviour
 
     public static event System.Action<bool> OnToggled;
 
-    private const float WIDTH_EXPANDED = 390f;
+    private const float WIDTH_EXPANDED  = 390f;
     private const float WIDTH_COLLAPSED = 100f;
-    private const float ANIM_DURATION = 0.2f;
+    private const float ANIM_DURATION   = 0.2f;
 
     private const string PREF_COLLAPSED        = "sidebar_collapsed";
     private const string PREF_FORTSCHRITT_OPEN = "sidebar_fortschritt_open";
@@ -41,9 +41,9 @@ public class SidebarController : MonoBehaviour
         { "nav-item-dashboard",        "Dashboard"        },
         { "nav-item-fortschritt",      "Fortschritt"      },
         { "nav-item-buchhaltung",      "Buchhaltung"      },
-        { "nav-item-finanzen",         "Finanzen"         },
+        { "nav-item-finanzen",         "Finanzdashboard"         },
         { "nav-item-dokumente",        "Dokument-Screen"  },
-        { "nav-item-gründerpfad",      "Gründungspfad"      },
+        { "nav-item-gr\u00fcndungspfad", "Gr\u00fcndungspfad"    },
         { "nav-item-wissensdatenbank", "Wissensdatenbank" },
         { "nav-item-erfolge",          "Erfolge"          },
         { "nav-item-angebot",          "Angebot"          },
@@ -52,18 +52,19 @@ public class SidebarController : MonoBehaviour
         { "nav-item-dienstleistungen", "Dienstleistungen" },
         { "nav-item-kassenbuch",       "Kassenbuch"       },
         { "nav-item-export",           "Export-Screen"    },
-        { "nav-item-liquidität",       "Finanzen1"        },
-        { "nav-item-rentabilität",     "Finanzen2"        },
+        { "nav-item-liquidit\u00e4t",  "Finanzen1"        },
+        { "nav-item-rentabilit\u00e4t","Finanzen2"        },
         { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
 
     private static readonly HashSet<string> FortschrittSubItems = new()
     {
-        "nav-item-gründerpfad",
+        "nav-item-gr\u00fcnderpfad",
         "nav-item-wissensdatenbank",
         "nav-item-erfolge",
     };
+
     private static readonly HashSet<string> BuchhaltungSubItems = new()
     {
         "nav-item-angebot",
@@ -71,19 +72,14 @@ public class SidebarController : MonoBehaviour
         "nav-item-kunden",
         "nav-item-dienstleistungen",
     };
+
     private static readonly HashSet<string> FinanzenSubItems = new()
     {
         "nav-item-kassenbuch",
         "nav-item-export",
-        "nav-item-liquidität",
-        "nav-item-rentabilität",
+        "nav-item-liquidit\u00e4t",
+        "nav-item-rentabilit\u00e4t",
         "nav-item-kennzahlen",
-    };
-    private static readonly HashSet<string> DropdownParents = new()
-    {
-        "nav-item-fortschritt",
-        "nav-item-buchhaltung",
-        "nav-item-finanzen",
     };
 
     // ─────────────────────────────────────────────────
@@ -94,8 +90,10 @@ public class SidebarController : MonoBehaviour
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
+
         _root    = uiDocument.rootVisualElement;
         _sidebar = _root.Q<VisualElement>("sidebar");
+
         _toggleButton         = _root.Q<Button>("toggle-button");
         _fortschrittSubmenu   = _root.Q<VisualElement>("fortschritt-submenu");
         _fortschrittToggleBtn = _root.Q<Button>("btn-fortschritt-toggle");
@@ -104,10 +102,7 @@ public class SidebarController : MonoBehaviour
         _finanzenSubmenu      = _root.Q<VisualElement>("finanzen-submenu");
         _finanzenToggleBtn    = _root.Q<Button>("btn-finanzen-toggle");
 
-        if (_toggleButton != null)         _toggleButton.clicked         += ToggleSidebar;
-        if (_fortschrittToggleBtn != null) _fortschrittToggleBtn.clicked += ToggleFortschrittSubmenu;
-        if (_buchhaltungToggleBtn != null) _buchhaltungToggleBtn.clicked += ToggleBuchhaltungSubmenu;
-        if (_finanzenToggleBtn != null)    _finanzenToggleBtn.clicked    += ToggleFinanzenSubmenu;
+        if (_toggleButton != null) _toggleButton.clicked += ToggleSidebar;
 
         RegisterNavigation();
         RegisterLogout();
@@ -117,10 +112,7 @@ public class SidebarController : MonoBehaviour
 
     void OnDisable()
     {
-        if (_toggleButton != null)         _toggleButton.clicked         -= ToggleSidebar;
-        if (_fortschrittToggleBtn != null) _fortschrittToggleBtn.clicked -= ToggleFortschrittSubmenu;
-        if (_buchhaltungToggleBtn != null) _buchhaltungToggleBtn.clicked -= ToggleBuchhaltungSubmenu;
-        if (_finanzenToggleBtn != null)    _finanzenToggleBtn.clicked    -= ToggleFinanzenSubmenu;
+        if (_toggleButton != null) _toggleButton.clicked -= ToggleSidebar;
 
         foreach (var kvp in NavToScene)
         {
@@ -128,6 +120,7 @@ public class SidebarController : MonoBehaviour
             if (item != null)
                 item.UnregisterCallback<ClickEvent>(OnNavItemClicked);
         }
+
         var logoutItem = _root?.Q<VisualElement>("nav-item-logout");
         if (logoutItem != null)
             logoutItem.UnregisterCallback<ClickEvent>(OnLogoutClicked);
@@ -156,7 +149,7 @@ public class SidebarController : MonoBehaviour
         ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, _finanzenOpen);
 
         OnToggled?.Invoke(_isCollapsed);
-    } // ← diese Klammer fehlte / war falsch platziert
+    }
 
     private void ApplySubmenuState(VisualElement submenu, Button toggleBtn, bool isOpen)
     {
@@ -164,7 +157,7 @@ public class SidebarController : MonoBehaviour
             submenu.style.display = isOpen ? DisplayStyle.Flex : DisplayStyle.None;
         if (toggleBtn != null)
             toggleBtn.style.rotate = new StyleRotate(new Rotate(isOpen ? 90f : 0f));
-    } // ← ApplySubmenuState gehört auf Klassenebene, nicht in RestoreState
+    }
 
     private void SaveState()
     {
@@ -201,15 +194,17 @@ public class SidebarController : MonoBehaviour
     {
         if (_sidebar == null) yield break;
         float startWidth = _sidebar.resolvedStyle.width;
-        float elapsed = 0f;
+        float elapsed    = 0f;
+
         while (elapsed < ANIM_DURATION)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / ANIM_DURATION);
+            float t     = Mathf.Clamp01(elapsed / ANIM_DURATION);
             float eased = t * t * (3f - 2f * t);
             _sidebar.style.width = Mathf.Lerp(startWidth, targetWidth, eased);
             yield return null;
         }
+
         _sidebar.style.width = targetWidth;
     }
 
@@ -245,15 +240,18 @@ public class SidebarController : MonoBehaviour
     private void SetActiveNavItem()
     {
         string currentScene = SceneManager.GetActiveScene().name;
+
         foreach (var navName in NavToScene.Keys)
         {
             var item = _root.Q<VisualElement>(navName);
             if (item != null)
                 item.RemoveFromClassList("nav-item--active");
         }
+
         foreach (var kvp in NavToScene)
         {
             if (kvp.Value != currentScene) continue;
+
             var item = _root.Q<VisualElement>(kvp.Key);
             if (item != null)
                 item.AddToClassList("nav-item--active");
@@ -286,62 +284,98 @@ public class SidebarController : MonoBehaviour
         foreach (var kvp in NavToScene)
         {
             string sceneName = kvp.Value;
-            var item = _root.Q<VisualElement>(kvp.Key);
+            string itemName  = kvp.Key;
+            var item = _root.Q<VisualElement>(itemName);
+
             if (item == null)
             {
-                Debug.LogWarning($"[Sidebar] Nav-Item '{kvp.Key}' nicht gefunden.");
+                Debug.LogWarning($"[Sidebar] Nav-Item '{itemName}' nicht gefunden.");
                 continue;
             }
-            if (kvp.Key == "nav-item-fortschritt")
+
+            // Dropdown-Parent-Items: Chevron stoppt Propagation (TrickleDown),
+            // damit nur das Submenü getoggelt wird ohne Szenennavigation.
+            // Klick auf das Parent-Item selbst toggelt Submenü UND lädt Szene.
+            if (itemName == "nav-item-fortschritt")
             {
-                item.RegisterCallback<ClickEvent>(evt => ToggleFortschrittSubmenu());
-                if (_fortschrittToggleBtn != null)
-                    _fortschrittToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-                continue;
-            }
-            if (kvp.Key == "nav-item-buchhaltung")
-            {
-                item.RegisterCallback<ClickEvent>(evt => ToggleBuchhaltungSubmenu());
-                if (_buchhaltungToggleBtn != null)
-                    _buchhaltungToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-                continue;
-            }
-            if (kvp.Key == "nav-item-finanzen")
-            {
-                item.RegisterCallback<ClickEvent>(evt => ToggleFinanzenSubmenu());
-                if (_finanzenToggleBtn != null)
-                    _finanzenToggleBtn.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
-                continue;
-            }
-            item.RegisterCallback<ClickEvent>(evt =>
-            {
-                bool sceneExists = false;
-                for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+                _fortschrittToggleBtn?.RegisterCallback<ClickEvent>(evt =>
                 {
-                    string path = SceneUtility.GetScenePathByBuildIndex(i);
-                    if (path.Contains(sceneName))
-                    {
-                        sceneExists = true;
-                        break;
-                    }
-                }
-                if (sceneExists)
-                    SceneManager.LoadScene(sceneName);
-                else
-                    Debug.LogWarning($"[Sidebar] Scene '{sceneName}' nicht in Build Settings gefunden.");
-            });
+                    evt.StopPropagation();
+                    ToggleFortschrittSubmenu();
+                }, TrickleDown.TrickleDown);
+
+                item.RegisterCallback<ClickEvent>(evt =>
+                {
+                    if (!_fortschrittOpen)
+                        ToggleFortschrittSubmenu();
+                    NavigateToScene(sceneName);
+                });
+                continue;
+            }
+
+            if (itemName == "nav-item-buchhaltung")
+            {
+                _buchhaltungToggleBtn?.RegisterCallback<ClickEvent>(evt =>
+                {
+                    evt.StopPropagation();
+                    ToggleBuchhaltungSubmenu();
+                }, TrickleDown.TrickleDown);
+
+                item.RegisterCallback<ClickEvent>(evt =>
+                {
+                    if (!_buchhaltungOpen)
+                        ToggleBuchhaltungSubmenu();
+                    NavigateToScene(sceneName);
+                });
+                continue;
+            }
+
+            if (itemName == "nav-item-finanzen")
+            {
+                _finanzenToggleBtn?.RegisterCallback<ClickEvent>(evt =>
+                {
+                    evt.StopPropagation();
+                    ToggleFinanzenSubmenu();
+                }, TrickleDown.TrickleDown);
+
+                item.RegisterCallback<ClickEvent>(evt =>
+                {
+                    if (!_finanzenOpen)
+                        ToggleFinanzenSubmenu();
+                    NavigateToScene(sceneName);
+                });
+                continue;
+            }
+
+            // Normale Nav-Items: nur Szene laden
+            item.RegisterCallback<ClickEvent>(evt => NavigateToScene(sceneName));
         }
+    }
+
+    private void NavigateToScene(string sceneName)
+    {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string path = SceneUtility.GetScenePathByBuildIndex(i);
+            if (path.Contains(sceneName))
+            {
+                SceneManager.LoadScene(sceneName);
+                return;
+            }
+        }
+        Debug.LogWarning($"[Sidebar] Szene '{sceneName}' nicht in Build Settings gefunden.");
     }
 
     private void OnNavItemClicked(ClickEvent evt)
     {
         var item = evt.currentTarget as VisualElement;
         if (item == null) return;
+
         foreach (var kvp in NavToScene)
         {
             if (kvp.Key == item.name)
             {
-                SceneManager.LoadScene(kvp.Value);
+                NavigateToScene(kvp.Value);
                 return;
             }
         }
