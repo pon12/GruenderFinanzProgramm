@@ -12,6 +12,7 @@ public class DocumentDashboard : MonoBehaviour
 
     [Header("Templates")]
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
+    [SerializeField] private Texture2D helpIconTexture;
 
     // UI-Elemente Hauptbildschirm
     private VisualElement root;
@@ -49,37 +50,36 @@ public class DocumentDashboard : MonoBehaviour
     private VisualElement editTemplateGroup;
     private VisualElement editStrukturFelderBox;
 
-    // L\u00f6sch-Best\u00e4tigungs-Popup
+    // Lösch-Bestätigungs-Popup
     private VisualElement deleteConfirmOverlay;
     private Button        deleteConfirmYesButton;
     private Button        deleteConfirmCancelButton;
     private Label         deleteConfirmHint;
 
-    // Systemzust\u00e4nde
-    private string          selectedType          = "Standard";
-    private string          selectedEditType      = "Standard";
-    private string          activeCategoryForList = "";
-    private DocumentData    activeDocForEditing;
-    private List<TextField> aktiveStrukturFelder  = new List<TextField>();
-
-    // Nutzerspezifischer Schlüssel für den Speicherpfad (abgeleitet aus DB-Instanz)
-    private string _userKey = "default";
+    // Systemzustände
+    private string       selectedType          = "Standard";
+    private string       selectedEditType       = "Standard";
+    private string       activeCategoryForList  = "";
+    private DocumentData  activeDocForEditing;
+    private List<TextField> aktiveStrukturFelder = new List<TextField>();
 
     // ============================================================
-    // FELD-DEFINITION
+    // FELD-DEFINITION – ein einzelnes strukturiertes Eingabefeld
     // ============================================================
     private class FeldDefinition
     {
-        public string key;
-        public string label;
-        public string placeholder;
+        public string key;         // interner Schlüssel, z.B. "iban"
+        public string label;       // Anzeigename, z.B. "IBAN"
+        public string placeholder; // Platzhaltertext im Feld
     }
 
     // ============================================================
     // KATEGORIEN-DEFINITION
     //
-    // istFest = true  -> nicht l\u00f6schbar, Werte bleiben editierbar.
-    // pflichtDocs     -> Pflichtdokumente dieser Kategorie.
+    // istFest = true -> nicht löschbar, nicht verschiebbar.
+    //                    Werte bleiben editierbar.
+    // pflichtDocs    -> Pflichtdokumente dieser Kategorie, jeweils
+    //                    mit eigener Feldstruktur (felderProDoc).
     // ============================================================
     private class KategorieDefinition
     {
@@ -90,39 +90,41 @@ public class DocumentDashboard : MonoBehaviour
 
     private readonly List<KategorieDefinition> kategorien = new List<KategorieDefinition>
     {
-        new KategorieDefinition { name = "Gr\u00fcndung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gr\u00fcndungsurkunde / Gesellschaftsvertrag", "Handelsregisterauszug", "Gewerbeanmeldung", "Gesellschafterliste" } },
-        new KategorieDefinition { name = "Bezahlweise",               istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung" } },
-        new KategorieDefinition { name = "Finanzen",                  istFest = false, pflichtDocs = new List<string> { "Er\u00f6ffnungsbilanz" } },
-        new KategorieDefinition { name = "Recht & Steuern",           istFest = false, pflichtDocs = new List<string> { "Datenschutzerkl\u00e4rung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum" } },
-        new KategorieDefinition { name = "Marketing & Personal",      istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
-        new KategorieDefinition { name = "Strategie & Planung",       istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
-        new KategorieDefinition { name = "Vorlagen & Checklisten",    istFest = false, pflichtDocs = new List<string> { "Gr\u00fcndungs-Checkliste", "Inventarliste", "Inventur" } },
-        new KategorieDefinition { name = "Sonstiges",                 istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde / Gesellschaftsvertrag", "Handelsregisterauszug", "Gewerbeanmeldung", "Gesellschafterliste" } },
+        new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung" } },
+        new KategorieDefinition { name = "Finanzen",               istFest = false, pflichtDocs = new List<string> { "Eröffnungsbilanz" } },
+        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum" } },
+        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
+        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
+        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur" } },
+        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string>() },
     };
 
     // ============================================================
     // FELD-DEFINITIONEN PRO PFLICHTDOKUMENT
+    //
+    // Key muss exakt dem Dokumenttitel in pflichtDocs entsprechen.
     // ============================================================
     private readonly Dictionary<string, List<FeldDefinition>> felderProPflichtDoc =
         new Dictionary<string, List<FeldDefinition>>
     {
         ["Unternehmensstammdaten"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "firma",      label = "Firmenname", placeholder = "z.B. Mustermann GmbH" },
+            new FeldDefinition { key = "firma",     label = "Firmenname", placeholder = "z.B. Mustermann GmbH" },
             new FeldDefinition { key = "rechtsform", label = "Rechtsform", placeholder = "z.B. GmbH" },
-            new FeldDefinition { key = "branche",    label = "Branche",    placeholder = "z.B. IT & Software" },
-            new FeldDefinition { key = "standort",   label = "Standort",   placeholder = "z.B. Berlin" },
+            new FeldDefinition { key = "branche",    label = "Branche",   placeholder = "z.B. IT & Software" },
+            new FeldDefinition { key = "standort",   label = "Standort",  placeholder = "z.B. Berlin" },
         },
-        ["Gr\u00fcndungsurkunde"] = new List<FeldDefinition>
+        ["Gründungsurkunde"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "datum",        label = "Gr\u00fcndungsdatum", placeholder = "TT.MM.JJJJ" },
-            new FeldDefinition { key = "notar",        label = "Notar",               placeholder = "Name des Notars" },
-            new FeldDefinition { key = "aktenzeichen", label = "Aktenzeichen",        placeholder = "z.B. UR-Nr. 123/2026" },
+            new FeldDefinition { key = "datum",        label = "Gründungsdatum", placeholder = "TT.MM.JJJJ" },
+            new FeldDefinition { key = "notar",        label = "Notar",          placeholder = "Name des Notars" },
+            new FeldDefinition { key = "aktenzeichen", label = "Aktenzeichen",   placeholder = "z.B. UR-Nr. 123/2026" },
         },
         ["Handelsregisterauszug"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "hrNummer",      label = "HR-Nummer",     placeholder = "z.B. HRB 12345" },
-            new FeldDefinition { key = "amtsgericht",   label = "Amtsgericht",   placeholder = "z.B. Amtsgericht Berlin" },
+            new FeldDefinition { key = "hrNummer",      label = "HR-Nummer",   placeholder = "z.B. HRB 12345" },
+            new FeldDefinition { key = "amtsgericht",   label = "Amtsgericht", placeholder = "z.B. Amtsgericht Berlin" },
             new FeldDefinition { key = "eintragsdatum", label = "Eintragsdatum", placeholder = "TT.MM.JJJJ" },
         },
         ["Kontodaten (IBAN/BIC)"] = new List<FeldDefinition>
@@ -140,6 +142,31 @@ public class DocumentDashboard : MonoBehaviour
         },
     };
 
+
+    private static readonly Dictionary<string, string> kategorieTooltips =
+        new Dictionary<string, string>
+    {
+        ["Gründung"]    = "Enthält Pflichtdokumente zur Unternehmensgründung. " +
+                               "Fülle Stammdaten, Gründungsurkunde und Handelsregister aus. " +
+                               "Diese Kategorie ist geschützt und kann nicht gelöscht werden.",
+        ["Bezahlweise"]       = "Enthält Pflichtdokumente für Zahlungsabwicklung und Rechnungsanhänge. " +
+                               "AGB, Disclaimer, Barzahlung und Überweisung werden als PDF-Anhänge verwendet. " +
+                               "Diese Kategorie ist geschützt und kann nicht gelöscht werden.",
+        ["Finanzen"]          = "Flexible Kategorie für finanzielle Dokumente wie Budgetpläne oder Kalkulationen. " +
+                               "Du kannst hier eigene Dokumente anlegen und löschen.",
+        ["Marketing"]         = "Flexible Kategorie für Marketingmaterial wie Konzepte oder Kampagnenpläne. " +
+                               "Du kannst hier eigene Dokumente anlegen und löschen.",
+        ["Steuern"]           = "Flexible Kategorie für steuerrelevante Dokumente wie Belege oder Bescheide. " +
+                               "Du kannst hier eigene Dokumente anlegen und löschen.",
+        ["Personal"]          = "Flexible Kategorie für Personaldokumente wie Verträge oder Zeugnisse. " +
+                               "Du kannst hier eigene Dokumente anlegen und löschen.",
+        ["Recht"]             = "Flexible Kategorie für rechtliche Dokumente wie Verträge oder Datenschutzerklärungen. " +
+                               "Du kannst hier eigene Dokumente anlegen und löschen.",
+    };
+
+    private const string defaultFest = "Geschützte Pflichtdokument-Kategorie. " +
+                                        "Dokumente können bearbeitet, aber nicht gelöscht werden.";
+    private const string defaultFlex = "Flexible Kategorie \u2013 du kannst hier eigene Dokumente anlegen und löschen.";
     private bool IstKategorieFest(string kategorieName)
         => kategorien.Find(k => k.name == kategorieName)?.istFest ?? false;
 
@@ -177,13 +204,7 @@ public class DocumentDashboard : MonoBehaviour
 
     void OnEnable()
     {
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db != null)
-            _userKey = UserDatabaseAccess.getCurrentDatabaseName() ?? "default";
-        else
-            Debug.LogWarning("[DocumentDashboard] Keine aktive NutzerDB beim Start.");
-
-        saveFilePath = GetSaveFilePathForUser(_userKey);
+        saveFilePath = Application.persistentDataPath + "/MyDashboardSave.json";
 
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         if (uiDocument == null) return;
@@ -224,13 +245,13 @@ public class DocumentDashboard : MonoBehaviour
         editTemplateGroup     = root.Q<VisualElement>("Edit-Buttons-Type-Group");
         editStrukturFelderBox = root.Q<VisualElement>("Edit-Struktur-Felder-Box");
 
-        // 5. L\u00f6sch-Best\u00e4tigungs-Popup
+        // 5. Lösch-Bestätigungs-Popup
         deleteConfirmOverlay      = root.Q<VisualElement>("Delete-Confirm-Overlay");
         deleteConfirmYesButton    = root.Q<Button>("Btn-Delete-Confirm-Yes");
         deleteConfirmCancelButton = root.Q<Button>("Btn-Delete-Confirm-Cancel");
         deleteConfirmHint         = root.Q<Label>("Delete-Confirm-Hint");
 
-        // Dropdown bef\u00fcllen (nur flexible Kategorien)
+        // Dropdown befüllen (nur flexible Kategorien)
         if (categoryDropdown != null)
         {
             var namen = kategorien.Select(k => k.name).ToList();
@@ -239,7 +260,7 @@ public class DocumentDashboard : MonoBehaviour
                 categoryDropdown.value = namen[0];
         }
 
-        // Event-Verdrahtung Hauptmen\u00fc
+        // Event-Verdrahtung Hauptmenü
         if (deleteButton != null) deleteButton.clicked += OpenDeleteConfirmPopup;
 
         // Event-Verdrahtung Erstell-Popup
@@ -270,19 +291,20 @@ public class DocumentDashboard : MonoBehaviour
         if (btnEditTypeDiagramm  != null) btnEditTypeDiagramm.clicked   += () => SelectEditType("Diagramm");
         if (btnEditTypeChecklist != null) btnEditTypeChecklist.clicked  += () => SelectEditType("Checklist");
 
-        // Event-Verdrahtung L\u00f6sch-Best\u00e4tigung
+        // Event-Verdrahtung Lösch-Bestätigung
         if (deleteConfirmCancelButton != null) deleteConfirmCancelButton.clicked += CloseDeleteConfirmPopup;
         if (deleteConfirmYesButton    != null) deleteConfirmYesButton.clicked    += ConfirmDeleteAllDocuments;
 
         LoadDataLocally();
         SicherePflichtdokumente();
         SpawnAllCardsAtStart();
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(root);
     }
 
     // ─────────────────────────────────────────
     // PFLICHTDOKUMENTE SICHERSTELLEN
     // ─────────────────────────────────────────
-
     private void SicherePflichtdokumente()
     {
         bool geaendert = false;
@@ -318,7 +340,7 @@ public class DocumentDashboard : MonoBehaviour
                 }
                 else
                 {
-                    // Neue Felder erg\u00e4nzen, falls die Definition erweitert wurde
+                    // Neue Felder ergänzen, falls die Definition erweitert wurde
                     if (felderProPflichtDoc.TryGetValue(pflichtTitel, out var definitionen))
                     {
                         foreach (var def in definitionen)
@@ -350,7 +372,7 @@ public class DocumentDashboard : MonoBehaviour
     }
 
     // ─────────────────────────────────────────
-    // ERSTELLLOGIK (nur f\u00fcr flexible Kategorien)
+    // ERSTELLLOGIK (nur für flexible Kategorien)
     // ─────────────────────────────────────────
 
     private void OpenPopup(string preselectedCategory = "")
@@ -455,9 +477,9 @@ public class DocumentDashboard : MonoBehaviour
                 {
                     var aktuellesDoc = kategorieDocs[slotIndex];
 
-                    string iconGlyph = aktuellesDoc.istPflichtdokument ? "\ud83d\udd12" :
-                                        aktuellesDoc.type == "Diagramm"  ? "\ud83d\udcca" :
-                                        aktuellesDoc.type == "Checklist" ? "\u2705" : "\ud83d\udcc4";
+                    string iconGlyph = aktuellesDoc.istPflichtdokument ? "🔒" :
+                                        aktuellesDoc.type == "Diagramm"  ? "📊" :
+                                        aktuellesDoc.type == "Checklist" ? "✅" : "📄";
                     if (iconBox != null)
                     {
                         iconBox.Clear();
@@ -490,7 +512,7 @@ public class DocumentDashboard : MonoBehaviour
 
                     if (plusBtn != null)
                     {
-                        plusBtn.text     = "\u270e";
+                        plusBtn.text     = "✎";
                         plusBtn.clicked += () => OpenEditPopup(aktuellesDoc);
                     }
                 }
@@ -513,11 +535,36 @@ public class DocumentDashboard : MonoBehaviour
                 }
             }
 
+            // Hilfe-Icon in die Kategorie-Karte einfügen
+            var karteHelpIcon = new VisualElement();
+            karteHelpIcon.name = "btn-help-karte";
+            HelpTooltip.SetzeBasisStilOeffentlich(karteHelpIcon);
+            // Icon-Textur setzen (helpIconTexture im Inspector zuweisen)
+            if (helpIconTexture != null)
+            {
+                karteHelpIcon.style.backgroundImage              = new StyleBackground(helpIconTexture);
+                karteHelpIcon.style.unityBackgroundImageTintColor = new StyleColor(
+                    new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
+            }
+
+            var headerRow = cardInstance.Q<VisualElement>(className: "category-header-row");
+            if (headerRow != null)
+                headerRow.Add(karteHelpIcon);
+            else
+                cardInstance.Add(karteHelpIcon);
+
+            string karteTooltip;
+            if (!kategorieTooltips.TryGetValue(kategorie.name, out karteTooltip))
+                karteTooltip = kategorie.istFest ? defaultFest : defaultFlex;
+
+            HelpTooltip.RegistriereInKarte(root, karteHelpIcon, karteTooltip);
+
             gridContainer.Add(cardInstance);
         }
     }
 
-    // Baut eine kurze Vorschau aus den Strukturfeldern oder dem Freitext.
+    // Baut eine kurze Vorschau aus den Strukturfeldern (Pflichtdokument)
+    // oder dem Freitext (flexibles Dokument) für die Kachelansicht.
     private string BildeInhaltVorschau(DocumentData doc)
     {
         if (doc.istPflichtdokument && doc.strukturFelder != null && doc.strukturFelder.Count > 0)
@@ -596,7 +643,7 @@ public class DocumentDashboard : MonoBehaviour
             VisualElement row = new VisualElement();
             row.AddToClassList("list-row-item");
 
-            string icon         = doc.istPflichtdokument ? "\ud83d\udd12" : doc.type == "Diagramm" ? "\ud83d\udcca" : doc.type == "Checklist" ? "\u2705" : "\ud83d\udcc4";
+            string icon         = doc.istPflichtdokument ? "🔒" : doc.type == "Diagramm" ? "📊" : doc.type == "Checklist" ? "✅" : "📄";
             string displayTitle = doc.title.Split('\n')[0];
             if (displayTitle.Length > 30) displayTitle = displayTitle.Substring(0, 27) + "...";
             string textToShow   = isGlobal
@@ -625,7 +672,7 @@ public class DocumentDashboard : MonoBehaviour
             {
                 if (doc.category != activeCategoryForList && !doc.istPflichtdokument)
                 {
-                    Button moveBtn = new Button { text = "Hinzuf\u00fcgen" };
+                    Button moveBtn = new Button { text = "Hinzufügen" };
                     moveBtn.AddToClassList("btn-add-global");
                     moveBtn.clicked += () => MoveDocumentToActiveCategory(doc);
                     btnGroup.Add(moveBtn);
@@ -642,16 +689,16 @@ public class DocumentDashboard : MonoBehaviour
 
                 if (!doc.istPflichtdokument)
                 {
-                    Button deleteBtn = new Button { text = "L\u00f6schen" };
+                    Button deleteBtn = new Button { text = "Löschen" };
                     deleteBtn.AddToClassList("btn-action-text");
                     deleteBtn.AddToClassList("btn-minus-delete");
-                    deleteBtn.tooltip  = "Dokument l\u00f6schen";
+                    deleteBtn.tooltip  = "Dokument löschen";
                     deleteBtn.clicked += () => DeleteSingleDocument(doc.id);
                     btnGroup.Add(deleteBtn);
                 }
                 else
                 {
-                    Label gesperrtLabel = new Label("Gesch\u00fctzt");
+                    Label gesperrtLabel = new Label("Geschützt");
                     gesperrtLabel.AddToClassList("locked-badge-inline");
                     btnGroup.Add(gesperrtLabel);
                 }
@@ -693,6 +740,11 @@ public class DocumentDashboard : MonoBehaviour
 
     // ─────────────────────────────────────────
     // BEARBEITEN-POPUP
+    //
+    // Zwei Modi:
+    //  - Flexibles Dokument:  Titel + Freitext + Template-Picker
+    //  - Pflichtdokument:     Titel (read-only Hinweis) + Strukturfelder,
+    //                          kein Template-Picker
     // ─────────────────────────────────────────
 
     private void OpenEditPopup(DocumentData doc)
@@ -716,6 +768,15 @@ public class DocumentDashboard : MonoBehaviour
 
         if (editTemplateGroup != null)
             editTemplateGroup.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
+
+        // Vorlagen-Hilfe-Icon nur bei nicht-Pflichtdokumenten anzeigen
+        var vorlagenHelpIcon = editPopupOverlay?.Q<VisualElement>("btn-help-vorlagen-edit");
+        if (vorlagenHelpIcon != null)
+            vorlagenHelpIcon.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
+        // Vorlagen-Label-Zeile ebenfalls ausblenden
+        var vorlagenLabelZeile = vorlagenHelpIcon?.parent;
+        if (vorlagenLabelZeile != null)
+            vorlagenLabelZeile.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
 
         var inhaltGroup = editInhaltInput?.parent;
         if (inhaltGroup != null)
@@ -822,7 +883,7 @@ public class DocumentDashboard : MonoBehaviour
     }
 
     // ─────────────────────────────────────────
-    // L\u00d6SCH-BEST\u00c4TIGUNG ("Alle l\u00f6schen")
+    // LÖSCH-BESTÄTIGUNG ("Alle löschen")
     // ─────────────────────────────────────────
 
     private void OpenDeleteConfirmPopup()
@@ -833,8 +894,8 @@ public class DocumentDashboard : MonoBehaviour
         if (deleteConfirmHint != null)
         {
             deleteConfirmHint.text = anzahlGeschuetzt > 0
-                ? $"{anzahlLoeschbar} Dokument(e) werden gel\u00f6scht. {anzahlGeschuetzt} gesch\u00fctzte Pflichtdokument(e) (\ud83d\udd12) bleiben erhalten."
-                : $"{anzahlLoeschbar} Dokument(e) werden unwiderruflich gel\u00f6scht.";
+                ? $"{anzahlLoeschbar} Dokument(e) werden gelöscht. {anzahlGeschuetzt} geschützte Pflichtdokument(e) (🔒) bleiben erhalten."
+                : $"{anzahlLoeschbar} Dokument(e) werden unwiderruflich gelöscht.";
         }
 
         if (deleteConfirmOverlay != null)
@@ -869,25 +930,15 @@ public class DocumentDashboard : MonoBehaviour
     {
         if (File.Exists(saveFilePath))
             speicherDaten = JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(saveFilePath));
-        else
-            speicherDaten = new DocumentSaveData();
     }
 
     // ─────────────────────────────────────────
-    // STATISCHER ZUGRIFF F\u00dcR EXPORT-SCREEN
+    // STATISCHER ZUGRIFF FÜR EXPORT-SCREEN
     // ─────────────────────────────────────────
 
-    private static string GetSaveFilePathForUser(string userKey)
-    {
-        return Application.persistentDataPath + $"/DashboardSave_{userKey}.json";
-    }
-
-    // Gibt den nutzerspezifischen Speicherpfad zur\u00fcck.
     public static string GetSaveFilePath()
     {
-        var db     = UserDatabaseAccess.getCurrentUserDatabase();
-        string key = UserDatabaseAccess.getCurrentDatabaseName() ?? "default";
-        return GetSaveFilePathForUser(key);
+        return Application.persistentDataPath + "/MyDashboardSave.json";
     }
 
     public static DocumentSaveData GetSavedDocuments()
@@ -898,13 +949,15 @@ public class DocumentDashboard : MonoBehaviour
     }
 
     // Liefert die Unternehmensstammdaten als Key-Value-Dictionary.
+    // Verwendung: var daten = DocumentDashboard.GetUnternehmenFelder();
+    //             string name = daten.GetValueOrDefault("firmenname", "");
     public static Dictionary<string, string> GetUnternehmenFelder()
     {
         var ergebnis = new Dictionary<string, string>();
         var alle     = GetSavedDocuments();
 
         var doc = alle.savedDocs.FirstOrDefault(d =>
-            d.category == "Gr\u00fcndung" && d.title == "Unternehmensstammdaten");
+            d.category == "Gründung" && d.title == "Unternehmensstammdaten");
 
         if (doc?.strukturFelder != null)
         {
@@ -916,6 +969,8 @@ public class DocumentDashboard : MonoBehaviour
     }
 
     // Liefert Kontodaten (IBAN/BIC) als Key-Value-Dictionary.
+    // Verwendung: var konto = DocumentDashboard.GetKontodatenFelder();
+    //             string iban = konto.GetValueOrDefault("iban", "");
     public static Dictionary<string, string> GetKontodatenFelder()
     {
         var ergebnis = new Dictionary<string, string>();
@@ -933,13 +988,14 @@ public class DocumentDashboard : MonoBehaviour
         return ergebnis;
     }
 
+    // Bleibt für Rückwärtskompatibilität erhalten.
     public static List<DocumentData> GetBezahlweiseDaten()
     {
         var alle = GetSavedDocuments();
         return alle.savedDocs.FindAll(d => d.category == "Bezahlweise");
     }
 
-    // Gibt den Inhalt eines Bezahlweise-Dokuments anhand des Titels zur\u00fcck.
+    // Gibt den inhalt eines Bezahlweise-Dokuments anhand des Titels zurück.
     public static string GetBezahlweiseInhalt(string titel)
     {
         var alle = GetSavedDocuments();
@@ -948,34 +1004,9 @@ public class DocumentDashboard : MonoBehaviour
         return doc?.inhalt ?? "";
     }
 
-    // Gibt den Barzahlungstext zurück.
-    public static string GetBarzahlungInhalt()
-    {
-        return GetBezahlweiseInhalt("Barzahlung");
-    }
-
-    // Gibt den Überweisungstext zurück.
-    public static string GetUeberweisungInhalt()
-    {
-        return GetBezahlweiseInhalt("Überweisung");
-    }
-
-    // Gibt den AGB-Text zurück.
-    public static string GetAgbInhalt()
-    {
-        return GetBezahlweiseInhalt("AGB");
-    }
-
-    // Gibt den Disclaimer-Text zurück.
-    public static string GetDisclaimerInhalt()
-    {
-        return GetBezahlweiseInhalt("Disclaimer");
-    }
-
     // ─────────────────────────────────────────
     // VORLAGENAUSWAHL VISUELL MARKIEREN
     // ─────────────────────────────────────────
-
     private void MarkiereAusgewaehlteVorlage(Button standard, Button diagramm, Button checklist, string aktiverTyp)
     {
         standard?.RemoveFromClassList("selected-template");
@@ -989,4 +1020,51 @@ public class DocumentDashboard : MonoBehaviour
             case "Checklist": checklist?.AddToClassList("selected-template"); break;
         }
     }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier verwaltest du alle deine Dokumente. " +
+            "Feste Kategorien (Gründung, Bezahlweise) sind geschützt. " +
+            "Eigene Kategorien und Dokumente kannst du frei anlegen.");
+
+        HelpTooltip.Registriere(root, "btn-help-alle-loeschen",
+            "Löscht alle selbst erstellten Dokumente endgültig. " +
+            "Pflichtdokumente bleiben erhalten. " +
+            "Diese Aktion kann nicht rükgängig gemacht werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-erstellen",
+            "Lege ein neues Dokument an. " +
+            "Gib einen Titel ein, wähle eine Kategorie und eine Vorlage. " +
+            "Das Dokument erscheint danach in der gewählten Kategorie.");
+
+        HelpTooltip.Registriere(root, "btn-help-vorlage",
+            "Standard: Freitextdokument.\n" +
+            "Diagramm: Strukturiertes Dokument.\n" +
+            "Checklist: Abhakbare Liste.");
+
+        HelpTooltip.Registriere(root, "btn-help-detail-liste",
+            "Links: alle Dokumente dieser Kategorie. " +
+            "Rechts: globale Liste aller Dokumente. " +
+            "Nicht-Pflichtdokumente können per \"Hinzufügen\" in diese Kategorie verschoben werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-bearbeiten",
+            "Bearbeite Titel, Inhalt und Typ des Dokuments. " +
+            "Pflichtdokumente haben strukturierte Felder " +
+            "und können nicht gelöscht werden.");
+
+        HelpTooltip.Registriere(root, "btn-help-strukturfelder",
+            "Vordefinierte Felder für Pflichtdokumente (z.\u00a0B. IBAN, Firmenname). " +
+            "Die Daten werden automatisch in Rechnungen und Angeboten verwendet.");
+
+        HelpTooltip.Registriere(root, "btn-help-vorlagen-edit",
+            "Standard: Freitext. Diagramm: Strukturiert. Checklist: Abhakbar. " +
+            "Der Typ beeinflusst das Layout, nicht den Inhalt.");
+
+        HelpTooltip.Registriere(root, "btn-help-popup-loeschen",
+            "Löscht alle nicht geschützten Dokumente endgültig. " +
+            "Pflichtdokumente bleiben erhalten. " +
+            "Nicht rükgängig machbar.");
+    }
+
 }

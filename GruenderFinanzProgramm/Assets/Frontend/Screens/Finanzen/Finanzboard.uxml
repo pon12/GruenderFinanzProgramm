@@ -5,6 +5,7 @@
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/DashboardStyles.uss?fileID=7433441132597879392&amp;guid=fe9c9a54b138ecc469e247e562306177&amp;type=3#DashboardStyles"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
 
     <ui:VisualElement name="main-content" class="root fullscreen-bg grid-container"
         style="flex-direction: row; width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
@@ -14,7 +15,11 @@
         <ui:VisualElement name="hauptbereich"
             style="flex-grow: 1; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; flex-direction: column;">
 
-            <ui:Label text="Finanzdashboard" style="font-size: 32px; -unity-font-style: bold; color: rgb(255,255,255); margin-bottom: 12px; flex-shrink: 0;"/>
+            <!-- Seitentitel -->
+            <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
+                <ui:Label text="Finanzdashboard" style="font-size: 32px; -unity-font-style: bold; color: rgb(255,255,255);"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+            </ui:VisualElement>
 
             <!-- OBERE ZEILE -->
             <ui:VisualElement style="flex-grow: 1; flex-direction: row; margin-bottom: 12px;">
@@ -24,7 +29,7 @@
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
                         <ui:Label text="Finanzen im Überblick" class="panel-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement style="flex-grow: 1;"/>
-                        <ui:VisualElement name="btn-help-chart" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                        <ui:VisualElement name="btn-help-chart" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="chart-container" class="chart-container" style="flex-grow: 1;">
                         <ui:VisualElement name="chart-y-axis" class="chart-y-axis">
@@ -52,13 +57,13 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
 
-                <!-- Mitte: KPI Karten untereinander -->
+                <!-- Mitte: KPI Karten -->
                 <ui:VisualElement style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column; justify-content: space-between;">
                     <ui:VisualElement name="Umsatz" class="stat-card" style="margin-bottom: 8px;">
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:Label text="Gesamtumsatz" class="stat-title"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-umsatz" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-umsatz" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Label text="0,00 €" name="Umsatzwert" class="stat-value"/>
                     </ui:VisualElement>
@@ -66,7 +71,7 @@
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:Label text="Offene Rechnungen" class="stat-title"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-rechnungen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-rechnungen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Label text="0" name="OffeneRechnungen" class="stat-value"/>
                     </ui:VisualElement>
@@ -74,7 +79,7 @@
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:Label text="Gewinn" class="stat-title"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-gewinn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-gewinn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Label text="0,00 €" name="Gewinnwert" class="stat-value"/>
                     </ui:VisualElement>
@@ -82,7 +87,7 @@
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:Label text="Details" class="stat-title"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-liquiditaet" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-liquiditaet" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Button text="Wichtige Kennzahlen →" name="Finanzen1" style="margin-top: 6px; background-color: rgb(128,207,149); color: rgb(20,20,20); border-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; padding-top: 8px; padding-bottom: 8px;"/>
                     </ui:VisualElement>
@@ -94,7 +99,7 @@
                         <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 6px;">
                             <ui:Label text="Top 3 Dienstleistungen" class="panel-title" style="margin-bottom: 0;"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-dienst" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-dienst" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="Ranking" style="flex-grow: 1;"/>
                     </ui:VisualElement>
@@ -102,7 +107,7 @@
                         <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 6px;">
                             <ui:Label text="Status der Angebote" class="panel-title" style="margin-bottom: 0;"/>
                             <ui:VisualElement style="flex-grow: 1;"/>
-                            <ui:VisualElement name="btn-help-angebote" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                            <ui:VisualElement name="btn-help-angebote" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="StatusAngebot" style="flex-grow: 1;"/>
                     </ui:VisualElement>
@@ -110,7 +115,7 @@
 
             </ui:VisualElement>
 
-            <!-- UNTERE ZEILE: 3 Charts mit Buttons -->
+            <!-- UNTERE ZEILE -->
             <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
 
                 <!-- Kapitalbedarf -->
@@ -118,7 +123,7 @@
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
                         <ui:Label text="Kapitalbedarf" class="panel-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement style="flex-grow: 1;"/>
-                        <ui:VisualElement name="btn-help-kapital" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                        <ui:VisualElement name="btn-help-kapital" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
                         <ui:VisualElement name="Diagramm2" style="flex-grow: 1; position: relative; overflow: hidden;"/>
@@ -132,7 +137,7 @@
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
                         <ui:Label text="Rentabilität" class="panel-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement style="flex-grow: 1;"/>
-                        <ui:VisualElement name="btn-help-rentab" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                        <ui:VisualElement name="btn-help-rentab" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="rentab-container" class="chart-container" style="flex-grow: 1;">
                         <ui:VisualElement name="rentab-y-axis" class="chart-y-axis">
@@ -156,7 +161,7 @@
                     <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
                         <ui:Label text="Rohgewinn" class="panel-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement style="flex-grow: 1;"/>
-                        <ui:VisualElement name="btn-help-rohgewinn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; flex-shrink: 0;"/>
+                        <ui:VisualElement name="btn-help-rohgewinn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="rohgewinn-container" class="chart-container" style="flex-grow: 1;">
                         <ui:VisualElement name="rohgewinn-y-axis" class="chart-y-axis">

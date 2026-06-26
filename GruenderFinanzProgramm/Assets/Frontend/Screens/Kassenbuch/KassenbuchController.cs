@@ -11,9 +11,6 @@ using System.Globalization;
 public class KassenbuchController : MonoBehaviour
 {
     private VisualElement _overlay;
-    private VisualElement _confirmOverlay;
-    private int _pendingDeleteId = -1;
-    private string _pendingDeleteTyp = "";
     private DropdownField dropJahrField;
     private VisualElement tableInput; // Repräsentiert deinen 'tableBody'
     private VisualTreeAsset outputTemplate;
@@ -62,8 +59,6 @@ public class KassenbuchController : MonoBehaviour
     private const string PLACEHOLDER_ZWECK = "z. B. Einkauf, Tanken, Gehalt...";
 
 
-    private VisualElement _root;
-
     void OnEnable()
     {
 
@@ -83,7 +78,6 @@ public class KassenbuchController : MonoBehaviour
 
 
         var root = GetComponent<UIDocument>().rootVisualElement;
-        _root = root;
 
 
         _overlay = root.Q<VisualElement>("popup-overlay");
@@ -93,22 +87,6 @@ public class KassenbuchController : MonoBehaviour
        
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
         letzteAktualLabel = root.Q<Label>("letzteAktual");
-
-        _confirmOverlay = root.Q<VisualElement>("confirm-overlay");
-        if (_confirmOverlay != null)
-        {
-            _confirmOverlay.RemoveFromHierarchy();
-            root.Add(_confirmOverlay);
-            _confirmOverlay.style.display = DisplayStyle.None;
-
-            root.Q<Button>("btn-confirm-ja")?.RegisterCallback<ClickEvent>(_ => BestaetigenLoeschen());
-            root.Q<Button>("btn-confirm-nein")?.RegisterCallback<ClickEvent>(_ =>
-            {
-                _confirmOverlay.style.display = DisplayStyle.None;
-                _pendingDeleteId  = -1;
-                _pendingDeleteTyp = "";
-            });
-        }
 
         if (_overlay != null)
 {
@@ -168,9 +146,9 @@ public class KassenbuchController : MonoBehaviour
         if (dropJahrField != null)
         {
             List<string> jahre = new List<string>();
-            for (int i = today.Year; i >= 2010; i--)
+            for (int i = 0; i < 100; i++)
             {
-                jahre.Add(i.ToString());
+                jahre.Add((today.Year - i).ToString());
             }
             dropJahrField.choices = jahre;
             dropJahrField.value = today.Year.ToString();
@@ -273,22 +251,32 @@ public class KassenbuchController : MonoBehaviour
 
 
         createList();
-        RegistriereHelpTooltips(root);
+
+        // Haupt-Icons sofort registrieren
+        RegistriereHauptIcons(root);
+
+        // Popup-Icon nach RemoveFromHierarchy verzögert registrieren
+        root.schedule.Execute(() =>
+        {
+            var r = GetComponent<UIDocument>().rootVisualElement;
+            HelpTooltip.Registriere(r, "btn-help-popup",
+                "Trage hier die Details der Buchung ein. " +
+                "Betrag, Verwendungszweck, Art und Datum sind Pflichtfelder. " +
+                "Das Datum kann über den Kalender ausgewählt werden.");
+            ButtonHoverController.RegistriereAlle(r);
+        }).ExecuteLater(150);
     }
 
-
-
-    private void RegistriereHelpTooltips(VisualElement root)
+    private void RegistriereHauptIcons(VisualElement root)
     {
         HelpTooltip.Registriere(root, "btn-help-seitentitel",
             "Das Kassenbuch erfasst alle Einnahmen und Ausgaben deines Unternehmens. " +
-            "Wähle oben rechts das Jahr, um Einträge jahresweise zu filtern. " +
+            "Wähle oben rechts das Jahr um Einträge jahresweise zu filtern. " +
             "Der Kontostand berechnet sich automatisch aus allen Buchungen.");
 
         HelpTooltip.Registriere(root, "btn-help-kontostand",
             "Zeigt den aktuellen Saldo: alle Einnahmen minus alle Ausgaben. " +
-            "Klicke auf den Betrag um Details zu sehen. " +
-            "Der Wert wird bei jeder neuen Buchung automatisch aktualisiert.");
+            "Ein grüner Betrag bedeutet Gewinn, ein roter Betrag bedeutet Verlust.");
 
         HelpTooltip.Registriere(root, "btn-help-ausgaben",
             "Erfasst eine neue Ausgabe im Kassenbuch. " +
@@ -306,16 +294,9 @@ public class KassenbuchController : MonoBehaviour
             "Das Jahr wählst du über das Dropdown oben rechts.");
 
         HelpTooltip.Registriere(root, "btn-help-tabelle",
-            "Tabellenspalten: Name (Verwendungszweck der Buchung), " +
-            "Buchungstag (Datum im Format TT.MM.JJJJ), " +
+            "Tabellenspalten: Name (Verwendungszweck), Buchungstag (Datum), " +
             "Betrag (Einnahmen grün / Ausgaben rot), " +
-            "Art der Buchung (z.B. Marketing, Steuern, Gehälter), " +
-            "Einnahme / Ausgabe (Typ der Buchung).");
-
-        HelpTooltip.Registriere(root, "btn-help-popup",
-            "Trage hier die Details der Buchung ein. " +
-            "Betrag, Verwendungszweck, Art und Datum sind Pflichtfelder. " +
-            "Das Datum kann über den Kalender ausgewählt werden.");
+            "Art der Buchung und Einnahme/Ausgabe-Typ.");
     }
 
     void OnDisable()
@@ -627,46 +608,13 @@ public class KassenbuchController : MonoBehaviour
         _aktuellerTyp = typ;
         _overlay.Q<Label>("popup-title").text = $"{typ} hinzufügen";
         _overlay.Q<TextField>("input-datum").value = DateTime.Now.ToString("dd.MM.yyyy");
-        
+       
         var inputBetrag = _overlay.Q<TextField>("input-betrag");
         SetupBetragInputAnpassung(inputBetrag, PLACEHOLDER_BETRAG);
 
 
         var inputZweck = _overlay.Q<TextField>("input-verwendungzweck");
         SetupPlaceholderSimulation(inputZweck, PLACEHOLDER_ZWECK);
-
-
-        // Dropdown-Kategorien nach Typ filtern
-        var dropdown = _overlay.Q<DropdownField>("Art");
-        if (dropdown != null)
-        {
-            if (typ == "Ausgabe")
-            {
-                dropdown.choices = new List<string>
-                {
-                    "Marketing",
-                    "Reisekosten",
-                    "Sonstige Kosten",
-                    "Barentnahme / Privatentnahme",
-                    "Tilgungsraten",
-                    "Finanzamt",
-                    "Steuern",
-                    "Gehälter"
-                };
-            }
-            else // Einnahme
-            {
-                dropdown.choices = new List<string>
-                {
-                    "Privateinzahlung",
-                    "Sonstige Einzahlung",
-                    "Darlehen",
-                    "Umsatzerlöse",
-                    "Sonstige Einnahmen"
-                };
-            }
-            dropdown.index = 0;
-        }
 
 
         if (meinUxmlKalender != null)
@@ -677,6 +625,7 @@ public class KassenbuchController : MonoBehaviour
 
         _overlay.style.display = DisplayStyle.Flex;
     }
+
        private void ClosePopup()
     {
         if (_overlay == null) return;
@@ -837,7 +786,6 @@ Debug.Log("Zweck: '" + zweck + "'");
         return;
     }
 
-    eintrag.Art = artDropdown?.value ?? "";
     SpeichereEintrag(eintrag);
 
     ClosePopup();
@@ -878,11 +826,22 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
         if (eintrag.Typ == "Einnahme") {
-            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
+            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
         }
         else {
-            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
-        }
+            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
+    }
+    }
+
+
+    public void Loeschen(string typ, int id)
+    {
+        if (db == null) return;
+
+
+        if (typ == "Einnahme") db.deleteEinkommen(id);
+        else db.deleteAusgaben(id);
+        createList();
     }
 
 
@@ -905,8 +864,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         if (balanceLabel != null)
         {
             // Erhält das Format aus dem 2. Code bei
-            var culture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
-            balanceLabel.text = differenz.ToString("N0", culture) + " €";
+            balanceLabel.text = differenz.ToString() + "€";
             balanceLabel.style.color = differenz < 0
                 ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
                 : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
@@ -1001,9 +959,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text = currentEinkommen.getDescription();
-                Label artLabelEin = newEntryCopy.Q<Label>("Art");
-                if (artLabelEin != null) artLabelEin.text = currentEinkommen.getArt();
+                nameLabel.text       = currentEinkommen.getDescription();
                 if (float.TryParse(currentEinkommen.getAmount(), out float betrag))
                 {
                     betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
@@ -1064,9 +1020,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text = currentAusgaben.getDescription();
-                Label artLabelAus = newEntryCopy.Q<Label>("Art");
-                if (artLabelAus != null) artLabelAus.text = currentAusgaben.getArt();
+                nameLabel.text       = currentAusgaben.getDescription();
                if (float.TryParse(currentAusgaben.getAmount(), out float betrag))
                     {
                         betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
@@ -1108,23 +1062,10 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
     
-
-    private void BestaetigenLoeschen()
-    {
-        if (_confirmOverlay != null) _confirmOverlay.style.display = DisplayStyle.None;
-        if (_pendingDeleteId >= 0) deleteEntry(_pendingDeleteId);
-        _pendingDeleteId  = -1;
-        _pendingDeleteTyp = "";
-    }
-
-    public void Loeschen(string typ, int id)
-    {
-        if (_confirmOverlay == null) { deleteEntry(id); return; }
-        _pendingDeleteId  = id;
-        _pendingDeleteTyp = typ;
-        _confirmOverlay.style.display = DisplayStyle.Flex;
-    }
-
+    // ===============================
+    // Aus altem Code übernommen
+    // Robustes Datums-Parsing
+    // ===============================
     private bool TryParseDatum(string text, out System.DateTime erg)
     {
         string[] formate =
@@ -1145,7 +1086,10 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             || System.DateTime.TryParse(text, deDe, none, out erg);
     }
 
-
+    // ===============================
+    // KONTOSTAND FÜR EIN BESTIMMTES JAHR
+    // Summiert nur Einkommen/Ausgaben mit Datum in diesem Jahr.
+    // ===============================
     private float BerechneKontostandFuerJahr(int jahr)
     {
         float summe = 0f;
@@ -1316,7 +1260,6 @@ public class KassenbuchEintrag
     public float Betrag;
     public string Beschreibung;
     public string Datum;
-    public string Art;
 
 
    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
