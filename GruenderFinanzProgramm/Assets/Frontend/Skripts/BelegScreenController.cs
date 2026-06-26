@@ -200,7 +200,8 @@ public abstract class BelegScreenController : MonoBehaviour
         var boxen = Root.Query(className: "angebot-address-box").ToList();
         NormalisiereAdressBoxen(boxen);
         if (boxen.Count > 0) SetzeAdressePlatzhalter(boxen[0], HoleEmpfaengerBezeichnung());
-        if (boxen.Count > 1) SetzeAdressePlatzhalter(boxen[1], HoleSenderBezeichnung());
+        // Absenderdaten direkt aus DB laden statt Platzhalter setzen
+        LadeAbsenderdaten();
     }
 
     private static void NormalisiereAdressBoxen(System.Collections.Generic.List<VisualElement> boxen)
@@ -2102,33 +2103,48 @@ public abstract class BelegScreenController : MonoBehaviour
             Debug.Log("[Reset] PositionenListe nach Reset Count: " + _positionenListe.childCount);
     }
 
+    // Gibt einen PlayerPrefs-String nutzerspezifisch zurück.
+    private static string HoleNutzerPref(string key, string fallback = "")
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
+        return PlayerPrefs.GetString(nutzerKey, PlayerPrefs.GetString(key, fallback));
+    }
+
+    private static int HoleNutzerPrefInt(string key, int fallback = 0)
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
+        return PlayerPrefs.GetInt(nutzerKey, PlayerPrefs.GetInt(key, fallback));
+    }
+
     protected float HoleMwstSatz()
     {
-        if (PlayerPrefs.GetInt("settings_steuer_custom_aktiv", 0) == 1)
+        if (HoleNutzerPrefInt("settings_steuer_custom_aktiv", 0) == 1)
         {
-            string customStr = PlayerPrefs.GetString("settings_steuer_custom_wert", "0");
+            string customStr = HoleNutzerPref("settings_steuer_custom_wert", "0");
             if (float.TryParse(customStr,
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture,
                 out float customSatz) && customSatz > 0)
                 return customSatz / 100f;
         }
-        int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
+        int steuersatz = HoleNutzerPrefInt("settings_steuersatz", 19);
         return steuersatz / 100f;
     }
 
     protected string HoleMwstProzentAnzeige()
     {
-        if (PlayerPrefs.GetInt("settings_steuer_custom_aktiv", 0) == 1)
+        if (HoleNutzerPrefInt("settings_steuer_custom_aktiv", 0) == 1)
         {
-            string customStr = PlayerPrefs.GetString("settings_steuer_custom_wert", "0");
+            string customStr = HoleNutzerPref("settings_steuer_custom_wert", "0");
             if (float.TryParse(customStr,
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture,
                 out float customSatz) && customSatz > 0)
                 return customSatz.ToString("0.##") + " %";
         }
-        return PlayerPrefs.GetInt("settings_steuersatz", 19) + " %";
+        return HoleNutzerPrefInt("settings_steuersatz", 19) + " %";
     }
 
     protected List<VoraussetzungsBereich> PruefePflichtdaten()
@@ -2161,21 +2177,21 @@ public abstract class BelegScreenController : MonoBehaviour
                     fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
             }
 
-            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_iban", "")) ||
-                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_bic", "")) ||
-                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_kontoinhaber", "")))
+            if (string.IsNullOrWhiteSpace(HoleNutzerPref("settings_iban")) ||
+                string.IsNullOrWhiteSpace(HoleNutzerPref("settings_bic")) ||
+                string.IsNullOrWhiteSpace(HoleNutzerPref("settings_kontoinhaber")))
             {
                 fehlend.Add(VoraussetzungsBereich.Bankverbindung);
             }
 
-            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_rechnr_praefix", "")) ||
-                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_startnummer", "")) ||
-                string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungsziel", "")))
+            if (string.IsNullOrWhiteSpace(HoleNutzerPref("settings_rechnr_praefix")) ||
+                string.IsNullOrWhiteSpace(HoleNutzerPref("settings_startnummer")) ||
+                string.IsNullOrWhiteSpace(HoleNutzerPref("settings_zahlungsziel")))
             {
                 fehlend.Add(VoraussetzungsBereich.Rechnungsformat);
             }
 
-            if (string.IsNullOrWhiteSpace(PlayerPrefs.GetString("settings_zahlungshinweis", "")))
+            if (string.IsNullOrWhiteSpace(HoleNutzerPref("settings_zahlungshinweis")))
             {
                 fehlend.Add(VoraussetzungsBereich.Bezahlweise);
             }

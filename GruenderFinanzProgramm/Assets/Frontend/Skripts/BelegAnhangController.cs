@@ -201,7 +201,7 @@ public static class BelegAnhangController
                 if (string.IsNullOrWhiteSpace(inhaltText)) continue;
 
                 document.NewPage();
-                document.Add(new Paragraph("Zahlungshinweise", titelFont));
+                document.Add(new Paragraph(key, titelFont));
                 document.Add(new Paragraph(" "));
                 document.Add(new Chunk(linie));
                 document.Add(new Paragraph(" "));
