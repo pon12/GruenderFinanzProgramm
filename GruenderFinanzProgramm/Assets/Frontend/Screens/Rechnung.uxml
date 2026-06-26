@@ -149,12 +149,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="action-bar" style="flex-direction: row; align-items: center; padding-top: 14px; padding-bottom: 14px; border-top-width: 1px; border-top-color: rgb(60, 60, 60); margin-top: 8px; gap: 12px;">
-                <ui:Button name="btn-angenommen" text="Versendet" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
-                <ui:Button name="btn-bezahlt" text="Bezahlt" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(75, 158, 102); color: rgb(255, 255, 255); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
-                <ui:Button name="btn-abgelehnt" text="Storniert" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
+                <ui:Button name="btn-angenommen" class="angebot-btn-primary" text="Versendet" />
+                <ui:Button name="btn-bezahlt" class="rechnung-btn-primary" text="Bezahlt" />
+                <ui:Button name="btn-abgelehnt" class="angebot-btn-danger" text="Storniert" />
                 <ui:VisualElement style="flex: 1;"/>
-                <ui:Button name="btn-export" text="Als PDF exportieren" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(70, 70, 70); color: rgb(255, 255, 255); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
-                <ui:Button name="btn-speichern" text="Speichern" style="height: 40px; padding-left: 24px; padding-right: 24px; background-color: rgb(128, 207, 149); color: rgb(30, 30, 30); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
+                <ui:Button name="btn-export" class="angebot-btn-secondary" text="Als PDF exportieren" />
+                <ui:Button name="btn-speichern" class="angebot-btn-primary" text="Speichern" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

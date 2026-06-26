@@ -10,7 +10,7 @@
                 <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
             </ui:VisualElement>
             <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: flex-end; margin-bottom: 16px;">
-                <ui:Button name="btn-neu" text="+ Neue Dienstleistung" class="add-btn" style="margin-bottom: 0;"/>
+                <ui:Button name="btn-neu" text="Neue Dienstleistung" emoji-fallback-support="false" class="add-btn" style="margin-bottom: 0;"/>
                 <ui:VisualElement name="btn-help-neu" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
             </ui:VisualElement>
             <ui:VisualElement name="tabelle-wrapper" class="tabelle-wrapper">

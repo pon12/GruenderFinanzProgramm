@@ -23,6 +23,13 @@
     margin-bottom: 16px;
     align-self: flex-end;
 }
+.add-btn:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+.add-btn:active {
+    background-color: rgb(102, 165, 11);
+}
 
 .tabelle-wrapper {
     flex-grow: 1;
@@ -249,3 +256,11 @@
     height: 50px;
     margin-top: 8px;
 }
+.popup-btn-fertig:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+.popup-btn-fertig:active {
+    background-color: rgb(102, 165, 11);
+}
+
