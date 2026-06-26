@@ -29,7 +29,7 @@
                 <ui:VisualElement name="kunden-liste-holder" style="flex-grow: 1;"/>
             </ui:ScrollView>
         </ui:VisualElement>
-        <ui:VisualElement name="PopUpKundeerstellen" picking-mode="Position" style="flex-grow: 1; position: absolute; height: 100%; width: 100%; display: none; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
+        <ui:VisualElement name="PopUpKundeerstellen" picking-mode="Position" style="flex-grow: 1; position: absolute; height: 100%; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; display: none;">
             <ui:VisualElement name="Pop-up" style="flex-grow: 1; width: 901px; height: 926px; align-self: center; background-color: rgb(44, 44, 44); -unity-text-align: upper-left; align-items: stretch; display: flex; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px;">
                 <ui:VisualElement name="Header" style="flex-grow: 1; height: auto; background-size: auto 0; border-top-width: 10px;">
                     <ui:Label text="Neuen Kunden / Kontakt anlegen " style="font-size: 36px; color: rgb(255, 255, 255); -unity-text-align: upper-center; margin-top: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
@@ -38,7 +38,7 @@
                     <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row;">
                         <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: column; -unity-background-image-tint-color: rgb(152, 152, 152);">
                             <ui:Label text="Vorname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="create-vorname" class="textfield-styled" style="flex-direction: row; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); color: rgb(255, 255, 255);"/>
+                            <ui:TextField label="" placeholder-text="" name="create-vorname" class="textfield-styled" style="flex-direction: row; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="VisualElement" style="flex-grow: 1;">
                             <ui:Label text="Nachname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
@@ -73,8 +73,8 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="Footer" style="flex-grow: 1; height: 30px; flex-direction: row; justify-content: space-between; border-left-width: 20px; border-right-width: 20px;">
-                    <ui:Button text="Abbrechen" class="btn-danger-pop-up" name="create-btn-abbrechen" />
-                    <ui:Button text="Kunden speichern" class="btn-primary-pop-up" name="create-btn-speichern" />
+                    <ui:Button text="Abbrechen" name="create-btn-abbrechen" class="btn-danger-pop-up"/>
+                    <ui:Button text="Kunden speichern" name="create-btn-speichern" class="btn-primary-pop-up"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
@@ -122,8 +122,8 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-grow: 1; height: 30px; flex-direction: row; justify-content: space-between; border-left-width: 20px; border-right-width: 20px; display: flex;">
-                    <ui:Button text="Abbrechen" class="btn-danger-pop-up" name="edit-btn-abbrechen"/>
-                    <ui:Button text="Speichern" class="btn-primary-pop-up" name="edit-btn-speichern" />
+                    <ui:Button text="Abbrechen" name="edit-btn-abbrechen" class="btn-danger-pop-up"/>
+                    <ui:Button text="Speichern" name="edit-btn-speichern" class="btn-primary-pop-up"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -33,9 +33,11 @@
 
 TextField > #unity-text-input {
     background-color: rgb(70, 70, 70);
+    color: #FFFFFF;
 }
 
 .textfield-styled > #unity-text-input {
+    color: #FFFFFF;
     background-color: rgb(70, 70, 70);
     border-left-color: rgb(70, 70, 70);
     border-right-color: rgb(70, 70, 70);

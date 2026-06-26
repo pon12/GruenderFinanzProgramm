@@ -11,43 +11,55 @@
     margin-bottom: 24px;
 }
 
+.buchhaltung-list-container{
+    width: 100%;
+}
+
 .table-header {
     flex-direction: row;
     padding-left: 20px;
     padding-right: 20px;
     margin-bottom: 12px;
     flex-shrink: 0;
+    -unity-text-align: middle-left;
 }
 
 .header-label {
-    color: rgb(142, 142, 147);
+    color: rgb(200, 200, 200);
     font-size: 14px;
     -unity-font-style: bold;
 }
 
 .col-bezeichnung {
-    flex-basis: 35%;
+    font-size: 14px;
+    width: 50%;
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    padding-left: 12px; /* Ersetzt das Zeilen-Padding elegant im Grid */
 }
 
 .col-erstellt {
-    flex-basis: 20%;
+    font-size: 14px;
+    width: 20%;
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
 }
 
 .col-faellig {
-    flex-basis: 15%;
+    font-size: 14px;
+    width: 15%;
     flex-grow: 0;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
     padding-right: 15px;
 }
 
 .col-status {
-    flex-basis: 30%;
+    width: 15%;
     flex-grow: 0;
-    flex-shrink: 0;
-    flex-direction: row;
-    align-items: center;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    align-items: flex-start; /* Hält Header-Text und Container-Inhalt linksbündig */
 }
