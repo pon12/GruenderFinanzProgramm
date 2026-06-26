@@ -827,11 +827,11 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
         if (eintrag.Typ == "Einnahme") {
-            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art);
+            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
         }
         else {
-            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art);
-    }
+            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
+        }
     }
 
 

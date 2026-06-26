@@ -11,6 +11,7 @@ public class Einkommen
     public string Description { get; set; }
     public string Datum { get; set; }
     public string Art { get; set; }
+    public string Kategorie { get; set; }
 
     public int getId()
     {
@@ -32,6 +33,11 @@ public class Einkommen
     public string getArt()
     {
         return Art ?? "";
+    }
+    
+    public string getKategorie()
+    {
+        return Kategorie;
     }
 }
 
@@ -44,6 +50,7 @@ public class Ausgaben
     public string Datum { get; set; }
     public string Art { get; set; }
 
+    public string Kategorie { get; set; }
     public int getId()
     {
         return Id;
@@ -64,5 +71,10 @@ public class Ausgaben
     public string getArt()
     {
         return Art ?? "";
+    }
+    
+    public string getKategorie()
+    {
+        return Kategorie;
     }
 }

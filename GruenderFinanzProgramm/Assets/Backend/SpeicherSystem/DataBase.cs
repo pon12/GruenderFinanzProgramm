@@ -329,6 +329,15 @@ public int deleteInvoiceItem(int id)
     {
         return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art });
     }
+    public int createEinkommen(float amount, string description, string datum, string kategorie)
+    {
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum , Kategorie = kategorie });
+    }
+
+    public int createAusgaben(float amount, string description, string datum, string kategorie)
+    {
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Kategorie = kategorie });
+    }
 
     public List<Einkommen> getAllEinkommenEntries()
     {
@@ -574,11 +583,11 @@ public int deleteInvoiceItem(int id)
 
             if (dauerauftrag.typ == "Einnahme")
             {
-                createEinkommen(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+                createEinkommen(dauerauftrag.amount, dauerauftrag.description, buchungsDatum, "Platzhalter");
             }
             else if (dauerauftrag.typ == "Ausgabe")
             {
-                createAusgaben(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+                createAusgaben(dauerauftrag.amount, dauerauftrag.description, buchungsDatum, "Platzhalter");
             }
             else
             {
@@ -752,7 +761,8 @@ public int deleteInvoiceItem(int id)
 
 public int createSettings(string rechnungsNrPräfix, string startNr, string zahlungsziel, int waehrung, int dtmFormat,  
 bool ustRechnung, bool autoNummer, string zahlungshinweis, string kontoInhaber, string iban, string bic, string kreditinstitut, 
-bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter )
+bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter, string emailFirma, 
+string teleponNrFirma,string websitefrima, string nutzer)
 {
     Settings newSettings = new Settings
     {
@@ -773,7 +783,11 @@ bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, 
         seitenzahl = seitenzahl,
         exportpfad = exportpfad,
         steuersatz = steuersatz,
-        Begleiter = Begleiter
+        Begleiter = Begleiter,
+        emailFirma = emailFirma,
+        teleponNrFirma = teleponNrFirma,
+        websitefrima = websitefrima,
+        nutzer = nutzer
     };
     return insert(newSettings);
 }
