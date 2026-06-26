@@ -10,6 +10,7 @@ public class Einkommen
     public float Amount { get; set; }
     public string Description { get; set; }
     public string Datum { get; set; }
+    public string Art { get; set; }
 
     public int getId()
     {
@@ -27,6 +28,10 @@ public class Einkommen
     public string getDatum()
     {
         return Datum;
+    }
+    public string getArt()
+    {
+        return Art ?? "";
     }
 }
 
@@ -37,6 +42,7 @@ public class Ausgaben
     public float Amount { get; set; }
     public string Description { get; set; }
     public string Datum { get; set; }
+    public string Art { get; set; }
 
     public int getId()
     {
@@ -54,5 +60,9 @@ public class Ausgaben
     public string getDatum()
     {
         return Datum;
+    }
+    public string getArt()
+    {
+        return Art ?? "";
     }
 }

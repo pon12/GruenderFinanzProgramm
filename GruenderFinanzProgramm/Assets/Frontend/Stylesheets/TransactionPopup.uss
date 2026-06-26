@@ -418,3 +418,25 @@ DropdownField,
     background-color: transparent;
     border-width: 0;
 }
+
+/* ============================================
+   TABELLEN-SPALTEN: col-Klassen für Header + Zeilen
+   Beide müssen identische flex-grow Werte haben
+   ============================================ */
+.col {
+    -unity-text-align: middle-center;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    flex-shrink: 1;
+    align-self: center;
+}
+.col-name    { flex-grow: 3; }
+.col-datum   { flex-grow: 2; }
+.col-betrag  { flex-grow: 1; }
+.col-art     { flex-grow: 2; }
+.col-typ     { flex-grow: 2; }
+.col-action  { flex-grow: 0; flex-shrink: 0; width: 80px; align-items: center; justify-content: center; padding-top: 6px; padding-bottom: 6px; padding-left: 0; padding-right: 8px; }

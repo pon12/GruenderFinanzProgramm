@@ -149,9 +149,9 @@ public class KassenbuchController : MonoBehaviour
         if (dropJahrField != null)
         {
             List<string> jahre = new List<string>();
-            for (int i = 0; i < 100; i++)
+            for (int i = today.Year; i >= 2010; i--)
             {
-                jahre.Add((today.Year - i).ToString());
+                jahre.Add(i.ToString());
             }
             dropJahrField.choices = jahre;
             dropJahrField.value = today.Year.ToString();
@@ -286,21 +286,12 @@ public class KassenbuchController : MonoBehaviour
             "Die Datei kann direkt an das Finanzamt weitergegeben werden. " +
             "Das Jahr wählst du über das Dropdown oben rechts.");
 
-        HelpTooltip.Registriere(root, "btn-help-spalte-name",
-            "Name und Verwendungszweck des Buchungseintrags. " +
-            "Beschreibt wofür die Zahlung bestimmt war.");
-
-        HelpTooltip.Registriere(root, "btn-help-spalte-datum",
-            "Datum an dem die Buchung stattgefunden hat. " +
-            "Format: TT.MM.JJJJ");
-
-        HelpTooltip.Registriere(root, "btn-help-spalte-betrag",
-            "Betrag der Buchung in Euro. " +
-            "Einnahmen werden grün, Ausgaben rot dargestellt.");
-
-        HelpTooltip.Registriere(root, "btn-help-spalte-typ",
-            "Gibt an ob es sich um eine Einnahme oder Ausgabe handelt. " +
-            "Außerdem die gewählte Art der Buchung (z. B. Marketing, Steuern).");
+        HelpTooltip.Registriere(root, "btn-help-tabelle",
+            "Tabellenspalten: Name (Verwendungszweck der Buchung), " +
+            "Buchungstag (Datum im Format TT.MM.JJJJ), " +
+            "Betrag (Einnahmen grün / Ausgaben rot), " +
+            "Art der Buchung (z.B. Marketing, Steuern, Gehälter), " +
+            "Einnahme / Ausgabe (Typ der Buchung).");
 
         HelpTooltip.Registriere(root, "btn-help-popup",
             "Trage hier die Details der Buchung ein. " +
@@ -795,6 +786,7 @@ Debug.Log("Zweck: '" + zweck + "'");
         return;
     }
 
+    eintrag.Art = artDropdown?.value ?? "";
     SpeichereEintrag(eintrag);
 
     ClosePopup();
@@ -835,10 +827,10 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
         if (eintrag.Typ == "Einnahme") {
-            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
+            db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art);
         }
         else {
-            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum);
+            db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art);
     }
     }
 
@@ -968,7 +960,9 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text       = currentEinkommen.getDescription();
+                nameLabel.text = currentEinkommen.getDescription();
+                Label artLabelEin = newEntryCopy.Q<Label>("Art");
+                if (artLabelEin != null) artLabelEin.text = currentEinkommen.getArt();
                 if (float.TryParse(currentEinkommen.getAmount(), out float betrag))
                 {
                     betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
@@ -1029,7 +1023,9 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
 
-                nameLabel.text       = currentAusgaben.getDescription();
+                nameLabel.text = currentAusgaben.getDescription();
+                Label artLabelAus = newEntryCopy.Q<Label>("Art");
+                if (artLabelAus != null) artLabelAus.text = currentAusgaben.getArt();
                if (float.TryParse(currentAusgaben.getAmount(), out float betrag))
                     {
                         betragLabel.text = betrag.ToString("N0").Replace(",", ".") + " €";
@@ -1269,6 +1265,7 @@ public class KassenbuchEintrag
     public float Betrag;
     public string Beschreibung;
     public string Datum;
+    public string Art;
 
 
    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)

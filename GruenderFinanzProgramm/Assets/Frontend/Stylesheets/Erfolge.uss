@@ -1,11 +1,14 @@
 /* =============================================
    Erfolge.uss
+   #80CF95 Primär / #2C2C2C Modul / #1E1E1E Hintergrund
    ============================================= */
 
-#root-container, Label, Button {
+/* GLOBALE SCHRIFT */
+#main-content, Label, Button {
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
+/* SEITE */
 .page-title {
     font-size: 32px;
     color: rgb(255, 255, 255);
@@ -17,18 +20,21 @@
     color: rgb(160, 160, 160);
 }
 .gesamt-prozent-label {
-    font-size: 22px;
+    font-size: 24px;
     color: rgb(128, 207, 149);
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
 }
 
-/* GESAMTFORTSCHRITT */
+/* GESAMTFORTSCHRITTSBALKEN */
 .gesamt-fortschritt-box {
     background-color: rgb(44, 44, 44);
     border-radius: 12px;
     border-width: 1px;
     border-color: rgb(55, 55, 55);
-    padding: 18px 22px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .fortschritt-header-label {
     font-size: 15px;
@@ -39,35 +45,37 @@
     color: rgb(128, 207, 149);
 }
 .fortschritt-balken-bg {
-    height: 10px;
+    height: 8px;
     background-color: rgb(55, 55, 55);
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
 }
 .fortschritt-balken-fill {
     height: 100%;
     background-color: rgb(128, 207, 149);
-    border-radius: 5px;
+    border-radius: 4px;
     transition-property: width;
     transition-duration: 0.3s;
 }
 
-/* GRID – 2 Spalten */
+/* GRID */
 .erfolge-grid {
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-/* KATEGORIE-CARD */
+/* KATEGORIE-KARTE */
 .kategorie-card {
     background-color: rgb(44, 44, 44);
     border-radius: 12px;
     border-width: 1px;
     border-color: rgb(55, 55, 55);
-    padding: 20px;
+    padding: 22px;
     margin-bottom: 20px;
     margin-right: 20px;
     width: 48%;
+    min-width: 400px;
+    flex-shrink: 0;
 }
 .kategorie-card:hover {
     border-color: rgb(128, 207, 149);
@@ -79,7 +87,7 @@
     margin-bottom: 10px;
 }
 .kategorie-icon {
-    font-size: 22px;
+    font-size: 24px;
     width: 40px;
     height: 40px;
     -unity-text-align: middle-center;
@@ -89,7 +97,7 @@
     flex-shrink: 0;
 }
 .kategorie-name {
-    font-size: 17px;
+    font-size: 18px;
     color: rgb(255, 255, 255);
     flex-grow: 1;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
@@ -100,6 +108,7 @@
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
 }
 
+/* Mini-Balken pro Kategorie */
 .kategorie-mini-bar-bg {
     height: 5px;
     background-color: rgb(55, 55, 55);
@@ -111,46 +120,51 @@
     height: 100%;
     background-color: rgb(128, 207, 149);
     border-radius: 3px;
+    transition-property: width;
+    transition-duration: 0.3s;
 }
 
-/* KACHELN */
-.kacheln-grid {
+/* ERFOLGS-KACHELN GRID */
+.erfolge-kacheln-grid {
     flex-direction: row;
     flex-wrap: wrap;
 }
 
+/* EINZELNE KACHEL */
 .erfolg-kachel {
     background-color: rgb(38, 38, 38);
     border-radius: 10px;
     border-width: 1px;
     border-color: rgb(60, 60, 60);
-    padding: 12px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    width: 47%;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    width: 100%;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
+    transition-property: border-color, background-color;
+    transition-duration: 0.15s;
 }
 .erfolg-kachel:hover {
-    border-color: rgb(90, 90, 90);
+    border-color: rgb(80, 80, 80);
+    background-color: rgb(42, 42, 42);
 }
 .erfolg-kachel--erledigt {
     border-color: rgb(128, 207, 149);
     background-color: rgba(128, 207, 149, 0.07);
 }
-.erfolg-kachel--offen {
-    opacity: 0.5;
+.erfolg-kachel--gesperrt {
+    opacity: 0.45;
 }
 
 .erfolg-icon-box {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     border-radius: 8px;
     background-color: rgb(55, 55, 55);
     -unity-text-align: middle-center;
-    font-size: 16px;
+    font-size: 22px;
     flex-shrink: 0;
-    margin-right: 10px;
+    margin-right: 14px;
     align-items: center;
     justify-content: center;
 }
@@ -163,55 +177,58 @@
     flex-direction: column;
 }
 .erfolg-titel {
-    font-size: 12px;
-    color: rgb(210, 210, 210);
+    font-size: 13px;
+    color: rgb(220, 220, 220);
     white-space: normal;
-    margin-bottom: 2px;
-    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    margin-bottom: 3px;
 }
 .erfolg-titel--erledigt {
     color: rgb(128, 207, 149);
 }
 .erfolg-beschreibung {
-    font-size: 10px;
-    color: rgb(130, 130, 130);
+    font-size: 11px;
+    color: rgb(140, 140, 140);
     white-space: normal;
 }
 
-/* STACKABLE */
-.stackable-badge {
+/* STACKABLE BADGE */
+.erfolg-stackable-badge {
     background-color: rgb(128, 207, 149);
     color: rgb(20, 20, 20);
     font-size: 9px;
     border-radius: 4px;
-    padding: 1px 4px;
+    padding: 1px 5px;
+    margin-left: 6px;
     -unity-text-align: middle-center;
+    flex-shrink: 0;
     align-self: flex-start;
-    margin-top: 2px;
+    margin-top: 1px;
 }
+
+/* Stackable Fortschrittsbalken */
 .stackable-bar-bg {
-    height: 3px;
+    height: 4px;
     background-color: rgb(60, 60, 60);
     border-radius: 2px;
     overflow: hidden;
-    margin-top: 5px;
+    margin-top: 6px;
 }
 .stackable-bar-fill {
     height: 100%;
     background-color: rgb(128, 207, 149);
     border-radius: 2px;
 }
-.stackable-count {
+.stackable-count-label {
     font-size: 10px;
     color: rgb(128, 207, 149);
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
-/* HAKEN */
+/* Haken oben rechts bei erledigten */
 .erfolg-check {
     font-size: 14px;
     color: rgb(128, 207, 149);
     flex-shrink: 0;
-    margin-left: 4px;
+    margin-left: 6px;
     align-self: flex-start;
 }

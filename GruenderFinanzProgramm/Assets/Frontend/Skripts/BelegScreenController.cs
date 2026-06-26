@@ -1476,7 +1476,7 @@ public abstract class BelegScreenController : MonoBehaviour
         _statusDropdown?.SetValueWithoutNotify(neuerStatus);
         AktualisiereUmwandelnButton();
 
-        if (angenommen) UebernimmInsKassenbuch();
+        // Kassenbuch-Eintrag nur über BezahltGeklickt() im RechnungController
 
         FeedbackPopup.Show(Root,
             angenommen ? BelegTyp + " best\u00e4tigt" : BelegTyp + " abgelehnt",

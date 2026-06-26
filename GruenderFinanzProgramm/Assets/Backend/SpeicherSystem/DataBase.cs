@@ -14,6 +14,9 @@ public class DataBase : DatabaseManager
         createTable<TextDocumentMeta>();
         createTable<Ausgaben>();
         createTable<Einkommen>();
+        // Migration: Art-Spalte hinzufügen falls noch nicht vorhanden
+        try { database.Execute("ALTER TABLE Einkommen ADD COLUMN Art TEXT DEFAULT ''"); } catch {}
+        try { database.Execute("ALTER TABLE Ausgaben ADD COLUMN Art TEXT DEFAULT ''"); } catch {}
         createTable<Dauerauftrag>();
         createTable<GruenderpfadEintrag>();
         createTable<Offer>();
@@ -317,14 +320,14 @@ public int deleteInvoiceItem(int id)
         createTable<Dauerauftrag>();
     }
 
-    public int createEinkommen(float amount, string description, string datum)
+    public int createEinkommen(float amount, string description, string datum, string art = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum });
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art });
     }
 
-    public int createAusgaben(float amount, string description, string datum)
+    public int createAusgaben(float amount, string description, string datum, string art = "")
     {
-        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum });
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art });
     }
 
     public List<Einkommen> getAllEinkommenEntries()
