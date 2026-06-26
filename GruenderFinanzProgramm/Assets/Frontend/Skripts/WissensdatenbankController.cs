@@ -2,13 +2,13 @@
 // WissensdatenbankController.cs
 //
 //  - Lädt Einträge aus einer JSON-Datei (Resources/wissensdatenbank.json)
-//  - KEINE manuelle Pflege im Inspector nötig
 //  - Klick auf eine Karte öffnet ein Lese-Popup mit dem Text
 //
 // EINRICHTUNG IN UNITY:
-//  1. Dieses Script auf das GameObject mit dem UIDocument legen
-//  2. wissensdatenbank.json in den Ordner Assets/Resources/ legen
+//  1. Script auf das GameObject mit dem UIDocument legen
+//  2. wissensdatenbank.json in Assets/Resources/ legen
 //  3. categoryCardTemplate im Inspector zuweisen
+//  4. helpIconTexture (Help circle.png) im Inspector zuweisen
 // ================================================================
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +22,9 @@ public class WissensdatenbankController : MonoBehaviour
 
     [Header("Templates")]
     [SerializeField] private VisualTreeAsset categoryCardTemplate;
+
+    [Header("Help Icon (Help circle.png zuweisen)")]
+    [SerializeField] private Texture2D helpIconTexture;
 
     [System.Serializable]
     private class WissensEintrag
@@ -43,6 +46,22 @@ public class WissensdatenbankController : MonoBehaviour
     {
         "Gründung", "Strategie", "Rechtliches", "Finanzen", "Steuern",
         "Vertrieb", "Marketing", "Organisation", "Personal", "System-Hilfe"
+    };
+
+    // Kategorie-Tooltips für die Karten-Icons
+    private static readonly Dictionary<string, string> KategorieTooltips =
+        new Dictionary<string, string>
+    {
+        ["Gründung"]     = "Grundlegendes Wissen rund um die Unternehmensgründung: Rechtsformen, Anmeldeprozesse und erste Schritte.",
+        ["Strategie"]    = "Strategische Grundlagen: Businessplan, Marktanalyse, Wettbewerbspositionierung und Wachstumsplanung.",
+        ["Rechtliches"]  = "Rechtliche Themen: Vertragsrecht, DSGVO, Impressumspflicht und weitere gesetzliche Anforderungen.",
+        ["Finanzen"]     = "Finanzwissen für Gründer: Buchhaltung, Liquiditätsplanung, Finanzierung und Fördermittel.",
+        ["Steuern"]      = "Steuerrelevante Themen: Umsatzsteuer, Einkommensteuer, Steuernummer und Zusammenarbeit mit dem Finanzamt.",
+        ["Vertrieb"]     = "Vertriebsstrategien: Kundengewinnung, Angebotserstellung und Preisgestaltung.",
+        ["Marketing"]    = "Marketinggrundlagen: Zielgruppenanalyse, Online-Marketing, Social Media und Corporate Identity.",
+        ["Organisation"] = "Organisatorische Themen: Prozesse, Tools, Zeitmanagement und interne Strukturen.",
+        ["Personal"]     = "Personalthemen: Einstellung, Arbeitsverträge, Führung und Mitarbeitermotivation.",
+        ["System-Hilfe"] = "Hilfe zur Nutzung dieser Anwendung: Funktionen, Tipps und häufige Fragen.",
     };
 
     private VisualElement root;
@@ -68,21 +87,26 @@ public class WissensdatenbankController : MonoBehaviour
 
         root = uiDocument.rootVisualElement;
 
-        gridContainer       = root.Q<VisualElement>("Grid-Container");
-        detailPopupOverlay  = root.Q<VisualElement>("Detail-Popup-Overlay");
-        detailListContainer = root.Q<VisualElement>("Detail-List-Container");
-        detailCloseButton   = root.Q<Button>("Btn-Detail-Close");
-        detailPopupTitle    = root.Q<Label>("Detail-Popup-Title");
-        viewPopupOverlay    = root.Q<VisualElement>("View-Popup-Overlay");
-        viewPopupTitle      = root.Q<Label>("View-Popup-Title");
-        viewPopupInhalt     = root.Q<Label>("View-Popup-Inhalt");
+        gridContainer        = root.Q<VisualElement>("Grid-Container");
+        detailPopupOverlay   = root.Q<VisualElement>("Detail-Popup-Overlay");
+        detailListContainer  = root.Q<VisualElement>("Detail-List-Container");
+        detailCloseButton    = root.Q<Button>("Btn-Detail-Close");
+        detailPopupTitle     = root.Q<Label>("Detail-Popup-Title");
+        viewPopupOverlay     = root.Q<VisualElement>("View-Popup-Overlay");
+        viewPopupTitle       = root.Q<Label>("View-Popup-Title");
+        viewPopupInhalt      = root.Q<Label>("View-Popup-Inhalt");
         viewPopupCloseButton = root.Q<Button>("Btn-View-Close");
 
         if (detailCloseButton    != null) detailCloseButton.clicked    += CloseDetailPopup;
         if (viewPopupCloseButton != null) viewPopupCloseButton.clicked += CloseViewPopup;
 
         SpawnAllCardsAtStart();
+        RegistriereHelpTooltips();
     }
+
+    // ============================================================
+    // DATEN LADEN
+    // ============================================================
 
     private void LoadJSON()
     {
@@ -98,6 +122,10 @@ public class WissensdatenbankController : MonoBehaviour
         else
             Debug.LogWarning("[Wissensdatenbank] JSON konnte nicht gelesen werden.");
     }
+
+    // ============================================================
+    // KARTEN AUFBAUEN
+    // ============================================================
 
     private void SpawnAllCardsAtStart()
     {
@@ -122,6 +150,24 @@ public class WissensdatenbankController : MonoBehaviour
             if (btnAlleAnzeigen != null)
                 btnAlleAnzeigen.clicked += () => OpenDetailPopup(kategorieName);
 
+            // Karten-Hilfe-Icon mit Textur und Tooltip registrieren
+            var karteHelpIcon = cardInstance.Q<VisualElement>("btn-help-karte");
+            if (karteHelpIcon != null)
+            {
+                var tex = helpIconTexture != null
+                    ? helpIconTexture
+                    : Resources.Load<Texture2D>("Icons/Help circle");
+                if (tex != null)
+                {
+                    karteHelpIcon.style.backgroundImage               = new StyleBackground(tex);
+                    karteHelpIcon.style.unityBackgroundImageTintColor  = new StyleColor(
+                        new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
+                }
+
+                if (KategorieTooltips.TryGetValue(kategorieName, out string tooltipText))
+                    HelpTooltip.RegistriereInKarte(root, karteHelpIcon, tooltipText);
+            }
+
             List<WissensEintrag> kategorieEintraege =
                 wissensEintraege.Where(w => w.category == kategorieName).ToList();
 
@@ -143,10 +189,10 @@ public class WissensdatenbankController : MonoBehaviour
                     if (iconBox != null)
                     {
                         iconBox.Clear();
-                        var iconLabel = new Label("📖");
-                        iconLabel.style.fontSize = 13;
+                        var iconLabel = new Label("\U0001f4d6");
+                        iconLabel.style.fontSize       = 13;
                         iconLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-                        iconLabel.style.flexGrow = 1;
+                        iconLabel.style.flexGrow       = 1;
                         iconBox.Add(iconLabel);
                     }
 
@@ -173,7 +219,7 @@ public class WissensdatenbankController : MonoBehaviour
 
                     if (plusBtn != null)
                     {
-                        plusBtn.text = "👁";
+                        plusBtn.text    = "\U0001f441";
                         plusBtn.tooltip = "Anzeigen";
                         plusBtn.clicked += () => OpenViewPopup(eintrag);
                     }
@@ -199,6 +245,10 @@ public class WissensdatenbankController : MonoBehaviour
         }
     }
 
+    // ============================================================
+    // POPUPS
+    // ============================================================
+
     private void OpenDetailPopup(string kategorie)
     {
         activeCategoryForList = kategorie;
@@ -212,7 +262,8 @@ public class WissensdatenbankController : MonoBehaviour
         if (detailListContainer == null) return;
         detailListContainer.Clear();
 
-        var kategorieEintraege = wissensEintraege.Where(w => w.category == activeCategoryForList).ToList();
+        var kategorieEintraege = wissensEintraege
+            .Where(w => w.category == activeCategoryForList).ToList();
 
         if (kategorieEintraege.Count == 0)
         {
@@ -230,7 +281,7 @@ public class WissensdatenbankController : MonoBehaviour
             string displayTitle = eintrag.title.Split('\n')[0];
             if (displayTitle.Length > 30) displayTitle = displayTitle.Substring(0, 27) + "...";
 
-            Label nameLabel = new Label($"📖 {displayTitle}");
+            Label nameLabel = new Label($"\U0001f4d6 {displayTitle}");
             nameLabel.AddToClassList("list-row-label");
             row.Add(nameLabel);
 
@@ -270,5 +321,25 @@ public class WissensdatenbankController : MonoBehaviour
     {
         if (viewPopupOverlay != null)
             viewPopupOverlay.style.display = DisplayStyle.None;
+    }
+
+    // ============================================================
+    // HELP TOOLTIPS
+    // ============================================================
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Die Wissensdatenbank enthält Anleitungen und Erklärungen rund um deine Gründung. " +
+            "Klicke auf eine Kategorie-Karte um alle Einträge zu sehen. " +
+            "Mit dem Auge-Symbol öffnest du einen Eintrag zum Lesen.");
+
+        HelpTooltip.Registriere(root, "btn-help-detail-popup",
+            "Alle Einträge dieser Kategorie auf einen Blick. " +
+            "Klicke auf Anzeigen um einen Eintrag vollständig zu lesen.");
+
+        HelpTooltip.Registriere(root, "btn-help-view-popup",
+            "Vollansicht des gewählten Wissenseintrags. " +
+            "Scrolle nach unten um den gesamten Inhalt zu lesen.");
     }
 }

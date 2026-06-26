@@ -141,6 +141,9 @@
 .angebot-btn-primary:hover {
     background-color: rgb(179, 226, 196);
 }
+.angebot-btn-primary:active {
+    background-color: rgb(102, 165, 119);
+}
 
 .angebot-btn-secondary {
     background-color: rgb(100, 100, 100);
@@ -166,6 +169,38 @@
 .angebot-btn-secondary:hover {
     background-color: rgb(142, 141, 141);
 }
+.angebot-btn-secondary:active {
+    background-color: rgb(56, 54, 54);
+}
+
+.rechnung-btn-primary {
+    background-color: rgb(75, 158, 102);
+    color: rgb(20, 20, 20);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.rechnung-btn-primary:hover {
+    background-color: rgb(110, 186, 134);
+}
+
+.rechnung-btn-primary:active {
+    background-color: rgb(38, 140, 71);
+}
+
 
 .angebot-btn-danger {
     background-color: rgb(230, 57, 70);
@@ -189,8 +224,12 @@
 }
 
 .angebot-btn-danger:hover {
-    background-color: rgb(200, 40, 52);
+    background-color: rgb(229, 103, 112);
 }
+.angebot-btn-danger:active {
+    background-color: rgb(243, 6, 24);
+}
+
 
 /* TextField Eingabebereich */
 .unity-base-field__input {

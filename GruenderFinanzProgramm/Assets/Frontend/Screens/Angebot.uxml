@@ -151,7 +151,7 @@
             <ui:VisualElement name="action-bar" style="flex-direction: row; align-items: center; padding-top: 14px; padding-bottom: 14px; border-top-width: 1px; border-top-color: rgb(60, 60, 60); margin-top: 8px; gap: 12px;">
                 <ui:Button name="btn-umwandeln" text="Angebot in Rechnung umwandeln" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(70, 70, 70); color: rgb(180, 180, 180); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
                 <ui:Button name="btn-angenommen" class="angebot-btn-primary" text="Angenommen" />
-                <ui:Button name="btn-abgelehnt" text="Abgelehnt" style="height: 40px; padding-left: 18px; padding-right: 18px; background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); font-size: 13px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
+                <ui:Button name="btn-abgelehnt" text="Abgelehnt" class="angebot-btn-danger"/>
                 <ui:VisualElement style="flex: 1;"/>
                 <ui:Button name="btn-export" class="angebot-btn-secondary" text="Als PDF exportieren"/>
                 <ui:Button name="btn-speichern" class="angebot-btn-primary" text="Speichern" />
