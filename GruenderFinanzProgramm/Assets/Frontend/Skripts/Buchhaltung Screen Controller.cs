@@ -58,6 +58,16 @@ public class BuchhaltungScreenController : MonoBehaviour
         }
 
         LadeEintraege();
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(_root);
+    }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
+            "Das Buchhaltungs-Dashboard zeigt alle Angebote in einer Übersicht. " +
+            "Du kannst nach Bezeichnung, Erstelldatum, Fälligkeit und Status sortieren. " +
+            "Klicke auf eine Spaltenüberschrift um die Sortierung zu ändern.");
     }
 
     // ─────────────────────────────────────────────────

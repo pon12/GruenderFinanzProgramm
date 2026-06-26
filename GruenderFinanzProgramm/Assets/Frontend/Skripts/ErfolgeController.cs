@@ -156,6 +156,19 @@ public class ErfolgeController : MonoBehaviour
         InitKategorien();
         LadeDaten();
         BaueUI();
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(root);
+    }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Hier siehst du alle Erfolge und Meilensteine, die du im Programm freischalten kannst. " +
+            "Erfolge werden automatisch freigeschaltet wenn du bestimmte Aktionen abschließt.");
+
+        HelpTooltip.Registriere(root, "btn-help-fortschritt",
+            "Zeigt wie viele Erfolge du bereits freigeschaltet hast. " +
+            "Je mehr Aufgaben du erfüllst, desto höher steigt dein Gesamtfortschritt.");
     }
 
     // ============================================================
