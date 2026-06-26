@@ -1,20 +1,140 @@
-/* TransactionPopup.uss */
+/* =====================================================
+   TransactionPopup.uss  –  Kassenbuch komplett neu
+   ===================================================== */
 
-/* Globale Schriftart für den gesamten Kassenbuch-Screen: Poppins-Bold,
-   durchgängig für alle Texte (Wunsch: alles in Poppins Bold).
-   Direkt auf Element-Typen gesetzt statt nur auf #root zu vererben,
-   robuster gegen Konflikte mit GridSystem.uss, sidebar.uss,
-   Background.uss und USS-Main.uss. */
-#root,
-Label,
-Button,
-TextField,
-DropdownField,
-.unity-text-element {
+/* Schriftart global */
+#root, Label, Button, TextField, DropdownField, .unity-text-element {
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
 }
 
-/* Overlay: muss auf root-ebene liegen, ueberdeckt alles */
+/* =====================================================
+   TABELLE
+   Aufbau: .table-wrapper > .row > .cell
+   Jede .row ist eine flex-direction: row.
+   Jede .cell ist ein festes proportionales Stück davon.
+   ===================================================== */
+
+.table-wrapper {
+    flex-direction: column;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-color: rgb(91, 91, 91);
+    border-right-color: rgb(91, 91, 91);
+    border-bottom-color: rgb(91, 91, 91);
+    border-left-color: rgb(91, 91, 91);
+    margin-top: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    margin-left: 8px;
+    flex-grow: 1;
+}
+
+/* Jede Zeile: horizontal, keine Umbrüche */
+.row {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 60, 60);
+    background-color: rgb(45, 45, 45);
+}
+
+.row-header {
+    background-color: rgb(44, 44, 44);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(91, 91, 91);
+}
+
+/* Basis-Zelle: alle Zellen erben dies */
+.cell {
+    /* Text zentriert */
+    -unity-text-align: middle-center;
+    /* Vertikale Zentrierung im Parent */
+    align-self: center;
+    /* Keine Umbrüche – überlanger Text wird abgeschnitten */
+    overflow: hidden;
+    /* Einheitliches Padding */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    /* Text-Größe */
+    font-size: 15px;
+    color: rgb(220, 220, 220);
+}
+
+/* Header-Zellen etwas heller/fetter */
+.row-header .cell {
+    font-size: 15px;
+    color: rgb(255, 255, 255);
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* ---- Spaltenbreiten ---- 
+   Summe flex-grow: 2 + 1.5 + 1 + 1.5 + 1.5 + 0(fix) = 7.5
+   col-action ist fix 44px damit der Button immer passt */
+.cell-name   { flex-grow: 2;   flex-shrink: 1; flex-basis: 0; }
+.cell-datum  { flex-grow: 1;   flex-shrink: 1; flex-basis: 0; }
+.cell-betrag { flex-grow: 1;   flex-shrink: 1; flex-basis: 0; }
+.cell-art    { flex-grow: 1;   flex-shrink: 1; flex-basis: 0; }
+.cell-typ    { flex-grow: 1;   flex-shrink: 1; flex-basis: 0; }
+.cell-action { flex-grow: 0;   flex-shrink: 0; width: 44px;
+               align-items: center; justify-content: center;
+               padding-top: 0; padding-bottom: 0;
+               padding-left: 0; padding-right: 4px; }
+
+/* Betrag-Farbe wird per C# gesetzt, Standardfarbe grün */
+.cell-betrag { color: rgb(128, 207, 149); }
+
+/* Art-Zelle etwas gedimmter */
+.cell-art { color: rgb(180, 180, 180); }
+
+/* ---- Löschen-Button ---- */
+.btn-delete {
+    width: 26px;
+    height: 26px;
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    background-color: rgba(230, 57, 70, 0.15);
+    border-top-color: rgb(230, 57, 70);
+    border-right-color: rgb(230, 57, 70);
+    border-bottom-color: rgb(230, 57, 70);
+    border-left-color: rgb(230, 57, 70);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    color: rgb(230, 57, 70);
+    font-size: 18px;
+    -unity-text-align: middle-center;
+    padding-top: 0;
+    padding-bottom: 2px;
+    padding-left: 0;
+    padding-right: 0;
+}
+.btn-delete:hover {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+}
+
+.table-body {
+    flex-grow: 1;
+}
+
+/* =====================================================
+   POPUP-OVERLAY
+   ===================================================== */
 .popup-overlay {
     position: absolute;
     left: 0;
@@ -26,7 +146,6 @@ DropdownField,
     justify-content: center;
 }
 
-/* Popup-Container */
 .popup-container {
     width: 380px;
     padding-top: 28px;
@@ -41,27 +160,23 @@ DropdownField,
     flex-direction: column;
 }
 
-/* Titel */
 .popup-title {
     color: rgb(255, 255, 255);
     font-size: 28px;
     margin-bottom: 16px;
 }
 
-/* Feldgruppe */
 .field-group {
     flex-direction: column;
     margin-bottom: 16px;
 }
 
-/* Label */
 .field-label {
     font-size: 18px;
     color: rgb(200, 200, 200);
     margin-bottom: 6px;
 }
 
-/* Text-Inputs */
 .field-input {
     height: 40px;
     border-top-left-radius: 8px;
@@ -94,13 +209,11 @@ DropdownField,
     padding-left: 14px;
 }
 
-/* Aktionsleiste */
 .popup-actions {
     flex-direction: row;
     margin-top: 8px;
 }
 
-/* Buttons */
 .btn {
     flex: 1;
     height: 40px;
@@ -120,24 +233,21 @@ DropdownField,
     color: rgb(28, 28, 28);
     margin-right: 8px;
 }
-
-.btn-primary:hover {
-    background-color: rgb(107, 191, 130);
-}
+.btn-primary:hover { background-color: rgb(107, 191, 130); }
 
 .btn-secondary {
     background-color: rgb(80, 80, 80);
     color: rgb(255, 255, 255);
 }
+.btn-secondary:hover { background-color: rgb(100, 100, 100); }
 
-.btn-secondary:hover {
-    background-color: rgb(100, 100, 100);
+/* =====================================================
+   HEADER-ZEILE & JAHRES-DROPDOWN
+   ===================================================== */
+.header-row {
+    margin-bottom: 8px;
 }
 
-/* ============================================
-   KASSENBUCH-KOPFZEILE: Jahr-Dropdown + Export-Button
-   Konsistent mit Styleguide: Primär #80CF95, Sekundär #646464
-   ============================================ */
 .jahr-dropdown {
     height: 40px;
     width: 160px;
@@ -151,57 +261,16 @@ DropdownField,
     color: rgb(255, 255, 255);
     font-size: 16px;
     -unity-text-align: middle-center;
-    transition-property: background-color, border-color;
-    transition-duration: 0.1s;
 }
-.jahr-dropdown:hover {
-    background-color: rgb(75, 75, 75);
-}
-.jahr-dropdown .unity-base-popup-field__text {
-    color: rgb(255, 255, 255);
-    font-size: 16px;
-    -unity-text-align: middle-center;
-}
-.jahr-dropdown .unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: rgb(255, 255, 255);
-}
-.jahr-dropdown .unity-base-field__input {
-    background-color: transparent;
-    border-width: 0;
-}
-.jahr-dropdown .unity-base-field__label {
-    display: none;
-}
+.jahr-dropdown:hover { background-color: rgb(75, 75, 75); }
+.jahr-dropdown .unity-base-popup-field__text { color: rgb(255, 255, 255); -unity-text-align: middle-center; }
+.jahr-dropdown .unity-base-popup-field__arrow { -unity-background-image-tint-color: rgb(255, 255, 255); }
+.jahr-dropdown .unity-base-field__input { background-color: transparent; border-width: 0; }
+.jahr-dropdown .unity-base-field__label { display: none; }
 
-.btn-export-finanzamt {
-    height: 40px;
-    padding: 0 20px;
-    background-color: rgb(100, 100, 100);
-    color: rgb(255, 255, 255);
-    border-width: 0;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    -unity-text-align: middle-center;
-    white-space: nowrap;
-    transition-property: background-color;
-    transition-duration: 0.1s;
-}
-.btn-export-finanzamt:hover {
-    background-color: rgb(120, 120, 120);
-}
-.btn-export-finanzamt:active {
-    background-color: rgb(80, 80, 80);
-}
-
-/* ============================================
-   3ER-AKTIONSREIHE: Ausgaben / Einnahmen / Export
-   Alle drei gleich groß, klar als zusammengehörige
-   Aktionsgruppe erkennbar.
-   ============================================ */
+/* =====================================================
+   AKTIONS-BUTTONS (Ausgaben / Einnahmen / Export)
+   ===================================================== */
 .btn-action-3er {
     width: 220px;
     height: 44px;
@@ -213,41 +282,18 @@ DropdownField,
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     font-size: 15px;
-    font-weight: bold;
     -unity-text-align: middle-center;
-    transition-property: background-color;
-    transition-duration: 0.1s;
 }
-.btn-action-3er.btn-red {
-    background-color: rgb(230, 57, 70);
-    color: rgb(255, 255, 255);
-}
-.btn-action-3er.btn-red:hover {
-    background-color: rgb(208, 45, 57);
-}
-.btn-action-3er.btn-green {
-    background-color: rgb(128, 207, 149);
-    color: rgb(28, 28, 28);
-}
-.btn-action-3er.btn-green:hover {
-    background-color: rgb(107, 191, 130);
-}
-.btn-action-3er.btn-export-finanzamt {
-    width: 220px;
-    background-color: rgb(100, 100, 100);
-}
+.btn-action-3er.btn-red  { background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); }
+.btn-action-3er.btn-red:hover { background-color: rgb(208, 45, 57); }
+.btn-action-3er.btn-green { background-color: rgb(128, 207, 149); color: rgb(28, 28, 28); }
+.btn-action-3er.btn-green:hover { background-color: rgb(107, 191, 130); }
+.btn-action-3er.btn-export-finanzamt { background-color: rgb(100, 100, 100); color: rgb(255,255,255); }
+.btn-action-3er.btn-export-finanzamt:hover { background-color: rgb(120, 120, 120); }
 
-/* Header-Zeile: Titel links, Jahr-Dropdown rechts */
-.header-row {
-    margin-bottom: 8px;
-}
-
-/* ============================================
-   KALENDER-WIDGET IM TRANSAKTIONS-POPUP
-   (übernommen aus DashboardStyles.uss – diese Klassen
-   fehlten hier komplett, deshalb sah der Kalender und
-   die Dropdowns im Popup wie unstyled Standard-Unity aus)
-   ============================================ */
+/* =====================================================
+   KALENDER-WIDGET
+   ===================================================== */
 .panel-half {
     background-color: rgb(40, 40, 40);
     border-radius: 10px;
@@ -260,12 +306,9 @@ DropdownField,
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
-    flex-grow: 0;
-    flex-shrink: 0;
 }
 .btn-cal-nav {
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;
     border-radius: 14px;
     background-color: #383838;
     border-color: #555555;
@@ -274,14 +317,8 @@ DropdownField,
     font-size: 18px;
     padding: 0;
     -unity-text-align: middle-center;
-    cursor: link;
-    transition-property: border-color, background-color;
-    transition-duration: 0.15s;
 }
-.btn-cal-nav:hover {
-    background-color: #4A4A4A;
-    border-color: #80CF95;
-}
+.btn-cal-nav:hover { background-color: #4A4A4A; border-color: #80CF95; }
 
 .cal-dropdown {
     flex-grow: 1;
@@ -292,151 +329,50 @@ DropdownField,
     border-radius: 6px;
     color: #ffffff;
     font-size: 13px;
-    font-weight: bold;
     height: 30px;
     -unity-text-align: middle-center;
-    transition-property: background-color, border-color;
-    transition-duration: 0.1s;
 }
-.cal-dropdown:hover {
-    background-color: #787878;
-    border-color: #80CF95;
-}
-.cal-dropdown > .unity-base-popup-field__text {
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: bold;
-    -unity-text-align: middle-center;
-}
-.cal-dropdown .unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: #ffffff;
-}
-.cal-dropdown .unity-base-field__input {
-    background-color: transparent;
-    border-width: 0;
-}
+.cal-dropdown:hover { background-color: #787878; border-color: #80CF95; }
+.cal-dropdown > .unity-base-popup-field__text { color: #ffffff; -unity-text-align: middle-center; }
+.cal-dropdown .unity-base-popup-field__arrow { -unity-background-image-tint-color: #ffffff; }
+.cal-dropdown .unity-base-field__input { background-color: transparent; border-width: 0; }
 
-.kalender-weekdays {
-    flex-direction: row;
-    margin-bottom: 4px;
-    flex-grow: 0;
-    flex-shrink: 0;
-}
+.kalender-weekdays { flex-direction: row; margin-bottom: 4px; }
 .cal-wd-label {
-    flex-grow: 1;
-    flex-basis: 0;
-    color: #888888;
-    font-size: 11px;
+    flex-grow: 1; flex-basis: 0;
+    color: #888888; font-size: 11px;
     -unity-text-align: middle-center;
-    font-weight: bold;
 }
 
-.kalender-grid {
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex-grow: 1;
-    align-content: stretch;
-}
+.kalender-grid { flex-direction: row; flex-wrap: wrap; flex-grow: 1; }
 .cal-day {
-    width: 13%;
-    flex-grow: 1;
-    flex-basis: 13%;
-    flex-shrink: 0;
-    margin: 2px;
-    padding: 0;
+    width: 13%; flex-grow: 1; flex-basis: 13%;
+    margin: 2px; padding: 0;
     background-color: transparent;
-    border-width: 0;
-    border-radius: 6px;
-    color: #cccccc;
-    font-size: 13px;
-    font-weight: bold;
+    border-width: 0; border-radius: 6px;
+    color: #cccccc; font-size: 13px;
     -unity-text-align: middle-center;
-    cursor: link;
     min-height: 32px;
 }
-.cal-day:hover {
-    background-color: #3A3A3A;
-    color: #ffffff;
-}
-.cal-day-today {
-    background-color: #80CF95;
-    color: #1E1E1E;
-    font-weight: bold;
-    border-radius: 6px;
-}
-.cal-day-today:hover {
-    background-color: #6BBF82;
-    color: #1E1E1E;
-}
-.cal-day-other-month {
-    color: #3A3A3A;
-    font-weight: normal;
-}
-.cal-day-empty {
-    background-color: transparent;
-    color: transparent;
-}
-.cal-day-empty:hover {
-    background-color: transparent;
-}
-.cal-day-deadline {
-    border-width: 1px;
-    border-color: #E07A2F;
-}
-.cal-day-deadline:hover {
-    border-color: #ffffff;
-}
+.cal-day:hover { background-color: #3A3A3A; color: #ffffff; }
+.cal-day-today { background-color: #80CF95; color: #1E1E1E; border-radius: 6px; }
+.cal-day-today:hover { background-color: #6BBF82; color: #1E1E1E; }
+.cal-day-other-month { color: #3A3A3A; }
+.cal-day-empty { background-color: transparent; color: transparent; }
+.cal-day-empty:hover { background-color: transparent; }
 
-/* ============================================
-   KATEGORIE-DROPDOWN ("Art") IM TRANSAKTIONS-POPUP
-   War im UXML ohne jede Klasse, dadurch unstyled
-   ============================================ */
+/* =====================================================
+   ART-DROPDOWN IM POPUP
+   ===================================================== */
 .art-dropdown {
     background-color: rgb(70, 70, 70);
-    border-width: 0;
-    border-radius: 6px;
+    border-width: 0; border-radius: 6px;
     color: rgb(255, 255, 255);
-    font-size: 14px;
-    height: 36px;
+    font-size: 14px; height: 36px;
     margin-bottom: 4px;
     -unity-text-align: middle-left;
-    transition-property: background-color, border-color;
-    transition-duration: 0.1s;
 }
-.art-dropdown:hover {
-    background-color: rgb(85, 85, 85);
-}
-.art-dropdown > .unity-base-popup-field__text {
-    color: rgb(255, 255, 255);
-    font-size: 14px;
-    padding-left: 6px;
-}
-.art-dropdown .unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: rgb(255, 255, 255);
-}
-.art-dropdown .unity-base-field__input {
-    background-color: transparent;
-    border-width: 0;
-}
-
-/* ============================================
-   TABELLEN-SPALTEN: col-Klassen für Header + Zeilen
-   Beide müssen identische flex-grow Werte haben
-   ============================================ */
-.col {
-    -unity-text-align: middle-center;
-    overflow: hidden;
-    white-space: nowrap;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 8px;
-    padding-right: 8px;
-    flex-shrink: 1;
-    align-self: center;
-}
-.col-name    { flex-grow: 3; }
-.col-datum   { flex-grow: 2; }
-.col-betrag  { flex-grow: 1; }
-.col-art     { flex-grow: 2; }
-.col-typ     { flex-grow: 2; }
-.col-action  { flex-grow: 0; flex-shrink: 0; width: 80px; align-items: center; justify-content: center; padding-top: 6px; padding-bottom: 6px; padding-left: 0; padding-right: 8px; }
+.art-dropdown:hover { background-color: rgb(85, 85, 85); }
+.art-dropdown > .unity-base-popup-field__text { color: rgb(255, 255, 255); padding-left: 6px; }
+.art-dropdown .unity-base-popup-field__arrow { -unity-background-image-tint-color: rgb(255, 255, 255); }
+.art-dropdown .unity-base-field__input { background-color: transparent; border-width: 0; }

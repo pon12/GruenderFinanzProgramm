@@ -30,16 +30,16 @@
                 <ui:Button text="Für Finanzamt exportieren" name="FinanzExport" class="btn-action-3er btn-export-finanzamt"/>
                 <ui:VisualElement name="btn-help-finanzexport" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 0; width: 28px; height: 28px; min-width: 28px; min-height: 28px;"/>
             </ui:VisualElement>
-            <ui:VisualElement name="Tabelle" class="table-wrapper" style="flex-grow: 1; flex-direction: column; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-left-color: rgb(91, 91, 91); border-right-color: rgb(91, 91, 91); border-top-color: rgb(91, 91, 91); border-bottom-color: rgb(91, 91, 91); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;">
-                <ui:VisualElement name="Table-Header" class="table-header-text" style="flex-direction: row; width: 100%; background-color: rgb(44, 44, 44); border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                    <ui:Label text="Name &amp; Verwendungszweck" class="col col-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Buchungstag" class="col col-datum" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Betrag" class="col col-betrag" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Art" class="col col-art" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Einnahme / Ausgabe" class="col col-typ" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:VisualElement class="col col-action" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); -unity-background-scale-mode: scale-to-fit; flex-grow: 0; flex-shrink: 0; width: 50px;" name="btn-help-tabelle"/>
+            <ui:VisualElement name="Tabelle" class="table-wrapper">
+                <ui:VisualElement name="Table-Header" class="row row-header">
+                    <ui:Label text="Name &amp; Verwendungszweck" class="cell cell-name"/>
+                    <ui:Label text="Buchungstag"                 class="cell cell-datum"/>
+                    <ui:Label text="Betrag"                      class="cell cell-betrag"/>
+                    <ui:Label text="Art"                         class="cell cell-art"/>
+                    <ui:Label text="Einnahme / Ausgabe"          class="cell cell-typ"/>
+                    <ui:VisualElement name="btn-help-tabelle" class="cell cell-action" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); -unity-background-scale-mode: scale-to-fit;"/>
                 </ui:VisualElement>
-                <ui:ScrollView name="tableBody" class="table-body" style="flex-grow: 1; border-bottom-width: 0;"/>
+                <ui:ScrollView name="tableBody" class="table-body" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="popup-overlay" class="popup-overlay" style="display: none; top: 2px; left: -2px;">
