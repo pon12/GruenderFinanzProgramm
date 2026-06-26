@@ -46,15 +46,25 @@ public class Finanzdashboard : MonoBehaviour
 
     private void RegistriereButtons()
     {
-        Button Finanzen1 = Root.Q<Button>("Finanzen1");
+        // "Wichtige Kennzahlen →" Button (oben mitte)
+        Button btnFinanzen1 = Root.Q<Button>("Finanzen1");
+        if (btnFinanzen1 != null)
+            btnFinanzen1.clicked += () => SceneManager.LoadScene("Finanzen1");
 
-        if (Finanzen1 == null)
-        {
-            Debug.LogWarning("[Finanzdashboard] btn-finanzen1 nicht gefunden");
-            return;
-        }
+        // "Details zum Kapital" Button (unten links)
+        Button btnKapital = Root.Q<Button>("btn-details-kapital");
+        if (btnKapital != null)
+            btnKapital.clicked += () => SceneManager.LoadScene("Finanzen1");
 
-        Finanzen1.clicked += OeffneFinanzen1;
+        // "Details zur Rentabilität" Button (unten mitte)
+        Button btnRentab = Root.Q<Button>("btn-details-rentab");
+        if (btnRentab != null)
+            btnRentab.clicked += () => SceneManager.LoadScene("Finanzen1");
+
+        // "Zum Kassenbuch" Button (unten rechts)
+        Button btnKassenbuch = Root.Q<Button>("btn-kassenbuch");
+        if (btnKassenbuch != null)
+            btnKassenbuch.clicked += () => SceneManager.LoadScene("Kassenbuch");
     }
 
 private void OeffneFinanzen1()
