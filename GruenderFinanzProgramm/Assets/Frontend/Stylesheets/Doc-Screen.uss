@@ -1,0 +1,572 @@
+/* =============================================
+   Doc-Screen.uss
+   Dokumente-Pool Stylesheet
+   Design 1:1 an Angebot.uss angelehnt:
+   Karten rgb(38,38,38), Border rgb(55,55,55), Hover-Grün rgb(128,207,149)
+   ============================================= */
+
+/* ---------- SEITEN-HEADER ---------- */
+.page-title {
+    font-size: 32px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    margin-bottom: 4px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+.page-subtitle {
+    font-size: 14px;
+    color: rgb(160, 160, 160);
+}
+
+/* ---------- GRUNDKARTE (wie .angebot-card) ---------- */
+.doc-card {
+    background-color: rgb(38, 38, 38);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    transition-property: border-color;
+    transition-duration: 0.15s;
+}
+
+.card-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+.card-subtitle {
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    margin-top: 2px;
+}
+
+/* ---------- GRID ---------- */
+.grid-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+/* ---------- KATEGORIE-KARTEN ---------- */
+.category-card {
+    width: 600px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 320px;
+    margin-right: 24px;
+    margin-bottom: 24px;
+    padding: 22px;
+    flex-direction: column;
+    gap: 16px;
+}
+.category-card:hover {
+    border-color: rgb(128, 207, 149);
+}
+
+.category-header-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+}
+
+.category-icon-tile {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    background-color: rgb(50, 50, 50);
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+}
+.category-icon-glyph {
+    font-size: 26px;
+}
+
+.category-title {
+    font-size: 19px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+.category-meta {
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    margin-top: 3px;
+}
+
+.lock-badge {
+    background-color: rgb(50, 50, 50);
+    border-radius: 8px;
+    padding: 3px 7px;
+    border-width: 1px;
+    border-color: rgb(80, 80, 80);
+}
+.lock-badge-glyph {
+    font-size: 12px;
+    color: rgb(230, 190, 100);
+}
+
+/* ---------- MINI-DOKUMENT-GRID 2x2 IN DER KARTE ---------- */
+.category-doc-grid-2x2 {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.doc-mini-slot {
+    width: 47%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    height: 82px;
+    overflow: hidden;
+    background-color: rgb(50, 50, 50);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(65, 65, 65);
+    padding: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    transition-property: border-color;
+    transition-duration: 0.12s;
+}
+.doc-mini-slot:hover {
+    border-color: rgb(100, 100, 100);
+}
+
+.doc-mini-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    background-color: rgb(40, 40, 40);
+    border-radius: 7px;
+}
+
+.doc-mini-content {
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 2px;
+}
+.doc-mini-title {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(235, 235, 235);
+    white-space: normal;
+}
+.doc-mini-inhalt {
+    font-size: 12px;
+    color: rgb(160, 160, 160);
+    white-space: normal;
+}
+.doc-mini-inhalt-leer {
+    font-size: 12px;
+    color: rgb(100, 100, 100);
+    -unity-font-style: italic;
+    white-space: normal;
+}
+.doc-mini-empty-label {
+    font-size: 13px;
+    color: rgb(105, 105, 105);
+    -unity-font-style: italic;
+}
+
+.doc-mini-plus {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background-color: rgb(40, 40, 40);
+    border-width: 1px;
+    border-color: rgb(70, 70, 70);
+    color: rgb(128, 207, 149);
+    font-size: 14px;
+    -unity-font-style: bold;
+    padding: 0;
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.doc-mini-plus:hover {
+    background-color: rgb(128, 207, 149);
+    border-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+}
+.doc-mini-plus:active {
+    background-color: rgb(108, 176, 127);
+    border-color: rgb(108, 176, 127);
+}
+
+/* ---------- ALLGEMEINE BUTTONS (Styleguide: Primär #80CF95, Sekundär #646464) ---------- */
+.doc-btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-width: 0;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.doc-btn-primary:hover {
+    background-color: rgb(147, 216, 165);
+}
+.doc-btn-primary:active {
+    background-color: rgb(108, 176, 127);
+}
+.doc-btn-primary:disabled {
+    opacity: 0.4;
+}
+
+.doc-btn-secondary {
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    border-width: 0;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.doc-btn-secondary:hover {
+    background-color: rgb(120, 120, 120);
+}
+.doc-btn-secondary:active {
+    background-color: rgb(80, 80, 80);
+}
+
+.doc-btn-danger-outline {
+    background-color: transparent;
+    color: rgb(230, 57, 70);
+    border-width: 1px;
+    border-color: rgb(230, 57, 70);
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    transition-property: background-color, color;
+    transition-duration: 0.1s;
+}
+.doc-btn-danger-outline:hover {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+}
+.doc-btn-danger-outline:active {
+    background-color: rgb(180, 40, 52);
+}
+
+/* ---------- "ALLE ANZEIGEN" BUTTON IN DER KARTE — Sekundärbutton-Variante ---------- */
+.doc-btn-add-inline {
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    border-width: 0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.doc-btn-add-inline:hover {
+    background-color: rgb(120, 120, 120);
+}
+.doc-btn-add-inline:active {
+    background-color: rgb(80, 80, 80);
+}
+
+/* ---------- POPUP OVERLAY (shared) ---------- */
+.popup-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.popup-window {
+    width: 100%;
+    max-width: 600px;
+    padding: 28px;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.popup-header-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.popup-footer-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.form-group {
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.field-label {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 6px;
+}
+
+/* ---------- VORLAGEN-AUSWAHL ---------- */
+.template-grid {
+    flex-direction: row;
+    gap: 12px;
+}
+.template-btn {
+    flex-grow: 1;
+    height: 70px;
+    background-color: rgb(50, 50, 50);
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: rgb(65, 65, 65);
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    -unity-font-style: bold;
+    justify-content: center;
+    align-items: center;
+    transition-property: border-color, background-color;
+    transition-duration: 0.1s;
+}
+.template-btn:hover {
+    background-color: rgb(44, 44, 44);
+    border-color: rgb(128, 207, 149);
+}
+.selected-template {
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+    background-color: rgba(128, 207, 149, 0.14);
+    color: rgb(128, 207, 149);
+}
+
+/* ---------- DETAIL-POPUP (Listen) ---------- */
+.detail-popup-box {
+    width: 100%;
+    max-width: 980px;
+    height: 80%;
+    padding: 28px;
+    flex-direction: column;
+}
+
+.split-body-layout {
+    flex-direction: row;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.column-half {
+    flex: 1;
+    flex-direction: column;
+}
+
+.column-header-title {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    margin-bottom: 10px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+
+.scroll-list-box {
+    flex-grow: 1;
+    background-color: rgb(30, 30, 30);
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    padding: 8px;
+}
+
+.list-row-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.list-row-item:hover {
+    background-color: rgb(44, 44, 44);
+}
+
+.list-row-label {
+    font-size: 13px;
+    color: rgb(220, 220, 220);
+    flex-grow: 1;
+    white-space: normal;
+}
+
+.list-row-inhalt-preview {
+    font-size: 11px;
+    color: rgb(140, 140, 140);
+    -unity-font-style: italic;
+    margin-right: 10px;
+    white-space: normal;
+}
+
+.list-empty-hint {
+    -unity-text-align: middle-center;
+    margin-top: 16px;
+    color: rgb(120, 120, 120);
+    font-size: 13px;
+}
+
+.row-btn-group {
+    flex-direction: row;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.btn-add-global {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-width: 0;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.btn-add-global:hover { background-color: rgb(147, 216, 165); }
+.btn-add-global:active { background-color: rgb(108, 176, 127); }
+
+/* Sichtbare Text-Buttons statt leerer Icon-Buttons */
+.btn-action-text {
+    height: 32px;
+    border-radius: 6px;
+    border-width: 1px;
+    padding: 0 14px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
+}
+.btn-edit-pen {
+    background-color: rgb(100, 100, 100);
+    border-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+}
+.btn-edit-pen:hover {
+    background-color: rgb(120, 120, 120);
+    border-color: rgb(120, 120, 120);
+}
+.btn-edit-pen:active {
+    background-color: rgb(80, 80, 80);
+}
+.btn-minus-delete {
+    background-color: rgba(230, 57, 70, 0.12);
+    border-color: rgba(230, 57, 70, 0.4);
+    color: rgb(230, 57, 70);
+}
+.btn-minus-delete:hover {
+    background-color: rgb(230, 57, 70);
+    border-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+}
+.btn-minus-delete:active {
+    background-color: rgb(180, 40, 52);
+    border-color: rgb(180, 40, 52);
+}
+
+.locked-badge-inline {
+    font-size: 10px;
+    color: rgb(230, 190, 100);
+    background-color: rgba(230, 190, 100, 0.12);
+    border-width: 1px;
+    border-color: rgba(230, 190, 100, 0.4);
+    border-radius: 6px;
+    padding: 5px 10px;
+    -unity-font-style: bold;
+}
+
+/* ---------- BEARBEITEN-POPUP ---------- */
+.edit-popup-box {
+    width: 100%;
+    max-width: 520px;
+    padding: 28px;
+    flex-direction: column;
+}
+
+/* ---------- LÖSCH-BESTÄTIGUNGS-POPUP ---------- */
+.delete-confirm-box {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px;
+    flex-direction: column;
+}
+.delete-confirm-hint {
+    font-size: 13px;
+    color: rgb(220, 220, 220);
+    white-space: normal;
+    line-height: 1.5;
+}
+
+/* ---------- LESE-POPUP (Wissensdatenbank) ---------- */
+.view-popup-box {
+    width: 100%;
+    max-width: 620px;
+    padding: 28px;
+    flex-direction: column;
+}
+.view-popup-text {
+    font-size: 14px;
+    color: rgb(220, 220, 220);
+    white-space: normal;
+    line-height: 1.6;
+}
+
+.locked-hint {
+    font-size: 12px;
+    color: rgb(230, 190, 100);
+    background-color: rgb(50, 45, 30);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    white-space: normal;
+}
+
+.edit-textarea {
+    min-height: 90px;
+}
+
+/* ---------- INPUT-FELDER (gleich wie Angebot.uss) ---------- */
+.unity-base-field__input,
+.unity-text-field__input,
+.unity-base-popup-field__input {
+    background-color: rgb(70, 70, 70);
+    border-width: 0;
+    border-radius: 6px;
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    -unity-cursor-color: rgb(255, 255, 255);
+}
+.unity-base-field__input:focus {
+    border-width: 1px;
+    border-color: rgb(128, 207, 149);
+}
+.unity-base-field__label {
+    display: none;
+}
+
+/* Fehler-Hervorhebung für Pflichtfeld "Dokumenttitel" */
+.input-error .unity-base-field__input {
+    border-width: 1px;
+    border-color: rgb(230, 57, 70);
+}

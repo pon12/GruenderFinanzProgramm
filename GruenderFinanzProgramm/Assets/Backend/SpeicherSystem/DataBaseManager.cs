@@ -213,7 +213,33 @@ public abstract class DatabaseManager : MonoBehaviour
         }
     }
 
+        public virtual int insertAndGetId<T>(T item) where T : new()
+        {
+            if (database == null)
+            {
+                Debug.LogError($"Database '{databaseName}' is not initialized. Cannot insert '{typeof(T).Name}'.");
+                return -1;
+            }
 
+            try
+            {
+                database.Insert(item);
+
+                object primaryKeyValue = database.GetMapping(typeof(T)).PK.GetValue(item);
+
+                int id = Convert.ToInt32(primaryKeyValue);
+
+                Debug.Log($"Inserted record into '{typeof(T).Name}' table. New ID: {id}");
+
+                return id;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to insert record and get ID: {ex.Message}");
+                return -1;
+            }
+        }
+    
     public virtual List<T> query<T>(string queryString) where T : new()
     {
         if (database == null)

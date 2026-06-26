@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Dienstleistungen.uss?fileID=7433441132597879392&amp;guid=01fec56cd8896774fab0da40d32297db&amp;type=3#Dienstleistungen"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/HelpTooltip.uss"/>
+    <ui:VisualElement class="popup-box">
+        <!-- Popup-Header mit ? -->
+        <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+            <ui:Label text="Dienstleistung" class="popup-titel" style="margin-bottom: 0; flex-grow: 1;"/>
+            <ui:VisualElement name="btn-help-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+        </ui:VisualElement>
+        <ui:Label text="Name" class="popup-label"/>
+        <ui:TextField name="feld-titel" class="popup-input"/>
+        <ui:Label text="Beschreibung" class="popup-label"/>
+        <ui:TextField name="feld-beschreibung" class="popup-input"/>
+        <!-- Preismodell mit ? -->
+        <ui:VisualElement style="flex-direction: row; align-items: center;">
+            <ui:Label text="Preismodell" class="popup-label" style="flex-grow: 1; margin-bottom: 0;"/>
+            <ui:VisualElement name="btn-help-preismodell-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px; margin-bottom: 6px;"/>
+        </ui:VisualElement>
+        <ui:DropdownField name="feld-preismodell" choices="Festpreis,Stundensatz,Pauschal" index="0" class="popup-dropdown"/>
+        <ui:Label text="Betrag" class="popup-label"/>
+        <ui:TextField name="feld-betrag" class="popup-input"/>
+        <ui:Button name="btn-fertig" text="Fertig" class="popup-btn-fertig"/>
+    </ui:VisualElement>
+</ui:UXML>

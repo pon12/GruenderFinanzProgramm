@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/TestSzenen/Dienstleistungen.unity
     guid: bedc143777864e94582d010be6e83b36
   - enabled: 1
-    path: Assets/Scenes/TestSzenen/Kassenbuch.unity
+    path: Assets/Scenes/Kassenbuch.unity
     guid: b195a52d9bf0abc40bf82f095633095b
   - enabled: 1
     path: Assets/Scenes/Dokument-Screen.unity
@@ -36,9 +36,33 @@ EditorBuildSettings:
     path: Assets/Scenes/Angebot.unity
     guid: 4d18be9d94918b04486f37264d8f222d
   - enabled: 1
-    path: Assets/Scenes/Fortschritt.unity
+    path: "Assets/Scenes/Gr\xFCndungspfad.unity"
     guid: dbd37b72ebe3795418633166cc352807
   - enabled: 1
     path: Assets/Scenes/Rechnung.unity
     guid: f7afd682bded2104b8b63e991f2c4115
+  - enabled: 1
+    path: Assets/Scenes/Wissensdatenbank.unity
+    guid: 474dc193bf588144ba8da8dc6f0e91ba
+  - enabled: 1
+    path: Assets/Scenes/Finanzdashboard.unity
+    guid: 488f105f3a4ef46439521e4a400878dc
+  - enabled: 1
+    path: Assets/Scenes/Finanzen3.unity
+    guid: a0da584a6c2bd2a44bf0237eb28b0e2a
+  - enabled: 1
+    path: Assets/Scenes/Finanzen1.unity
+    guid: c4745a707f6c0c94c9476b354bd38d41
+  - enabled: 1
+    path: Assets/Scenes/Finanzen2.unity
+    guid: 269efaecfcd32984ab5a1e39f6ed3eb1
+  - enabled: 1
+    path: Assets/Scenes/Buchhaltung.unity
+    guid: 3223ecc4fc5f1a94da507ab8e65cfa31
+  - enabled: 1
+    path: Assets/Scenes/Erfolge.unity
+    guid: 0885218bb9ce838428b58ba8978f6dd7
+  - enabled: 1
+    path: Assets/Scenes/Fortschritt.unity
+    guid: 1a325552a479336479c5b58934c863e5
   m_configObjects: {}

@@ -4,14 +4,15 @@ using System.IO;
 using UnityEngine;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-
+using iTextSharp.text.pdf.draw;
 public static class InvoicePdfExporter
 {
     public static UserPDFDocument ExportInvoiceToPdf(
         Invoice invoice,
         List<InvoiceItem> items,
         int userId,
-        DataBase db
+        DataBase db,
+        List<string> anhaenge = null
     )
     {
         string folderPath = Path.Combine(
@@ -40,7 +41,12 @@ public static class InvoicePdfExporter
 
             using (FileStream fs = new FileStream(filePath, FileMode.Create))
             {
-                PdfWriter.GetInstance(doc, fs);
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent(
+                invoice.companyName,
+                invoice.companyAddress,
+                true
+                );
 
                 doc.AddAuthor("Ventoriq");
                 doc.AddTitle("Rechnung " + invoice.invoiceNumber);
@@ -76,7 +82,50 @@ public static class InvoicePdfExporter
                         new iTextSharp.text.Color(128, 128, 128)
                     );
 
+                iTextSharp.text.Font footerFont =
+                FontFactory.GetFont(
+                FontFactory.HELVETICA,
+                9
+                    );
+
                 // =========================
+                // KUNDE und firma
+                // =========================
+
+                PdfPTable adressen = new PdfPTable(2);
+                adressen.WidthPercentage = 100f;
+                adressen.SetWidths(new float[] { 1f, 1f });
+
+                PdfPCell kundeCell = new PdfPCell();
+                kundeCell.Border = Rectangle.NO_BORDER;
+                kundeCell.AddElement(new Paragraph("Kunde", headerFont));
+
+                if (!string.IsNullOrEmpty(invoice.customerAddress))
+                {
+                    kundeCell.AddElement(new Paragraph(invoice.customerAddress, normalFont));
+                }
+
+                PdfPCell firmaCell = new PdfPCell();
+                firmaCell.Border = Rectangle.NO_BORDER;
+                firmaCell.AddElement(new Paragraph("Absender", headerFont));
+
+                if (!string.IsNullOrEmpty(invoice.companyName))
+                {
+                    firmaCell.AddElement(new Paragraph(invoice.companyName, normalFont));
+                }
+
+                if (!string.IsNullOrEmpty(invoice.companyAddress))
+                {
+                    firmaCell.AddElement(new Paragraph(invoice.companyAddress, normalFont));
+                }
+
+                adressen.AddCell(kundeCell);
+                adressen.AddCell(firmaCell);
+
+                doc.Add(adressen);
+                doc.Add(new Paragraph(" "));
+                
+               // =========================
                 // TITEL
                 // =========================
 
@@ -89,23 +138,7 @@ public static class InvoicePdfExporter
 
                 doc.Add(invoiceTitle);
                 doc.Add(new Paragraph(" "));
-
-                // =========================
-                // FIRMA
-                // =========================
-
-                doc.Add(new Paragraph(
-                    invoice.companyName,
-                    headerFont
-                ));
-
-                doc.Add(new Paragraph(
-                    invoice.companyAddress,
-                    normalFont
-                ));
-
-                doc.Add(new Paragraph(" "));
-
+               
                 // =========================
                 // RECHNUNGSDATEN
                 // =========================
@@ -126,44 +159,20 @@ public static class InvoicePdfExporter
                 ));
 
                 doc.Add(new Paragraph(" "));
-
-                // =========================
-                // KUNDE
-                // =========================
-
-                doc.Add(new Paragraph(
-                    "Kunde: " + invoice.customerName,
-                    headerFont
-                ));
-
-                if (!string.IsNullOrEmpty(invoice.customerAddress))
-                {
-                    doc.Add(new Paragraph(
-                        invoice.customerAddress,
-                        normalFont
-                    ));
-                }
-
-                doc.Add(new Paragraph(" "));
-
+                
                 // =========================
                 // TABELLE
                 // =========================
 
-                PdfPTable table = new PdfPTable(4);
+                PdfPTable table = new PdfPTable(5);
 
                 table.WidthPercentage = 100f;
 
                 table.SetWidths(
                     new float[]
-                    {
-                        3.5f,
-                        1f,
-                        1.2f,
-                        1.2f
-                    }
+                    {1.4f, 3.0f, 1f, 1.2f, 1.2f }
                 );
-
+                AddHeaderCell(table, "Leistung", headerFont);
                 AddHeaderCell(table, "Beschreibung", headerFont);
                 AddHeaderCell(table, "Menge", headerFont);
                 AddHeaderCell(table, "Einzel (€)", headerFont);
@@ -171,6 +180,12 @@ public static class InvoicePdfExporter
 
                 foreach (InvoiceItem item in items)
                 {
+                   AddBodyCell(
+                    table, 
+                    item.articleNumber, 
+                    normalFont
+                    );
+                   
                     AddBodyCell(
                         table,
                         item.description,
@@ -205,53 +220,44 @@ public static class InvoicePdfExporter
                 // =========================
                 // SUMMEN
                 // =========================
+                
+                double positionenGesamt = 0;
 
+                foreach (InvoiceItem item in items)
+                {
+                    positionenGesamt += item.calculatedTotal;
+                }
+                double rabatt = invoice.discount;
+                double skonto = invoice.extraCosts;
+                int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
+                double mwstSatz = steuersatz / 100.0;
+                double steuerBasis = positionenGesamt - rabatt;
+                double mwst = steuerBasis * mwstSatz;
+                double zwischensumme = steuerBasis + mwst;
+                double gesamt = zwischensumme - skonto;
+                
                 PdfPTable totals = new PdfPTable(2);
-
+                totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
 
-                AddBodyCell(
-                    totals,
-                    "Zwischensumme:",
-                    normalFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "Netto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, positionenGesamt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals,
-                    invoice.subtotal.ToString("0.00") + " €",
-                    normalFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "Rabatt:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + rabatt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals,
-                    "MwSt:",
-                    normalFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "MwSt (" + steuersatz + "%):", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, mwst.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals,
-                    invoice.tax.ToString("0.00") + " €",
-                    normalFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "Zwischenbetrag:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, zwischensumme.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals,
-                    "Gesamt:",
-                    headerFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "Skonto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + skonto.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals,
-                    invoice.total.ToString("0.00") + " €",
-                    headerFont,
-                    Element.ALIGN_RIGHT
-                );
+                AddBodyCell(totals, "Brutto:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, gesamt.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
                 doc.Add(totals);
 
@@ -274,6 +280,40 @@ public static class InvoicePdfExporter
                     ));
                 }
 
+                PdfPTable closingTable = new PdfPTable(1);
+                closingTable.WidthPercentage = 100f;
+                closingTable.SplitRows = false;
+                closingTable.KeepTogether = true;
+
+                PdfPCell closingCell = new PdfPCell();
+                closingCell.Border = Rectangle.NO_BORDER;
+
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                "Vielen Dank für Ihren Auftrag. Bitte begleichen Sie den Rechnungsbetrag innerhalb der angegebenen Zahlungsfrist.",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                    "Mit freundlichen Grüßen",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingTable.AddCell(closingCell);
+
+                doc.Add(closingTable);
+
+
+
+
+
+
+
                 // =========================
                 // FOOTER
                 // =========================
@@ -284,12 +324,10 @@ public static class InvoicePdfExporter
                 Paragraph footer = new Paragraph(
                     "Erstellt am " +
                     DateTime.Now.ToString("dd.MM.yyyy"),
-                    grayFont
+                    footerFont
                 );
 
-                footer.Alignment = Element.ALIGN_CENTER;
-
-                doc.Add(footer);
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge, invoice.status);
 
                 doc.Close();
             }
@@ -352,5 +390,21 @@ public static class InvoicePdfExporter
 
         table.AddCell(cell);
     }
+private static void AddFooterCell(
+    PdfPTable table,
+    string text,
+    iTextSharp.text.Font font
+)
+{
+    PdfPCell cell = new PdfPCell(new Phrase(text, font));
+    cell.Border = Rectangle.NO_BORDER;
+    cell.PaddingTop = 6;
+    cell.PaddingRight = 10;
+    cell.HorizontalAlignment = Element.ALIGN_LEFT;
+    table.AddCell(cell);
+}
+
+
+
 }
 

@@ -1,0 +1,145 @@
+#card-Lokaler-Nutzer {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+#card-Lokaler-Nutzer:hover {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}
+
+#card-Zwischenbar {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+TextField > #unity-text-input {
+    background-color: rgb(70, 70, 70);
+}
+
+.textfield-styled > #unity-text-input {
+    background-color: rgb(70, 70, 70);
+    border-left-color: rgb(70, 70, 70);
+    border-right-color: rgb(70, 70, 70);
+    border-top-color: rgb(70, 70, 70);
+    border-bottom-color: rgb(70, 70, 70);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+.textfield-styled > #unity-text-input:hover {
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}
+
+.btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 35px;
+    padding-right: 35px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    height: 40px;
+    align-self: center;
+}
+
+.btn-primary:hover {
+    background-color: rgb(179, 226, 196);
+}
+.btn-primary:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.btn-primary-pop-up {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 35px;
+    padding-right: 35px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    height: 40px;
+    align-self: center;
+    margin-bottom: 40px;
+}
+
+.btn-primary-pop-up:hover {
+    background-color: rgb(179, 226, 196);
+}
+.btn-primary-pop-up:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.btn-danger-pop-up {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    margin-bottom: 40px;
+}
+
+.btn-danger-pop-up:hover {
+    background-color: rgb(229, 103, 112);
+}
+.btn-danger-pop-up:active {
+    background-color: rgb(243, 6, 24);
+}

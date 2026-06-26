@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 408463287}
-  - component: {fileID: 408463286}
+  - component: {fileID: 408463288}
   m_Layer: 0
   m_Name: _DashboardManager
   m_TagString: Untagged
@@ -136,20 +136,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &408463286
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 408463285}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c697ff3eb009f1141aa6c6aec3b799f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DocumentDashboard
-  uiDocument: {fileID: 666096093}
-  categoryCardTemplate: {fileID: 9197481963319205126, guid: 9b419d2b28d59b040b9981302d044860, type: 3}
 --- !u!4 &408463287
 Transform:
   m_ObjectHideFlags: 0
@@ -165,6 +151,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &408463288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408463285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5690eb817d7a5d64d87d0273751e61cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DocumentDashboard
+  uiDocument: {fileID: 666096093}
+  categoryCardTemplate: {fileID: 9197481963319205126, guid: 02c017225ddc5c249b5187f5249bae66, type: 3}
+  helpIconTexture: {fileID: 2800000, guid: 1ea511ec5bd6a8148ab87a586b001f57, type: 3}
 --- !u!1 &666096092
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: f0e52e98fbf590d4f9a864cb7e3f3b48, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 7f4e217df42c1384182adbc9f8aa1a5b, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1

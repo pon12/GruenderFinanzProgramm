@@ -1,0 +1,86 @@
+#card-kunden-item-template {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+#card-kunden-item-template:hover {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-top-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+}
+
+.btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 45px;
+    padding-right: 45px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    height: 40px;
+    align-self: center;height: 40px;
+    align-self: center;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.btn-primary:hover {
+    background-color: rgb(179, 226, 196);
+}
+.btn-primary:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.btn-danger {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 45px;
+    padding-right: 45px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    height: 40px;
+    align-self: center;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.btn-danger:hover {
+    background-color: rgb(229, 103, 112);
+}
+.btn-danger:active {
+    background-color: rgb(243, 6, 24);
+}

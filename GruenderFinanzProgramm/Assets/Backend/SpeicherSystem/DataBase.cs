@@ -14,6 +14,9 @@ public class DataBase : DatabaseManager
         createTable<TextDocumentMeta>();
         createTable<Ausgaben>();
         createTable<Einkommen>();
+        // Migration: Art-Spalte hinzufügen falls noch nicht vorhanden
+        try { database.Execute("ALTER TABLE Einkommen ADD COLUMN Art TEXT DEFAULT ''"); } catch {}
+        try { database.Execute("ALTER TABLE Ausgaben ADD COLUMN Art TEXT DEFAULT ''"); } catch {}
         createTable<Dauerauftrag>();
         createTable<GruenderpfadEintrag>();
         createTable<Offer>();
@@ -72,17 +75,25 @@ public class DataBase : DatabaseManager
     {
         return getAll<Company>();
     }
-    public int createCompany(string name, int legalForm, int industry, string location)
+ public int createCompany(string name, int legalForm, int industry, string location, string steuerNr, string gruendungsJahr, string handelsReg, string strasseuHausNr, int plz, string ustIdNr, string email, string handyNr)
+{
+    Company newCompany = new Company
     {
-        Company newCompany = new Company
-        {
-            name = name,
-            legalForm = legalForm,
-            industry = industry,
-            location = location
-        };
-        return insert(newCompany);
-    }
+        name = name,
+        legalForm = legalForm,
+        industry = industry,
+        location = location,
+        steuerNr = steuerNr,
+        gruendungsJahr = gruendungsJahr,    
+        handelsReg = handelsReg,
+        strasseuHausNr = strasseuHausNr,
+        plz = plz,
+        ustIdNr = ustIdNr,
+        email = email,
+        handyNr = handyNr
+    };
+    return insert(newCompany);
+}
     public int updateCompany(Company company)
     {
         return update(company);
@@ -126,44 +137,44 @@ public class DataBase : DatabaseManager
     }
     // --- Rechnungen ---
 
-    public int createInvoice(Invoice invoice)
-    {
-        return insert(invoice);
-    }
-    public int updateInvoice(Invoice invoice)
-    {
-        return update(invoice);
-    }
-    public int deleteInvoice(int id)
-    {
-        return delete<Invoice>(id);
-    }
-    public List<Invoice> getAllInvoices()
-    {
-        return getAll<Invoice>();
-    }
-    public Invoice getInvoiceById(int id)
-    {
-        return getById<Invoice>(id);
-    }
-    public List<InvoiceItem> getItemsByInvoice(int invoiceId)
-    {
-        return query<InvoiceItem>(
-            $"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}"
-        );
-    }
-    public int createInvoiceItem(InvoiceItem item)
-    {
-        return insert(item);
-    }
-    public int updateInvoiceItem(InvoiceItem item)
-    {
-        return update(item);
-    }
-    public int deleteInvoiceItem(int id)
-    {
-        return delete<InvoiceItem>(id);
-    }
+public int createInvoice(Invoice invoice)
+{
+    return insertAndGetId(invoice);
+}
+public int updateInvoice(Invoice invoice)
+{
+    return update(invoice);
+}
+public int deleteInvoice(int id)
+{
+    return delete<Invoice>(id);
+}
+public List<Invoice> getAllInvoices()
+{
+    return getAll<Invoice>();
+}
+public Invoice getInvoiceById(int id)
+{
+    return getById<Invoice>(id);
+}
+public List<InvoiceItem> getItemsByInvoice(int invoiceId)
+{
+    return query<InvoiceItem>(
+        $"SELECT * FROM InvoiceItem WHERE invoiceId = {invoiceId}"
+    );
+}
+public int createInvoiceItem(InvoiceItem item)
+{
+    return insert(item);
+}
+public int updateInvoiceItem(InvoiceItem item)
+{
+    return update(item);
+}
+public int deleteInvoiceItem(int id)
+{
+    return delete<InvoiceItem>(id);
+}
 
     // --- Angebote ---
 
@@ -249,7 +260,6 @@ public class DataBase : DatabaseManager
 
     public int createService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return insert(service);
     }
 
@@ -265,7 +275,6 @@ public class DataBase : DatabaseManager
 
     public int updateService(Service service)
     {
-        service.lastUpdated = System.DateTime.Now;
         return update(service);
     }
 
@@ -311,14 +320,14 @@ public class DataBase : DatabaseManager
         createTable<Dauerauftrag>();
     }
 
-    public int createEinkommen(float amount, string description, string datum)
+    public int createEinkommen(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum });
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
     }
 
-    public int createAusgaben(float amount, string description, string datum)
+    public int createAusgaben(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum });
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie  });
     }
 
     public List<Einkommen> getAllEinkommenEntries()
@@ -380,6 +389,22 @@ public class DataBase : DatabaseManager
     public List<UserDocument> getAllUserDocuments()
     {
         return getAll<UserDocument>();
+    }
+
+    public int deleteUserDocument(int id)
+    {
+        return delete<UserDocument>(id);
+    }
+
+    public int deleteAllUserDocumentsByType(int documentType)
+    {
+        var docs = getAllUserDocuments();
+        if (docs == null) return 0;
+        int count = 0;
+        foreach (var doc in docs)
+            if (doc.documentType == documentType)
+                count += delete<UserDocument>(doc.id);
+        return count;
     }
 
 
@@ -549,11 +574,11 @@ public class DataBase : DatabaseManager
 
             if (dauerauftrag.typ == "Einnahme")
             {
-                createEinkommen(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+                createEinkommen(dauerauftrag.amount, dauerauftrag.description, buchungsDatum, "Platzhalter");
             }
             else if (dauerauftrag.typ == "Ausgabe")
             {
-                createAusgaben(dauerauftrag.amount, dauerauftrag.description, buchungsDatum);
+                createAusgaben(dauerauftrag.amount, dauerauftrag.description, buchungsDatum, "Platzhalter");
             }
             else
             {
@@ -721,5 +746,137 @@ public class DataBase : DatabaseManager
 
         return delete<TextDocumentMeta>(documentId);
     }
+
+
+// Settings
+
+public int createSettings(string rechnungsNrPräfix, string startNr, string zahlungsziel, int waehrung, int dtmFormat,  
+bool ustRechnung, bool autoNummer, string zahlungshinweis, string kontoInhaber, string iban, string bic, string kreditinstitut, 
+bool ibanRechnung, bool logo, bool seitenzahl ,bool exportpfad, int steuersatz, bool Begleiter, string emailFirma, 
+string teleponNrFirma,string websitefrima, string nutzer)
+{
+    Settings newSettings = new Settings
+    {
+        rechnungsNrPräfix = rechnungsNrPräfix,
+        startNr = startNr,
+        zahlungsziel = zahlungsziel,
+        waehrung = waehrung,
+        dtmFormat = dtmFormat,
+        ustRechnung = ustRechnung,
+        autoNummer = autoNummer,
+        zahlungshinweis = zahlungshinweis,
+        kontoInhaber = kontoInhaber,
+        iban = iban,
+        bic = bic,
+        kreditinstitut = kreditinstitut,
+        ibanRechnung = ibanRechnung,
+        logo = logo,
+        seitenzahl = seitenzahl,
+        exportpfad = exportpfad,
+        steuersatz = steuersatz,
+        Begleiter = Begleiter,
+        emailFirma = emailFirma,
+        teleponNrFirma = teleponNrFirma,
+        websitefrima = websitefrima,
+        nutzer = nutzer
+    };
+    return insert(newSettings);
+}
+
+public List<Settings> getAllSettings()
+{
+    return getAll<Settings>();
+}
+
+public int deleteSettings(int id)
+{
+    return delete<Settings>(id);
+}
+
+public int updateSettings(Settings settings)
+{
+    return update(settings);
+}
+
+
+//Finanzdaten 
+
+public int createFinanzdaten(int monat,int ausgaben,int einahmenTotal,int erstellteAng ,int angenommenAng, int erstellteRech ,int angenommenRech)
+{
+    Finanzdaten newFinanzdaten = new Finanzdaten
+    {
+        monat = monat,
+        ausgaben = ausgaben,
+        einahmenTotal = einahmenTotal,
+        erstellteAng = erstellteAng,
+        angenommenAng = angenommenAng,
+        erstellteRech = erstellteRech,
+        angenommenRech = angenommenRech
+    };
+    return insert(newFinanzdaten);
+}
+
+public List<Finanzdaten> getAllFinanzdaten()
+{
+    return getAll<Finanzdaten>();
+}
+
+public int deleteFinanzdatenMonat(int monat)
+{
+    return delete<Finanzdaten>(monat);
+}
+
+public int updateFinanzdaten(Finanzdaten finanzdaten)
+{
+    return update(finanzdaten);
+}
+
+public Finanzdaten  getFinanzdatenMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+
+}
+
+public List<Finanzdaten> orderFinanzdatenASC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat ASC");
+}
+
+public List<Finanzdaten> orderFinanzdatenDESC()
+{
+    return query<Finanzdaten>($"SELECT * FROM Finanzdaten ORDER BY monat DESC");
+}
+
+public Finanzdaten getAusgabenbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT ausgaben FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getEinahmenTotalbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT einahmenTotal FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenAngbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenAng FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getErstellteRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT erstellteRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+public Finanzdaten  getAngenommenRechbyMonat(int monat)
+{
+    return query<Finanzdaten>($"SELECT angenommenRech FROM Finanzdaten WHERE monat = {monat}").FirstOrDefault();;
+}
+
+
 
 }

@@ -12,10 +12,16 @@
   <component name="ChangeListManager">
     <list default="true" id="c9b04849-62dd-48ee-a981-e0371bfeb1a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/Popup Dienstleistungen.uxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/Popup Dienstleistungen.uxml.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/Popup.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/Popup.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +35,10 @@
     <commands />
     <urls />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 8
@@ -38,26 +48,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "cidr.known.project.marker": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Alina",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Alina-will-nicht-mehr&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Unity.exe" />
@@ -130,12 +140,62 @@
       <workItem from="1780485218758" duration="36000" />
       <workItem from="1780485376655" duration="14000" />
       <workItem from="1780858478379" duration="6000" />
+      <workItem from="1781778241332" duration="380000" />
+      <workItem from="1781809507618" duration="463000" />
+      <workItem from="1781810119374" duration="1241000" />
+      <workItem from="1781811461877" duration="122000" />
+      <workItem from="1781811606316" duration="7000" />
+      <workItem from="1781811784814" duration="160000" />
+      <workItem from="1781813312497" duration="284000" />
+      <workItem from="1781813617290" duration="107000" />
+      <workItem from="1781813897236" duration="179000" />
+      <workItem from="1781814093553" duration="15000" />
+      <workItem from="1781814150648" duration="23000" />
+      <workItem from="1781814195845" duration="103000" />
+      <workItem from="1781814412173" duration="18000" />
+      <workItem from="1781815778498" duration="9000" />
+      <workItem from="1781815808795" duration="67000" />
+      <workItem from="1782045041310" duration="37000" />
+      <workItem from="1782045109343" duration="31000" />
+      <workItem from="1782045156377" duration="350000" />
+      <workItem from="1782045778927" duration="552000" />
+      <workItem from="1782047062335" duration="14000" />
+      <workItem from="1782047807337" duration="7000" />
+      <workItem from="1782048078742" duration="51000" />
+      <workItem from="1782052585439" duration="305000" />
+      <workItem from="1782293945606" duration="144000" />
+      <workItem from="1782295256043" duration="346000" />
+      <workItem from="1782295671165" duration="569000" />
+      <workItem from="1782382093332" duration="2164000" />
+      <workItem from="1782385905457" duration="776000" />
+      <workItem from="1782386719181" duration="10000" />
+      <workItem from="1782387004263" duration="6000" />
+      <workItem from="1782387048179" duration="22000" />
+      <workItem from="1782387090126" duration="51000" />
+      <workItem from="1782387180094" duration="497000" />
+      <workItem from="1782387714614" duration="527000" />
+      <workItem from="1782388299367" duration="743000" />
+      <workItem from="1782389903409" duration="1159000" />
+      <workItem from="1782391094371" duration="20000" />
+      <workItem from="1782392161338" duration="15000" />
+      <workItem from="1782393316565" duration="10000" />
+      <workItem from="1782394130510" duration="6000" />
+      <workItem from="1782403506776" duration="171000" />
+      <workItem from="1782403715043" duration="1463000" />
+      <workItem from="1782405219831" duration="1374000" />
+      <workItem from="1782408583911" duration="191000" />
+      <workItem from="1782409050193" duration="1329000" />
+      <workItem from="1782426791142" duration="5342000" />
+      <workItem from="1782432266411" duration="5000" />
+      <workItem from="1782432297312" duration="11000" />
+      <workItem from="1782432388139" duration="6000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
     <option name="hasUnityReference" value="true" />
