@@ -11,7 +11,8 @@ public static class OfferPdfExporter
         Offer offer,
         List<OfferItem> items,
         int userId,
-        DataBase db
+        DataBase db,
+        List<string> anhaenge = null
     )
     {
         string folderPath = Path.Combine(
@@ -37,7 +38,8 @@ public static class OfferPdfExporter
                 PdfWriter writer = PdfWriter.GetInstance(doc, fs);
                 writer.PageEvent = new PdfFooterEvent(
                 offer.companyName,
-                offer.companyAddress
+                offer.companyAddress,
+                true
             );
 
                 doc.AddAuthor("Ventoriq");
@@ -294,6 +296,8 @@ public static class OfferPdfExporter
                     "Erstellt am " + DateTime.Now.ToString("dd.MM.yyyy"),
                     footerFont
                 );
+
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge, offer.status, "Angebot");
 
                 doc.Close();
             }

@@ -11,7 +11,8 @@ public static class InvoicePdfExporter
         Invoice invoice,
         List<InvoiceItem> items,
         int userId,
-        DataBase db
+        DataBase db,
+        List<string> anhaenge = null
     )
     {
         string folderPath = Path.Combine(
@@ -43,7 +44,8 @@ public static class InvoicePdfExporter
                 PdfWriter writer = PdfWriter.GetInstance(doc, fs);
                 writer.PageEvent = new PdfFooterEvent(
                 invoice.companyName,
-                invoice.companyAddress
+                invoice.companyAddress,
+                true
                 );
 
                 doc.AddAuthor("Ventoriq");
@@ -97,11 +99,6 @@ public static class InvoicePdfExporter
                 PdfPCell kundeCell = new PdfPCell();
                 kundeCell.Border = Rectangle.NO_BORDER;
                 kundeCell.AddElement(new Paragraph("Kunde", headerFont));
-
-                if (!string.IsNullOrEmpty(invoice.customerName))
-                {
-                    kundeCell.AddElement(new Paragraph(invoice.customerName, normalFont));
-                }
 
                 if (!string.IsNullOrEmpty(invoice.customerAddress))
                 {
@@ -231,92 +228,36 @@ public static class InvoicePdfExporter
                     positionenGesamt += item.calculatedTotal;
                 }
                 double rabatt = invoice.discount;
-                double sonstigeKosten = invoice.extraCosts;
+                double skonto = invoice.extraCosts;
                 int steuersatz = PlayerPrefs.GetInt("settings_steuersatz", 19);
                 double mwstSatz = steuersatz / 100.0;
-                double zwischensumme = positionenGesamt - rabatt + sonstigeKosten;
-                double mwst = zwischensumme * mwstSatz;
-                double gesamt = zwischensumme + mwst;
+                double steuerBasis = positionenGesamt - rabatt;
+                double mwst = steuerBasis * mwstSatz;
+                double zwischensumme = steuerBasis + mwst;
+                double gesamt = zwischensumme - skonto;
                 
                 PdfPTable totals = new PdfPTable(2);
                 totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
 
-                AddBodyCell(
-                    totals, 
-                    "Netto:", 
-                    normalFont, Element.ALIGN_RIGHT
-                );
-                AddBodyCell(
-                    totals, 
-                    positionenGesamt.ToString("0.00") + " €", 
-                    normalFont, Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Netto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, positionenGesamt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Rabatt:", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    "-" + rabatt.ToString("0.00") + " €",
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Rabatt:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + rabatt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Sonstige Kosten:", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    "+" + sonstigeKosten.ToString("0.00") + " €", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "MwSt (" + steuersatz + "%):", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, mwst.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Zwischensumme:", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    zwischensumme.ToString("0.00") + " €", 
-                    headerFont, Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Zwischenbetrag:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, zwischensumme.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "MwSt (" + steuersatz + "%):",
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    mwst.ToString("0.00") + " €", 
-                    normalFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Skonto:", normalFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, "-" + skonto.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
-                AddBodyCell(
-                    totals, 
-                    "Brutto:", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
-                AddBodyCell(
-                    totals, 
-                    gesamt.ToString("0.00") + " €", 
-                    headerFont, 
-                    Element.ALIGN_RIGHT
-                    );
+                AddBodyCell(totals, "Brutto:", headerFont, Element.ALIGN_RIGHT);
+                AddBodyCell(totals, gesamt.ToString("0.00") + " €", headerFont, Element.ALIGN_RIGHT);
 
                 doc.Add(totals);
 
@@ -339,6 +280,40 @@ public static class InvoicePdfExporter
                     ));
                 }
 
+                PdfPTable closingTable = new PdfPTable(1);
+                closingTable.WidthPercentage = 100f;
+                closingTable.SplitRows = false;
+                closingTable.KeepTogether = true;
+
+                PdfPCell closingCell = new PdfPCell();
+                closingCell.Border = Rectangle.NO_BORDER;
+
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                "Vielen Dank für Ihren Auftrag. Bitte begleichen Sie den Rechnungsbetrag innerhalb der angegebenen Zahlungsfrist.",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingCell.AddElement(new Paragraph(
+                    "Mit freundlichen Grüßen",
+                    normalFont));
+
+                closingCell.AddElement(new Paragraph(" "));
+                closingCell.AddElement(new Paragraph(" "));
+
+                closingTable.AddCell(closingCell);
+
+                doc.Add(closingTable);
+
+
+
+
+
+
+
                 // =========================
                 // FOOTER
                 // =========================
@@ -351,6 +326,8 @@ public static class InvoicePdfExporter
                     DateTime.Now.ToString("dd.MM.yyyy"),
                     footerFont
                 );
+
+                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge, invoice.status, "Rechnung");
 
                 doc.Close();
             }
@@ -430,4 +407,3 @@ private static void AddFooterCell(
 
 
 }
-

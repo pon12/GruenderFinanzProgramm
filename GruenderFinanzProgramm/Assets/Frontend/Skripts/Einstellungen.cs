@@ -10,9 +10,9 @@ public class EinstellungenController : MonoBehaviour
 {
     private AuthService authService;
 
-    [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private PassKeyAuthController passKeyAuthController;
-    [SerializeField] private MainLogoutController mainLogoutController;
+    [SerializeField] private UIDocument             uiDocument;
+    [SerializeField] private PassKeyAuthController  passKeyAuthController;
+    [SerializeField] private MainLogoutController   mainLogoutController;
 
     // ═══════════════════════════════════════════════════════════
     // PLAYERPREFS KEYS
@@ -52,21 +52,21 @@ public class EinstellungenController : MonoBehaviour
     // ═══════════════════════════════════════════════════════════
     // FELD-LIMITS
     // ═══════════════════════════════════════════════════════════
-    private const int MAX_NAME        = 100;
-    private const int MAX_ORT         = 100;
-    private const int MAX_STRASSE     = 100;
-    private const int MAX_PLZ         = 5;
-    private const int MAX_STEUERNR    = 30;
-    private const int MAX_USTIDNR     = 30;
-    private const int MAX_HANDELSREG  = 30;
-    private const int MAX_JAHR        = 4;
-    private const int MAX_IBAN        = 34;
-    private const int MAX_BIC         = 11;
-    private const int MAX_KONTOINHAB  = 100;
-    private const int MAX_KREDITINST  = 100;
-    private const int MAX_PRAEFIX     = 20;
-    private const int MAX_STARTNR     = 6;
-    private const int MAX_ZAHLZIEL    = 4;
+    private const int MAX_NAME       = 100;
+    private const int MAX_ORT        = 100;
+    private const int MAX_STRASSE    = 100;
+    private const int MAX_PLZ        = 5;
+    private const int MAX_STEUERNR   = 30;
+    private const int MAX_USTIDNR    = 30;
+    private const int MAX_HANDELSREG = 30;
+    private const int MAX_JAHR       = 4;
+    private const int MAX_IBAN       = 34;
+    private const int MAX_BIC        = 11;
+    private const int MAX_KONTOINHAB = 100;
+    private const int MAX_KREDITINST = 100;
+    private const int MAX_PRAEFIX    = 20;
+    private const int MAX_STARTNR    = 6;
+    private const int MAX_ZAHLZIEL   = 4;
 
     // ═══════════════════════════════════════════════════════════
     // UI-ELEMENTE
@@ -185,7 +185,7 @@ public class EinstellungenController : MonoBehaviour
     private readonly List<string> _rechtsformOptions = new List<string>
     {
         "GmbH", "KG", "AG", "OHG", "GbR",
-        "UG (haftungsbeschränkt)", "Einzelunternehmen", "GmbH & Co. KG", "eG"
+        "UG (haftungsbeschr\u00e4nkt)", "Einzelunternehmen", "GmbH & Co. KG", "eG"
     };
 
     private readonly List<string> _brancheOptions = new List<string>
@@ -206,9 +206,9 @@ public class EinstellungenController : MonoBehaviour
     {
         authService = new AuthService();
 
-        if (uiDocument == null)            uiDocument            = GetComponent<UIDocument>();
+        if (uiDocument            == null) uiDocument            = GetComponent<UIDocument>();
         if (passKeyAuthController == null) passKeyAuthController  = FindAnyObjectByType<PassKeyAuthController>();
-        if (mainLogoutController == null)  mainLogoutController   = FindAnyObjectByType<MainLogoutController>();
+        if (mainLogoutController  == null) mainLogoutController   = FindAnyObjectByType<MainLogoutController>();
 
         _root = uiDocument.rootVisualElement;
 
@@ -340,31 +340,31 @@ public class EinstellungenController : MonoBehaviour
     }
 
     // ═══════════════════════════════════════════════════════════
-    // FELDBESCHRÄNKUNGEN
+    // FELDBESCHR\u00c4NKUNGEN
     // ═══════════════════════════════════════════════════════════
 
     private void SetupFeldBeschraenkungen()
     {
         // Unternehmen-Popup
-        SetzeMaxLaenge(_inputFirmenname,          MAX_NAME);
-        SetzeMaxLaenge(_inputStrasse,             MAX_STRASSE);
-        SetzeMaxLaenge(_inputStadt,               MAX_ORT);
-        SetzeMaxLaenge(_inputSteuernummer,        MAX_STEUERNR);
-        SetzeMaxLaenge(_inputUstidnr,             MAX_USTIDNR);
-        SetzeMaxLaenge(_inputHandelsreg,          MAX_HANDELSREG);
-        SetzeMaxLaengeNurZahlen(_inputPlz,        MAX_PLZ);
-        SetzeMaxLaengeNurZahlen(_inputGruendungsjahr, MAX_JAHR);
+        SetzeMaxLaenge(_inputFirmenname,               MAX_NAME);
+        SetzeMaxLaenge(_inputStrasse,                  MAX_STRASSE);
+        SetzeMaxLaenge(_inputStadt,                    MAX_ORT);
+        SetzeMaxLaenge(_inputSteuernummer,             MAX_STEUERNR);
+        SetzeMaxLaenge(_inputUstidnr,                  MAX_USTIDNR);
+        SetzeMaxLaenge(_inputHandelsreg,               MAX_HANDELSREG);
+        SetzeMaxLaengeNurZahlen(_inputPlz,             MAX_PLZ);
+        SetzeMaxLaengeNurZahlen(_inputGruendungsjahr,  MAX_JAHR);
 
         // Bank-Popup
-        SetzeMaxLaenge(_inputKontoinhaber,  MAX_KONTOINHAB);
-        SetzeMaxLaenge(_inputIban,          MAX_IBAN);
-        SetzeMaxLaenge(_inputBic,           MAX_BIC);
-        SetzeMaxLaenge(_inputKreditinstitut,MAX_KREDITINST);
+        SetzeMaxLaenge(_inputKontoinhaber,   MAX_KONTOINHAB);
+        SetzeMaxLaenge(_inputIban,           MAX_IBAN);
+        SetzeMaxLaenge(_inputBic,            MAX_BIC);
+        SetzeMaxLaenge(_inputKreditinstitut, MAX_KREDITINST);
 
         // Rechnungsformat-Popup
-        SetzeMaxLaenge(_inputRechnrPraefix,          MAX_PRAEFIX);
-        SetzeMaxLaengeNurZahlen(_inputStartnummer,   MAX_STARTNR);
-        SetzeMaxLaengeNurZahlen(_inputZahlungsziel,  MAX_ZAHLZIEL);
+        SetzeMaxLaenge(_inputRechnrPraefix,            MAX_PRAEFIX);
+        SetzeMaxLaengeNurZahlen(_inputStartnummer,     MAX_STARTNR);
+        SetzeMaxLaengeNurZahlen(_inputZahlungsziel,    MAX_ZAHLZIEL);
 
         // Recovery Key: nur Ziffern, max. 16 Stellen, Copy/Paste erlaubt
         SetzeMaxLaengeNurZahlen(_inputSuperkeyReset, 16);
@@ -401,7 +401,7 @@ public class EinstellungenController : MonoBehaviour
     {
         if (_dropdownBranche      != null) _dropdownBranche.choices      = _brancheOptions;
         if (_dropdownRechtsform   != null) _dropdownRechtsform.choices   = _rechtsformOptions;
-        if (_dropdownWaehrung     != null) _dropdownWaehrung.choices     = new List<string> { "Euro €", "Dollar $", "Pfund £", "Franken CHF" };
+        if (_dropdownWaehrung     != null) _dropdownWaehrung.choices     = new List<string> { "Euro \u20ac", "Dollar $", "Pfund \u00a3", "Franken CHF" };
         if (_dropdownDatumsformat != null) _dropdownDatumsformat.choices = new List<string> { "DD.MM.YYYY", "MM/DD/YYYY", "YYYY-MM-DD" };
     }
 
@@ -464,7 +464,7 @@ public class EinstellungenController : MonoBehaviour
                     if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
                 }
                 else
-                    Debug.LogWarning("[Einstellungen] Kein neuer Passkey zurückgegeben.");
+                    Debug.LogWarning("[Einstellungen] Kein neuer Passkey zur\u00fcckgegeben.");
             };
 
         if (_btnDeleteProfile != null) _btnDeleteProfile.clicked += ShowDeleteDialog;
@@ -515,37 +515,45 @@ public class EinstellungenController : MonoBehaviour
         if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
 
         var companies = db.getAllCompanies();
-        if (companies == null || companies.Count == 0) return;
+
+        // Beim ersten Login existiert noch kein Firmendatensatz. Einen leeren anlegen,
+        // damit andere Screens (Angebot, Rechnung) sofort über getAllCompanies() darauf zugreifen können.
+        if (companies == null || companies.Count == 0)
+        {
+            db.createCompany("", 0, 0, "", "", "", "", "", 0, "", "Null", "Null");
+            companies = db.getAllCompanies();
+            if (companies == null || companies.Count == 0) return;
+        }
 
         _currentCompany = companies[0];
-        if (_inputFirmenname    != null) _inputFirmenname.value    = _currentCompany.name             ?? "";
-        if (_dropdownBranche    != null) _dropdownBranche.index    = _currentCompany.industry;
-        if (_dropdownRechtsform != null) _dropdownRechtsform.index = _currentCompany.legalForm;
-        if (_inputStadt         != null) _inputStadt.value         = _currentCompany.location         ?? "";
-        if (_inputStrasse       != null) _inputStrasse.value       = _currentCompany.strasseuHausNr   ?? "";
-        if (_inputPlz           != null) _inputPlz.value           = _currentCompany.plz.ToString() == "0" ? "" : _currentCompany.plz.ToString();
-        if (_inputSteuernummer  != null) _inputSteuernummer.value  = _currentCompany.steuerNr         ?? "";
-        if (_inputUstidnr       != null) _inputUstidnr.value       = _currentCompany.ustIdNr          ?? "";
-        if (_inputHandelsreg    != null) _inputHandelsreg.value    = _currentCompany.handelsReg       ?? "";
-        if (_inputGruendungsjahr!= null) _inputGruendungsjahr.value= _currentCompany.gruendungsJahr   ?? "";
+        if (_inputFirmenname     != null) _inputFirmenname.value     = _currentCompany.name             ?? "";
+        if (_dropdownBranche     != null) _dropdownBranche.index     = _currentCompany.industry;
+        if (_dropdownRechtsform  != null) _dropdownRechtsform.index  = _currentCompany.legalForm;
+        if (_inputStadt          != null) _inputStadt.value          = _currentCompany.location         ?? "";
+        if (_inputStrasse        != null) _inputStrasse.value        = _currentCompany.strasseuHausNr   ?? "";
+        if (_inputPlz            != null) _inputPlz.value            = _currentCompany.plz.ToString() == "0" ? "" : _currentCompany.plz.ToString();
+        if (_inputSteuernummer   != null) _inputSteuernummer.value   = _currentCompany.steuerNr         ?? "";
+        if (_inputUstidnr        != null) _inputUstidnr.value        = _currentCompany.ustIdNr          ?? "";
+        if (_inputHandelsreg     != null) _inputHandelsreg.value     = _currentCompany.handelsReg       ?? "";
+        if (_inputGruendungsjahr != null) _inputGruendungsjahr.value = _currentCompany.gruendungsJahr   ?? "";
     }
 
     private void LoadLocalSettings()
     {
-        SetField(_inputRechnrPraefix,  PREF_RECHNR_PRAEFIX,  "RE-");
-        SetField(_inputStartnummer,    PREF_STARTNUMMER,      "1");
-        SetField(_inputZahlungsziel,   PREF_ZAHLUNGSZIEL,     "14");
-        SetField(_inputZahlungshinweis,PREF_ZAHLUNGSHINWEIS,  "Bitte überweisen Sie den Betrag auf ...");
+        SetField(_inputRechnrPraefix,   PREF_RECHNR_PRAEFIX,  "RE-");
+        SetField(_inputStartnummer,     PREF_STARTNUMMER,      "1");
+        SetField(_inputZahlungsziel,    PREF_ZAHLUNGSZIEL,     "14");
+        SetField(_inputZahlungshinweis, PREF_ZAHLUNGSHINWEIS,  "Bitte \u00fcberweisen Sie den Betrag auf ...");
 
         if (_dropdownWaehrung     != null) _dropdownWaehrung.index     = PlayerPrefs.GetInt(PREF_WAEHRUNG, 0);
         if (_dropdownDatumsformat != null) _dropdownDatumsformat.index = PlayerPrefs.GetInt(PREF_DATUMSFORMAT, 0);
         if (_toggleUstRechnung    != null) _toggleUstRechnung.value    = PlayerPrefs.GetInt(PREF_UST_RECHNUNG, 1) == 1;
         if (_toggleAutoNummer     != null) _toggleAutoNummer.value     = PlayerPrefs.GetInt(PREF_AUTO_NUMMER, 0) == 1;
 
-        SetField(_inputKontoinhaber,  PREF_KONTOINHABER,  "");
-        SetField(_inputIban,          PREF_IBAN,           "");
-        SetField(_inputBic,           PREF_BIC,            "");
-        SetField(_inputKreditinstitut,PREF_KREDITINSTITUT, "");
+        SetField(_inputKontoinhaber,   PREF_KONTOINHABER,  "");
+        SetField(_inputIban,           PREF_IBAN,           "");
+        SetField(_inputBic,            PREF_BIC,            "");
+        SetField(_inputKreditinstitut, PREF_KREDITINSTITUT, "");
         if (_toggleIbanRechnung != null) _toggleIbanRechnung.value = PlayerPrefs.GetInt(PREF_IBAN_RECHNUNG, 0) == 1;
 
         if (_toggleLogo       != null) _toggleLogo.value       = PlayerPrefs.GetInt(PREF_LOGO_RECHNUNG, 1) == 1;
@@ -563,21 +571,20 @@ public class EinstellungenController : MonoBehaviour
 
         if (_toggleBegleiter != null) _toggleBegleiter.value = PlayerPrefs.GetInt(PREF_BEGLEITER, 1) == 1;
 
-        SetField(_inputAgb,         PREF_AGB,         "");
-        SetField(_inputDisclaimer,  PREF_DISCLAIMER,  "");
-        SetField(_inputBarzahlung,  PREF_BARZAHLUNG,  "");
-        SetField(_inputUeberweisung,PREF_UEBERWEISUNG,"");
+        SetField(_inputAgb,          PREF_AGB,         "");
+        SetField(_inputDisclaimer,   PREF_DISCLAIMER,  "");
+        SetField(_inputBarzahlung,   PREF_BARZAHLUNG,  "");
+        SetField(_inputUeberweisung, PREF_UEBERWEISUNG,"");
     }
 
     private void LadeBezahlweiseAusDokumenten()
     {
-        // Felder aus dem Dokumenten-Pool lesen und in PlayerPrefs + UI schreiben
         var mapping = new System.Collections.Generic.Dictionary<string, (string pref, TextField feld)>
         {
-            { "AGB",              (PREF_AGB,         _inputAgb)         },
-            { "Disclaimer",       (PREF_DISCLAIMER,  _inputDisclaimer)  },
-            { "Barzahlung",       (PREF_BARZAHLUNG,  _inputBarzahlung)  },
-            { "Überweisung", (PREF_UEBERWEISUNG,_inputUeberweisung)},
+            { "AGB",         (PREF_AGB,         _inputAgb)         },
+            { "Disclaimer",  (PREF_DISCLAIMER,  _inputDisclaimer)  },
+            { "Barzahlung",  (PREF_BARZAHLUNG,  _inputBarzahlung)  },
+            { "\u00dcberweisung", (PREF_UEBERWEISUNG, _inputUeberweisung) },
         };
 
         bool geaendert = false;
@@ -608,8 +615,8 @@ public class EinstellungenController : MonoBehaviour
     private void SetStatusLabel(Label label, string inhalt)
     {
         if (label == null) return;
-        bool hat = !string.IsNullOrWhiteSpace(inhalt);
-        label.text        = hat ? "hinterlegt" : "nicht hinterlegt";
+        bool hat       = !string.IsNullOrWhiteSpace(inhalt);
+        label.text     = hat ? "hinterlegt" : "nicht hinterlegt";
         label.style.color = hat
             ? new StyleColor(COLOR_GREEN)
             : new StyleColor(new Color(160f / 255f, 160f / 255f, 160f / 255f));
@@ -766,9 +773,6 @@ public class EinstellungenController : MonoBehaviour
     // DOKUMENT-SYNCHRONISATION
     // ═══════════════════════════════════════════════════════════
 
-    // Schreibt Unternehmensdaten in das Pflichtdokument "Unternehmensstammdaten"
-    // (Kategorie "Gründung"). Nur die vier im Dokument definierten Felder:
-    // firma, rechtsform, branche, standort.
     private void SyncUnternehmenToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -778,28 +782,24 @@ public class EinstellungenController : MonoBehaviour
         if (saveData?.savedDocs == null) return;
 
         string rechtsformText = _dropdownRechtsform != null && _dropdownRechtsform.index >= 0
-            ? _dropdownRechtsform.value ?? ""
-            : "";
-
+            ? _dropdownRechtsform.value ?? "" : "";
         string brancheText = _dropdownBranche != null && _dropdownBranche.index >= 0
-            ? _dropdownBranche.value ?? ""
-            : "";
+            ? _dropdownBranche.value ?? "" : "";
 
         foreach (var doc in saveData.savedDocs)
         {
             if (doc.strukturFelder == null) continue;
-            if (doc.category != "Gründung" || doc.title != "Unternehmensstammdaten") continue;
+            if (doc.category != "Gr\u00fcndung" || doc.title != "Unternehmensstammdaten") continue;
 
-            SetStrukturFeld(doc, "firma",     _inputFirmenname?.value ?? "");
+            SetStrukturFeld(doc, "firma",      _inputFirmenname?.value ?? "");
             SetStrukturFeld(doc, "rechtsform", rechtsformText);
-            SetStrukturFeld(doc, "branche",   brancheText);
-            SetStrukturFeld(doc, "standort",  _inputStadt?.value      ?? "");
+            SetStrukturFeld(doc, "branche",    brancheText);
+            SetStrukturFeld(doc, "standort",   _inputStadt?.value ?? "");
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
     }
 
-    // Schreibt Bankdaten in das Pflichtdokument "Kontodaten (IBAN/BIC)"
     private void SyncBankToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -813,16 +813,15 @@ public class EinstellungenController : MonoBehaviour
             if (doc.strukturFelder == null) continue;
             if (doc.category != "Bezahlweise" || doc.title != "Kontodaten (IBAN/BIC)") continue;
 
-            SetStrukturFeld(doc, "iban",         _inputIban?.value           ?? "");
-            SetStrukturFeld(doc, "bic",          _inputBic?.value            ?? "");
-            SetStrukturFeld(doc, "bank",         _inputKreditinstitut?.value  ?? "");
-            SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value   ?? "");
+            SetStrukturFeld(doc, "iban",         _inputIban?.value          ?? "");
+            SetStrukturFeld(doc, "bic",          _inputBic?.value           ?? "");
+            SetStrukturFeld(doc, "bank",         _inputKreditinstitut?.value ?? "");
+            SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value  ?? "");
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
     }
 
-    // Schreibt Bezahlweise-Texte in passende Dokumente
     private void SyncBezahlweiseToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -831,13 +830,12 @@ public class EinstellungenController : MonoBehaviour
         var saveData = DocumentDashboard.GetSavedDocuments();
         if (saveData?.savedDocs == null) return;
 
-        // Mapping: Dokumenttitel → Feldwert
         var mapping = new System.Collections.Generic.Dictionary<string, string>
         {
-            { "AGB",           _inputAgb?.value         ?? "" },
-            { "Disclaimer",    _inputDisclaimer?.value  ?? "" },
-            { "Barzahlung",    _inputBarzahlung?.value  ?? "" },
-            { "Überweisung", _inputUeberweisung?.value ?? "" },
+            { "AGB",                _inputAgb?.value         ?? "" },
+            { "Disclaimer",         _inputDisclaimer?.value  ?? "" },
+            { "Barzahlung",         _inputBarzahlung?.value  ?? "" },
+            { "\u00dcberweisung",   _inputUeberweisung?.value ?? "" },
         };
 
         foreach (var doc in saveData.savedDocs)
@@ -931,7 +929,7 @@ public class EinstellungenController : MonoBehaviour
     }
 
     // ═══════════════════════════════════════════════════════════
-    // POPUP: LOKALPROFIL LÖSCHEN
+    // POPUP: LOKALPROFIL L\u00d6SCHEN
     // ═══════════════════════════════════════════════════════════
 
     private void ShowDeleteDialog()
@@ -952,7 +950,7 @@ public class EinstellungenController : MonoBehaviour
         { Debug.LogWarning("[Einstellungen] Super-Passkey fehlt."); return; }
 
         if (key1 != key2)
-        { Debug.LogWarning("[Einstellungen] Super-Passkeys stimmen nicht überein."); return; }
+        { Debug.LogWarning("[Einstellungen] Super-Passkeys stimmen nicht \u00fcberein."); return; }
 
         if (mainLogoutController != null) mainLogoutController.logout();
         PlayerPrefs.DeleteAll();
@@ -989,8 +987,8 @@ public class EinstellungenController : MonoBehaviour
     {
         HelpTooltip.Registriere(_root, "btn-help-seitentitel",
             "Hier verwaltest du alle grundlegenden Einstellungen deines Unternehmens. " +
-            "Änderungen wirken sich auf Rechnungen, Angebote und PDF-Exporte aus. " +
-            "Speichere am Ende, damit alle Änderungen übernommen werden.");
+            "\u00c4nderungen wirken sich auf Rechnungen, Angebote und PDF-Exporte aus. " +
+            "Speichere am Ende, damit alle \u00c4nderungen \u00fcbernommen werden.");
 
         HelpTooltip.Registriere(_root, "btn-help-unternehmen",
             "Hinterlege hier Firmenname, Rechtsform, Adresse und Steuerdaten. " +
@@ -999,16 +997,16 @@ public class EinstellungenController : MonoBehaviour
 
         HelpTooltip.Registriere(_root, "btn-help-bank",
             "Trage hier deine Bankverbindung ein: IBAN, BIC, Kontoinhaber und Kreditinstitut. " +
-            "Die Daten werden auf Wunsch im Fußbereich von Rechnungen angezeigt.");
+            "Die Daten werden auf Wunsch im Fu\u00dfbereich von Rechnungen angezeigt.");
 
         HelpTooltip.Registriere(_root, "btn-help-rechnungsformat",
             "Lege fest wie deine Rechnungen nummeriert und aufgebaut werden. " +
-            "Hier stellst du Nummernkreis, Zahlungsziel, Währung " +
-            "und Standardtexte für Kopf- und Fußzeile ein.");
+            "Hier stellst du Nummernkreis, Zahlungsziel, W\u00e4hrung " +
+            "und Standardtexte f\u00fcr Kopf- und Fu\u00dfzeile ein.");
 
         HelpTooltip.Registriere(_root, "btn-help-bezahlweise",
-            "Verwalte hier Dokumente, die als Anhänge an Rechnungen angehängt werden: " +
-            "AGB, Disclaimer, Barzahlungs- und Überweisungshinweis.");
+            "Verwalte hier Dokumente, die als Anh\u00e4nge an Rechnungen angeh\u00e4ngt werden: " +
+            "AGB, Disclaimer, Barzahlungs- und \u00dcberweisungshinweis.");
 
         HelpTooltip.Registriere(_root, "btn-help-version",
             "Zeigt die aktuell installierte Programmversion. " +
@@ -1019,16 +1017,15 @@ public class EinstellungenController : MonoBehaviour
             "Logo, Seitenzahl und letzten Exportpfad aktivieren oder deaktivieren.");
 
         HelpTooltip.Registriere(_root, "btn-help-steuersaetze",
-            "Wähle den Standard-Mehrwertsteuersatz für deine Dienstleistungen. " +
-            "Der ausgewählte Satz wird beim Erstellen neuer Belege automatisch vorausgewählt.");
+            "W\u00e4hle den Standard-Mehrwertsteuersatz f\u00fcr deine Dienstleistungen. " +
+            "Der ausgew\u00e4hlte Satz wird beim Erstellen neuer Belege automatisch vorausgew\u00e4hlt.");
 
         HelpTooltip.Registriere(_root, "btn-help-layout",
             "Wechsle hier zwischen Hell- und Dunkelmodus. " +
-            "Die Einstellung gilt sofort für die gesamte Anwendung.");
+            "Die Einstellung gilt sofort f\u00fcr die gesamte Anwendung.");
 
         HelpTooltip.Registriere(_root, "btn-help-sicherheit",
-            "Setze hier deinen Passkey zurück, gebe dazu deinen RevoeryKey ein. " +
-            "Das Löschen des Kontos ist endgültig und kann nicht rükgängig gemacht werden.");
+            "Setze hier deinen Passkey zur\u00fcck, gib dazu deinen Recovery Key ein. " +
+            "Das L\u00f6schen des Kontos ist endg\u00fcltig und kann nicht r\u00fcckg\u00e4ngig gemacht werden.");
     }
-
 }
