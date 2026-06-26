@@ -608,13 +608,46 @@ public class KassenbuchController : MonoBehaviour
         _aktuellerTyp = typ;
         _overlay.Q<Label>("popup-title").text = $"{typ} hinzufügen";
         _overlay.Q<TextField>("input-datum").value = DateTime.Now.ToString("dd.MM.yyyy");
-       
+        
         var inputBetrag = _overlay.Q<TextField>("input-betrag");
         SetupBetragInputAnpassung(inputBetrag, PLACEHOLDER_BETRAG);
 
 
         var inputZweck = _overlay.Q<TextField>("input-verwendungzweck");
         SetupPlaceholderSimulation(inputZweck, PLACEHOLDER_ZWECK);
+
+
+        // Dropdown-Kategorien nach Typ filtern
+        var dropdown = _overlay.Q<DropdownField>("Art");
+        if (dropdown != null)
+        {
+            if (typ == "Ausgabe")
+            {
+                dropdown.choices = new List<string>
+                {
+                    "Marketing",
+                    "Reisekosten",
+                    "Sonstige Kosten",
+                    "Barentnahme / Privatentnahme",
+                    "Tilgungsraten",
+                    "Finanzamt",
+                    "Steuern",
+                    "Gehälter"
+                };
+            }
+            else // Einnahme
+            {
+                dropdown.choices = new List<string>
+                {
+                    "Privateinzahlung",
+                    "Sonstige Einzahlung",
+                    "Darlehen",
+                    "Umsatzerlöse",
+                    "Sonstige Einnahmen"
+                };
+            }
+            dropdown.index = 0;
+        }
 
 
         if (meinUxmlKalender != null)
@@ -625,7 +658,6 @@ public class KassenbuchController : MonoBehaviour
 
         _overlay.style.display = DisplayStyle.Flex;
     }
-
        private void ClosePopup()
     {
         if (_overlay == null) return;
@@ -864,8 +896,9 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
         if (balanceLabel != null)
         {
-            // Erhält das Format aus dem 2. Code bei
-            balanceLabel.text = differenz.ToString() + "€";
+            // Tausendertrennzeichen: z.B. "21.222 €" statt "21222€"
+            var culture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+            balanceLabel.text = differenz.ToString("N0", culture) + " €";
             balanceLabel.style.color = differenz < 0
                 ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
                 : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
