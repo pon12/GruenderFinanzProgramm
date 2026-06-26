@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/sidebar.uss?fileID=7433441132597879392&amp;guid=75a81b0b36c221f47b38dc27c4b347a9&amp;type=3#sidebar"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/DashboardStyles.uss?fileID=7433441132597879392&amp;guid=fe9c9a54b138ecc469e247e562306177&amp;type=3#DashboardStyles"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
+    <ui:VisualElement name="nav-item-finanzdashboard" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; width: 1920px; height: 1080px; background-color: rgb(30, 30, 30);">
+        <ui:VisualElement style="flex-grow: 0; width: 388px;"/>
+        <ui:VisualElement style="flex-grow: 1; background-color: rgb(30, 30, 30); padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
+            <ui:VisualElement style="flex-direction: row; align-items: center; max-height: 70px; padding-left: 0; margin-bottom: 8px; padding-top: 20px;">
+                <ui:Label text="Wichtige Kennzahlen" name="Label" style="font-size: 36px; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+            </ui:VisualElement>
+            <ui:Label name="lbl-jahr" text="Auswertung 2026" style="font-size: 14px; color: rgb(160, 160, 160); margin-bottom: 12px;"/>
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
+                    <ui:Label text="Rentabilität" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
+                    <ui:VisualElement name="Rentabilitaet" style="flex-grow: 1;"><ui:Label text="TEST123" style="color: rgb(255, 0, 0); font-size: 20px;"/></ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
+                    <ui:Label text="Liquidität zum Geschäftsbeginn" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
+                    <ui:VisualElement name="Liquiditaet" style="flex-grow: 1;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
+                    <ui:Label text="Liquiditätsplanung" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
+                    <ui:VisualElement name="Gruendung" style="flex-grow: 1;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
