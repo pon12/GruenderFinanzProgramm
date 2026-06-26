@@ -3,7 +3,7 @@
     <Style src="project://database/Assets/Frontend/Grid%20System/GridSystem.uss?fileID=7433441132597879392&amp;guid=d3dab0810f9c6274990ca4455b3a7372&amp;type=3#GridSystem"/>
     <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
     <ui:VisualElement class="fullscreen-bg" style="flex-grow: 1; background-color: rgb(56, 56, 56); width: 100%; height: 100%; position: relative;">
-        <ui:VisualElement name="panel-welcome" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+        <ui:VisualElement name="panel-welcome" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url(&quot;project://database/Assets/Frontend/Bilder/start_bg_1080p.png?fileID=2800000&amp;guid=0ff4864136671e84ea50db619951dea8&amp;type=3#start_bg_1080p&quot;);">
             <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" style="width: 200px; height: 144px; top: 144px; left: 860px;"/>
             <ui:Label text="Willkommen!" name="Ueberschrift" class="ueberschrift" style="top: 160px; left: 703px; width: 532px; height: 90px; margin: 0;"/>
             <ui:Label text="Schön, dass du Ventoriq nutzt!" name="Text" class="text" style="width: 699px; height: 20px; left: 620px; top: 200px; margin: 0;"/>

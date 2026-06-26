@@ -11,6 +11,9 @@ using System.Globalization;
 public class KassenbuchController : MonoBehaviour
 {
     private VisualElement _overlay;
+    private VisualElement _confirmOverlay;
+    private int _pendingDeleteId = -1;
+    private string _pendingDeleteTyp = "";
     private DropdownField dropJahrField;
     private VisualElement tableInput; // Repräsentiert deinen 'tableBody'
     private VisualTreeAsset outputTemplate;
@@ -90,6 +93,22 @@ public class KassenbuchController : MonoBehaviour
        
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
         letzteAktualLabel = root.Q<Label>("letzteAktual");
+
+        _confirmOverlay = root.Q<VisualElement>("confirm-overlay");
+        if (_confirmOverlay != null)
+        {
+            _confirmOverlay.RemoveFromHierarchy();
+            root.Add(_confirmOverlay);
+            _confirmOverlay.style.display = DisplayStyle.None;
+
+            root.Q<Button>("btn-confirm-ja")?.RegisterCallback<ClickEvent>(_ => BestaetigenLoeschen());
+            root.Q<Button>("btn-confirm-nein")?.RegisterCallback<ClickEvent>(_ =>
+            {
+                _confirmOverlay.style.display = DisplayStyle.None;
+                _pendingDeleteId  = -1;
+                _pendingDeleteTyp = "";
+            });
+        }
 
         if (_overlay != null)
 {
@@ -867,17 +886,6 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
     }
 
 
-    public void Loeschen(string typ, int id)
-    {
-        if (db == null) return;
-
-
-        if (typ == "Einnahme") db.deleteEinkommen(id);
-        else db.deleteAusgaben(id);
-        createList();
-    }
-
-
     public void createList()
     {
         if (db == null || tableInput == null) return;
@@ -896,7 +904,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
         if (balanceLabel != null)
         {
-            // Tausendertrennzeichen: z.B. "21.222 €" statt "21222€"
+            // Erhält das Format aus dem 2. Code bei
             var culture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
             balanceLabel.text = differenz.ToString("N0", culture) + " €";
             balanceLabel.style.color = differenz < 0
@@ -1100,10 +1108,23 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
     
-    // ===============================
-    // Aus altem Code übernommen
-    // Robustes Datums-Parsing
-    // ===============================
+
+    private void BestaetigenLoeschen()
+    {
+        if (_confirmOverlay != null) _confirmOverlay.style.display = DisplayStyle.None;
+        if (_pendingDeleteId >= 0) deleteEntry(_pendingDeleteId);
+        _pendingDeleteId  = -1;
+        _pendingDeleteTyp = "";
+    }
+
+    public void Loeschen(string typ, int id)
+    {
+        if (_confirmOverlay == null) { deleteEntry(id); return; }
+        _pendingDeleteId  = id;
+        _pendingDeleteTyp = typ;
+        _confirmOverlay.style.display = DisplayStyle.Flex;
+    }
+
     private bool TryParseDatum(string text, out System.DateTime erg)
     {
         string[] formate =
@@ -1124,10 +1145,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             || System.DateTime.TryParse(text, deDe, none, out erg);
     }
 
-    // ===============================
-    // KONTOSTAND FÜR EIN BESTIMMTES JAHR
-    // Summiert nur Einkommen/Ausgaben mit Datum in diesem Jahr.
-    // ===============================
+
     private float BerechneKontostandFuerJahr(int jahr)
     {
         float summe = 0f;
