@@ -1,365 +1,156 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
-using System;
-using System.Collections.Generic;
 
-public class Finanzen2 : MonoBehaviour
+public class FinanceDashboardBinder : MonoBehaviour
 {
-    private VisualElement _root;
-    private BarChartElement _chart;
+    [SerializeField] private UIDocument uiDocument;
+
+    private DataBase db;
+
+    private VisualElement root;
 
     private void Awake()
     {
-        UIDocument document = GetComponent<UIDocument>();
-
-        if (document == null)
+        if (uiDocument == null)
         {
-            Debug.LogError("[Finanzen2] Kein UIDocument gefunden.");
-            return;
+            uiDocument = GetComponent<UIDocument>();
+        }
+    }
+
+    private IEnumerator Start()
+    {
+        Debug.Log("[FinanceUI] Start -> warte auf UI Build...");
+
+        db = GlobalDatabaseManager.Instance.GetOrCreateDatabase<DataBase>("Alex");
+
+        if (db == null)
+        {
+            Debug.LogError("[FinanceUI] DB ist NULL");
+            yield break;
         }
 
-        _root = document.rootVisualElement;
-    }
+        db.setupDatabase();
 
-    private void Start()
-    {
-        SetupDiagramm();
-        LadeRentabilitaet();
-    }
+        // 🔥 WICHTIG: UI Toolkit braucht 1 Frame
+        yield return null;
 
-    private void SetupDiagramm()
-    {
-        VisualElement diagramm = _root.Q<VisualElement>("diagramm");
-        VisualElement yAxis = _root.Q<VisualElement>("chart-y-axis");
-        VisualElement xAxis = _root.Q<VisualElement>("chart-x-axis");
+        root = uiDocument.rootVisualElement;
 
-        if (diagramm == null)
+        if (root == null)
         {
-            Debug.LogError("[Finanzen2] Diagramm nicht gefunden.");
-            return;
+            Debug.LogError("[FinanceUI] Root VisualElement ist NULL");
+            yield break;
         }
 
-        _chart = new BarChartElement(yAxis, xAxis);
+        Debug.Log("[FinanceUI] UI geladen -> starte Binding");
 
-        _chart.style.position = Position.Absolute;
-        _chart.style.left = 0;
-        _chart.style.right = 0;
-        _chart.style.top = 0;
-        _chart.style.bottom = 0;
-
-        diagramm.Add(_chart);
-
-        SetDaten(new float[]
-        {
-            100000f, 40000f, 8000f,
-            220000f, 90000f, 45000f
-        });
+        RefreshUI();
     }
 
-    public void SetDaten(float[] daten)
+    private void RefreshUI()
     {
-        if (_chart != null)
-            _chart.SetValues(daten);
-    }
+        Debug.Log("[FinanceUI] RefreshUI gestartet");
 
-    // =========================================================
-    // RENTABILITÄT
-    // =========================================================
-    private void LadeRentabilitaet()
-    {
-        var container = _root.Q<VisualElement>("Rentabilitaet");
-
-        if (container == null)
+        // =========================
+        // 🔥 SAFE GET LABEL FUNCTION
+        // =========================
+        void Set(string name, float value, string suffix = " €")
         {
-            Debug.LogWarning("Rentabilitaet nicht gefunden");
-            return;
-        }
+            var label = root.Q<Label>(name);
 
-        container.Clear();
-
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null) return;
-
-        var einkommen = db.getAllEinkommenEntries();
-        var ausgaben = db.getAllAusgabenEntries();
-
-        float u1 = 0, u2 = 0;
-        float d1 = 0, d2 = 0;
-
-        float gk1 = 0, gk2 = 0;
-        float pa1 = 0, pa2 = 0;
-        float ba1 = 0, ba2 = 0;
-        float ab1 = 0, ab2 = 0;
-        float z1 = 0, z2 = 0;
-
-        int baseYear = GetBaseYear(einkommen, ausgaben);
-
-        if (einkommen != null)
-        {
-            foreach (var e in einkommen)
+            if (label == null)
             {
-                if (!TryParse(e.Datum, out var d)) continue;
-
-                if (d.Year == baseYear) u1 += (float)e.Amount;
-                if (d.Year == baseYear + 1) u2 += (float)e.Amount;
-            }
-        }
-
-        if (ausgaben != null)
-        {
-            foreach (var a in ausgaben)
-            {
-                if (!TryParse(a.Datum, out var d)) continue;
-
-                string desc = a.Description.ToLower();
-
-                if (desc.Contains("direkt"))
-                {
-                    if (d.Year == baseYear) d1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) d2 += (float)a.Amount;
-                }
-                else if (desc.Contains("gründung"))
-                {
-                    if (d.Year == baseYear) gk1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) gk2 += (float)a.Amount;
-                }
-                else if (desc.Contains("personal"))
-                {
-                    if (d.Year == baseYear) pa1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) pa2 += (float)a.Amount;
-                }
-                else if (desc.Contains("betrieb"))
-                {
-                    if (d.Year == baseYear) ba1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) ba2 += (float)a.Amount;
-                }
-                else if (desc.Contains("abschreibung"))
-                {
-                    if (d.Year == baseYear) ab1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) ab2 += (float)a.Amount;
-                }
-                else if (desc.Contains("zins"))
-                {
-                    if (d.Year == baseYear) z1 += (float)a.Amount;
-                    if (d.Year == baseYear + 1) z2 += (float)a.Amount;
-                }
-            }
-        }
-
-        float rg1 = u1 - d1;
-        float rg2 = u2 - d2;
-
-        float betriebs1 = rg1 - (gk1 + pa1 + ba1 + ab1);
-        float betriebs2 = rg2 - (gk2 + pa2 + ba2 + ab2);
-
-        float ergebnis1 = betriebs1 - z1;
-        float ergebnis2 = betriebs2 - z2;
-
-        container.Add(CreateRentHeader());
-
-        container.Add(CreateRentRow("Umsatzerlöse", u1, u2));
-        container.Add(CreateRentRow("Direkte Kosten", d1, d2));
-        container.Add(CreateRentRow("Rohgewinn", rg1, rg2));
-
-        container.Add(CreateRentRow("Gründungskosten", gk1, gk2));
-        container.Add(CreateRentRow("Personalaufwand", pa1, pa2));
-        container.Add(CreateRentRow("Betriebsaufwand", ba1, ba2));
-        container.Add(CreateRentRow("Abschreibungen", ab1, ab2));
-
-        container.Add(CreateRentRow("Betriebsergebnis", betriebs1, betriebs2));
-
-        container.Add(CreateRentRow("Zinsen", z1, z2));
-
-        container.Add(CreateRentRow("Ergebnis (vor Steuern)", ergebnis1, ergebnis2));
-
-        container.Add(CreateRentRowBold("Überschuss / Fehlbetrag", ergebnis1, ergebnis2));
-    }
-
-    // =========================================================
-    // UI
-    // =========================================================
-    private VisualElement CreateRentHeader()
-    {
-        var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.justifyContent = Justify.SpaceBetween;
-        row.style.marginBottom = 6;
-
-        row.Add(CreateCell("Name", true));
-        row.Add(CreateCell("Jahr 1", true));
-        row.Add(CreateCell("Jahr 2", true));
-
-        return row;
-    }
-
-    private VisualElement CreateRentRow(string name, float y1, float y2)
-    {
-        var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.justifyContent = Justify.SpaceBetween;
-        row.style.marginBottom = 4;
-
-        row.Add(CreateCell(name, false));
-        row.Add(CreateCell(y1.ToString("N0") + " €", false));
-        row.Add(CreateCell(y2.ToString("N0") + " €", false));
-
-        return row;
-    }
-
-    private VisualElement CreateRentRowBold(string name, float y1, float y2)
-    {
-        var row = CreateRentRow(name, y1, y2);
-
-        foreach (var c in row.Children())
-            if (c is Label l)
-                l.style.unityFontStyleAndWeight = FontStyle.Bold;
-
-        return row;
-    }
-
-    // =========================================================
-    // HELPERS
-    // =========================================================
-    private bool TryParse(string text, out DateTime result)
-    {
-        return DateTime.TryParse(text, out result);
-    }
-
-    private int GetBaseYear(List<Einkommen> einkommen, List<Ausgaben> ausgaben)
-    {
-        DateTime min = DateTime.MaxValue;
-
-        if (einkommen != null)
-        {
-            foreach (var e in einkommen)
-                if (TryParse(e.Datum, out var d))
-                    if (d < min) min = d;
-        }
-
-        if (ausgaben != null)
-        {
-            foreach (var a in ausgaben)
-                if (TryParse(a.Datum, out var d))
-                    if (d < min) min = d;
-        }
-
-        return min == DateTime.MaxValue ? DateTime.Now.Year : min.Year;
-    }
-
-    // =========================================================
-    // CHART (FIX: KEINE VERTIKALEN GRID-LINIEN MEHR)
-    // =========================================================
-    private class BarChartElement : VisualElement
-    {
-        private float[] _values;
-        private readonly VisualElement _yAxis;
-        private readonly VisualElement _xAxis;
-
-        public BarChartElement(VisualElement yAxis, VisualElement xAxis)
-        {
-            _yAxis = yAxis;
-            _xAxis = xAxis;
-            generateVisualContent += Draw;
-        }
-
-        public void SetValues(float[] values)
-        {
-            _values = values;
-            MarkDirtyRepaint();
-        }
-
-        private void Draw(MeshGenerationContext ctx)
-        {
-            var p = ctx.painter2D;
-
-            float width = contentRect.width;
-            float height = contentRect.height;
-
-            if (width <= 0 || height <= 0 || _values == null)
+                Debug.LogError("[FinanceUI] Label NICHT gefunden: " + name);
                 return;
-
-            float max = 1f;
-            foreach (var v in _values)
-                if (v > max) max = v;
-
-            // =====================================================
-            // NUR HORIZONTALE GRID-LINIEN
-            // =====================================================
-            p.strokeColor = new Color(1f, 1f, 1f, 0.12f);
-            p.lineWidth = 1f;
-
-            if (_yAxis != null)
-            {
-                foreach (var label in _yAxis.Children())
-                {
-                    float y = label.worldBound.center.y - worldBound.yMin;
-
-                    p.BeginPath();
-                    p.MoveTo(new Vector2(0, y));
-                    p.LineTo(new Vector2(width, y));
-                    p.Stroke();
-                }
             }
 
-            // ❌ KEINE X-AXIS GRID LINES (VERTIKAL ENTFERNT)
-
-            int years = 2;
-            float groupWidth = width / years;
-
-            float barWidth = 40f;
-            float spacing = 10f;
-
-            for (int year = 0; year < years; year++)
-            {
-                float startX = year * groupWidth + groupWidth / 2f - 70f;
-
-                for (int type = 0; type < 3; type++)
-                {
-                    int index = year * 3 + type;
-                    if (index >= _values.Length) continue;
-
-                    float value = _values[index];
-                    float h = (value / max) * height;
-
-                    float x = startX + type * (barWidth + spacing);
-                    float y = height - h;
-
-                    Color barColor =
-                        type == 0 ? new Color(0.2f, 0.8f, 0.3f, 1f) :
-                        type == 1 ? new Color(0.95f, 0.6f, 0.1f, 1f) :
-                                    new Color(0.3f, 0.6f, 1f, 1f);
-
-                    p.fillColor = barColor;
-
-                    p.BeginPath();
-                    p.MoveTo(new Vector2(x, height));
-                    p.LineTo(new Vector2(x, y));
-                    p.LineTo(new Vector2(x + barWidth, y));
-                    p.LineTo(new Vector2(x + barWidth, height));
-                    p.ClosePath();
-                    p.Fill();
-                }
-            }
+            label.text = value.ToString("N2") + suffix;
+            Debug.Log("[FinanceUI] gesetzt: " + name + " = " + label.text);
         }
+
+        // =========================
+        // 💰 GESAMTWERTE
+        // =========================
+        float umsatz = FinanceKassenbuchAuswertungService.GetSummeEinnahmenGesamt(db);
+        float kosten = FinanceKassenbuchAuswertungService.GetSummeAusgabenGesamt(db);
+        float saldo = FinanceKassenbuchAuswertungService.GetSaldo(db);
+
+        float prozent = umsatz > 0 ? (saldo / umsatz) * 100f : 0f;
+
+        Set("Umsatz", umsatz);
+        Set("Kosten", kosten);
+        Set("Rohgewinn", saldo);
+        Set("Prozent", prozent, " %");
+
+        // =========================
+        // 📊 ERTRAG
+        // =========================
+        Set("Dienst1",
+            FinanceKassenbuchAuswertungService.GetSummeEinnahmenNachKategorie(db, "Dienstleistungen"));
+
+        Set("Dienst2", 0);
+        Set("Dienst3", 0);
+        Set("Dienst4", 0);
+
+        // =========================
+        // 💸 KOSTEN
+        // =========================
+        Set("Honorar1",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Honorar"));
+
+        Set("Material",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Material"));
+
+        Set("Honorar2", 0);
+        Set("Honorar3", 0);
+        Set("Honorar4", 0);
+
+        // =========================
+        // 🏢 BETRIEB
+        // =========================
+        Set("Auto",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Auto"));
+
+        Set("Marketing",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Marketing"));
+
+        Set("Reisekosten",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Reisekosten"));
+
+        Set("Betriebsausgaben",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Betriebsausgaben"));
+
+        // =========================
+        // 🏗 INVEST
+        // =========================
+        Set("Mustermodell", 0);
+        Set("Investitionswert", 0);
+        Set("Ausstattung", 0);
+        Set("SummeSacheinlagen", 0);
+
+        // =========================
+        // 🧾 GRÜNDUNG
+        // =========================
+        Set("CoparateDesigne",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Corporate Design"));
+
+        Set("Grundausstattung", 0);
+
+        Set("Homepage",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Homepage"));
+
+        Set("SummeGruendungskosten",
+            FinanceKassenbuchAuswertungService.GetSummeAusgabenNachKategorie(db, "Gründungskosten"));
+
+        // =========================
+        // 💰 KAPITAL
+        // =========================
+        Set("KapitalbedarfInvestition", 0);
+        Set("Sacheinlagen", 0);
+        Set("Grunderkosten", 0);
+        Set("Kapitalbedarf", 0);
+        Set("Liquidservice", 0);
+        Set("Gesamtkapitalbedarf", 0);
     }
-
-    private VisualElement CreateCell(string text, bool isHeader)
-    {
-        var label = new Label(text);
-
-        label.style.color = Color.white;
-        label.style.unityTextAlign = TextAnchor.MiddleLeft;
-
-        label.style.flexGrow = 1;
-        label.style.width = Length.Percent(33);
-
-        label.style.fontSize = isHeader ? 16 : 14;
-
-        if (isHeader)
-            label.style.unityFontStyleAndWeight = FontStyle.Bold;
-
-        return label;
-    }
-
-    
 }
