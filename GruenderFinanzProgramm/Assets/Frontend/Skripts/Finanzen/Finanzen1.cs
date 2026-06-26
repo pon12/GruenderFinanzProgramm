@@ -1,516 +1,283 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Finanzen1 : MonoBehaviour
 {
+    [SerializeField] private UIDocument uiDocument;
+
     private VisualElement _root;
-    private LineChartElement _chart;
 
-    private void Awake()
-    {
-        UIDocument document = GetComponent<UIDocument>();
-
-        if (document == null)
-        {
-            Debug.LogError("[Finanzen1] Kein UIDocument gefunden.");
-            return;
-        }
-
-        _root = document.rootVisualElement;
-    }
+    // Ventoriq-Farben
+    private static readonly Color GreenColor  = new Color(0.502f, 0.812f, 0.584f, 1f);
+    private static readonly Color RedColor    = new Color(0.902f, 0.224f, 0.275f, 1f);
+    private static readonly Color GridColor   = new Color(0.25f,  0.25f,  0.25f,  1f);
+    private static readonly Color TextColor   = new Color(0.863f, 0.863f, 0.863f, 1f);
+    private static readonly Color HeaderColor = new Color(1f,     1f,     1f,     1f);
+    private static readonly Color SubColor    = new Color(0.627f, 0.627f, 0.627f, 1f);
 
     private void Start()
     {
-        SetupDiagramm();
-        LadeMonatlichenCashflow();
-        LadeLiquiditaetAmAnfang();
-        LadeGruendungsUebersicht();
-        LadeAktuelleLiquiditaet();
+        StartCoroutine(InitUI());
     }
 
-    private void SetupDiagramm()
+    private IEnumerator InitUI()
     {
-        VisualElement diagramm =
-            _root.Q<VisualElement>("diagramm");
+        yield return new WaitForEndOfFrame();
 
-        VisualElement yAxis =
-            _root.Q<VisualElement>("chart-y-axis");
+        if (uiDocument == null || uiDocument.rootVisualElement == null) yield break;
+        _root = uiDocument.rootVisualElement;
 
-        VisualElement xAxis =
-            _root.Q<VisualElement>("chart-x-axis");
+        int jahr = DateTime.Today.Year;
 
-        if (diagramm == null)
-        {
-            Debug.LogError("[Finanzen2] Diagramm nicht gefunden.");
-            return;
-        }
+        var jahrLabel = _root.Q<Label>("lbl-jahr");
+        if (jahrLabel != null) jahrLabel.text = $"Auswertung {jahr}";
 
-        _chart = new LineChartElement(yAxis, xAxis);
-
-        _chart.style.position = Position.Absolute;
-        _chart.style.left = 0;
-        _chart.style.right = 0;
-        _chart.style.top = 0;
-        _chart.style.bottom = 0;
-
-        diagramm.Add(_chart);
+        AktualisiereRentabilitaet(jahr);
+        AktualisiereLiquiditaet(jahr);
+        AktualisiereChart(jahr);
     }
 
-    public void SetDaten(float[] daten)
+    // ============================================================
+    // RENTABILITÄT
+    // Zeigt Einnahmen- und Ausgaben-Kategorien für das aktuelle Jahr
+    // ============================================================
+    private void AktualisiereRentabilitaet(int jahr)
     {
-        if (_chart != null)
-        {
-            _chart.SetValues(daten);
-        }
-    }
-
-    private class LineChartElement : VisualElement
-    {
-        private float[] _values;
-
-        private readonly VisualElement _yAxis;
-        private readonly VisualElement _xAxis;
-
-        public LineChartElement(
-            VisualElement yAxis,
-            VisualElement xAxis)
-        {
-            _yAxis = yAxis;
-            _xAxis = xAxis;
-
-            generateVisualContent += Draw;
-        }
-
-        public void SetValues(float[] values)
-        {
-            _values = values;
-            MarkDirtyRepaint();
-        }
-
-        private void Draw(MeshGenerationContext ctx)
-        {
-            var p = ctx.painter2D;
-
-            float width = contentRect.width;
-            float height = contentRect.height;
-
-            if (width <= 0 || height <= 0)
-                return;
-
-            // =====================================
-            // HILFSLINIEN AUF LABEL-POSITIONEN
-            // =====================================
-
-            p.strokeColor = new Color(1f, 1f, 1f, 0.15f);
-            p.lineWidth = 1f;
-
-            if (_yAxis != null)
-            {
-                foreach (var label in _yAxis.Children())
-                {
-                    float y =
-                        label.worldBound.center.y -
-                        worldBound.yMin;
-
-                    p.BeginPath();
-                    p.MoveTo(new Vector2(0, y));
-                    p.LineTo(new Vector2(width, y));
-                    p.Stroke();
-                }
-            }
-
-            if (_xAxis != null)
-            {
-                foreach (var label in _xAxis.Children())
-                {
-                    float x =
-                        label.worldBound.center.x -
-                        worldBound.xMin;
-
-                    p.BeginPath();
-                    p.MoveTo(new Vector2(x, 0));
-                    p.LineTo(new Vector2(x, height));
-                    p.Stroke();
-                }
-            }
-
-            // =====================================
-            // KEINE DATEN
-            // =====================================
-
-            if (_values == null || _values.Length < 2)
-            {
-                _values = new float[]
-                {
-                    0,0,0,0,0,0,
-                    0,0,0,0,0,0
-                };
-            }
-
-            // =====================================
-            // MIN / MAX
-            // =====================================
-
-            float min = float.MaxValue;
-            float max = float.MinValue;
-
-            foreach (float value in _values)
-            {
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-
-            float range = Mathf.Max(max - min, 1f);
-
-            // =====================================
-            // PUNKTE BERECHNEN
-            // =====================================
-
-            Vector2[] points = new Vector2[_values.Length];
-
-            for (int i = 0; i < _values.Length; i++)
-            {
-                float x = width * i / (_values.Length - 1);
-
-                float normalized =
-                    (_values[i] - min) / range;
-
-                float y =
-                    height -
-                    (normalized * height);
-
-                points[i] = new Vector2(x, y);
-            }
-
-            // =====================================
-            // DIAGRAMMLINIE
-            // =====================================
-
-            p.strokeColor = Color.green;
-            p.lineWidth = 3f;
-
-            p.BeginPath();
-            p.MoveTo(points[0]);
-
-            for (int i = 1; i < points.Length; i++)
-            {
-                p.LineTo(points[i]);
-            }
-
-            p.Stroke();
-
-            // =====================================
-            // DATENPUNKTE
-            // =====================================
-
-            p.fillColor = Color.green;
-
-            foreach (Vector2 point in points)
-            {
-                p.BeginPath();
-                p.Arc(point, 4f, 0f, 360f);
-                p.Fill();
-            }
-        }
-    }
-    private void LadeMonatlichenCashflow()
-    {
-        Label label = _root.Q<Label>("mntlCashflow");
-
-        if (label == null)
-        {
-            Debug.LogWarning("[Finanzen1] mntlCashflow Label nicht gefunden");
-            return;
-        }
-
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
-        {
-            label.text = "0 €";
-            return;
-        }
-
-        float einnahmen = 0f;
-        float ausgaben = 0f;
-
-        var einkommen = db.getAllEinkommenEntries();
-        var ausgabenList = db.getAllAusgabenEntries();
-
-        if (einkommen != null)
-        {
-            foreach (var e in einkommen)
-            {
-                einnahmen += (float)e.Amount;
-            }
-        }
-
-        if (ausgabenList != null)
-        {
-            foreach (var a in ausgabenList)
-            {
-                ausgaben += (float)a.Amount;
-            }
-        }
-
-        float cashflow = einnahmen - ausgaben;
-
-        label.text = cashflow.ToString("N2") + " €";
-
-        Debug.Log("[Finanzen1] Cashflow: " + cashflow);
-    }
-
-    private void LadeLiquiditaetAmAnfang()
-    {
-        Label label = _root.Q<Label>("LiquAnfang");
-
-        if (label == null)
-        {
-            Debug.LogWarning("[Finanzen1] LiquAnfang Label nicht gefunden");
-            return;
-        }
-
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
-        {
-            label.text = "0 €";
-            return;
-        }
-
-        var einkommen = db.getAllEinkommenEntries();
-        var ausgaben = db.getAllAusgabenEntries();
-
-        if ((einkommen == null || einkommen.Count == 0) &&
-            (ausgaben == null || ausgaben.Count == 0))
-        {
-            label.text = "0 €";
-            return;
-        }
-
-        DateTime firstDate = DateTime.MaxValue;
-
-        void CheckDate(string date)
-        {
-            if (DateTime.TryParse(date, out DateTime d))
-            {
-                if (d < firstDate)
-                    firstDate = d;
-            }
-        }
-
-        foreach (var e in einkommen)
-            CheckDate(e.Datum);
-
-        foreach (var a in ausgaben)
-            CheckDate(a.Datum);
-
-        float einnahmen = 0f;
-        float kosten = 0f;
-
-        foreach (var e in einkommen)
-        {
-            if (DateTime.TryParse(e.Datum, out DateTime d) && d == firstDate)
-                einnahmen += (float)e.Amount;
-        }
-
-        foreach (var a in ausgaben)
-        {
-            if (DateTime.TryParse(a.Datum, out DateTime d) && d == firstDate)
-                kosten += (float)a.Amount;
-        }
-
-        float liquiditaetAnfang = einnahmen - kosten;
-
-        label.text = liquiditaetAnfang.ToString("N2") + " €";
-
-        Debug.Log("[Finanzen1] Liquidität Anfang: " + liquiditaetAnfang);
-    }
-
-   private void LadeGruendungsUebersicht()
-    {
-        var container = _root.Q<VisualElement>("GruendungTabelle");
-
-        if (container == null)
-        {
-            Debug.LogError("GruendungTabelle nicht gefunden");
-            return;
-        }
-
+        var container = _root.Q<VisualElement>("Rentabilitaet");
+        if (container == null) return;
         container.Clear();
 
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null)
-        {
-            Debug.LogWarning("Keine aktive Datenbank");
-            return;
-        }
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) return;
 
-        float geldeinlagen = 0f;
-        float kredite = 0f;
-
-        float investitionen = 0f;
-        float gruendungskosten = 0f;
-        float mwstInvest = 0f;
-        float mwstGruendung = 0f;
-
-        // =========================
-        // EINNAHMEN AUSWERTEN
-        // =========================
+        // Einnahmen nach Art summieren
+        var einnahmenMap = new Dictionary<string, float>();
         var einkommen = db.getAllEinkommenEntries();
-
         if (einkommen != null)
-        {
             foreach (var e in einkommen)
-            {
-                string desc = e.Description.ToLower();
+                if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year == jahr)
+                {
+                    string art = string.IsNullOrEmpty(e.getArt()) ? "Sonstige Einnahmen" : e.getArt();
+                    if (!einnahmenMap.ContainsKey(art)) einnahmenMap[art] = 0;
+                    einnahmenMap[art] += e.Amount;
+                }
 
-                if (desc.Contains("einlage"))
-                    geldeinlagen += (float)e.Amount;
-
-                if (desc.Contains("kredit"))
-                    kredite += (float)e.Amount;
-            }
-        }
-
-        // =========================
-        // AUSGABEN AUSWERTEN
-        // =========================
+        // Ausgaben nach Art summieren
+        var ausgabenMap = new Dictionary<string, float>
+        {
+            { "Gehälter",                   0 },
+            { "Marketing",                  0 },
+            { "Reisekosten",                0 },
+            { "Steuern",                    0 },
+            { "Finanzamt",                  0 },
+            { "Tilgungsraten",              0 },
+            { "Barentnahme / Privatentnahme", 0 },
+            { "Sonstige Kosten",            0 },
+        };
         var ausgaben = db.getAllAusgabenEntries();
-
         if (ausgaben != null)
-        {
             foreach (var a in ausgaben)
-            {
-                string desc = a.Description.ToLower();
+                if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
+                {
+                    string art = string.IsNullOrEmpty(a.getArt()) ? "Sonstige Kosten" : a.getArt();
+                    if (!ausgabenMap.ContainsKey(art)) ausgabenMap[art] = 0;
+                    ausgabenMap[art] += a.Amount;
+                }
 
-                if (desc.Contains("invest"))
-                    investitionen += (float)a.Amount;
+        float gesamtEinnahmen = einnahmenMap.Values.Sum();
+        float gesamtAusgaben  = ausgabenMap.Values.Sum();
+        float ueberschuss     = gesamtEinnahmen - gesamtAusgaben;
 
-                else if (desc.Contains("gründung") || desc.Contains("gruendung"))
-                    gruendungskosten += (float)a.Amount;
+        // Header
+        container.Add(CreateTabelleHeader("Kategorie", "Betrag"));
 
-                else if (desc.Contains("mwst invest"))
-                    mwstInvest += (float)a.Amount;
+        // Einnahmen-Sektion
+        container.Add(CreateSektionLabel("── Einnahmen"));
+        foreach (var kv in einnahmenMap.Where(k => k.Value > 0))
+            container.Add(CreateTabelleRow(kv.Key, kv.Value, GreenColor));
+        container.Add(CreateTabelleRow("Gesamt Einnahmen", gesamtEinnahmen, GreenColor, true));
 
-                else if (desc.Contains("mwst gründung"))
-                    mwstGruendung += (float)a.Amount;
-            }
-        }
+        // Trennlinie
+        container.Add(CreateTrennlinie());
 
-        float anfangsbestand =
-            (geldeinlagen + kredite + mwstInvest + mwstGruendung)
-            - (investitionen + gruendungskosten);
+        // Ausgaben-Sektion
+        container.Add(CreateSektionLabel("── Ausgaben"));
+        foreach (var kv in ausgabenMap.Where(k => k.Value > 0))
+            container.Add(CreateTabelleRow(kv.Key, kv.Value, RedColor));
+        container.Add(CreateTabelleRow("Gesamt Ausgaben", gesamtAusgaben, RedColor, true));
 
-        // =========================
-        // UI AUSGABE
-        // =========================
-        container.Add(CreateRow("Geldeinlagen", geldeinlagen));
-        container.Add(CreateRow("Kredite", kredite));
-        container.Add(CreateRow("Investitionen", investitionen));
-        container.Add(CreateRow("Gründungskosten", gruendungskosten));
-        container.Add(CreateRow("Rückerstattung MwSt Investitionen", mwstInvest));
-        container.Add(CreateRow("Rückerstattung MwSt Gründungskosten", mwstGruendung));
+        // Trennlinie
+        container.Add(CreateTrennlinie());
 
-        container.Add(CreateSeparator());
-        container.Add(CreateRowBold("Anfangsbestand zu Geschäftsbeginn", anfangsbestand));
+        // Überschuss/Fehlbetrag
+        Color ueberschussColor = ueberschuss >= 0 ? GreenColor : RedColor;
+        container.Add(CreateTabelleRow("Überschuss / Fehlbetrag", ueberschuss, ueberschussColor, true));
     }
 
-    private VisualElement CreateRow(string label, float value)
+    // ============================================================
+    // LIQUIDITÄT ZUM GESCHÄFTSBEGINN
+    // Zeigt Startkapital-relevante Einnahmen (Einlagen, Kredite etc.)
+    // ============================================================
+    private void AktualisiereLiquiditaet(int jahr)
     {
-        VisualElement row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.justifyContent = Justify.SpaceBetween;
+        var container = _root.Q<VisualElement>("Liquiditaet");
+        if (container == null) return;
+        container.Clear();
 
-        Label l = new Label(label);
-        Label v = new Label(value.ToString("N2") + " €");
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) return;
 
-        l.style.color = Color.white;
-        v.style.color = Color.white;
-
-        row.Add(l);
-        row.Add(v);
-
-        return row;
-    }
-
-    private VisualElement CreateRowBold(string label, float value)
-    {
-        VisualElement row = CreateRow(label, value);
-
-        foreach (var child in row.Children())
+        var liquidMap = new Dictionary<string, float>
         {
-            if (child is Label lbl)
-            {
-                lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
-            }
+            { "Privateinzahlung",  0 },
+            { "Darlehen",          0 },
+            { "Sonstige Einzahlung", 0 },
+        };
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+            foreach (var e in einkommen)
+                if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year == jahr)
+                {
+                    string art = e.getArt();
+                    if (liquidMap.ContainsKey(art))
+                        liquidMap[art] += e.Amount;
+                }
+
+        var ausgaben = db.getAllAusgabenEntries();
+        var gruendungskostenMap = new Dictionary<string, float>
+        {
+            { "Tilgungsraten", 0 },
+            { "Finanzamt",     0 },
+        };
+        if (ausgaben != null)
+            foreach (var a in ausgaben)
+                if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
+                {
+                    string art = a.getArt();
+                    if (gruendungskostenMap.ContainsKey(art))
+                        gruendungskostenMap[art] += a.Amount;
+                }
+
+        float gesamtZufluss  = liquidMap.Values.Sum();
+        float gesamtAbfluss  = gruendungskostenMap.Values.Sum();
+        float liquiditaet    = gesamtZufluss - gesamtAbfluss;
+
+        container.Add(CreateTabelleHeader("Kategorie", "Betrag"));
+
+        container.Add(CreateSektionLabel("── Zufluss"));
+        foreach (var kv in liquidMap)
+            container.Add(CreateTabelleRow(kv.Key, kv.Value, GreenColor));
+
+        container.Add(CreateTrennlinie());
+
+        container.Add(CreateSektionLabel("── Abfluss"));
+        foreach (var kv in gruendungskostenMap)
+            container.Add(CreateTabelleRow(kv.Key, kv.Value, RedColor));
+
+        container.Add(CreateTrennlinie());
+
+        Color liqColor = liquiditaet >= 0 ? GreenColor : RedColor;
+        container.Add(CreateTabelleRow("Liquidität gesamt", liquiditaet, liqColor, true));
+    }
+
+    // ============================================================
+    // CHART: Einnahmen vs Ausgaben monatlich
+    // ============================================================
+    private void AktualisiereChart(int jahr)
+    {
+        var container = _root.Q<VisualElement>("chart-container");
+        if (container == null) return;
+
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        float[] einnahmen = new float[12];
+        float[] ausgaben  = new float[12];
+
+        if (db != null)
+        {
+            var einkommen = db.getAllEinkommenEntries();
+            if (einkommen != null)
+                foreach (var e in einkommen)
+                    if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year == jahr)
+                        einnahmen[d.Month - 1] += e.Amount;
+
+            var ausgabenList = db.getAllAusgabenEntries();
+            if (ausgabenList != null)
+                foreach (var a in ausgabenList)
+                    if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
+                        ausgaben[d.Month - 1] += a.Amount;
         }
 
+        var chart = new FinanzChartElement();
+        chart.style.position = Position.Absolute;
+        chart.style.left = 0; chart.style.right  = 0;
+        chart.style.top  = 0; chart.style.bottom = 0;
+        container.Add(chart);
+        chart.SetData(einnahmen, ausgaben);
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+    private VisualElement CreateTabelleHeader(string links, string rechts)
+    {
+        var row = new VisualElement();
+        row.style.flexDirection   = FlexDirection.Row;
+        row.style.justifyContent  = Justify.SpaceBetween;
+        row.style.paddingBottom   = 6;
+        row.style.marginBottom    = 4;
+        row.style.borderBottomWidth = 1;
+        row.style.borderBottomColor = new Color(1, 1, 1, 0.2f);
+
+        row.Add(MakeLabel(links,  HeaderColor, 14, true));
+        row.Add(MakeLabel(rechts, HeaderColor, 14, true));
         return row;
     }
 
-    private VisualElement CreateSeparator()
+    private VisualElement CreateTabelleRow(string name, float wert, Color wertFarbe, bool fett = false)
     {
-        VisualElement line = new VisualElement();
-        line.style.height = 2;
-        line.style.marginTop = 10;
-        line.style.marginBottom = 10;
-        line.style.backgroundColor = new Color(1, 1, 1, 0.2f);
+        var row = new VisualElement();
+        row.style.flexDirection  = FlexDirection.Row;
+        row.style.justifyContent = Justify.SpaceBetween;
+        row.style.paddingTop     = 5;
+        row.style.paddingBottom  = 5;
 
+        string wertText = (wert < 0 ? "-" : "") + Mathf.Abs(wert).ToString("N0") + " €";
+
+        row.Add(MakeLabel(name,     fett ? HeaderColor : TextColor, 13, fett));
+        row.Add(MakeLabel(wertText, wertFarbe, 13, fett));
+        return row;
+    }
+
+    private VisualElement CreateSektionLabel(string text)
+    {
+        var row = new VisualElement();
+        row.style.paddingTop    = 8;
+        row.style.paddingBottom = 4;
+        row.Add(MakeLabel(text, SubColor, 11, false));
+        return row;
+    }
+
+    private VisualElement CreateTrennlinie()
+    {
+        var line = new VisualElement();
+        line.style.height           = 1;
+        line.style.backgroundColor  = new Color(1, 1, 1, 0.1f);
+        line.style.marginTop        = 6;
+        line.style.marginBottom     = 6;
         return line;
     }
 
-    private void LadeAktuelleLiquiditaet()
+    private Label MakeLabel(string text, Color farbe, int size, bool fett)
     {
-        var label = _root.Q<Label>("LiquAktuell");
-
-        if (label == null)
-        {
-            Debug.LogWarning("LiquAktuell Label nicht gefunden");
-            return;
-        }
-
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
-        {
-            label.text = "0,00 €";
-            return;
-        }
-
-        float einnahmen = 0f;
-        float ausgaben = 0f;
-
-        // =========================
-        // EINNAHMEN
-        // =========================
-        var einkommen = db.getAllEinkommenEntries();
-        if (einkommen != null)
-        {
-            foreach (var e in einkommen)
-            {
-                einnahmen += (float)e.Amount;
-            }
-        }
-
-        // =========================
-        // AUSGABEN
-        // =========================
-        var ausgabenListe = db.getAllAusgabenEntries();
-        if (ausgabenListe != null)
-        {
-            foreach (var a in ausgabenListe)
-            {
-                ausgaben += (float)a.Amount;
-            }
-        }
-
-        float liquiditaet = einnahmen - ausgaben;
-
-        label.text = liquiditaet.ToString("N2") + " €";
-
-        Debug.Log("[Finanzen1] Liquidität aktuell: " + liquiditaet);
+        var l = new Label(text);
+        l.style.color = farbe;
+        l.style.fontSize = size;
+        l.style.unityFontStyleAndWeight = fett ? FontStyle.Bold : FontStyle.Normal;
+        return l;
     }
 }
