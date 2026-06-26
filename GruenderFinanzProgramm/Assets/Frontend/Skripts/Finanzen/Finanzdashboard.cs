@@ -186,6 +186,9 @@ private void OeffneFinanzen1()
         float gewinn = einnahmen - ausgaben;
 
         gewinnLabel.text = gewinn.ToString("N2") + " €";
+        gewinnLabel.style.color = gewinn < 0
+            ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot
+            : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Grün
 
         Debug.Log(
             $"[Finanzdashboard] Gewinn: {gewinn} € | Einnahmen: {einnahmen} € | Ausgaben: {ausgaben} €"
@@ -291,239 +294,69 @@ private void OeffneFinanzen1()
     // =========================================================
     private void SetupChart()
     {
-        VisualElement diagramm =
-            Root.Q<VisualElement>("diagramm");
+        var canvas = Root.Q<VisualElement>("diagramm");
+        if (canvas == null) { Debug.LogWarning("[Finanzdashboard] diagramm nicht gefunden"); return; }
 
-        VisualElement yAxis =
-            Root.Q<VisualElement>("chart-y-axis");
-
-        VisualElement xAxis =
-            Root.Q<VisualElement>("chart-x-axis");
-
-        if (diagramm == null)
-        {
-            Debug.LogWarning("[Dashboard] diagramm nicht gefunden");
-            return;
-        }
-
-        _chart = new LineChartElement(yAxis, xAxis);
-
+        _chart = new LineChartElement(new float[12]);
+        canvas.Add(_chart);
         _chart.style.position = Position.Absolute;
-        _chart.style.left = 0;
-        _chart.style.right = 0;
-        _chart.style.top = 0;
-        _chart.style.bottom = 0;
-
-        diagramm.Add(_chart);
+        _chart.style.left = 0; _chart.style.top = 0;
+        _chart.style.right = 0; _chart.style.bottom = 0;
     }
 
-    // =========================================================
-    // PARSE HELPER
-    // =========================================================
-    private bool TryParse(string text, out DateTime result)
-    {
-        return DateTime.TryParse(text, out result);
-    }
-
-    // =========================================================
-    // HEADER
-    // =========================================================
-    private VisualElement CreateHeader()
-    {
-        VisualElement header = new VisualElement();
-        header.style.flexDirection = FlexDirection.Row;
-        header.style.justifyContent = Justify.SpaceBetween;
-        header.style.paddingBottom = 10;
-        header.style.marginBottom = 10;
-        header.style.borderBottomWidth = 1;
-        header.style.borderBottomColor = new Color(1, 1, 1, 0.25f);
-
-        Label left = new Label("Status");
-        Label right = new Label("Anzahl");
-
-        ApplyTextStyle(left, true);
-        ApplyTextStyle(right, true);
-
-        header.Add(left);
-        header.Add(right);
-
-        return header;
-    }
-
-    // =========================================================
-    // ROWS
-    // =========================================================
-    private VisualElement CreateRow(string status, int count)
-    {
-        VisualElement row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.justifyContent = Justify.SpaceBetween;
-        row.style.paddingTop = 7;
-        row.style.paddingBottom = 7;
-
-        Label statusLabel = new Label(status);
-        Label countLabel = new Label(count.ToString());
-
-        ApplyTextStyle(statusLabel, false);
-        ApplyTextStyle(countLabel, false);
-
-        row.Add(statusLabel);
-        row.Add(countLabel);
-
-        return row;
-    }
-
-    // =========================================================
-    // STYLE
-    // =========================================================
-    private void ApplyTextStyle(Label label, bool isHeader)
-    {
-        label.style.color = Color.white;
-        label.style.fontSize = isHeader ? 18 : 16;
-
-        label.style.unityFontStyleAndWeight =
-            isHeader ? FontStyle.Bold : FontStyle.Normal;
-
-        if (!isHeader)
-            label.style.opacity = 0.92f;
-    }
-
-    // =========================================================
-    // LINE CHART (EINFACHER NETTO-CHART)
-    // =========================================================
+    // Identisch mit DashboardController.LineChartElement
     private class LineChartElement : VisualElement
-{
-    private float[] _values;
-
-    private readonly VisualElement _yAxis;
-    private readonly VisualElement _xAxis;
-
-    public LineChartElement(
-        VisualElement yAxis,
-        VisualElement xAxis)
     {
-        _yAxis = yAxis;
-        _xAxis = xAxis;
+        private float[] _values;
+        private static readonly Color LineColor  = new Color(0.502f, 0.812f, 0.584f, 1f);
+        private static readonly Color GridColor  = new Color(0.25f,  0.25f,  0.25f,  1f);
+        private static readonly Color FillColor  = new Color(0.502f, 0.812f, 0.584f, 0.12f);
+        private static readonly Color PointColor = new Color(0.502f, 0.812f, 0.584f, 1f);
 
-        generateVisualContent += Draw;
-    }
+        public LineChartElement(float[] v) { _values = v; generateVisualContent += Draw; }
+        public void SetValues(float[] v)   { _values = v; MarkDirtyRepaint(); }
 
-    public void SetValues(float[] values)
-    {
-        _values = values;
-        MarkDirtyRepaint();
-    }
-
-    private void Draw(MeshGenerationContext ctx)
-    {
-        var p = ctx.painter2D;
-
-        float width = contentRect.width;
-        float height = contentRect.height;
-
-        if (width <= 0 || height <= 0)
-            return;
-
-        // Hilfslinien
-
-        p.strokeColor = new Color(1f, 1f, 1f, 0.15f);
-        p.lineWidth = 1f;
-
-        if (_yAxis != null)
+        private void Draw(MeshGenerationContext ctx)
         {
-            foreach (var label in _yAxis.Children())
-            {
-                float y =
-                    label.worldBound.center.y -
-                    worldBound.yMin;
+            if (_values == null || _values.Length < 2) return;
+            float w = contentRect.width, h = contentRect.height, padX = 12f, padY = 14f;
 
-                p.BeginPath();
-                p.MoveTo(new Vector2(0, y));
-                p.LineTo(new Vector2(width, y));
-                p.Stroke();
+            float maxV = float.MinValue, minV = float.MaxValue;
+            foreach (var v in _values) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
+            float range = Mathf.Max(maxV - minV, 1f);
+            float vMin  = minV - range * 0.08f;
+            float vMax  = maxV + range * 0.08f;
+            float vRange = vMax - vMin;
+
+            var p = ctx.painter2D;
+            p.strokeColor = GridColor; p.lineWidth = 0.5f;
+            for (int g = 0; g <= 4; g++)
+            {
+                float yg = padY + (h - 2 * padY) * g / 4f;
+                p.BeginPath(); p.MoveTo(new Vector2(padX, yg)); p.LineTo(new Vector2(w - padX, yg)); p.Stroke();
             }
-        }
 
-        if (_xAxis != null)
-        {
-            foreach (var label in _xAxis.Children())
-            {
-                float x =
-                    label.worldBound.center.x -
-                    worldBound.xMin;
+            var pts = new Vector2[_values.Length];
+            for (int i = 0; i < _values.Length; i++)
+                pts[i] = new Vector2(
+                    padX + (w - 2*padX) * i / (_values.Length - 1),
+                    padY + (h - 2*padY) * (1f - (_values[i] - vMin) / vRange));
 
-                p.BeginPath();
-                p.MoveTo(new Vector2(x, 0));
-                p.LineTo(new Vector2(x, height));
-                p.Stroke();
-            }
-        }
+            p.fillColor = FillColor;
+            p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, h - padY));
+            foreach (var pt in pts) p.LineTo(pt);
+            p.LineTo(new Vector2(pts[pts.Length-1].x, h - padY));
+            p.ClosePath(); p.Fill();
 
-        // Keine Daten
+            p.strokeColor = LineColor; p.lineWidth = 2f;
+            p.BeginPath(); p.MoveTo(pts[0]);
+            for (int i = 1; i < pts.Length; i++) p.LineTo(pts[i]);
+            p.Stroke();
 
-        if (_values == null || _values.Length < 2)
-        {
-            _values = new float[]
-            {
-                0,0,0,0,0,0,
-                0,0,0,0,0,0
-            };
-        }
-
-        float min = float.MaxValue;
-        float max = float.MinValue;
-
-        foreach (float value in _values)
-        {
-            if (value < min) min = value;
-            if (value > max) max = value;
-        }
-
-        float range = Mathf.Max(max - min, 1f);
-
-        Vector2[] points = new Vector2[_values.Length];
-
-        for (int i = 0; i < _values.Length; i++)
-        {
-            float x = width * i / (_values.Length - 1);
-
-            float normalized =
-                (_values[i] - min) / range;
-
-            float y =
-                height -
-                (normalized * height);
-
-            points[i] = new Vector2(x, y);
-        }
-
-        // Grüne Linie
-
-        p.strokeColor = Color.green;
-        p.lineWidth = 3f;
-
-        p.BeginPath();
-        p.MoveTo(points[0]);
-
-        for (int i = 1; i < points.Length; i++)
-        {
-            p.LineTo(points[i]);
-        }
-
-        p.Stroke();
-
-        // Punkte
-
-        p.fillColor = Color.green;
-
-        foreach (Vector2 point in points)
-        {
-            p.BeginPath();
-            p.Arc(point, 4f, 0f, 360f);
-            p.Fill();
+            p.fillColor = PointColor;
+            foreach (var pt in pts) { p.BeginPath(); p.Arc(pt, 3.5f, 0f, 360f); p.Fill(); }
         }
     }
-}
     private void UpdateYAxisLabels(float[] values)
     {
         VisualElement yAxis = Root.Q<VisualElement>("chart-y-axis");
@@ -574,6 +407,61 @@ private void OeffneFinanzen1()
             return $"{sign}€{(abs / 1000f):0.#}k";
 
         return $"{sign}€{abs:0}";
+    }
+
+    private bool TryParse(string text, out DateTime result)
+    {
+        return DateTime.TryParse(text, out result);
+    }
+
+    private VisualElement CreateHeader()
+    {
+        VisualElement header = new VisualElement();
+        header.style.flexDirection = FlexDirection.Row;
+        header.style.justifyContent = Justify.SpaceBetween;
+        header.style.paddingBottom = 10;
+        header.style.marginBottom = 10;
+        header.style.borderBottomWidth = 1;
+        header.style.borderBottomColor = new Color(1, 1, 1, 0.25f);
+
+        Label left = new Label("Status");
+        Label right = new Label("Anzahl");
+
+        ApplyTextStyle(left, true);
+        ApplyTextStyle(right, true);
+
+        header.Add(left);
+        header.Add(right);
+
+        return header;
+    }
+
+    private VisualElement CreateRow(string status, int count)
+    {
+        VisualElement row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.justifyContent = Justify.SpaceBetween;
+        row.style.paddingTop = 7;
+        row.style.paddingBottom = 7;
+
+        Label statusLabel = new Label(status);
+        Label countLabel = new Label(count.ToString());
+
+        ApplyTextStyle(statusLabel, false);
+        ApplyTextStyle(countLabel, false);
+
+        row.Add(statusLabel);
+        row.Add(countLabel);
+
+        return row;
+    }
+
+    private void ApplyTextStyle(Label label, bool isHeader)
+    {
+        label.style.color = Color.white;
+        label.style.fontSize = isHeader ? 18 : 16;
+        label.style.unityFontStyleAndWeight = isHeader ? FontStyle.Bold : FontStyle.Normal;
+        if (!isHeader) label.style.opacity = 0.92f;
     }
 
     private void LadeOffeneRechnungen()
