@@ -320,23 +320,14 @@ public int deleteInvoiceItem(int id)
         createTable<Dauerauftrag>();
     }
 
-    public int createEinkommen(float amount, string description, string datum, string art = "")
+    public int createEinkommen(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art });
+        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
     }
 
-    public int createAusgaben(float amount, string description, string datum, string art = "")
+    public int createAusgaben(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art });
-    }
-    public int createEinkommen(float amount, string description, string datum, string kategorie)
-    {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum , Kategorie = kategorie });
-    }
-
-    public int createAusgaben(float amount, string description, string datum, string kategorie)
-    {
-        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Kategorie = kategorie });
+        return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie  });
     }
 
     public List<Einkommen> getAllEinkommenEntries()
