@@ -31,7 +31,7 @@ public static class BelegAnhangController
                 if (doc.category == "Bezahlweise" && !string.IsNullOrEmpty(doc.title))
                     if (!titel.Contains(doc.title))
                         titel.Add(doc.title);
-        }
+            }
         }
         catch (Exception e)
         {
@@ -46,6 +46,10 @@ public static class BelegAnhangController
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
     {
         var ergebnis = new Dictionary<string, bool>();
+
+        foreach (string key in AnhangSchluessel)
+            ergebnis[key] = false;
+
         try
         {
             var alle = DocumentDashboard.GetSavedDocuments();
@@ -53,8 +57,8 @@ public static class BelegAnhangController
 
             foreach (var doc in alle.savedDocs)
             {
-                if (doc.category != "Bezahlweise") continue;
                 if (string.IsNullOrEmpty(doc.title)) continue;
+                if (!AnhangSchluessel.Contains(doc.title)) continue;
 
                 bool hatInhalt = !string.IsNullOrWhiteSpace(doc.inhalt);
 
@@ -69,30 +73,82 @@ public static class BelegAnhangController
         {
             Debug.LogWarning("[BelegAnhang] Dokumente konnten nicht geladen werden: " + e.Message);
         }
+
         return ergebnis;
     }
 
     // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF
-    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt)
+    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt, string status = "")
     {
         if (ausgewaehlt == null || ausgewaehlt.Count == 0) return;
 
         try
         {
             var alle = DocumentDashboard.GetSavedDocuments();
-            if (alle?.savedDocs == null) return;
 
             var titelFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
-            var textFont  = FontFactory.GetFont(FontFactory.HELVETICA, 11);
-            var linie     = new LineSeparator();
+            var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+            var linie = new LineSeparator();
+
+            bool barzahlungAusgewaehlt = ausgewaehlt.Contains("Barzahlung");
+            bool ueberweisungAusgewaehlt = ausgewaehlt.Contains("Überweisung");
+
+            if (barzahlungAusgewaehlt || ueberweisungAusgewaehlt)
+            {
+                bool istBezahlt =
+        !string.IsNullOrWhiteSpace(status) &&
+        status.Equals("Bezahlt", StringComparison.OrdinalIgnoreCase);
+
+                string methodenText = "";
+
+                if (barzahlungAusgewaehlt)
+                    methodenText += "Barzahlung";
+
+                if (ueberweisungAusgewaehlt)
+                {
+                    if (!string.IsNullOrWhiteSpace(methodenText))
+                        methodenText += " und ";
+
+                    methodenText += "Überweisung";
+                }
+
+                string inhaltText;
+
+                if (istBezahlt)
+                {
+                    inhaltText =
+                        "Die Rechnung wurde per " + methodenText + " bezahlt.";
+                }
+                else
+                {
+                    inhaltText =
+                        "Folgende Möglichkeiten zur Begleichung der Gesamtsumme stehen Ihnen zur Verfügung:\n\n";
+
+                    if (barzahlungAusgewaehlt)
+                        inhaltText += "• Barzahlung\n";
+
+                    if (ueberweisungAusgewaehlt)
+                        inhaltText += "• Überweisung\n\nDie Bankdaten finden Sie in der Fußzeile.";
+                }
+
+                document.NewPage();
+                document.Add(new Paragraph("Zahlungshinweise", titelFont));
+                document.Add(new Paragraph(" "));
+                document.Add(new Chunk(linie));
+                document.Add(new Paragraph(" "));
+                document.Add(new Paragraph(inhaltText, textFont));
+            }
 
             foreach (string key in ausgewaehlt)
             {
-                var doc = alle.savedDocs.Find(d => d.category == "Bezahlweise" && d.title == key);
+                if (key == "Barzahlung" || key == "Überweisung")
+                    continue;
+
+                string inhaltText = "";
+
+                var doc = alle?.savedDocs?.Find(d => d.title == key);
                 if (doc == null) continue;
 
-                // Inhalt aus Freitext oder Strukturfeldern zusammenbauen
-                string inhaltText = "";
                 if (!string.IsNullOrWhiteSpace(doc.inhalt))
                 {
                     inhaltText = doc.inhalt;
@@ -100,18 +156,20 @@ public static class BelegAnhangController
                 else if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
                 {
                     var zeilen = new System.Text.StringBuilder();
+
                     foreach (var feld in doc.strukturFelder)
                     {
                         if (!string.IsNullOrWhiteSpace(feld.wert))
                             zeilen.AppendLine(feld.key + ": " + feld.wert);
                     }
+
                     inhaltText = zeilen.ToString().Trim();
                 }
 
                 if (string.IsNullOrWhiteSpace(inhaltText)) continue;
 
                 document.NewPage();
-                document.Add(new Paragraph(doc.title, titelFont));
+                document.Add(new Paragraph(key, titelFont));
                 document.Add(new Paragraph(" "));
                 document.Add(new Chunk(linie));
                 document.Add(new Paragraph(" "));

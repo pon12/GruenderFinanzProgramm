@@ -1286,11 +1286,22 @@ public abstract class BelegScreenController : MonoBehaviour
         _anhangAusgewaehlt.Clear();
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
-        var alleTitel  = BelegAnhangController.HoleAlleBezahlweiseTitel();
+
+        var alleTitel = new List<string>
+{
+    "AGB",
+    "Disclaimer",
+    "Barzahlung",
+    "Überweisung"
+};
 
         foreach (string key in alleTitel)
         {
-            bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
+            bool vorhanden =
+                key == "Barzahlung" ||
+                key == "Überweisung" ||
+                (verfuegbar.ContainsKey(key) && verfuegbar[key]);
+
             _anhangAusgewaehlt[key] = false;
             string lokalerKey = key;
 
@@ -1298,21 +1309,31 @@ public abstract class BelegScreenController : MonoBehaviour
             zeile.style.flexDirection = FlexDirection.Row;
             zeile.style.alignItems = Align.Center;
             zeile.style.marginBottom = 4;
-            zeile.style.paddingTop = 4; zeile.style.paddingBottom = 4;
-            zeile.style.paddingLeft = 8; zeile.style.paddingRight = 8;
-            zeile.style.borderTopLeftRadius = 6; zeile.style.borderTopRightRadius = 6;
-            zeile.style.borderBottomLeftRadius = 6; zeile.style.borderBottomRightRadius = 6;
+            zeile.style.paddingTop = 4;
+            zeile.style.paddingBottom = 4;
+            zeile.style.paddingLeft = 8;
+            zeile.style.paddingRight = 8;
+            zeile.style.borderTopLeftRadius = 6;
+            zeile.style.borderTopRightRadius = 6;
+            zeile.style.borderBottomLeftRadius = 6;
+            zeile.style.borderBottomRightRadius = 6;
             zeile.style.backgroundColor = vorhanden
                 ? new Color(55f / 255f, 55f / 255f, 55f / 255f)
                 : new Color(40f / 255f, 40f / 255f, 40f / 255f);
 
             var box = new VisualElement();
-            box.style.width = 18; box.style.height = 18;
-            box.style.flexShrink = 0; box.style.marginRight = 8;
-            box.style.borderTopLeftRadius = 4; box.style.borderTopRightRadius = 4;
-            box.style.borderBottomLeftRadius = 4; box.style.borderBottomRightRadius = 4;
-            box.style.borderTopWidth = 1; box.style.borderRightWidth = 1;
-            box.style.borderBottomWidth = 1; box.style.borderLeftWidth = 1;
+            box.style.width = 18;
+            box.style.height = 18;
+            box.style.flexShrink = 0;
+            box.style.marginRight = 8;
+            box.style.borderTopLeftRadius = 4;
+            box.style.borderTopRightRadius = 4;
+            box.style.borderBottomLeftRadius = 4;
+            box.style.borderBottomRightRadius = 4;
+            box.style.borderTopWidth = 1;
+            box.style.borderRightWidth = 1;
+            box.style.borderBottomWidth = 1;
+            box.style.borderLeftWidth = 1;
             box.style.alignItems = Align.Center;
             box.style.justifyContent = Justify.Center;
 
@@ -1347,19 +1368,8 @@ public abstract class BelegScreenController : MonoBehaviour
                     bool neuerWert = !_anhangAusgewaehlt[lokalerKey];
                     _anhangAusgewaehlt[lokalerKey] = neuerWert;
                     AktualisiereCheckboxOptik(box, haken, neuerWert, true);
+
                     zeile.style.backgroundColor = neuerWert
-                        ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                        : new Color(55f / 255f, 55f / 255f, 55f / 255f);
-                });
-                zeile.RegisterCallback<MouseEnterEvent>(_ =>
-                {
-                    if (!_anhangAusgewaehlt[lokalerKey])
-                        zeile.style.backgroundColor =
-                            new Color(65f / 255f, 65f / 255f, 65f / 255f);
-                });
-                zeile.RegisterCallback<MouseLeaveEvent>(_ =>
-                {
-                    zeile.style.backgroundColor = _anhangAusgewaehlt[lokalerKey]
                         ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
                         : new Color(55f / 255f, 55f / 255f, 55f / 255f);
                 });
@@ -1368,7 +1378,6 @@ public abstract class BelegScreenController : MonoBehaviour
             _anhangBereich.Add(zeile);
         }
     }
-
     private static void AktualisiereCheckboxOptik(
         VisualElement box, Label haken, bool ausgewaehlt, bool vorhanden)
     {
