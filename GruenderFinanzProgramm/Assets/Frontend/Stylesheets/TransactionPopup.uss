@@ -376,3 +376,26 @@
 .art-dropdown > .unity-base-popup-field__text { color: rgb(255, 255, 255); padding-left: 6px; }
 .art-dropdown .unity-base-popup-field__arrow { -unity-background-image-tint-color: rgb(255, 255, 255); }
 .art-dropdown .unity-base-field__input { background-color: transparent; border-width: 0; }
+
+/* =====================================================
+   PFAD-BTN-PRIMARY (Gründungspfad-Style, grüner Button)
+   Eingebunden im Finanzboard für den Kassenbuch-Button
+   ===================================================== */
+.pfad-btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 14px;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+.pfad-btn-primary:hover  { background-color: rgb(179, 226, 196); }
+.pfad-btn-primary:active { background-color: rgb(102, 165, 119); }
