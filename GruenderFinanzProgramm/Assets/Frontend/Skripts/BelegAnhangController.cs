@@ -17,7 +17,7 @@ public static class BelegAnhangController
         "Überweisung"
     };
 
-    // Diese Titel werden zu einer gemeinsamen "Bezahlweise"-Seite zusammengefasst
+    // Titel, die zu einer gemeinsamen "Bezahlweise"-Seite zusammengefasst werden
     private static readonly HashSet<string> BezahlweiseGruppe = new HashSet<string>
     {
         "Barzahlung",
@@ -46,7 +46,7 @@ public static class BelegAnhangController
         return titel;
     }
 
-    // Prüft welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind
+    // Prüft, welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
     {
         var ergebnis = new Dictionary<string, bool>();
@@ -77,8 +77,6 @@ public static class BelegAnhangController
 
     // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF.
     // Barzahlung und Überweisung werden auf einer gemeinsamen "Bezahlweise"-Seite zusammengefasst.
-    // belegTyp: "Angebot" oder "Rechnung"
-    // status: aktueller Belegstatus z.B. "Bezahlt", "Angenommen"
     public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt, string status = "", string belegTyp = "Rechnung")
     {
         if (ausgewaehlt == null || ausgewaehlt.Count == 0) return;
@@ -92,10 +90,8 @@ public static class BelegAnhangController
             var kursivFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 11);
             var linie      = new LineSeparator();
 
-            // Bezahlweise-Gruppe separat behandeln
             var bezahlweiseAusgewaehlt = ausgewaehlt.Where(k => BezahlweiseGruppe.Contains(k)).ToList();
 
-            // Kontodaten erscheinen nur im Footer — nicht als Anhangseite
             var nurFooter = new HashSet<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen" };
             var einzelAnhaenge = ausgewaehlt
                 .Where(k => !BezahlweiseGruppe.Contains(k) && !nurFooter.Contains(k))
@@ -123,7 +119,6 @@ public static class BelegAnhangController
                 document.Add(new Chunk(linie));
                 document.Add(new Paragraph(" "));
 
-                // Einleitungstext je nach Kontext
                 string einleitung;
                 if (istAngebot)
                     einleitung =
@@ -147,10 +142,10 @@ public static class BelegAnhangController
                 // Bankverbindung bei Überweisung ausgeben
                 if (hatUeberweisung)
                 {
-                    string iban           = PlayerPrefs.GetString("settings_iban", "");
-                    string bic            = PlayerPrefs.GetString("settings_bic", "");
-                    string kreditinstitut = PlayerPrefs.GetString("settings_kreditinstitut", "");
-                    string kontoinhaber   = PlayerPrefs.GetString("settings_kontoinhaber", "");
+                    string iban           = HoleNutzerPref("settings_iban");
+                    string bic            = HoleNutzerPref("settings_bic");
+                    string kreditinstitut = HoleNutzerPref("settings_kreditinstitut");
+                    string kontoinhaber   = HoleNutzerPref("settings_kontoinhaber");
 
                     if (string.IsNullOrEmpty(iban))
                     {
@@ -178,7 +173,7 @@ public static class BelegAnhangController
                     document.Add(new Paragraph(" "));
                 }
 
-                // Zusätzlicher Hinweistext aus Barzahlung-Dokument
+                // Hinweistext aus dem Barzahlung-Dokument
                 if (hatBar)
                 {
                     var barDok = alle.savedDocs.Find(
@@ -212,6 +207,14 @@ public static class BelegAnhangController
         {
             Debug.LogWarning("[BelegAnhang] PDF-Anhang fehlgeschlagen: " + e.Message);
         }
+    }
+
+    // Liest einen PlayerPrefs-Wert nutzerspezifisch aus
+    private static string HoleNutzerPref(string key, string fallback = "")
+    {
+        string prefix    = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
+        return PlayerPrefs.GetString(nutzerKey, PlayerPrefs.GetString(key, fallback));
     }
 
     private static string HoleInhalt(DocumentDashboard.DocumentData doc)

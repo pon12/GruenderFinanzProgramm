@@ -446,7 +446,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // Graut Statusbuttons aus, wenn der jeweilige Status bereits aktiv ist.
     protected virtual void AktualisiereStatusButtons(string status)
     {
-        SetzeButtonAktiv(FindeButton(AngenommenButtonName, "Angenommen"), status != "Angenommen" && status != "Versendet" && status != "Bezahlt" && status != "Storniert" && status != "Abgelehnt");
+        SetzeButtonAktiv(FindeButton(AngenommenButtonName, "Angenommen"), status != "Angenommen" && status != "Bezahlt" && status != "Storniert" && status != "Abgelehnt");
         SetzeButtonAktiv(FindeButton(AbgelehntButtonName,  "Abgelehnt"),  status != "Abgelehnt"  && status != "Storniert");
     }
 

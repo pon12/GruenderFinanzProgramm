@@ -11,20 +11,18 @@ public class PdfFooterEvent : PdfPageEventHelper
 
     private readonly iTextSharp.text.Font footerFont;
 
-    // Bankdaten aus PlayerPrefs
     private readonly string kreditinstitut;
     private readonly string iban;
     private readonly string bic;
     private readonly string kontoinhaber;
 
-    // Steuerdaten aus DB (Company)
     private readonly string steuerNr;
     private readonly string ustIdNr;
 
     public PdfFooterEvent(string firma, string adresse, bool showBankData)
     {
-        this.firma       = firma;
-        this.adresse     = adresse;
+        this.firma        = firma;
+        this.adresse      = adresse;
         this.showBankData = showBankData;
 
         footerFont = FontFactory.GetFont(
@@ -33,13 +31,13 @@ public class PdfFooterEvent : PdfPageEventHelper
             iTextSharp.text.Color.BLACK
         );
 
-        // Bankdaten aus PlayerPrefs lesen
-        kreditinstitut = PlayerPrefs.GetString("settings_kreditinstitut", "");
-        iban           = PlayerPrefs.GetString("settings_iban",           "");
-        bic            = PlayerPrefs.GetString("settings_bic",            "");
-        kontoinhaber   = PlayerPrefs.GetString("settings_kontoinhaber",   "");
+        // Bankdaten nutzerspezifisch aus PlayerPrefs lesen
+        kreditinstitut = HoleNutzerPref("settings_kreditinstitut");
+        iban           = HoleNutzerPref("settings_iban");
+        bic            = HoleNutzerPref("settings_bic");
+        kontoinhaber   = HoleNutzerPref("settings_kontoinhaber");
 
-        // Steuerdaten aus DB lesen (werden nicht in PlayerPrefs gespeichert)
+        // Steuerdaten aus DB lesen
         steuerNr = "";
         ustIdNr  = "";
         try
@@ -50,16 +48,16 @@ public class PdfFooterEvent : PdfPageEventHelper
                 var companies = db.getAllCompanies();
                 if (companies != null && companies.Count > 0)
                 {
-                    steuerNr = companies[0].steuerNr   ?? "";
-                    ustIdNr  = companies[0].ustIdNr    ?? "";
+                    steuerNr = companies[0].steuerNr  ?? "";
+                    ustIdNr  = companies[0].ustIdNr   ?? "";
 
-                    // Firmenname und Adresse aus DB als Fallback wenn nicht übergeben
                     if (string.IsNullOrEmpty(this.firma))
                         this.firma = companies[0].name ?? "";
+
                     if (string.IsNullOrEmpty(this.adresse))
                     {
-                        string ort = companies[0].location         ?? "";
-                        string str = companies[0].strasseuHausNr   ?? "";
+                        string ort = companies[0].location       ?? "";
+                        string str = companies[0].strasseuHausNr ?? "";
                         string plz = companies[0].plz > 0
                             ? companies[0].plz.ToString()
                             : "";
@@ -118,6 +116,14 @@ public class PdfFooterEvent : PdfPageEventHelper
         );
     }
 
+    // Liest einen PlayerPrefs-Wert nutzerspezifisch aus
+    private static string HoleNutzerPref(string key, string fallback = "")
+    {
+        string prefix    = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
+        return PlayerPrefs.GetString(nutzerKey, PlayerPrefs.GetString(key, fallback));
+    }
+
     private static void AddFooterCell(
         PdfPTable table,
         string text,
@@ -125,10 +131,10 @@ public class PdfFooterEvent : PdfPageEventHelper
     )
     {
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.Border               = Rectangle.NO_BORDER;
-        cell.PaddingTop           = 4;
-        cell.PaddingRight         = 10;
-        cell.HorizontalAlignment  = Element.ALIGN_LEFT;
+        cell.Border              = Rectangle.NO_BORDER;
+        cell.PaddingTop          = 4;
+        cell.PaddingRight        = 10;
+        cell.HorizontalAlignment = Element.ALIGN_LEFT;
         table.AddCell(cell);
     }
 }
