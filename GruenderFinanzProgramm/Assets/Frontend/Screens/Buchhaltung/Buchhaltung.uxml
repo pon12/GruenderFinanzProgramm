@@ -8,5 +8,22 @@
             </ui:VisualElement>
             <ui:ScrollView name="buchhaltung-list-container" style="flex-grow: 1; align-items: flex-start;"/>
         </ui:VisualElement>
+
+        <ui:VisualElement name="popup-modal-hintergrund" class="popup-overlay popup-hidden">
+            <ui:VisualElement name="popup-fenster" class="popup-window">
+                <ui:VisualElement class="popup-header">
+                    <ui:Label text="Beleg bearbeiten" name="popup-titel" class="popup-title" />
+                    <ui:Button text="✕" name="btn-popup-schliessen" class="popup-close-btn" />
+                </ui:VisualElement>
+                
+                <ui:ScrollView name="popup-content-container" class="popup-content">
+                    <ui:TextField label="Kunde" name="popup-input-kunde" class="popup-field" />
+                    <ui:TextField label="Referenz / Betreff" name="popup-input-referenz" class="popup-field" />
+                    <ui:DropdownField label="Status" name="popup-dropdown-status" class="popup-field" />
+                    
+                    <ui:Button text="Änderungen Speichern" name="btn-popup-speichern" class="popup-save-btn" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

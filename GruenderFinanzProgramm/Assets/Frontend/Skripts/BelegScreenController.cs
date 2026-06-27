@@ -7,6 +7,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
 
+
+public static class BelegTransfer
+{
+    public static string AusgewaehlteNummer = null;
+    public static bool IstRechnung = false;
+}
+
 public abstract class BelegScreenController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
