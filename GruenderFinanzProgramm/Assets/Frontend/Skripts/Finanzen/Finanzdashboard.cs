@@ -42,7 +42,63 @@ public class Finanzdashboard : MonoBehaviour
     LadeOffeneRechnungen();
 
     RegistriereButtons();
+    RegistriereHelpTooltips();
+    ButtonHoverController.RegistriereAlle(Root);
 }
+
+ // ============================================================
+    // HELP TOOLTIPS
+    // ============================================================
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(Root, "btn-help-seitentitel",
+            "Das Finanzdashboard gibt dir einen vollstÃ¤ndigen Ãœberblick Ã¼ber deine finanzielle Lage. " +
+            "Alle Werte stammen direkt aus deinem Kassenbuch.");
+
+        HelpTooltip.Registriere(Root, "btn-help-chart",
+            "Zeigt die monatliche Nettobilanz (Einnahmen minus Ausgaben) als Linienchart. " +
+            "Punkte Ã¼ber der Nulllinie sind Gewinnmonate.");
+
+        HelpTooltip.Registriere(Root, "btn-help-umsatz",
+            "Summe aller Einnahmen aus dem Kassenbuch Ã¼ber den gesamten Zeitraum.");
+
+        HelpTooltip.Registriere(Root, "btn-help-rechnungen",
+            "Anzahl der Rechnungen mit dem Status 'Angenommen' â€“ " +
+            "also Rechnungen die noch nicht als bezahlt markiert wurden.");
+
+        HelpTooltip.Registriere(Root, "btn-help-gewinn",
+            "Differenz aus Gesamteinnahmen minus Gesamtausgaben. " +
+            "Ein negativer Wert bedeutet einen Verlust.");
+
+        HelpTooltip.Registriere(Root, "btn-help-liquiditaet",
+            "Zeigt dir wichtige Finanzkennzahlen im Detail. " +
+            "Klicke auf den Button um zur vollstÃ¤ndigen FinanzÃ¼bersicht zu gelangen.");
+
+        HelpTooltip.Registriere(Root, "btn-help-dienst",
+            "Deine drei meistgenutzten Dienstleistungen aus der Dienstleistungsdatenbank. " +
+            "FÃ¼ge Dienstleistungen im Dienstleistungen-Screen hinzu.");
+
+        HelpTooltip.Registriere(Root, "btn-help-angebote",
+            "Zeigt wie viele Angebote sich in welchem Status befinden. " +
+            "Erstelle und verwalte Angebote im Angebots-Screen.");
+
+        HelpTooltip.Registriere(Root, "btn-help-kapital",
+            "Verteilung deiner Ausgaben nach Kategorie als Kreisdiagramm. " +
+            "GehÃ¤lter, Betriebskosten, Steuern, Tilgung und Sonstiges.");
+
+        HelpTooltip.Registriere(Root, "btn-help-rentab",
+            "Vergleicht Einnahmen, Ausgaben und Gewinn der letzten zwei Jahre als Balkendiagramm. " +
+            "GrÃ¼n = Einnahmen, Rot = Ausgaben, Blau = Gewinn.");
+
+        HelpTooltip.Registriere(Root, "btn-help-rohgewinn",
+            "Zeigt die monatliche Rohgewinn-Entwicklung des aktuellen Jahres. " +
+            "Berechnet aus Einnahmen minus Ausgaben pro Monat.");
+    }
+
+    // ============================================================
+    // BUTTONS
+    // ============================================================
 
     private void RegistriereButtons()
     {
