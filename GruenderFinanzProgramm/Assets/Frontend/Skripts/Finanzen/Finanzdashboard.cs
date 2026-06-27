@@ -564,7 +564,67 @@ private void OeffneFinanzen1()
     // =========================================================
     // LINE CHART (EINFACHER NETTO-CHART)
     // =========================================================
-    // Identisch mit DashboardController.LineChartElement — Füllfläche + Ventoriq-Farben
+    // ============================================================
+    // OFFENE RECHNUNGEN
+    // ============================================================
+
+    private void LadeOffeneRechnungen()
+    {
+        Label label = Root.Q<Label>("OffeneRechnungen");
+        if (label == null) return;
+
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) { label.text = "0"; return; }
+
+        var invoices = db.getAllInvoices();
+        if (invoices == null) { label.text = "0"; return; }
+
+        int count = 0;
+        foreach (var r in invoices)
+            if (r != null && r.status == "Angenommen") count++;
+
+        label.text = count.ToString();
+    }
+
+    // ============================================================
+    // Y-ACHSE
+    // ============================================================
+
+    private void UpdateYAxisLabels(float[] values)
+    {
+        UpdateYAxisLabelsFor(Root.Q<VisualElement>("chart-y-axis"), values);
+    }
+
+    private void UpdateYAxisLabelsFor(VisualElement yAxis, float[] values)
+    {
+        if (yAxis == null || values == null) return;
+
+        float max = float.MinValue, min = float.MaxValue;
+        foreach (float v in values) { if (v > max) max = v; if (v < min) min = v; }
+
+        float range   = Mathf.Max(max - min, 1f);
+        float dispMin = min - range * 0.1f;
+        float dispMax = max + range * 0.1f;
+
+        var labels = yAxis.Query<Label>().ToList();
+        for (int i = 0; i < labels.Count; i++)
+        {
+            float t     = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
+            float value = Mathf.Lerp(dispMax, dispMin, t);
+            labels[i].text = FormatEuro(value);
+        }
+    }
+
+    private string FormatEuro(float value)
+    {
+        string sign = value < 0 ? "-" : "";
+        float  abs  = Mathf.Abs(value);
+        if (abs >= 1000000f) return $"{sign}€{(abs / 1000000f):0.#}M";
+        if (abs >= 1000f)    return $"{sign}€{(abs / 1000f):0.#}k";
+        return $"{sign}€{abs:0}";
+    }
+
+    // LineChartElement — vom Kollegen (Finanzdashboard2.cs)
     private class LineChartElement : VisualElement
     {
         private float[] _values;
@@ -577,8 +637,7 @@ private void OeffneFinanzen1()
 
         public LineChartElement(VisualElement yAxis, VisualElement xAxis)
         {
-            _yAxis = yAxis;
-            _xAxis = xAxis;
+            _yAxis = yAxis; _xAxis = xAxis;
             generateVisualContent += Draw;
         }
 
@@ -591,9 +650,9 @@ private void OeffneFinanzen1()
 
             float maxV = float.MinValue, minV = float.MaxValue;
             foreach (var v in _values) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
-            float range = Mathf.Max(maxV - minV, 1f);
-            float vMin  = minV - range * 0.08f;
-            float vMax  = maxV + range * 0.08f;
+            float range  = Mathf.Max(maxV - minV, 1f);
+            float vMin   = minV - range * 0.08f;
+            float vMax   = maxV + range * 0.08f;
             float vRange = vMax - vMin;
 
             var p = ctx.painter2D;
@@ -610,7 +669,7 @@ private void OeffneFinanzen1()
                     padX + (w - 2*padX) * i / (_values.Length - 1),
                     padY + (h - 2*padY) * (1f - (_values[i] - vMin) / vRange));
 
-            // Baseline: bei negativen Werten auf Null-Linie setzen statt auf Bottom
+            // Null-Linie als Baseline für Füllfläche
             float zeroY = padY + (h - 2*padY) * (1f - (0f - vMin) / vRange);
             zeroY = Mathf.Clamp(zeroY, padY, h - padY);
 
@@ -629,85 +688,8 @@ private void OeffneFinanzen1()
             foreach (var pt in pts) { p.BeginPath(); p.Arc(pt, 3.5f, 0f, 360f); p.Fill(); }
         }
     }
-    // Legacy - für Finanzen im Überblick
-    private void UpdateYAxisLabels(float[] values)
-    {
-        UpdateYAxisLabelsFor(Root.Q<VisualElement>("chart-y-axis"), values);
-    }
 
-    private void UpdateYAxisLabelsFor(VisualElement yAxis, float[] values)
-    {
-        if (yAxis == null || values == null) return;
-
-        float max = float.MinValue, min = float.MaxValue;
-        foreach (float v in values) { if (v > max) max = v; if (v < min) min = v; }
-
-        float range    = Mathf.Max(max - min, 1f);
-        float dispMin  = min - range * 0.1f;
-        float dispMax  = max + range * 0.1f;
-
-        var labels = yAxis.Query<Label>().ToList();
-        for (int i = 0; i < labels.Count; i++)
-        {
-            float t     = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
-            float value = Mathf.Lerp(dispMax, dispMin, t);
-            labels[i].text = FormatEuro(value);
-        }
-    }
-    private string FormatEuro(float value)
-    {
-        string sign = value < 0 ? "-" : "";
-        float abs = Mathf.Abs(value);
-
-        if (abs >= 1000000f)
-            return $"{sign}€{(abs / 1000000f):0.#}M";
-
-        if (abs >= 1000f)
-            return $"{sign}€{(abs / 1000f):0.#}k";
-
-        return $"{sign}€{abs:0}";
-    }
-
-    private void LadeOffeneRechnungen()
-    {
-        Label label = Root.Q<Label>("OffeneRechnungen");
-
-        if (label == null)
-        {
-            Debug.LogWarning("[Finanzdashboard] OffeneRechnungen Label nicht gefunden");
-            return;
-        }
-
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
-        {
-            label.text = "0";
-            return;
-        }
-
-        var invoices = db.getAllInvoices();
-
-        if (invoices == null)
-        {
-            label.text = "0";
-            return;
-        }
-
-        int count = 0;
-
-        foreach (var r in invoices)
-        {
-            if (r != null && r.status == "Angenommen")
-            {
-                count++;
-            }
-        }
-
-        label.text = count.ToString();
-    }
-
-    // Bar Chart
+    // BarChartElement — vom Kollegen (Finanzdashboard2.cs) mit Null-Linie
     private class BarChartElement : VisualElement
     {
         private float[] _values;
@@ -716,178 +698,131 @@ private void OeffneFinanzen1()
 
         public BarChartElement(VisualElement yAxis, VisualElement xAxis)
         {
-            _yAxis = yAxis;
-            _xAxis = xAxis;
+            _yAxis = yAxis; _xAxis = xAxis;
             generateVisualContent += Draw;
         }
 
-        public void SetValues(float[] values)
-        {
-            _values = values;
-            MarkDirtyRepaint();
-        }
+        public void SetValues(float[] values) { _values = values; MarkDirtyRepaint(); }
 
         private void Draw(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
+            float width = contentRect.width, height = contentRect.height;
+            if (width <= 0 || height <= 0 || _values == null || _values.Length == 0) return;
 
-            float width = contentRect.width;
-            float height = contentRect.height;
+            float max = float.MinValue, min = float.MaxValue;
+            foreach (float v in _values) { if (v > max) max = v; if (v < min) min = v; }
+            float range = Mathf.Max(max - min, 1f);
+            float dispMin = min - range * 0.1f;
+            float dispMax = max + range * 0.1f;
+            if (dispMin > 0f) dispMin = 0f;
+            if (dispMax < 0f) dispMax = 0f;
+            float dispRange = Mathf.Max(dispMax - dispMin, 1f);
 
-            if (width <= 0 || height <= 0 || _values == null)
-                return;
-
-            float max = 1f;
-            foreach (var v in _values)
-                if (v > max) max = v;
-
-            // =====================================================
-            // NUR HORIZONTALE GRID-LINIEN
-            // =====================================================
-            p.strokeColor = new Color(1f, 1f, 1f, 0.12f);
-            p.lineWidth = 1f;
-
+            p.strokeColor = new Color(1f, 1f, 1f, 0.12f); p.lineWidth = 1f;
             if (_yAxis != null)
-            {
                 foreach (var label in _yAxis.Children())
                 {
                     float y = label.worldBound.center.y - worldBound.yMin;
-
-                    p.BeginPath();
-                    p.MoveTo(new Vector2(0, y));
-                    p.LineTo(new Vector2(width, y));
-                    p.Stroke();
+                    y = Mathf.Clamp(y, 0f, height);
+                    p.BeginPath(); p.MoveTo(new Vector2(0, y)); p.LineTo(new Vector2(width, y)); p.Stroke();
                 }
-            }
 
-            // ❌ KEINE X-AXIS GRID LINES (VERTIKAL ENTFERNT)
-
-            int years = 2;
+            float zeroNorm = Mathf.Clamp01((0f - dispMin) / dispRange);
+            float zeroY    = Mathf.Lerp(height, 0f, zeroNorm);
+            int years = Mathf.Max(1, _values.Length / 3);
             float groupWidth = width / years;
-
-            float barWidth = 40f;
-            float spacing = 10f;
+            float sidePad = 12f, innerSpacing = 8f;
+            float barWidth = Mathf.Max(8f, (groupWidth - sidePad * 2f - innerSpacing * 2f) / 3f);
 
             for (int year = 0; year < years; year++)
             {
-                float startX = year * groupWidth + groupWidth / 2f - 70f;
-
+                float startX = year * groupWidth + sidePad;
                 for (int type = 0; type < 3; type++)
                 {
                     int index = year * 3 + type;
                     if (index >= _values.Length) continue;
-
                     float value = _values[index];
-                    float h = (value / max) * height;
+                    float valNorm = Mathf.Clamp01((value - dispMin) / dispRange);
+                    float valueY  = Mathf.Lerp(height, 0f, valNorm);
+                    float x = startX + type * (barWidth + innerSpacing);
 
-                    float x = startX + type * (barWidth + spacing);
-                    float y = height - h;
-
-                    // Ventoriq: Einnahmen=Grün, Ausgaben=Rot, Gewinn=Blau
                     Color barColor =
                         type == 0 ? new Color(0.502f, 0.812f, 0.584f, 1f) :
                         type == 1 ? new Color(0.902f, 0.224f, 0.275f, 1f) :
                                     new Color(0.302f, 0.596f, 1.000f, 1f);
-
                     p.fillColor = barColor;
 
+                    float topY    = Mathf.Min(zeroY, valueY);
+                    float bottomY = Mathf.Max(zeroY, valueY);
+                    if (bottomY - topY <= 0.5f) continue;
+
                     p.BeginPath();
-                    p.MoveTo(new Vector2(x, height));
-                    p.LineTo(new Vector2(x, y));
-                    p.LineTo(new Vector2(x + barWidth, y));
-                    p.LineTo(new Vector2(x + barWidth, height));
-                    p.ClosePath();
-                    p.Fill();
+                    p.MoveTo(new Vector2(x, bottomY));
+                    p.LineTo(new Vector2(x, topY));
+                    p.LineTo(new Vector2(x + barWidth, topY));
+                    p.LineTo(new Vector2(x + barWidth, bottomY));
+                    p.ClosePath(); p.Fill();
                 }
             }
+
+            p.strokeColor = new Color(1f, 1f, 1f, 0.22f); p.lineWidth = 1.5f;
+            p.BeginPath(); p.MoveTo(new Vector2(0, zeroY)); p.LineTo(new Vector2(width, zeroY)); p.Stroke();
         }
     }
 
-    private VisualElement CreateCell(string text, bool isHeader)
-    {
-        var label = new Label(text);
-
-        label.style.color = Color.white;
-        label.style.unityTextAlign = TextAnchor.MiddleLeft;
-
-        label.style.flexGrow = 1;
-        label.style.width = Length.Percent(33);
-
-        label.style.fontSize = isHeader ? 16 : 14;
-
-        if (isHeader)
-            label.style.unityFontStyleAndWeight = FontStyle.Bold;
-
-        return label;
-    }
-
-
-
-        private class PieChartElement : VisualElement
+    // PieChartElement — vom Kollegen (Finanzdashboard2.cs) mit Sonderfall Vollkreis
+    private class PieChartElement : VisualElement
     {
         private float[] _values;
-
         private readonly Color[] _colors =
         {
-            new Color(0.502f, 0.812f, 0.584f), // Grün   - Gehälter
-            new Color(0.902f, 0.224f, 0.275f), // Rot    - Betrieb
-            new Color(0.996f, 0.663f, 0.220f), // Orange - Steuern
-            new Color(0.302f, 0.596f, 1.000f), // Blau   - Tilgung
-            new Color(0.627f, 0.627f, 0.627f), // Grau   - Sonstiges
+            new Color(0.502f, 0.812f, 0.584f),
+            new Color(0.902f, 0.224f, 0.275f),
+            new Color(0.996f, 0.663f, 0.220f),
+            new Color(0.302f, 0.596f, 1.000f),
+            new Color(0.627f, 0.627f, 0.627f),
         };
 
-        public PieChartElement()
-        {
-            generateVisualContent += Draw;
-        }
-
-        public void SetValues(float[] values)
-        {
-            _values = values;
-            MarkDirtyRepaint();
-        }
+        public PieChartElement() { generateVisualContent += Draw; }
+        public void SetValues(float[] values) { _values = values; MarkDirtyRepaint(); }
 
         private void Draw(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
-
-            float width = contentRect.width;
-            float height = contentRect.height;
-
-            if (width <= 0 || height <= 0)
-                return;
-
-            if (_values == null || _values.Length == 0)
-                return;
+            float width = contentRect.width, height = contentRect.height;
+            if (width <= 0 || height <= 0 || _values == null || _values.Length == 0) return;
 
             float total = 0f;
-
-            foreach (var v in _values)
-                total += Mathf.Max(0, v);
-
-            if (total <= 0)
-                return;
+            int positiveCount = 0, lastPositiveIndex = -1;
+            for (int i = 0; i < _values.Length; i++)
+            {
+                float v = Mathf.Max(0f, _values[i]);
+                total += v;
+                if (v > 0f) { positiveCount++; lastPositiveIndex = i; }
+            }
+            if (total <= 0f) return;
 
             Vector2 center = new Vector2(width / 2f, height / 2f);
             float radius = Mathf.Min(width, height) * 0.4f;
 
-            float start = 0f;
+            if (positiveCount == 1)
+            {
+                p.fillColor = _colors[lastPositiveIndex % _colors.Length];
+                p.BeginPath(); p.Arc(center, radius, 0f, 360f); p.ClosePath(); p.Fill();
+                return;
+            }
 
+            float start = 0f;
             for (int i = 0; i < _values.Length; i++)
             {
-                float v = Mathf.Max(0, _values[i]);
-                float slice = v / total;
-
-                float end = start + slice * 360f;
-
+                float value = Mathf.Max(0f, _values[i]);
+                if (value <= 0f) continue;
+                float end = start + (value / total) * 360f;
                 p.fillColor = _colors[i % _colors.Length];
-
-                p.BeginPath();
-                p.MoveTo(center);
+                p.BeginPath(); p.MoveTo(center);
                 p.Arc(center, radius, start, end);
-                p.ClosePath();
-                p.Fill();
-
+                p.ClosePath(); p.Fill();
                 start = end;
             }
         }
