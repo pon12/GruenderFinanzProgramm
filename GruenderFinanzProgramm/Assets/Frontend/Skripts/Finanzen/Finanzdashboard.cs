@@ -27,107 +27,54 @@ public class Finanzdashboard : MonoBehaviour
         Root = uiDocument.rootVisualElement;
     }
 
-    private void Start()
-    {
-        SetupChart();
-        SetupDiagramm();
-        SetupDiagramm2();
-        AktualisiereStatusTabelle();
-        LadeKassenbuchDiagramm();
+ private void Start()
+{
+    SetupChart();
+    SetupDiagramm();
+    SetupDiagramm2();
+    AktualisiereStatusTabelle();
+    LadeKassenbuchDiagramm();
 
-        LadeGesamtumsatz();
-        LadeGewinn();
-        LadeDienstleistungsRanking();
+    LadeGesamtumsatz();
+    LadeGewinn();        
+    LadeDienstleistungsRanking();
 
-        LadeOffeneRechnungen();
+    LadeOffeneRechnungen();
 
-        RegistriereButtons();
-        RegistriereHelpTooltips();
-        ButtonHoverController.RegistriereAlle(Root);
-    }
-
-    // ============================================================
-    // HELP TOOLTIPS
-    // ============================================================
-
-    private void RegistriereHelpTooltips()
-    {
-        HelpTooltip.Registriere(Root, "btn-help-seitentitel",
-            "Das Finanzdashboard gibt dir einen vollständigen Überblick über deine finanzielle Lage. " +
-            "Alle Werte stammen direkt aus deinem Kassenbuch.");
-
-        HelpTooltip.Registriere(Root, "btn-help-chart",
-            "Zeigt die monatliche Nettobilanz (Einnahmen minus Ausgaben) als Linienchart. " +
-            "Punkte über der Nulllinie sind Gewinnmonate.");
-
-        HelpTooltip.Registriere(Root, "btn-help-umsatz",
-            "Summe aller Einnahmen aus dem Kassenbuch über den gesamten Zeitraum.");
-
-        HelpTooltip.Registriere(Root, "btn-help-rechnungen",
-            "Anzahl der Rechnungen mit dem Status 'Angenommen' – " +
-            "also Rechnungen die noch nicht als bezahlt markiert wurden.");
-
-        HelpTooltip.Registriere(Root, "btn-help-gewinn",
-            "Differenz aus Gesamteinnahmen minus Gesamtausgaben. " +
-            "Ein negativer Wert bedeutet einen Verlust.");
-
-        HelpTooltip.Registriere(Root, "btn-help-liquiditaet",
-            "Zeigt dir wichtige Finanzkennzahlen im Detail. " +
-            "Klicke auf den Button um zur vollständigen Finanzübersicht zu gelangen.");
-
-        HelpTooltip.Registriere(Root, "btn-help-dienst",
-            "Deine drei meistgenutzten Dienstleistungen aus der Dienstleistungsdatenbank. " +
-            "Füge Dienstleistungen im Dienstleistungen-Screen hinzu.");
-
-        HelpTooltip.Registriere(Root, "btn-help-angebote",
-            "Zeigt wie viele Angebote sich in welchem Status befinden. " +
-            "Erstelle und verwalte Angebote im Angebots-Screen.");
-
-        HelpTooltip.Registriere(Root, "btn-help-kapital",
-            "Verteilung deiner Ausgaben nach Kategorie als Kreisdiagramm. " +
-            "Gehälter, Betriebskosten, Steuern, Tilgung und Sonstiges.");
-
-        HelpTooltip.Registriere(Root, "btn-help-rentab",
-            "Vergleicht Einnahmen, Ausgaben und Gewinn der letzten zwei Jahre als Balkendiagramm. " +
-            "Grün = Einnahmen, Rot = Ausgaben, Blau = Gewinn.");
-
-        HelpTooltip.Registriere(Root, "btn-help-rohgewinn",
-            "Zeigt die monatliche Rohgewinn-Entwicklung des aktuellen Jahres. " +
-            "Berechnet aus Einnahmen minus Ausgaben pro Monat.");
-    }
-
-    // ============================================================
-    // BUTTONS
-    // ============================================================
+    RegistriereButtons();
+}
 
     private void RegistriereButtons()
     {
+        // "Wichtige Kennzahlen →" Button (oben mitte)
         Button btnFinanzen1 = Root.Q<Button>("Finanzen1");
         if (btnFinanzen1 != null)
             btnFinanzen1.clicked += () => SceneManager.LoadScene("Finanzen1");
 
+        // "Details zum Kapital" Button (unten links)
         Button btnKapital = Root.Q<Button>("btn-details-kapital");
         if (btnKapital != null)
             btnKapital.clicked += () => SceneManager.LoadScene("Finanzen1");
 
+        // "Details zur Rentabilität" Button (unten mitte)
         Button btnRentab = Root.Q<Button>("btn-details-rentab");
         if (btnRentab != null)
             btnRentab.clicked += () => SceneManager.LoadScene("Finanzen1");
 
+        // "Zum Kassenbuch" Button (unten rechts)
         Button btnKassenbuch = Root.Q<Button>("btn-kassenbuch");
         if (btnKassenbuch != null)
             btnKassenbuch.clicked += () => SceneManager.LoadScene("Kassenbuch");
     }
 
-    private void OeffneFinanzen1()
-    {
-        SceneManager.LoadScene("Finanzen1");
-    }
+private void OeffneFinanzen1()
+{
+    SceneManager.LoadScene("Finanzen1");
+}
 
-    // ============================================================
-    // KASSENBUCH DIAGRAMM
-    // ============================================================
-
+    // =========================================================
+    // 💰 KASSENBUCH DIAGRAMM (JAHRESSTATISTIK)
+    // =========================================================
     private void LadeKassenbuchDiagramm()
     {
         DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -154,6 +101,7 @@ public class Finanzdashboard : MonoBehaviour
 
         _chart?.SetValues(netto);
 
+        // Y-Achse für Finanzen im Überblick updaten
         UpdateYAxisLabelsFor(Root.Q<VisualElement>("chart-y-axis"), netto);
     }
 
@@ -180,10 +128,16 @@ public class Finanzdashboard : MonoBehaviour
         var einkommen = db.getAllEinkommenEntries();
 
         if (einkommen != null)
+        {
             foreach (var eintrag in einkommen)
+            {
                 gesamtumsatz += (float)eintrag.Amount;
+            }
+        }
 
         umsatzLabel.text = gesamtumsatz.ToString("N2") + " €";
+
+        Debug.Log("[Finanzdashboard] Gesamtumsatz: " + gesamtumsatz);
     }
 
     private void LadeGewinn()
@@ -205,29 +159,48 @@ public class Finanzdashboard : MonoBehaviour
         }
 
         float einnahmen = 0f;
-        float ausgaben  = 0f;
+        float ausgaben = 0f;
 
+        // Einnahmen summieren
         var einkommen = db.getAllEinkommenEntries();
-        if (einkommen != null)
-            foreach (var e in einkommen)
-                einnahmen += (float)e.Amount;
 
+        if (einkommen != null)
+        {
+            foreach (var e in einkommen)
+            {
+                einnahmen += (float)e.Amount;
+            }
+        }
+
+        // Ausgaben summieren
         var ausgabenListe = db.getAllAusgabenEntries();
+
         if (ausgabenListe != null)
+        {
             foreach (var a in ausgabenListe)
+            {
                 ausgaben += (float)a.Amount;
+            }
+        }
 
         float gewinn = einnahmen - ausgaben;
+
         gewinnLabel.text = gewinn.ToString("N2") + " €";
+
+        Debug.Log(
+            $"[Finanzdashboard] Gewinn: {gewinn} € | Einnahmen: {einnahmen} € | Ausgaben: {ausgaben} €"
+        );
     }
 
     private void LadeDienstleistungsRanking()
     {
+        Debug.Log("=== LadeDienstleistungsRanking gestartet ===");
+
         VisualElement ranking = Root.Q<VisualElement>("Ranking");
 
         if (ranking == null)
         {
-            Debug.LogError("[Finanzdashboard] Ranking nicht gefunden!");
+            Debug.LogError("Ranking nicht gefunden!");
             return;
         }
 
@@ -235,26 +208,48 @@ public class Finanzdashboard : MonoBehaviour
 
         DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
 
-        if (db == null) return;
+        if (db == null)
+        {
+            Debug.LogError("Keine Datenbank aktiv");
+            return;
+        }
 
         List<Service> services = db.getAllServices();
 
-        if (services == null) return;
+        if (services == null)
+        {
+            Debug.LogError("Keine Services gefunden");
+            return;
+        }
 
+        Debug.Log("Services gefunden: " + services.Count);
+
+        // Nur Top 3
+        int count = 0;
         foreach (Service service in services)
         {
+            if (count >= 3) break;
+
             Label row = new Label("• " + service.name);
-            row.style.color       = Color.white;
-            row.style.fontSize    = 18;
-            row.style.marginBottom = 8;
+            row.style.color = Color.white;
+            row.style.fontSize = 16;
+            row.style.marginBottom = 6;
             ranking.Add(row);
+            count++;
+        }
+
+        if (services.Count == 0)
+        {
+            Label empty = new Label("Keine Dienstleistungen vorhanden");
+            empty.style.color = new Color(0.5f, 0.5f, 0.5f);
+            empty.style.fontSize = 14;
+            ranking.Add(empty);
         }
     }
 
-    // ============================================================
-    // STATUS TABELLE
-    // ============================================================
-
+    // =========================================================
+    // STATUS TABELLE (DEIN ORIGINAL + UNVERÄNDERT)
+    // =========================================================
     public void AktualisiereStatusTabelle()
     {
         VisualElement container = Root.Q<VisualElement>("StatusAngebot");
@@ -266,14 +261,15 @@ public class Finanzdashboard : MonoBehaviour
         }
 
         container.Clear();
+
         container.Add(CreateHeader());
 
         Dictionary<string, int> statusCount = new Dictionary<string, int>
         {
-            { "Entwurf",    0 },
-            { "Versendet",  0 },
+            { "Entwurf", 0 },
+            { "Versendet", 0 },
             { "Angenommen", 0 },
-            { "Abgelehnt",  0 }
+            { "Abgelehnt", 0 }
         };
 
         DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -283,40 +279,60 @@ public class Finanzdashboard : MonoBehaviour
             List<Offer> offers = db.getAllOffers();
 
             if (offers != null)
+            {
                 foreach (Offer offer in offers)
-                    if (offer != null && !string.IsNullOrEmpty(offer.status))
-                        if (statusCount.ContainsKey(offer.status))
-                            statusCount[offer.status]++;
+                {
+                    if (offer == null || string.IsNullOrEmpty(offer.status))
+                        continue;
+
+                    if (statusCount.ContainsKey(offer.status))
+                        statusCount[offer.status]++;
+                }
+            }
         }
 
         foreach (var entry in statusCount)
+        {
             container.Add(CreateRow(entry.Key, entry.Value));
+        }
     }
 
-    // ============================================================
+    // =========================================================
     // CHART SETUP
-    // ============================================================
-
+    // =========================================================
     private void SetupChart()
     {
-        VisualElement diagramm1 = Root.Q<VisualElement>("diagramm1");
-        VisualElement yAxis     = Root.Q<VisualElement>("chart-y-axis");
-        VisualElement xAxis     = Root.Q<VisualElement>("chart-x-axis");
+        VisualElement diagramm1 =
+            Root.Q<VisualElement>("diagramm1");
+
+        VisualElement yAxis =
+            Root.Q<VisualElement>("chart-y-axis");
+
+        VisualElement xAxis =
+            Root.Q<VisualElement>("chart-x-axis");
 
         if (diagramm1 == null)
         {
-            Debug.LogWarning("[Dashboard] diagramm1 nicht gefunden");
+            Debug.LogWarning("[Dashboard] diagramm nicht gefunden");
             return;
         }
 
         _chart = new LineChartElement(yAxis, xAxis);
+
         _chart.style.position = Position.Absolute;
-        _chart.style.left = 0; _chart.style.right  = 0;
-        _chart.style.top  = 0; _chart.style.bottom = 0;
+        _chart.style.left = 0;
+        _chart.style.right = 0;
+        _chart.style.top = 0;
+        _chart.style.bottom = 0;
+
         diagramm1.Add(_chart);
+
+
+
+      
     }
 
-    private void SetupDiagramm()
+   private void SetupDiagramm()
     {
         VisualElement diagramm = Root.Q<VisualElement>("diagramm4");
         VisualElement yAxis    = Root.Q<VisualElement>("rentab-y-axis");
@@ -334,73 +350,62 @@ public class Finanzdashboard : MonoBehaviour
         _barchart.style.top  = 0; _barchart.style.bottom = 0;
         diagramm.Add(_barchart);
 
-        var db       = UserDatabaseAccess.getCurrentUserDatabase();
+        // Echte Daten aus DB laden
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
         int letzJahr = DateTime.Today.Year - 1;
         int diesJahr = DateTime.Today.Year;
         float ein1 = 0, aus1 = 0, ein2 = 0, aus2 = 0;
-
         if (db != null)
         {
             var eink = db.getAllEinkommenEntries();
             var ausg = db.getAllAusgabenEntries();
-
-            if (eink != null)
-                foreach (var e in eink)
-                    if (DateTime.TryParse(e.getDatum(), out DateTime d))
-                    {
-                        if (d.Year == letzJahr) ein1 += e.Amount;
-                        else if (d.Year == diesJahr) ein2 += e.Amount;
-                    }
-
-            if (ausg != null)
-                foreach (var a in ausg)
-                    if (DateTime.TryParse(a.getDatum(), out DateTime d))
-                    {
-                        if (d.Year == letzJahr) aus1 += a.Amount;
-                        else if (d.Year == diesJahr) aus2 += a.Amount;
-                    }
+            if (eink != null) foreach (var e in eink)
+                if (DateTime.TryParse(e.getDatum(), out DateTime d))
+                { if (d.Year == letzJahr) ein1 += e.Amount; else if (d.Year == diesJahr) ein2 += e.Amount; }
+            if (ausg != null) foreach (var a in ausg)
+                if (DateTime.TryParse(a.getDatum(), out DateTime d))
+                { if (d.Year == letzJahr) aus1 += a.Amount; else if (d.Year == diesJahr) aus2 += a.Amount; }
         }
-
         SetDaten(new float[] { ein1, aus1, ein1 - aus1, ein2, aus2, ein2 - aus2 });
     }
 
     public void SetDaten(float[] daten)
     {
-        if (_barchart != null) _barchart.SetValues(daten);
+        if (_barchart != null)
+            _barchart.SetValues(daten);
     }
 
     private void SetupDiagramm2()
     {
-        VisualElement diagramm3  = Root.Q<VisualElement>("diagramm3");
-        VisualElement yAxis3     = Root.Q<VisualElement>("rohgewinn-y-axis");
-        VisualElement xAxis3     = Root.Q<VisualElement>("rohgewinn-x-axis");
-        VisualElement diagramm2  = Root.Q<VisualElement>("Diagramm2");
+        // ROHGEWINN (diagramm3) - LineChart
+        VisualElement diagramm3 = Root.Q<VisualElement>("diagramm3");
+        VisualElement yAxis3    = Root.Q<VisualElement>("rohgewinn-y-axis");
+        VisualElement xAxis3    = Root.Q<VisualElement>("rohgewinn-x-axis");
+
+        // KAPITALBEDARF (Diagramm2) - PieChart
+        VisualElement diagramm2 = Root.Q<VisualElement>("Diagramm2");
         VisualElement pieLegende = Root.Q<VisualElement>("pie-legende");
 
-        var db       = UserDatabaseAccess.getCurrentUserDatabase();
+        // Rohgewinn: Einnahmen - Betriebsausgaben pro Monat
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
         float[] rohgewinn = new float[12];
-
         if (db != null)
         {
-            int jahr      = DateTime.Today.Year;
+            int jahr = DateTime.Today.Year;
             float[] einnahmen = new float[12];
             float[] ausgaben  = new float[12];
             var eink = db.getAllEinkommenEntries();
             var ausg = db.getAllAusgabenEntries();
-
-            if (eink != null)
-                foreach (var e in eink)
-                    if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year == jahr)
-                        einnahmen[d.Month - 1] += e.Amount;
-
-            if (ausg != null)
-                foreach (var a in ausg)
-                    if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
-                        ausgaben[d.Month - 1] += a.Amount;
-
+            if (eink != null) foreach (var e in eink)
+                if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year == jahr)
+                    einnahmen[d.Month - 1] += e.Amount;
+            if (ausg != null) foreach (var a in ausg)
+                if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
+                    ausgaben[d.Month - 1] += a.Amount;
             for (int i = 0; i < 12; i++) rohgewinn[i] = einnahmen[i] - ausgaben[i];
         }
 
+        // LineChart Rohgewinn
         if (diagramm3 != null)
         {
             var rohChart = new LineChartElement(yAxis3, xAxis3);
@@ -412,27 +417,26 @@ public class Finanzdashboard : MonoBehaviour
             UpdateYAxisLabelsFor(yAxis3, rohgewinn);
         }
 
+        // PieChart Kapitalbedarf - Ausgaben nach Art
         if (diagramm2 != null)
         {
             float personal = 0, betrieb = 0, steuern = 0, tilgung = 0, sonstiges = 0;
-
             if (db != null)
             {
                 int jahr = DateTime.Today.Year;
                 var ausg = db.getAllAusgabenEntries();
-                if (ausg != null)
-                    foreach (var a in ausg)
-                        if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
-                        {
-                            string art = a.getArt() ?? "";
-                            if (art == "Gehälter")                               personal  += a.Amount;
-                            else if (art == "Steuern" || art == "Finanzamt")     steuern   += a.Amount;
-                            else if (art == "Tilgungsraten")                     tilgung   += a.Amount;
-                            else if (art == "Marketing" || art == "Reisekosten") betrieb   += a.Amount;
-                            else                                                 sonstiges += a.Amount;
-                        }
+                if (ausg != null) foreach (var a in ausg)
+                    if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year == jahr)
+                    {
+                        string art = a.getArt() ?? "";
+                        if (art == "Gehälter")                           personal  += a.Amount;
+                        else if (art == "Steuern" || art == "Finanzamt") steuern   += a.Amount;
+                        else if (art == "Tilgungsraten")                 tilgung   += a.Amount;
+                        else if (art == "Marketing" || art == "Reisekosten") betrieb += a.Amount;
+                        else                                             sonstiges += a.Amount;
+                    }
             }
-
+            // Fallback wenn keine Daten
             if (personal + betrieb + steuern + tilgung + sonstiges == 0)
             { personal = 30; betrieb = 25; steuern = 15; tilgung = 10; sonstiges = 20; }
 
@@ -443,35 +447,32 @@ public class Finanzdashboard : MonoBehaviour
             _pieChart.style.top  = 0; _pieChart.style.bottom = 0;
             diagramm2.Add(_pieChart);
 
+            // Legende
             if (pieLegende != null)
             {
                 var kategorien = new (string name, Color farbe)[]
                 {
-                    ("Gehälter",  new Color(0.502f, 0.812f, 0.584f)),
-                    ("Betrieb",   new Color(0.902f, 0.224f, 0.275f)),
-                    ("Steuern",   new Color(0.996f, 0.663f, 0.220f)),
-                    ("Tilgung",   new Color(0.302f, 0.596f, 1.000f)),
-                    ("Sonstiges", new Color(0.627f, 0.627f, 0.627f)),
+                    ("Gehälter",    new Color(0.502f, 0.812f, 0.584f)),
+                    ("Betrieb",     new Color(0.902f, 0.224f, 0.275f)),
+                    ("Steuern",     new Color(0.996f, 0.663f, 0.220f)),
+                    ("Tilgung",     new Color(0.302f, 0.596f, 1.000f)),
+                    ("Sonstiges",   new Color(0.627f, 0.627f, 0.627f)),
                 };
-
                 foreach (var k in kategorien)
                 {
                     var zeile = new VisualElement();
                     zeile.style.flexDirection = FlexDirection.Row;
                     zeile.style.alignItems    = Align.Center;
                     zeile.style.marginBottom  = 4;
-
                     var dot = new VisualElement();
-                    dot.style.width  = 10; dot.style.height = 10;
-                    dot.style.borderTopLeftRadius    = dot.style.borderTopRightRadius    =
+                    dot.style.width = 10; dot.style.height = 10;
+                    dot.style.borderTopLeftRadius = dot.style.borderTopRightRadius =
                     dot.style.borderBottomLeftRadius = dot.style.borderBottomRightRadius = 5;
                     dot.style.backgroundColor = k.farbe;
                     dot.style.marginRight = 6; dot.style.flexShrink = 0;
-
                     var lbl = new Label(k.name);
-                    lbl.style.color    = new Color(0.8f, 0.8f, 0.8f);
+                    lbl.style.color = new Color(0.8f, 0.8f, 0.8f);
                     lbl.style.fontSize = 11;
-
                     zeile.Add(dot); zeile.Add(lbl);
                     pieLegende.Add(zeile);
                 }
@@ -479,135 +480,91 @@ public class Finanzdashboard : MonoBehaviour
         }
     }
 
-    public void SetDaten2(float[] daten)   { _chart?.SetValues(daten); }
-    public void SetPieDaten(float[] daten) { _pieChart?.SetValues(daten); }
+    public void SetDaten2(float[] daten)
+    {
+        _chart?.SetValues(daten);
+    }
 
-    // ============================================================
+    public void SetPieDaten(float[] daten)
+    {
+        _pieChart?.SetValues(daten);
+    }
+
+    // =========================================================
     // PARSE HELPER
-    // ============================================================
-
+    // =========================================================
     private bool TryParse(string text, out DateTime result)
     {
         return DateTime.TryParse(text, out result);
     }
 
-    // ============================================================
-    // HEADER / ROWS
-    // ============================================================
-
+    // =========================================================
+    // HEADER
+    // =========================================================
     private VisualElement CreateHeader()
     {
-        var header = new VisualElement();
-        header.style.flexDirection    = FlexDirection.Row;
-        header.style.justifyContent   = Justify.SpaceBetween;
-        header.style.paddingBottom    = 10;
-        header.style.marginBottom     = 10;
+        VisualElement header = new VisualElement();
+        header.style.flexDirection = FlexDirection.Row;
+        header.style.justifyContent = Justify.SpaceBetween;
+        header.style.paddingBottom = 10;
+        header.style.marginBottom = 10;
         header.style.borderBottomWidth = 1;
         header.style.borderBottomColor = new Color(1, 1, 1, 0.25f);
 
-        Label left  = new Label("Status");
+        Label left = new Label("Status");
         Label right = new Label("Anzahl");
-        ApplyTextStyle(left,  true);
+
+        ApplyTextStyle(left, true);
         ApplyTextStyle(right, true);
+
         header.Add(left);
         header.Add(right);
+
         return header;
     }
 
+    // =========================================================
+    // ROWS
+    // =========================================================
     private VisualElement CreateRow(string status, int count)
     {
-        var row = new VisualElement();
-        row.style.flexDirection  = FlexDirection.Row;
+        VisualElement row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
         row.style.justifyContent = Justify.SpaceBetween;
-        row.style.paddingTop     = 7;
-        row.style.paddingBottom  = 7;
+        row.style.paddingTop = 7;
+        row.style.paddingBottom = 7;
 
         Label statusLabel = new Label(status);
-        Label countLabel  = new Label(count.ToString());
+        Label countLabel = new Label(count.ToString());
+
         ApplyTextStyle(statusLabel, false);
-        ApplyTextStyle(countLabel,  false);
+        ApplyTextStyle(countLabel, false);
+
         row.Add(statusLabel);
         row.Add(countLabel);
+
         return row;
     }
 
+    // =========================================================
+    // STYLE
+    // =========================================================
     private void ApplyTextStyle(Label label, bool isHeader)
     {
-        label.style.color                  = Color.white;
-        label.style.fontSize               = isHeader ? 18 : 16;
-        label.style.unityFontStyleAndWeight = isHeader ? FontStyle.Bold : FontStyle.Normal;
-        if (!isHeader) label.style.opacity = 0.92f;
+        label.style.color = Color.white;
+        label.style.fontSize = isHeader ? 18 : 16;
+
+        label.style.unityFontStyleAndWeight =
+            isHeader ? FontStyle.Bold : FontStyle.Normal;
+
+        if (!isHeader)
+            label.style.opacity = 0.92f;
     }
 
-    // ============================================================
-    // Y-ACHSE
-    // ============================================================
-
-    private void UpdateYAxisLabels(float[] values)
-    {
-        UpdateYAxisLabelsFor(Root.Q<VisualElement>("chart-y-axis"), values);
-    }
-
-    private void UpdateYAxisLabelsFor(VisualElement yAxis, float[] values)
-    {
-        if (yAxis == null || values == null) return;
-
-        float max = float.MinValue, min = float.MaxValue;
-        foreach (float v in values) { if (v > max) max = v; if (v < min) min = v; }
-
-        float range   = Mathf.Max(max - min, 1f);
-        float dispMin = min - range * 0.1f;
-        float dispMax = max + range * 0.1f;
-
-        var labels = yAxis.Query<Label>().ToList();
-        for (int i = 0; i < labels.Count; i++)
-        {
-            float t     = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
-            float value = Mathf.Lerp(dispMax, dispMin, t);
-            labels[i].text = FormatEuro(value);
-        }
-    }
-
-    private string FormatEuro(float value)
-    {
-        string sign = value < 0 ? "-" : "";
-        float  abs  = Mathf.Abs(value);
-        if (abs >= 1000000f) return $"{sign}€{(abs / 1000000f):0.#}M";
-        if (abs >= 1000f)    return $"{sign}€{(abs / 1000f):0.#}k";
-        return $"{sign}€{abs:0}";
-    }
-
-    // ============================================================
-    // OFFENE RECHNUNGEN
-    // ============================================================
-
-    private void LadeOffeneRechnungen()
-    {
-        Label label = Root.Q<Label>("OffeneRechnungen");
-
-        if (label == null)
-        {
-            Debug.LogWarning("[Finanzdashboard] OffeneRechnungen Label nicht gefunden");
-            return;
-        }
-
-        var db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null) { label.text = "0"; return; }
-
-        var invoices = db.getAllInvoices();
-        if (invoices == null) { label.text = "0"; return; }
-
-        int count = 0;
-        foreach (var r in invoices)
-            if (r != null && r.status == "Angenommen") count++;
-
-        label.text = count.ToString();
-    }
-
-    // ============================================================
-    // LINE CHART
-    // ============================================================
-
+    // =========================================================
+    // LINE CHART (EINFACHER NETTO-CHART)
+    // =========================================================
+    // Identisch mit DashboardController.LineChartElement — Füllfläche + Ventoriq-Farben
     private class LineChartElement : VisualElement
     {
         private float[] _values;
@@ -620,7 +577,8 @@ public class Finanzdashboard : MonoBehaviour
 
         public LineChartElement(VisualElement yAxis, VisualElement xAxis)
         {
-            _yAxis = yAxis; _xAxis = xAxis;
+            _yAxis = yAxis;
+            _xAxis = xAxis;
             generateVisualContent += Draw;
         }
 
@@ -633,9 +591,9 @@ public class Finanzdashboard : MonoBehaviour
 
             float maxV = float.MinValue, minV = float.MaxValue;
             foreach (var v in _values) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
-            float range  = Mathf.Max(maxV - minV, 1f);
-            float vMin   = minV - range * 0.08f;
-            float vMax   = maxV + range * 0.08f;
+            float range = Mathf.Max(maxV - minV, 1f);
+            float vMin  = minV - range * 0.08f;
+            float vMax  = maxV + range * 0.08f;
             float vRange = vMax - vMin;
 
             var p = ctx.painter2D;
@@ -652,10 +610,14 @@ public class Finanzdashboard : MonoBehaviour
                     padX + (w - 2*padX) * i / (_values.Length - 1),
                     padY + (h - 2*padY) * (1f - (_values[i] - vMin) / vRange));
 
+            // Baseline: bei negativen Werten auf Null-Linie setzen statt auf Bottom
+            float zeroY = padY + (h - 2*padY) * (1f - (0f - vMin) / vRange);
+            zeroY = Mathf.Clamp(zeroY, padY, h - padY);
+
             p.fillColor = FillColor;
-            p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, h - padY));
+            p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, zeroY));
             foreach (var pt in pts) p.LineTo(pt);
-            p.LineTo(new Vector2(pts[pts.Length-1].x, h - padY));
+            p.LineTo(new Vector2(pts[pts.Length-1].x, zeroY));
             p.ClosePath(); p.Fill();
 
             p.strokeColor = LineColor; p.lineWidth = 2f;
@@ -667,11 +629,85 @@ public class Finanzdashboard : MonoBehaviour
             foreach (var pt in pts) { p.BeginPath(); p.Arc(pt, 3.5f, 0f, 360f); p.Fill(); }
         }
     }
+    // Legacy - für Finanzen im Überblick
+    private void UpdateYAxisLabels(float[] values)
+    {
+        UpdateYAxisLabelsFor(Root.Q<VisualElement>("chart-y-axis"), values);
+    }
 
-    // ============================================================
-    // BAR CHART
-    // ============================================================
+    private void UpdateYAxisLabelsFor(VisualElement yAxis, float[] values)
+    {
+        if (yAxis == null || values == null) return;
 
+        float max = float.MinValue, min = float.MaxValue;
+        foreach (float v in values) { if (v > max) max = v; if (v < min) min = v; }
+
+        float range    = Mathf.Max(max - min, 1f);
+        float dispMin  = min - range * 0.1f;
+        float dispMax  = max + range * 0.1f;
+
+        var labels = yAxis.Query<Label>().ToList();
+        for (int i = 0; i < labels.Count; i++)
+        {
+            float t     = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
+            float value = Mathf.Lerp(dispMax, dispMin, t);
+            labels[i].text = FormatEuro(value);
+        }
+    }
+    private string FormatEuro(float value)
+    {
+        string sign = value < 0 ? "-" : "";
+        float abs = Mathf.Abs(value);
+
+        if (abs >= 1000000f)
+            return $"{sign}€{(abs / 1000000f):0.#}M";
+
+        if (abs >= 1000f)
+            return $"{sign}€{(abs / 1000f):0.#}k";
+
+        return $"{sign}€{abs:0}";
+    }
+
+    private void LadeOffeneRechnungen()
+    {
+        Label label = Root.Q<Label>("OffeneRechnungen");
+
+        if (label == null)
+        {
+            Debug.LogWarning("[Finanzdashboard] OffeneRechnungen Label nicht gefunden");
+            return;
+        }
+
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        if (db == null)
+        {
+            label.text = "0";
+            return;
+        }
+
+        var invoices = db.getAllInvoices();
+
+        if (invoices == null)
+        {
+            label.text = "0";
+            return;
+        }
+
+        int count = 0;
+
+        foreach (var r in invoices)
+        {
+            if (r != null && r.status == "Angenommen")
+            {
+                count++;
+            }
+        }
+
+        label.text = count.ToString();
+    }
+
+    // Bar Chart
     private class BarChartElement : VisualElement
     {
         private float[] _values;
@@ -680,33 +716,57 @@ public class Finanzdashboard : MonoBehaviour
 
         public BarChartElement(VisualElement yAxis, VisualElement xAxis)
         {
-            _yAxis = yAxis; _xAxis = xAxis;
+            _yAxis = yAxis;
+            _xAxis = xAxis;
             generateVisualContent += Draw;
         }
 
-        public void SetValues(float[] values) { _values = values; MarkDirtyRepaint(); }
+        public void SetValues(float[] values)
+        {
+            _values = values;
+            MarkDirtyRepaint();
+        }
 
         private void Draw(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
-            float width = contentRect.width, height = contentRect.height;
-            if (width <= 0 || height <= 0 || _values == null) return;
+
+            float width = contentRect.width;
+            float height = contentRect.height;
+
+            if (width <= 0 || height <= 0 || _values == null)
+                return;
 
             float max = 1f;
-            foreach (var v in _values) if (v > max) max = v;
+            foreach (var v in _values)
+                if (v > max) max = v;
 
-            p.strokeColor = new Color(1f, 1f, 1f, 0.12f); p.lineWidth = 1f;
+            // =====================================================
+            // NUR HORIZONTALE GRID-LINIEN
+            // =====================================================
+            p.strokeColor = new Color(1f, 1f, 1f, 0.12f);
+            p.lineWidth = 1f;
+
             if (_yAxis != null)
+            {
                 foreach (var label in _yAxis.Children())
                 {
                     float y = label.worldBound.center.y - worldBound.yMin;
-                    p.BeginPath(); p.MoveTo(new Vector2(0, y)); p.LineTo(new Vector2(width, y)); p.Stroke();
-                }
 
-            int   years      = 2;
+                    p.BeginPath();
+                    p.MoveTo(new Vector2(0, y));
+                    p.LineTo(new Vector2(width, y));
+                    p.Stroke();
+                }
+            }
+
+            // ❌ KEINE X-AXIS GRID LINES (VERTIKAL ENTFERNT)
+
+            int years = 2;
             float groupWidth = width / years;
-            float barWidth   = 40f;
-            float spacing    = 10f;
+
+            float barWidth = 40f;
+            float spacing = 10f;
 
             for (int year = 0; year < years; year++)
             {
@@ -718,16 +778,19 @@ public class Finanzdashboard : MonoBehaviour
                     if (index >= _values.Length) continue;
 
                     float value = _values[index];
-                    float h     = (value / max) * height;
-                    float x     = startX + type * (barWidth + spacing);
-                    float y     = height - h;
+                    float h = (value / max) * height;
 
+                    float x = startX + type * (barWidth + spacing);
+                    float y = height - h;
+
+                    // Ventoriq: Einnahmen=Grün, Ausgaben=Rot, Gewinn=Blau
                     Color barColor =
                         type == 0 ? new Color(0.502f, 0.812f, 0.584f, 1f) :
                         type == 1 ? new Color(0.902f, 0.224f, 0.275f, 1f) :
                                     new Color(0.302f, 0.596f, 1.000f, 1f);
 
                     p.fillColor = barColor;
+
                     p.BeginPath();
                     p.MoveTo(new Vector2(x, height));
                     p.LineTo(new Vector2(x, y));
@@ -740,70 +803,97 @@ public class Finanzdashboard : MonoBehaviour
         }
     }
 
-    // ============================================================
-    // PIE CHART
-    // ============================================================
+    private VisualElement CreateCell(string text, bool isHeader)
+    {
+        var label = new Label(text);
 
-    private class PieChartElement : VisualElement
+        label.style.color = Color.white;
+        label.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+        label.style.flexGrow = 1;
+        label.style.width = Length.Percent(33);
+
+        label.style.fontSize = isHeader ? 16 : 14;
+
+        if (isHeader)
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+
+        return label;
+    }
+
+
+
+        private class PieChartElement : VisualElement
     {
         private float[] _values;
 
         private readonly Color[] _colors =
         {
-            new Color(0.502f, 0.812f, 0.584f),
-            new Color(0.902f, 0.224f, 0.275f),
-            new Color(0.996f, 0.663f, 0.220f),
-            new Color(0.302f, 0.596f, 1.000f),
-            new Color(0.627f, 0.627f, 0.627f),
+            new Color(0.502f, 0.812f, 0.584f), // Grün   - Gehälter
+            new Color(0.902f, 0.224f, 0.275f), // Rot    - Betrieb
+            new Color(0.996f, 0.663f, 0.220f), // Orange - Steuern
+            new Color(0.302f, 0.596f, 1.000f), // Blau   - Tilgung
+            new Color(0.627f, 0.627f, 0.627f), // Grau   - Sonstiges
         };
 
-        public PieChartElement() { generateVisualContent += Draw; }
+        public PieChartElement()
+        {
+            generateVisualContent += Draw;
+        }
 
-        public void SetValues(float[] values) { _values = values; MarkDirtyRepaint(); }
+        public void SetValues(float[] values)
+        {
+            _values = values;
+            MarkDirtyRepaint();
+        }
 
         private void Draw(MeshGenerationContext ctx)
         {
             var p = ctx.painter2D;
-            float width = contentRect.width, height = contentRect.height;
-            if (width <= 0 || height <= 0 || _values == null || _values.Length == 0) return;
+
+            float width = contentRect.width;
+            float height = contentRect.height;
+
+            if (width <= 0 || height <= 0)
+                return;
+
+            if (_values == null || _values.Length == 0)
+                return;
 
             float total = 0f;
-            foreach (var v in _values) total += Mathf.Max(0, v);
-            if (total <= 0) return;
+
+            foreach (var v in _values)
+                total += Mathf.Max(0, v);
+
+            if (total <= 0)
+                return;
 
             Vector2 center = new Vector2(width / 2f, height / 2f);
-            float   radius = Mathf.Min(width, height) * 0.4f;
-            float   start  = 0f;
+            float radius = Mathf.Min(width, height) * 0.4f;
+
+            float start = 0f;
 
             for (int i = 0; i < _values.Length; i++)
             {
-                float slice = Mathf.Max(0, _values[i]) / total;
-                float end   = start + slice * 360f;
+                float v = Mathf.Max(0, _values[i]);
+                float slice = v / total;
+
+                float end = start + slice * 360f;
+
                 p.fillColor = _colors[i % _colors.Length];
+
                 p.BeginPath();
                 p.MoveTo(center);
                 p.Arc(center, radius, start, end);
                 p.ClosePath();
                 p.Fill();
+
                 start = end;
             }
         }
     }
 
-    // ============================================================
-    // HILFSMETHODEN
-    // ============================================================
-
-    private VisualElement CreateCell(string text, bool isHeader)
-    {
-        var label = new Label(text);
-        label.style.color              = Color.white;
-        label.style.unityTextAlign     = TextAnchor.MiddleLeft;
-        label.style.flexGrow           = 1;
-        label.style.width              = Length.Percent(33);
-        label.style.fontSize           = isHeader ? 16 : 14;
-        if (isHeader)
-            label.style.unityFontStyleAndWeight = FontStyle.Bold;
-        return label;
-    }
+    
 }
+
+
