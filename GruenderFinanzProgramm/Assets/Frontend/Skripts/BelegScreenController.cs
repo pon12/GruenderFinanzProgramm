@@ -7,6 +7,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
 
+
+public static class BelegTransfer
+{
+    public static string AusgewaehlteNummer = null;
+    public static bool IstRechnung = false;
+}
+
 public abstract class BelegScreenController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
@@ -61,6 +68,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected int    _ausgewaehlterKundeId      = 0;
     protected string _ausgewaehlterKundeAdresse = "";
     private Button        _umwandelnButton;
+    private Label         _rabattWertBezeichnungLabel;
     private bool          _buttonsRegistriert = false;
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
     private VisualElement _anhangBereich;
@@ -87,7 +95,7 @@ public abstract class BelegScreenController : MonoBehaviour
         public TextField     Menge;
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         Root = uiDocument.rootVisualElement;
@@ -120,6 +128,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
         BerechneSummen();
         AktualisiereUmwandelnButton();
+
+        ButtonHoverController.Registriere(Root);
+        
     }
 
     private void RegistriereHelpTooltips()
@@ -158,6 +169,11 @@ public abstract class BelegScreenController : MonoBehaviour
         HelpTooltip.Registriere(Root, "btn-help-details",
             "Lege Rabatt und Skonto fest. " +
             "Im Notizfeld kannst du interne Hinweise hinterlegen (max. 150 Zeichen).");
+
+        HelpTooltip.Registriere(Root, "btn-help-zuruecksetzen",
+            "Setzt das gesamte Formular auf den Ausgangszustand zurück. " +
+            "Alle eingegebenen Daten, Positionen und Anhänge werden gelöscht. " +
+            "Gespeicherte " + BelegTyp + "e sind davon nicht betroffen.");
     }
 
     private void OnDisable()
@@ -189,6 +205,7 @@ public abstract class BelegScreenController : MonoBehaviour
         _rabattTypDropdown = Root.Q<DropdownField>(RabattTypDropdownName);
 
         _umwandelnButton = Root.Q<Button>(UmwandelnButtonName);
+        _rabattWertBezeichnungLabel = Root.Q<Label>("label-rabatt-wert-bezeichnung");
     }
 
     private void LeereDemoInhalte()
@@ -345,7 +362,11 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             _rabattTypDropdown.choices = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
             _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
-            _rabattTypDropdown.RegisterValueChangedCallback(_ => BerechneSummen());
+            _rabattTypDropdown.RegisterValueChangedCallback(evt =>
+            {
+                BerechneSummen();
+                AktualisiereRabattLabel(evt.newValue);
+            });
         }
     }
 
@@ -403,17 +424,37 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void AktualisiereUmwandelnButton()
     {
-        if (_umwandelnButton == null) return;
+        string status = _statusDropdown != null ? _statusDropdown.value : "";
 
-        bool angenommen = _statusDropdown != null && _statusDropdown.value == "Angenommen";
+        // Umwandeln-Button (nur Angebot)
+        if (_umwandelnButton != null)
+        {
+            bool angenommen = status == "Angenommen";
+            _umwandelnButton.SetEnabled(angenommen);
+            _umwandelnButton.style.backgroundColor = angenommen
+                ? Gruen
+                : new Color(70f / 255f, 70f / 255f, 70f / 255f);
+            _umwandelnButton.style.color = angenommen
+                ? new Color(30f / 255f, 30f / 255f, 30f / 255f)
+                : new Color(180f / 255f, 180f / 255f, 180f / 255f);
+        }
 
-        _umwandelnButton.SetEnabled(angenommen);
-        _umwandelnButton.style.backgroundColor = angenommen
-            ? Gruen
-            : new Color(70f / 255f, 70f / 255f, 70f / 255f);
-        _umwandelnButton.style.color = angenommen
-            ? new Color(30f / 255f, 30f / 255f, 30f / 255f)
-            : new Color(180f / 255f, 180f / 255f, 180f / 255f);
+        // Statusbuttons ausgrauen wenn Status bereits gesetzt
+        AktualisiereStatusButtons(status);
+    }
+
+    // Graut Statusbuttons aus, wenn der jeweilige Status bereits aktiv ist.
+    protected virtual void AktualisiereStatusButtons(string status)
+    {
+        SetzeButtonAktiv(FindeButton(AngenommenButtonName, "Angenommen"), status != "Angenommen" && status != "Versendet" && status != "Bezahlt" && status != "Storniert" && status != "Abgelehnt");
+        SetzeButtonAktiv(FindeButton(AbgelehntButtonName,  "Abgelehnt"),  status != "Abgelehnt"  && status != "Storniert");
+    }
+
+    protected static void SetzeButtonAktiv(Button btn, bool aktiv)
+    {
+        if (btn == null) return;
+        btn.SetEnabled(aktiv);
+        btn.style.opacity = aktiv ? 1f : 0.4f;
     }
 
     private void LadeAbsenderdaten()
@@ -516,6 +557,9 @@ public abstract class BelegScreenController : MonoBehaviour
         FindeButton(AbgelehntButtonName,   "Abgelehnt")?.RegisterCallback<ClickEvent>(_ => StatusGeklickt(false));
         FindeButton("btn-export",          "Als PDF")?.RegisterCallback<ClickEvent>(_ => ExportierePDF());
         FindeButton(PositionAddButtonName, "+")?.RegisterCallback<ClickEvent>(_ => OeffneDienstleistungsPopup());
+        FindeButton("btn-zuruecksetzen", "Zur\u00fccksetzen")
+            ?.RegisterCallback<ClickEvent>(_ => ResetBelegFormular());
+
         RegistriereZusatzButtons();
     }
 
@@ -1162,6 +1206,14 @@ public abstract class BelegScreenController : MonoBehaviour
         if (_mwstBezeichnungLabel != null) _mwstBezeichnungLabel.text = "MwSt. (" + HoleMwstProzentAnzeige() + ")";
     }
 
+    private void AktualisiereRabattLabel(string typ)
+    {
+        if (_rabattWertBezeichnungLabel == null) return;
+        _rabattWertBezeichnungLabel.text = typ == "Festbetrag"
+            ? "Rabatt (Wert in EUR)"
+            : "Rabatt (Wert in %)";
+    }
+
     // ============================================================
     // KUNDENSUCHE
     // ============================================================
@@ -1520,8 +1572,9 @@ public abstract class BelegScreenController : MonoBehaviour
                 InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db, HoleAusgewaehlteAnhaenge());
             }
 
-            ResetBelegFormular();
-            FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+           NachSpeichernHook();
+           ResetBelegFormular();
+           FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
         }
         catch (Exception e)
         {
@@ -1529,6 +1582,9 @@ public abstract class BelegScreenController : MonoBehaviour
             FeedbackPopup.Show(Root, "Speichern fehlgeschlagen", FeedbackTyp.Fehler);
         }
     }
+
+    // Wird nach erfolgreichem Speichern aufgerufen. Kann in Unterklassen überschrieben werden.
+    protected virtual void NachSpeichernHook() { }
 
     protected virtual void StatusGeklickt(bool angenommen)
     {

@@ -7,7 +7,10 @@
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 0 430px; overflow: hidden;">
             <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                 <ui:Label text="Angebot erstellen" name="page-title" style="font-size: 32px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
-                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:Button name="btn-zuruecksetzen" text="Zurücksetzen" class="angebot-btn-zuruecksetzen" style="margin-left: 50px; left: 39px;"/>
+                <ui:VisualElement name="btn-help-zuruecksetzen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-right: 12px; left: 36px;"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 1071px;"/>
             </ui:VisualElement>
             <ui:VisualElement name="top-row" style="flex-direction: row; gap: 16px; flex-shrink: 0; margin-bottom: 16px;">
                 <ui:VisualElement name="card-partner" class="angebot-card" style="flex: 1; flex-direction: column; padding: 14px 18px; gap: 8px; background-color: rgb(44, 44, 44); margin-left: 0; padding-left: 18px;">
@@ -134,7 +137,7 @@
                             <ui:DropdownField name="dropdown-rabatt-typ" style="width: 100%; margin-left: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
-                            <ui:Label text="Rabatt (Wert in %)" style="font-size: 11px; color: rgb(180, 180, 180); -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=cf0fdeb33f1d7be4886321d0c79cbfb5&amp;type=3#Poppins-SemiBold&quot;);"/>
+                            <ui:Label name="label-rabatt-wert-bezeichnung" text="Rabatt (Wert in %)" style="font-size: 11px; color: rgb(180, 180, 180); -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-SemiBold.ttf?fileID=12800000&amp;guid=cf0fdeb33f1d7be4886321d0c79cbfb5&amp;type=3#Poppins-SemiBold&quot;);"/>
                             <ui:TextField name="input-rabatt-wert" style="width: 100%; padding-right: 3px;"/>
                         </ui:VisualElement>
                         <ui:VisualElement style="flex-direction: column; gap: 4px;">
