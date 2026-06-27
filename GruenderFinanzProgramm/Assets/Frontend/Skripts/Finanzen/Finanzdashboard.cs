@@ -366,7 +366,9 @@ private void OeffneFinanzen1()
                 if (DateTime.TryParse(a.getDatum(), out DateTime d))
                 { if (d.Year == letzJahr) aus1 += a.Amount; else if (d.Year == diesJahr) aus2 += a.Amount; }
         }
-        SetDaten(new float[] { ein1, aus1, ein1 - aus1, ein2, aus2, ein2 - aus2 });
+    float[] rentabilitaet = new float[] { ein1, aus1, ein1 - aus1, ein2, aus2, ein2 - aus2 };
+    SetDaten(rentabilitaet);
+    UpdateYAxisLabelsFor(yAxis, rentabilitaet);
     }
 
     public void SetDaten(float[] daten)
