@@ -7,16 +7,23 @@ public class RechnungController : BelegScreenController
     protected override string BelegTyp      => "Rechnung";
     protected override string NummernPrefix => "RG-NR";
 
+    // Verhindert doppelte Kassenbucheinträge innerhalb einer Session
+    private bool _insKassenbuchGebucht = false;
+
     protected override List<string> StatusOptionen => new List<string>
     {
-        "Entwurf",
         "Versendet",
-        "Angenommen",
         "Bezahlt",
-        "Abgelehnt"
+        "Storniert"
     };
 
-    // Zählt Rechnungen statt Angebote für die Nummerierung
+    protected override void OnEnable()
+    {
+        _insKassenbuchGebucht = false;
+        base.OnEnable();
+    }
+
+    // Zählt Rechnungen für die Nummerierung
     protected override string ErzeugeNaechsteNummer()
     {
         try
@@ -41,23 +48,22 @@ public class RechnungController : BelegScreenController
             Debug.LogWarning("[Rechnung] Bezahlt-Button nicht gefunden.");
     }
 
-    private void VersendetGeklickt()
+    // Wird vom Speichern-Button in der Basisklasse nach erfolgreichem Speichern aufgerufen.
+    // Trägt den Betrag ins Kassenbuch ein, falls Status "Bezahlt" und noch nicht gebucht.
+    protected override void NachSpeichernHook()
     {
-        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten())) return;
-        if (!PflichtfelderGefuellt()) return;
-
         var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
-        statusDropdown?.SetValueWithoutNotify("Versendet");
-
-        FeedbackPopup.Show(Root, "Rechnung versendet", FeedbackTyp.Erfolg);
+        if (statusDropdown?.value == "Bezahlt" && !_insKassenbuchGebucht)
+        {
+            UebernimmInsKassenbuch();
+            _insKassenbuchGebucht = true;
+        }
     }
 
-    private void StorniertGeklickt()
+    protected override void AktualisiereStatusButtons(string status)
     {
-        var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
-        statusDropdown?.SetValueWithoutNotify("Abgelehnt");
-
-        FeedbackPopup.Show(Root, "Rechnung storniert", FeedbackTyp.Fehler);
+        base.AktualisiereStatusButtons(status);
+        SetzeButtonAktiv(Root.Q<Button>("btn-bezahlt"), status != "Bezahlt" && status != "Storniert" && status != "Abgelehnt");
     }
 
     private void BezahltGeklickt()
@@ -68,7 +74,12 @@ public class RechnungController : BelegScreenController
         var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
         statusDropdown?.SetValueWithoutNotify("Bezahlt");
 
-        UebernimmInsKassenbuch();
+        if (!_insKassenbuchGebucht)
+        {
+            UebernimmInsKassenbuch();
+            _insKassenbuchGebucht = true;
+        }
+
         FeedbackPopup.Show(Root, "Rechnung als bezahlt markiert", FeedbackTyp.Erfolg);
     }
 }

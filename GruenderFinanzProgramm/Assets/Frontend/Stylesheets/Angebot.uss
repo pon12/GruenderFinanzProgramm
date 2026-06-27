@@ -291,3 +291,35 @@
     padding-top: 8px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
+
+
+
+.angebot-btn-zuruecksetzen{
+background-color: rgb(100, 100, 100);
+    color: rgb(20, 20, 20);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+    margin-left: 30px;
+}
+
+.angebot-btn-zuruecksetzen:hover {
+    background-color: rgb(142, 141, 141);
+}
+.angebot-btn-zuruecksetzen:active 
+{
+    background-color: rgb(56, 54, 54);
+}
