@@ -13,6 +13,8 @@ public class FinanceDashboardBinder : MonoBehaviour
     private static readonly Color TextColor   = new Color(0.863f, 0.863f, 0.863f, 1f);
     private static readonly Color HeaderColor = new Color(1f, 1f, 1f, 1f);
 
+    private int _gewaehltesJahr = DateTime.Today.Year;
+
     private void Start()
     {
         StartCoroutine(InitUI());
@@ -23,8 +25,37 @@ public class FinanceDashboardBinder : MonoBehaviour
         yield return new WaitForEndOfFrame();
         if (uiDocument == null || uiDocument.rootVisualElement == null) yield break;
 
+        RegistriereJahresAuswahl();
+        BefuelleAlles();
+    }
+
+    // FIX: Vorher fest auf das aktuelle Jahr beschränkt - keine Möglichkeit,
+    // sich vergangene Jahre (2010 bis heute) anzusehen. Gleiches
+    // Dropdown-Muster wie im Kassenbuch und bei Finanzen 1.
+    private void RegistriereJahresAuswahl()
+    {
+        var dropJahr = uiDocument.rootVisualElement.Q<DropdownField>("dropJahr");
+        if (dropJahr == null) return;
+
+        var jahre = new List<string>();
+        for (int j = DateTime.Today.Year; j >= 2010; j--) jahre.Add(j.ToString());
+
+        dropJahr.choices = jahre;
+        dropJahr.value   = _gewaehltesJahr.ToString();
+        dropJahr.RegisterValueChangedCallback(evt =>
+        {
+            if (int.TryParse(evt.newValue, out int neuesJahr))
+            {
+                _gewaehltesJahr = neuesJahr;
+                BefuelleAlles();
+            }
+        });
+    }
+
+    private void BefuelleAlles()
+    {
         var root = uiDocument.rootVisualElement;
-        int jahr = DateTime.Today.Year;
+        int jahr = _gewaehltesJahr;
 
         var jahrLabel = root.Q<Label>("lbl-jahr");
         if (jahrLabel != null) jahrLabel.text = $"Auswertung {jahr}";
@@ -42,6 +73,14 @@ public class FinanceDashboardBinder : MonoBehaviour
         float sonstigeAusg    = 0f;
         float geldeinlagen    = 0f;
         float kredite         = 0f;
+
+        // FIX: Neue Investitions- und Gründerkosten-Kategorien im Kassenbuch
+        // (waren vorher gar nicht vorhanden -> "wieso keine Ausgabe mit
+        // Investition?"). Jeweils mind. 3 gängige Kategorien nach
+        // Businessplan-Konvention ergänzt.
+        float invBueroausstattung = 0f, invFuhrpark = 0f, invMaschinen = 0f, invSoftware = 0f;
+        float gkCorporateDesign   = 0f, gkHomepage   = 0f, gkGrundausstattung = 0f;
+
         var einnahmenMap = new Dictionary<string, float>();
 
         var db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -68,15 +107,22 @@ public class FinanceDashboardBinder : MonoBehaviour
                         string art = string.IsNullOrEmpty(a.getArt()) ? "Sonstige Kosten" : a.getArt();
                         switch (art)
                         {
-                            case "Gehälter":                          gehaelter      += a.Amount; break;
-                            case "Marketing":                         marketing      += a.Amount; break;
-                            case "Reisekosten":                       reisekosten    += a.Amount; break;
-                            case "Steuern":                           steuern        += a.Amount; break;
-                            case "Finanzamt":                         finanzamt      += a.Amount; break;
-                            case "Tilgungsraten":                     tilgungsraten  += a.Amount; break;
-                            case "Barentnahme / Privatentnahme":      privatentnahme += a.Amount; break;
-                            case "Sonstige Kosten":                   sonstigeKosten += a.Amount; break;
-                            default:                                  sonstigeAusg   += a.Amount; break;
+                            case "Gehälter":                          gehaelter          += a.Amount; break;
+                            case "Marketing":                         marketing          += a.Amount; break;
+                            case "Reisekosten":                       reisekosten        += a.Amount; break;
+                            case "Steuern":                           steuern            += a.Amount; break;
+                            case "Finanzamt":                         finanzamt          += a.Amount; break;
+                            case "Tilgungsraten":                     tilgungsraten      += a.Amount; break;
+                            case "Barentnahme / Privatentnahme":      privatentnahme     += a.Amount; break;
+                            case "Sonstige Kosten":                   sonstigeKosten     += a.Amount; break;
+                            case "Büroausstattung":                   invBueroausstattung += a.Amount; break;
+                            case "Fuhrpark":                          invFuhrpark        += a.Amount; break;
+                            case "Maschinen / Anlagen":               invMaschinen       += a.Amount; break;
+                            case "Software / Lizenzen":               invSoftware        += a.Amount; break;
+                            case "Corporate Design":                  gkCorporateDesign  += a.Amount; break;
+                            case "Homepage":                          gkHomepage         += a.Amount; break;
+                            case "Grundausstattung":                  gkGrundausstattung += a.Amount; break;
+                            default:                                  sonstigeAusg       += a.Amount; break;
                         }
                     }
         }
@@ -131,51 +177,71 @@ public class FinanceDashboardBinder : MonoBehaviour
         }
 
         // INVESTITION
+        // FIX: Vorher fest "Mustermodell"/"Büroausstattung" mit 0f, ohne
+        // Bezug zu echten Kassenbuch-Kategorien. Jetzt 4 echte
+        // Investitionsarten (Businessplan-Standardkategorien), die auch im
+        // Kassenbuch-Dropdown als Art auswählbar sind.
+        float summeInvestition = invBueroausstattung + invFuhrpark + invMaschinen + invSoftware;
         var cInvest = root.Q<VisualElement>("Investition");
         if (cInvest != null)
         {
             cInvest.Clear();
             cInvest.Add(MakeHeader("Kategorie", "Betrag"));
-            cInvest.Add(MakeRow("Mustermodell",      0f, TextColor));
-            cInvest.Add(MakeRow("Büroausstattung",   0f, TextColor));
+            cInvest.Add(MakeRow("Büroausstattung",    invBueroausstattung, RedColor));
+            cInvest.Add(MakeRow("Fuhrpark",           invFuhrpark,         RedColor));
+            cInvest.Add(MakeRow("Maschinen / Anlagen",invMaschinen,        RedColor));
+            cInvest.Add(MakeRow("Software / Lizenzen",invSoftware,         RedColor));
             cInvest.Add(MakeTrenn());
-            cInvest.Add(MakeRow("Summe Investition", 0f, TextColor, true));
-            cInvest.Add(MakeRow("Summe Sacheinlagen",0f, TextColor, true));
+            cInvest.Add(MakeRow("Summe Investition",  summeInvestition,    RedColor, true));
+            // Sacheinlagen (Geräte etc. die eingebracht statt gekauft werden)
+            // sind keine Kassenbuch-Buchung, sondern eine reine
+            // Businessplan-Angabe - dafür gibt es hier bewusst keine
+            // automatische Herleitung.
+            cInvest.Add(MakeRow("Summe Sacheinlagen", 0f, TextColor, true));
         }
 
         // GRÜNDERKOSTEN
-        // Diese Kategorien kommen aus "Sonstige Kosten" im Kassenbuch.
-        // Für detaillierte Aufschlüsselung (Homepage, Corporate Design etc.)
-        // bitte entsprechende Buchungen im Kassenbuch unter "Sonstige Kosten" erfassen.
+        // FIX: Vorher fest "Corporate Design"/"Grundausstattung"/"Homepage"
+        // mit 0f. Jetzt echte Kassenbuch-Kategorien, plus weiterhin der
+        // Sammel-Posten "Sonstige Kosten (Kassenbuch)" für alles, was in
+        // keine der 3 spezifischen Kategorien passt.
         float sonstigeKostenGruend = sonstigeKosten + sonstigeAusg;
+        float summeGruenderkosten  = gkCorporateDesign + gkHomepage + gkGrundausstattung + sonstigeKostenGruend;
         var cGruend = root.Q<VisualElement>("Grunderkosten");
         if (cGruend != null)
         {
             cGruend.Clear();
             cGruend.Add(MakeHeader("Kategorie", "Betrag"));
-            cGruend.Add(MakeRow("Corporate Design",     0f, TextColor));
-            cGruend.Add(MakeRow("Grundausstattung",     0f, TextColor));
-            cGruend.Add(MakeRow("Homepage",             0f, TextColor));
-            cGruend.Add(MakeTrenn());
-            // Summe aus "Sonstige Kosten" im Kassenbuch
+            cGruend.Add(MakeRow("Corporate Design",     gkCorporateDesign,   RedColor));
+            cGruend.Add(MakeRow("Grundausstattung",     gkGrundausstattung,  RedColor));
+            cGruend.Add(MakeRow("Homepage",             gkHomepage,          RedColor));
             cGruend.Add(MakeRow("Sonstige Kosten (Kassenbuch)", sonstigeKostenGruend, sonstigeKostenGruend > 0 ? RedColor : TextColor));
             cGruend.Add(MakeTrenn());
-            cGruend.Add(MakeRow("Summe Gründungskosten", sonstigeKostenGruend, sonstigeKostenGruend > 0 ? RedColor : TextColor, true));
+            cGruend.Add(MakeRow("Summe Gründungskosten", summeGruenderkosten, summeGruenderkosten > 0 ? RedColor : TextColor, true));
         }
 
         // KAPITALBEDARF
+        // FIX: Rechnete vorher nichts (alle Zwischenwerte fest 0f), nur die
+        // letzte Zeile "Gesamtkapitalbedarf" hatte echte Werte. Jetzt aus
+        // Investition + Gründerkosten hergeleitet.
         var cKapital = root.Q<VisualElement>("Kapitalbedarf");
         if (cKapital != null)
         {
+            float kapitalbedarf = summeInvestition + summeGruenderkosten;
             float gesamtKapital = geldeinlagen + kredite;
+
             cKapital.Clear();
             cKapital.Add(MakeHeader("Kategorie", "Betrag"));
-            cKapital.Add(MakeRow("Investition",        0f,           TextColor));
-            cKapital.Add(MakeRow("Sacheinlagen",       0f,           TextColor));
-            cKapital.Add(MakeRow("Gründerkosten",      0f,           TextColor));
+            cKapital.Add(MakeRow("Investition",        summeInvestition,   RedColor));
+            // Sacheinlagen: siehe Hinweis oben bei "Investition" - keine
+            // Kassenbuch-Buchung, daher bewusst ohne automatische Herleitung.
+            cKapital.Add(MakeRow("Sacheinlagen",       0f,                  TextColor));
+            cKapital.Add(MakeRow("Gründerkosten",      summeGruenderkosten, RedColor));
             cKapital.Add(MakeTrenn());
-            cKapital.Add(MakeRow("Kapitalbedarf",      0f,           TextColor, true));
-            cKapital.Add(MakeRow("Liquiditätsreserve", 0f,           TextColor));
+            cKapital.Add(MakeRow("Kapitalbedarf",      kapitalbedarf,       RedColor, true));
+            // Liquiditätsreserve ist ebenfalls eine reine Planungsgröße
+            // (Businessplan-Puffer), kein Kassenbuch-Wert.
+            cKapital.Add(MakeRow("Liquiditätsreserve", 0f,                  TextColor));
             cKapital.Add(MakeTrenn());
             cKapital.Add(MakeRow("Gesamtkapitalbedarf",gesamtKapital,
                 gesamtKapital >= 0 ? GreenColor : RedColor, true));

@@ -49,6 +49,10 @@ public class KassenbuchController : MonoBehaviour
 
     private int _currentYear;
     private int _currentMonth;
+    // FIX: Vorher hat der Kalender beim Rendern IMMER mit System.DateTime.Today
+    // verglichen -> egal welchen Tag man anklickte, markiert blieb immer "heute".
+    // Jetzt wird das tatsächlich ausgewählte Datum separat gemerkt.
+    private DateTime? _ausgewaehltesDatum = null;
     private readonly string[] _monthNames =
     {
         "Januar","Februar","März","April","Mai","Juni",
@@ -258,6 +262,12 @@ public class KassenbuchController : MonoBehaviour
         var btnAbbrechen = root.Q<Button>("btn-abbrechen");
         if (btnAbbrechen != null) btnAbbrechen.clicked += ClosePopup;
 
+        // FIX: Popup hatte keine Möglichkeit, es "einfach so" zu schließen
+        // (nur Speichern/Abbrechen als Textbuttons unten) - jetzt zusätzlich
+        // ein X oben rechts, funktional identisch zu Abbrechen.
+        var btnPopupSchliessen = root.Q<Button>("btn-popup-schliessen");
+        if (btnPopupSchliessen != null) btnPopupSchliessen.clicked += ClosePopup;
+
 
         // --- EVENT-VERKNÜPFUNGEN FÜR DASHBOARD BUTTONS ---
         if (btnAngebotErstellen != null) btnAngebotErstellen.clicked += () => Debug.Log("[Dashboard] Erstelle neues Angebot...");
@@ -300,7 +310,15 @@ public class KassenbuchController : MonoBehaviour
             "Tilgungsraten",
             "Finanzamt",
             "Steuern",
-            "Gehälter"
+            "Gehälter",
+            "Zinsen",
+            "Büroausstattung",
+            "Fuhrpark",
+            "Maschinen / Anlagen",
+            "Software / Lizenzen",
+            "Corporate Design",
+            "Homepage",
+            "Grundausstattung"
         };
 
         artDropdown.value = "Marketing";
@@ -388,13 +406,19 @@ public class KassenbuchController : MonoBehaviour
     {
         if (field == null) return;
 
+        // HINWEIS FÜR ALEX: Beträge werden aktuell als "float" in der DB
+        // gespeichert (Einkommen.Amount / Ausgaben.Amount). Für Geldbeträge
+        // ist "decimal" eigentlich die robustere Wahl (keine Rundungsfehler
+        // durch Binärdarstellung). Hier im UI wird strikt auf 2
+        // Nachkommastellen begrenzt - ob das DB-seitig auch so
+        // durchgesetzt/umgestellt werden soll, bitte mit Alex klären.
 
-        field.maxLength = 50;
-
+        // Reicht für "10.000.000,00" (13 Zeichen) plus etwas Puffer
+        field.maxLength = 20;
 
         if (string.IsNullOrEmpty(field.value) || field.value == placeholder)
         {
-            field.value = placeholder;
+            field.SetValueWithoutNotify(placeholder);
         }
 
 
@@ -402,51 +426,73 @@ public class KassenbuchController : MonoBehaviour
 {
     string original = evt.newValue;
 
-    // Cursorposition merken
-    int cursorPos = field.cursorIndex;
-
-    // Nur Zahlen behalten
-    string zahlen = "";
-    foreach (char c in original)
+    // FIX: Den Platzhalter selbst nicht anfassen - vorher wurde "0,00"
+    // (der Platzhalter) durch diese Logik in "0" OHNE Komma zerlegt,
+    // sobald ClosePopup() das Feld programmgesteuert zurückgesetzt hat.
+    if (original == placeholder)
     {
-        if (char.IsDigit(c))
-            zahlen += c;
+        return;
     }
 
-    if (string.IsNullOrEmpty(zahlen))
+    // FIX (3. Anlauf): Die bisherigen Versuche haben aus dem Text ein
+    // Dezimaltrennzeichen (Komma/Punkt) herausgelesen - das ging schief,
+    // sobald die eigene Live-Formatierung selbst schon einen Punkt als
+    // Tausendertrennzeichen eingefügt hatte (z.B. nach "1.000" wurde eine
+    // weitere getippte Ziffer fälschlich als Cent-Stelle hinter DIESEM
+    // Punkt gelesen -> Sprung auf "1,00 €" statt "10.000 €").
+    //
+    // Jetzt wie vom Chef vorgeschlagen: ein reines Cent-Eingabefeld nach
+    // Kassenautomaten-Prinzip. Es werden IMMER nur die Ziffern gelesen -
+    // Kommas/Punkte werden komplett ignoriert, egal ob vom Nutzer oder von
+    // der eigenen Formatierung eingefügt. Die letzten 2 Ziffern sind IMMER
+    // die Cent-Stellen, alles davor volle Euro. Kein Rätselraten mehr,
+    // welches Zeichen das Dezimaltrennzeichen sein soll - es gibt keins
+    // mehr zu erraten.
+    string ziffern = new string(original.Where(char.IsDigit).ToArray());
+
+    if (ziffern.Length == 0)
     {
         field.SetValueWithoutNotify("");
         return;
     }
 
-    if (long.TryParse(zahlen, out long wert))
+    // Sicherheitsnetz gegen extrem lange Eingaben (Überlauf-Schutz)
+    if (ziffern.Length > 10) ziffern = ziffern.Substring(ziffern.Length - 10);
+
+    long centWert = long.Parse(ziffern);
+
+    // 10 Millionen Euro Limit (in Cent)
+    const long MAX_CENT = 10_000_000L * 100L;
+    if (centWert > MAX_CENT) centWert = MAX_CENT;
+
+    long euroTeil = centWert / 100;
+    long centTeil = centWert % 100;
+
+    string formatiert = euroTeil.ToString("N0", KassenbuchController.DeKultur)
+        + "," + centTeil.ToString("D2");
+
+    field.SetValueWithoutNotify(formatiert);
+
+    // Cursor ans Ende setzen
+    field.schedule.Execute(() =>
     {
-        // FIX: Vorher wurde die aktuelle Systemkultur genutzt und Kommas
-        // manuell durch Punkte ersetzt. Das brach auf Rechnern, deren
-        // Regionaleinstellung kein Komma als Gruppentrennzeichen nutzt
-        // (z.B. Leerzeichen). Jetzt explizit deutsches Format.
-        string formatiert = wert.ToString("N0", KassenbuchController.DeKultur);
-
-        field.SetValueWithoutNotify(formatiert);
-
-        // Cursor ans Ende setzen
-        field.schedule.Execute(() =>
-        {
-            field.cursorIndex = formatiert.Length;
-            field.selectIndex = formatiert.Length;
-        });
-    }
+        field.cursorIndex = formatiert.Length;
+        field.selectIndex = formatiert.Length;
+    });
 });
 
         field.RegisterCallback<FocusInEvent>(evt => {
             if (field.value == placeholder)
             {
-                field.value = "";
+                field.SetValueWithoutNotify("");
                 field.style.color = new StyleColor(StyleKeyword.Null);
             }
             else
             {
-                field.value = field.value.Replace("€", "").Trim();
+                // FIX: Vorher "field.value = ..." benutzt, das feuert erneut
+                // den ValueChanged-Handler und das gerade entfernte "€"
+                // wurde von der Formatierungslogik sofort wieder verworfen.
+                field.SetValueWithoutNotify(field.value.Replace("€", "").Trim());
             }
         });
 
@@ -457,13 +503,13 @@ public class KassenbuchController : MonoBehaviour
 
             if (string.IsNullOrEmpty(aktuellerText))
             {
-                field.value = placeholder;
+                field.SetValueWithoutNotify(placeholder);
             }
             else
             {
                 if (!aktuellerText.Contains("€"))
                 {
-                    field.value = aktuellerText + " €";
+                    field.SetValueWithoutNotify(aktuellerText + " €");
                 }
             }
         });
@@ -620,12 +666,32 @@ public class KassenbuchController : MonoBehaviour
                 int tag = i - startWochentag + 1;
                 btn.text = tag.ToString();
 
+                bool istHeute = tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year;
+                bool istAusgewaehlt = _ausgewaehltesDatum.HasValue
+                    && tag == _ausgewaehltesDatum.Value.Day
+                    && _currentMonth == _ausgewaehltesDatum.Value.Month
+                    && _currentYear == _ausgewaehltesDatum.Value.Year;
 
-                if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
+                // FIX: Die tatsächlich ausgewählte Zahlung hat jetzt Vorrang
+                // (kräftige Füllung). "Heute" bekommt nur noch einen dezenten
+                // Rahmen als Orientierung, falls es nicht der gewählte Tag ist.
+                if (istAusgewaehlt)
                 {
                     btn.AddToClassList("cal-day-today");
-                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.4f));
+                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.6f));
                     btn.style.color = new StyleColor(UnityEngine.Color.white);
+                }
+                else if (istHeute)
+                {
+                    btn.style.borderTopWidth = 1;
+                    btn.style.borderBottomWidth = 1;
+                    btn.style.borderLeftWidth = 1;
+                    btn.style.borderRightWidth = 1;
+                    var heuteRahmen = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.8f));
+                    btn.style.borderTopColor = heuteRahmen;
+                    btn.style.borderBottomColor = heuteRahmen;
+                    btn.style.borderLeftColor = heuteRahmen;
+                    btn.style.borderRightColor = heuteRahmen;
                 }
 
 
@@ -642,18 +708,22 @@ public class KassenbuchController : MonoBehaviour
 
     private void OnTagAusgewaehlt(int tag, int monat, int jahr)
     {
-        DateTime ausgewaehltesDatum = new DateTime(jahr, monat, tag);
-       
+        _ausgewaehltesDatum = new DateTime(jahr, monat, tag);
+
         if (_overlay != null)
         {
             var inputDatum = _overlay.Q<TextField>("input-datum");
-            if (inputDatum != null) inputDatum.value = ausgewaehltesDatum.ToString("dd.MM.yyyy");
+            if (inputDatum != null) inputDatum.value = _ausgewaehltesDatum.Value.ToString("dd.MM.yyyy");
         }
        
         if (meinUxmlKalender != null)
         {
             meinUxmlKalender.style.display = DisplayStyle.None;
         }
+
+        // Kalender neu zeichnen, damit die neue Markierung sofort sichtbar
+        // ist, falls man ihn direkt danach wieder öffnet.
+        RenderKalender(GetComponent<UIDocument>().rootVisualElement);
     }
 
 
@@ -665,13 +735,18 @@ public class KassenbuchController : MonoBehaviour
         _aktuellerTyp = typ;
         _overlay.Q<Label>("popup-title").text = $"{typ} hinzufügen";
         _overlay.Q<TextField>("input-datum").value = DateTime.Now.ToString("dd.MM.yyyy");
-        
-        var inputBetrag = _overlay.Q<TextField>("input-betrag");
-        SetupBetragInputAnpassung(inputBetrag, PLACEHOLDER_BETRAG);
+        // FIX: Kalender-Markierung mit dem Standarddatum synchron halten,
+        // sonst zeigt der Kalender beim ersten Öffnen "heute" markiert,
+        // obwohl das Feld schon ein anderes Datum enthalten könnte.
+        _ausgewaehltesDatum = DateTime.Now.Date;
 
-
-        var inputZweck = _overlay.Q<TextField>("input-verwendungzweck");
-        SetupPlaceholderSimulation(inputZweck, PLACEHOLDER_ZWECK);
+        // FIX: SetupBetragInputAnpassung/SetupPlaceholderSimulation wurden
+        // vorher bei JEDEM OpenPopup erneut aufgerufen und haben dabei
+        // IMMER NEUE Event-Handler registriert, ohne die alten zu entfernen.
+        // Nach mehrfachem Öffnen liefen also mehrere Formatierungs-Handler
+        // gleichzeitig übereinander - das war die Ursache für die kaputte
+        // Formatierung ("0" ohne Komma) beim erneuten Öffnen. Die Handler
+        // werden jetzt nur noch EINMAL in OnEnable registriert.
 
 
         // Dropdown-Kategorien nach Typ filtern
@@ -689,7 +764,15 @@ public class KassenbuchController : MonoBehaviour
                     "Tilgungsraten",
                     "Finanzamt",
                     "Steuern",
-                    "Gehälter"
+                    "Gehälter",
+                    "Zinsen",
+                    "Büroausstattung",
+                    "Fuhrpark",
+                    "Maschinen / Anlagen",
+                    "Software / Lizenzen",
+                    "Corporate Design",
+                    "Homepage",
+                    "Grundausstattung"
                 };
             }
             else // Einnahme
@@ -803,6 +886,17 @@ betragText = betragText.Replace("€", "").Trim();
             out float betrag))
     {
         ShowFehler("Ungültiger Betrag.");
+        return;
+    }
+
+    // Zusätzliche Absicherung zum Limit in SetupBetragInputAnpassung -
+    // falls z.B. per Copy&Paste eine zu hohe Zahl reinrutscht.
+    // HINWEIS: Chef wollte prüfen lassen, ob diese Grenze zusätzlich auf
+    // DB-Ebene (mit Alex) erzwungen werden soll, statt nur hier im UI.
+    const float MAX_BETRAG_EURO = 10_000_000f;
+    if (betrag > MAX_BETRAG_EURO)
+    {
+        ShowFehler("Der Betrag darf maximal 10.000.000 € betragen.");
         return;
     }
 
@@ -1319,7 +1413,8 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         float summeSoll  = sollPosten.Sum(p => p.Betrag);
         float gewinn     = summeHaben - summeSoll;
 
-        float anfangsbestandFolgejahr = BerechneKumulierterKontostandBisEndeJahr(jahrZahl);
+        float anfangsbestandJahr = BerechneKumulierterKontostandBisEndeJahr(jahrZahl - 1);
+        float endbestandJahr     = anfangsbestandJahr + gewinn;
 
         string folderPath = Path.Combine(
             Application.persistentDataPath,
@@ -1407,7 +1502,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 doc.Add(table);
                 doc.Add(new Paragraph(" "));
 
-                // Jahresauswertung: Gewinn/Verlust + Anfangsbestand Folgejahr
+                // Jahresauswertung: Anfangsbestand, Gewinn/Verlust, Endbestand
                 var auswertungFarbe = gewinn >= 0 ? gruenBrand : rotBrand;
                 var auswertungFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, auswertungFarbe);
 
@@ -1415,9 +1510,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                     ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N0", DeKultur) + " €"
                     : "Jahresergebnis " + jahr + ": Verlust " + Math.Abs(gewinn).ToString("N0", DeKultur) + " €";
 
+                doc.Add(new Paragraph(
+                    "Anfangsbestand " + jahr + " (aus Vorjahr): " + anfangsbestandJahr.ToString("N0", DeKultur) + " €",
+                    normalFont));
                 doc.Add(new Paragraph(gewinnText, auswertungFont));
                 doc.Add(new Paragraph(
-                    "Anfangsbestand " + (jahrZahl + 1) + ": " + anfangsbestandFolgejahr.ToString("N0", DeKultur) + " €",
+                    "Endbestand " + jahr + " / Anfangsbestand " + (jahrZahl + 1) + ": "
+                    + endbestandJahr.ToString("N0", DeKultur) + " €",
                     normalFont));
 
                 doc.Close();

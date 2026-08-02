@@ -15,6 +15,8 @@ public class Finanzen1 : MonoBehaviour
     private static readonly Color RedColor   = new Color(0.902f, 0.224f, 0.275f, 1f);
     private static readonly Color TextColor  = new Color(0.863f, 0.863f, 0.863f, 1f);
 
+    private int _gewaehltesJahr = DateTime.Today.Year;
+
     private void Start()
     {
         StartCoroutine(InitUI());
@@ -23,9 +25,33 @@ public class Finanzen1 : MonoBehaviour
     private IEnumerator InitUI()
     {
         yield return new WaitForEndOfFrame();
+        RegistriereJahresAuswahl();
         AktualisiereTabellen();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(uiDocument.rootVisualElement);
+    }
+
+    // FIX: Vorher gab es keine Möglichkeit, sich vergangene Jahre anzusehen -
+    // die Auswertung war immer fest auf das aktuelle Jahr beschränkt. Jetzt
+    // wie im Kassenbuch ein Jahres-Dropdown von 2010 bis heute.
+    private void RegistriereJahresAuswahl()
+    {
+        var dropJahr = uiDocument.rootVisualElement.Q<DropdownField>("dropJahr");
+        if (dropJahr == null) return;
+
+        var jahre = new List<string>();
+        for (int j = DateTime.Today.Year; j >= 2010; j--) jahre.Add(j.ToString());
+
+        dropJahr.choices = jahre;
+        dropJahr.value   = _gewaehltesJahr.ToString();
+        dropJahr.RegisterValueChangedCallback(evt =>
+        {
+            if (int.TryParse(evt.newValue, out int neuesJahr))
+            {
+                _gewaehltesJahr = neuesJahr;
+                AktualisiereTabellen();
+            }
+        });
     }
 
     // ============================================================
@@ -62,13 +88,13 @@ public class Finanzen1 : MonoBehaviour
     {
         if (uiDocument == null || uiDocument.rootVisualElement == null) return;
 
-        int aktuellesJahr = DateTime.Today.Year;
+        int jahr = _gewaehltesJahr;
 
         var jahrLabel = uiDocument.rootVisualElement.Q<Label>("lbl-jahr");
-        if (jahrLabel != null) jahrLabel.text = $"Auswertung {aktuellesJahr}";
+        if (jahrLabel != null) jahrLabel.text = $"Auswertung {jahr}";
 
         float gesamtEinn = 0f, personal = 0f, betrieb = 0f;
-        float steuern = 0f, tilgung = 0f, privatentnahme = 0f;
+        float steuern = 0f, tilgung = 0f, privatentnahme = 0f, zinsen = 0f;
         float geldeinlagen = 0f, kredite = 0f, sonstEinz = 0f;
         float[] einnahmenMonat = new float[12];
         float[] ausgabenMonat  = new float[12];
@@ -76,8 +102,6 @@ public class Finanzen1 : MonoBehaviour
         var db = UserDatabaseAccess.getCurrentUserDatabase();
         if (db != null)
         {
-            int jahr = DateTime.Today.Year;
-
             var einkList = db.getAllEinkommenEntries();
             if (einkList != null)
                 foreach (var e in einkList)
@@ -102,24 +126,21 @@ public class Finanzen1 : MonoBehaviour
                         else if (art == "Tilgungsraten")                 tilgung        += a.Amount;
                         else if (art == "Steuern" || art == "Finanzamt") steuern        += a.Amount;
                         else if (art == "Barentnahme / Privatentnahme")  privatentnahme += a.Amount;
+                        // FIX: "Zinsen" hatte vorher keine eigene Art-Kategorie
+                        // im Kassenbuch und stand deshalb immer fest auf 0.
+                        // Jetzt gibt es "Zinsen" als eigene Ausgaben-Kategorie
+                        // im Kassenbuch-Dropdown, wird hier eingerechnet UND
+                        // aus "Betriebsausgaben" rausgehalten (sonst doppelt).
+                        else if (art == "Zinsen")                        zinsen         += a.Amount;
                         else                                             betrieb        += a.Amount;
                     }
         }
 
-        float ueberschuss = gesamtEinn - personal - betrieb - steuern - tilgung - privatentnahme;
+        float ueberschuss = gesamtEinn - personal - betrieb - steuern - tilgung - privatentnahme - zinsen;
 
-        // FIX: "Anfangsbestand" war hartkodiert 0f, obwohl das Kassenbuch
-        // durchaus Buchungen aus Vorjahren enthalten kann. Jetzt: kumulierter
-        // Saldo aus ALLEN Buchungen vor dem 1.1. des aktuellen Jahres.
-        float anfangsbestand = BerechneKumuliertenSaldoVorJahr(db, DateTime.Today.Year);
-        // FIX: "Endbestand" war = Überschuss, ohne den Anfangsbestand
-        // einzurechnen - dadurch stimmte die Liquiditätsplanung nicht.
+        // Kumulierter Saldo aus ALLEN Buchungen vor dem 1.1. des gewählten Jahres.
+        float anfangsbestand = BerechneKumuliertenSaldoVorJahr(db, jahr);
         float endbestand = anfangsbestand + ueberschuss;
-
-        // HINWEIS: "Zinsen" hat aktuell keine eigene Art-Kategorie im
-        // Kassenbuch (weder bei Einnahmen noch Ausgaben) und bleibt daher
-        // vorerst 0 - gehört in denselben Rahmen wie die offene
-        // Finanzen-2-Anbindung (neue Kategorien im Kassenbuch nötig).
 
         // 1. RENTABILITÄT (Farben/Trennlinien wie Finanzen 2: Einnahmen grün,
         // Kosten rot, Summenzeile grün/rot je nach Vorzeichen)
@@ -164,18 +185,22 @@ public class Finanzen1 : MonoBehaviour
         {
             containerGruendung.Clear();
             containerGruendung.Add(MakeHeader("Kategorie", "Betrag"));
-            containerGruendung.Add(MakeRow("Anfangsbestand",   anfangsbestand, TextColor));
+            // FIX: Vorher generische Labels ohne Jahresbezug ("Anfangsbestand",
+            // "Überschuss/Fehlbetrag", "Endbestand") - dadurch war nicht klar
+            // erkennbar, auf welches Jahr sich welche Zeile bezieht bzw. dass
+            // der Anfangsbestand aus dem Vorjahr resultiert.
+            containerGruendung.Add(MakeRow($"Anfangsbestand {jahr} aus Vorjahr", anfangsbestand, TextColor));
             containerGruendung.Add(MakeRow("Umsatzerlöse",     gesamtEinn,     GreenColor));
             containerGruendung.Add(MakeRow("Personalausgaben", personal,       RedColor));
             containerGruendung.Add(MakeRow("Betriebsausgaben", betrieb,        RedColor));
-            containerGruendung.Add(MakeRow("Zinsen",           0f,             RedColor));
+            containerGruendung.Add(MakeRow("Zinsen",           zinsen,         RedColor));
             containerGruendung.Add(MakeRow("Tilgung",          tilgung,        RedColor));
             containerGruendung.Add(MakeRow("MwSt / Finanzamt", steuern,        RedColor));
             containerGruendung.Add(MakeRow("Privatentnahmen",  privatentnahme, RedColor));
             containerGruendung.Add(MakeTrenn());
-            containerGruendung.Add(MakeRow("Überschuss/Fehlbetrag", ueberschuss,
+            containerGruendung.Add(MakeRow($"Überschuss {jahr}", ueberschuss,
                 ueberschuss >= 0 ? GreenColor : RedColor, true));
-            containerGruendung.Add(MakeRow("Endbestand", endbestand,
+            containerGruendung.Add(MakeRow($"Endbestand {jahr}", endbestand,
                 endbestand >= 0 ? GreenColor : RedColor, true));
         }
     }
