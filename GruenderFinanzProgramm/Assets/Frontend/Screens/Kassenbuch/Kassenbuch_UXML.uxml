@@ -32,11 +32,11 @@
             </ui:VisualElement>
             <ui:VisualElement name="Tabelle" class="table-wrapper">
                 <ui:VisualElement name="Table-Header" class="row row-header">
-                    <ui:Label text="Name &amp; Verwendungszweck" class="cell cell-name"/>
-                    <ui:Label text="Buchungstag"                 class="cell cell-datum"/>
-                    <ui:Label text="Betrag"                      class="cell cell-betrag"/>
-                    <ui:Label text="Art"                         class="cell cell-art"/>
-                    <ui:Label text="Einnahme / Ausgabe"          class="cell cell-typ"/>
+                    <ui:Label text="Name &amp; Verwendungszweck" name="col-header-name"   class="cell cell-name"/>
+                    <ui:Label text="Buchungstag"                 name="col-header-datum"  class="cell cell-datum"/>
+                    <ui:Label text="Betrag"                      name="col-header-betrag" class="cell cell-betrag"/>
+                    <ui:Label text="Art"                         name="col-header-art"    class="cell cell-art"/>
+                    <ui:Label text="Einnahme / Ausgabe"          name="col-header-typ"    class="cell cell-typ"/>
                     <ui:VisualElement name="btn-help-tabelle" class="cell cell-action" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); -unity-background-scale-mode: scale-to-fit;"/>
                 </ui:VisualElement>
                 <ui:ScrollView name="tableBody" class="table-body" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"/>
