@@ -1,91 +1,198 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 public class TutorialManager : MonoBehaviour
 {
+    private const string ErsterStartSchluessel =
+        "TutorialStartDialogAngezeigt";
+
     [Header("Tutorial-Bilder")]
-    [SerializeField] private Sprite[] tutorialBilder;
+    [SerializeField] private Sprite[] tutorialBilderLang;
+    [SerializeField] private Sprite[] tutorialBilderKurz;
+
     [Header("UI-Referenzen")]
     [SerializeField] private GameObject startDialog;
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private Image tutorialBildAnzeige;
-    [SerializeField] private Button jaButton;
-    [SerializeField] private Button neinButton;
+
+    [Header("Tutorial-Auswahl")]
+    [SerializeField] private Button langButton;
+    [SerializeField] private Button kurzButton;
+    [SerializeField] private Button keinTutorialButton;
+
+    [Header("Navigation")]
     [SerializeField] private Button weiterButton;
     [SerializeField] private Button zurueckButton;
-    [Header("Unabhängiger Start-Button")]
+
+    [Header("Tutorial-Button in den Einstellungen")]
     [SerializeField] private Button tutorialDirektButton;
-    private int aktuellerIndex = 0;
-    void Start()
+
+    private Sprite[] aktiveTutorialBilder;
+    private int aktuellerIndex;
+
+    private void Start()
     {
-        // Start-Dialog anzeigen, Tutorial verstecken
-        startDialog.SetActive(true);
         tutorialPanel.SetActive(false);
-        // Button-Events registrieren
-        jaButton.onClick.AddListener(TutorialStarten);
-        neinButton.onClick.AddListener(TutorialSchliessen);
+
+        // Nur beim ersten Start automatisch anzeigen.
+        bool auswahlBereitsAngezeigt =
+            PlayerPrefs.GetInt(ErsterStartSchluessel, 0) == 1;
+
+        startDialog.SetActive(!auswahlBereitsAngezeigt);
+
+        if (!auswahlBereitsAngezeigt)
+        {
+            PlayerPrefs.SetInt(ErsterStartSchluessel, 1);
+            PlayerPrefs.Save();
+        }
+
+        langButton.onClick.AddListener(LangesTutorialStarten);
+        kurzButton.onClick.AddListener(KurzesTutorialStarten);
+        keinTutorialButton.onClick.AddListener(AuswahlSchliessen);
+
         weiterButton.onClick.AddListener(NaechstesBild);
         zurueckButton.onClick.AddListener(VorherigesBild);
-        // Unabhängiger Button, um das Tutorial jederzeit direkt zu starten
-        // ( in den Einstellungen platziert)
+
         if (tutorialDirektButton != null)
         {
-            tutorialDirektButton.onClick.AddListener(TutorialDirektStarten);
+            // Zeigt zuerst die Auswahl, statt direkt das Tutorial zu starten.
+            tutorialDirektButton.onClick.AddListener(
+                TutorialAuswahlOeffnen
+            );
         }
     }
-    private void TutorialStarten()
+
+    /// Wird vom Tutorial-Button in den Einstellungen aufgerufen.
+    public void TutorialAuswahlOeffnen()
     {
+        tutorialPanel.SetActive(false);
+        startDialog.SetActive(true);
+    }
+
+    private void LangesTutorialStarten()
+    {
+        TutorialOeffnen(tutorialBilderLang);
+    }
+
+    private void KurzesTutorialStarten()
+    {
+        TutorialOeffnen(tutorialBilderKurz);
+    }
+
+    private void TutorialOeffnen(Sprite[] bilder)
+    {
+        if (bilder == null || bilder.Length == 0)
+        {
+            Debug.LogWarning(
+                "Für diese Tutorial-Variante wurden keine Bilder eingetragen."
+            );
+            return;
+        }
+
+        aktiveTutorialBilder = bilder;
+        aktuellerIndex = 0;
+
         startDialog.SetActive(false);
         tutorialPanel.SetActive(true);
-        aktuellerIndex = 0;
+
         BildAktualisieren();
     }
-    // Öffentliche Methode: startet das Tutorial unabhängig vom Start-Dialog.
-    public void TutorialDirektStarten()
-    {
-        if (startDialog != null)
-        {
-            startDialog.SetActive(false);
-        }
-        tutorialPanel.SetActive(true);
-        aktuellerIndex = 0;
-        BildAktualisieren();
-    }
-    private void TutorialSchliessen()
+
+    private void AuswahlSchliessen()
     {
         startDialog.SetActive(false);
         tutorialPanel.SetActive(false);
     }
+
     private void NaechstesBild()
     {
-        if (aktuellerIndex < tutorialBilder.Length - 1)
+        if (aktiveTutorialBilder == null ||
+            aktiveTutorialBilder.Length == 0)
+        {
+            return;
+        }
+
+        if (aktuellerIndex < aktiveTutorialBilder.Length - 1)
         {
             aktuellerIndex++;
             BildAktualisieren();
         }
         else
         {
-            // Letztes Bild erreicht – Tutorial beenden
             TutorialSchliessen();
         }
     }
+
     private void VorherigesBild()
     {
+        if (aktiveTutorialBilder == null ||
+            aktiveTutorialBilder.Length == 0)
+        {
+            return;
+        }
+
         if (aktuellerIndex > 0)
         {
             aktuellerIndex--;
             BildAktualisieren();
         }
     }
+
     private void BildAktualisieren()
     {
-        tutorialBildAnzeige.sprite = tutorialBilder[aktuellerIndex];
-        // Zurück-Button nur anzeigen, wenn nicht beim ersten Bild
+        if (aktiveTutorialBilder == null ||
+            aktiveTutorialBilder.Length == 0)
+        {
+            return;
+        }
+
+        tutorialBildAnzeige.sprite =
+            aktiveTutorialBilder[aktuellerIndex];
+
         zurueckButton.interactable = aktuellerIndex > 0;
-        // Optional: Weiter-Button-Text ändern beim letzten Bild
-        var weiterText = weiterButton.GetComponentInChildren<Text>();
+
+        Text weiterText =
+            weiterButton.GetComponentInChildren<Text>();
+
         if (weiterText != null)
         {
-            weiterText.text = aktuellerIndex >= tutorialBilder.Length - 1 ? "Fertig" : "Weiter";
+            bool istLetztesBild =
+                aktuellerIndex == aktiveTutorialBilder.Length - 1;
+
+            weiterText.text = istLetztesBild ? "Fertig" : "Weiter";
         }
+    }
+
+    private void TutorialSchliessen()
+    {
+        tutorialPanel.SetActive(false);
+        aktiveTutorialBilder = null;
+        aktuellerIndex = 0;
+    }
+
+    private void OnDestroy()
+    {
+        langButton.onClick.RemoveListener(LangesTutorialStarten);
+        kurzButton.onClick.RemoveListener(KurzesTutorialStarten);
+        keinTutorialButton.onClick.RemoveListener(AuswahlSchliessen);
+
+        weiterButton.onClick.RemoveListener(NaechstesBild);
+        zurueckButton.onClick.RemoveListener(VorherigesBild);
+
+        if (tutorialDirektButton != null)
+        {
+            tutorialDirektButton.onClick.RemoveListener(
+                TutorialAuswahlOeffnen
+            );
+        }
+    }
+
+    [ContextMenu("Ersten Start zurücksetzen")]
+    private void ErstenStartZuruecksetzen()
+    {
+        PlayerPrefs.DeleteKey(ErsterStartSchluessel);
+        PlayerPrefs.Save();
+
+        Debug.Log("Der Tutorial-Erststart wurde zurückgesetzt.");
     }
 }
