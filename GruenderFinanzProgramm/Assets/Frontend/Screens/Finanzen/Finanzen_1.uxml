@@ -5,30 +5,55 @@
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/DashboardStyles.uss?fileID=7433441132597879392&amp;guid=fe9c9a54b138ecc469e247e562306177&amp;type=3#DashboardStyles"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
-    <ui:VisualElement name="nav-item-finanzdashboard" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; width: 1920px; height: 1080px; background-color: rgb(30, 30, 30);">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
+
+    <ui:VisualElement name="root" class="root fullscreen-bg grid-container"
+        style="flex-direction: row; width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
+
         <ui:VisualElement style="flex-grow: 0; width: 388px;"/>
-        <ui:VisualElement style="flex-grow: 1; background-color: rgb(30, 30, 30); padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
-            <ui:VisualElement style="flex-direction: row; align-items: center; max-height: 70px; padding-left: 0; margin-bottom: 8px; padding-top: 20px;">
-                <ui:Label text="Wichtige Kennzahlen" name="Label" style="font-size: 36px; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+
+        <ui:ScrollView name="hauptbereich" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"
+            style="flex-grow: 1; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px;">
+
+            <!-- Seitentitel mit Help-Icon -->
+            <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px; flex-shrink: 0;">
+                <ui:Label text="Wichtige Kennzahlen" name="label-seitentitel" style="font-size: 32px; -unity-font-style: bold; color: rgb(255,255,255);"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:DropdownField label="Jahr:" name="dropJahr" class="jahr-dropdown"/>
             </ui:VisualElement>
-            <ui:Label name="lbl-jahr" text="Auswertung 2026" style="font-size: 14px; color: rgb(160, 160, 160); margin-bottom: 12px;"/>
-            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
-                    <ui:Label text="Rentabilität" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
-                    <ui:VisualElement name="Rentabilitaet" style="flex-grow: 1;"><ui:Label text="TEST123" style="color: rgb(255, 0, 0); font-size: 20px;"/></ui:VisualElement>
+            <ui:Label name="lbl-jahr" text="Auswertung 2026" style="font-size: 14px; color: rgb(160,160,160); margin-bottom: 12px; flex-shrink: 0;"/>
+
+            <!-- Rentabilität (volle Breite) -->
+            <ui:VisualElement style="flex-grow: 0; flex-direction: column; margin-bottom: 12px; flex-shrink: 0; background-color: rgb(44,44,44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; padding-top: 14px; padding-bottom: 14px; padding-left: 16px; padding-right: 16px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                    <ui:Label text="Rentabilität" style="font-size: 18px; color: rgb(255,255,255); -unity-font-style: bold;"/>
+                    <ui:VisualElement style="flex-grow: 1;"/>
+                    <ui:VisualElement name="btn-help-rentabilitaet" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                 </ui:VisualElement>
+                <ui:VisualElement name="Rentabilitaet" style="flex-grow: 1;"/>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
-                    <ui:Label text="Liquidität zum Geschäftsbeginn" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
+
+            <!-- Liquidität + Liquiditätsplanung nebeneinander -->
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-bottom: 12px; flex-shrink: 0;">
+                <ui:VisualElement style="flex-grow: 1; flex-basis: 0; flex-direction: column; margin-right: 12px; background-color: rgb(44,44,44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; padding-top: 14px; padding-bottom: 14px; padding-left: 16px; padding-right: 16px;">
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Liquidität zum Geschäftsbeginn" style="font-size: 18px; color: rgb(255,255,255); -unity-font-style: bold;"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-liquiditaet" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
+                    </ui:VisualElement>
                     <ui:VisualElement name="Liquiditaet" style="flex-grow: 1;"/>
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; margin-right: 10px; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; margin-bottom: 10px;">
-                    <ui:Label text="Liquiditätsplanung" style="color: rgb(255, 255, 255); font-size: 22px; -unity-font-style: bold; margin-bottom: 8px;"/>
+                <ui:VisualElement style="flex-grow: 1; flex-basis: 0; flex-direction: column; background-color: rgb(44,44,44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; padding-top: 14px; padding-bottom: 14px; padding-left: 16px; padding-right: 16px;">
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Liquiditätsplanung" style="font-size: 18px; color: rgb(255,255,255); -unity-font-style: bold;"/>
+                        <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="btn-help-liquiditaetsplanung" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
+                    </ui:VisualElement>
                     <ui:VisualElement name="Gruendung" style="flex-grow: 1;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
 
-        </ui:VisualElement>
+        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

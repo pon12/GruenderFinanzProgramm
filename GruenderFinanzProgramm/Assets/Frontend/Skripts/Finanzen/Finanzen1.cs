@@ -9,6 +9,14 @@ public class Finanzen1 : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
 
+    // Identische Farben wie in Finanzen 2 (FinanceDashboardBinder), damit
+    // beide Screens exakt gleich aussehen.
+    private static readonly Color GreenColor = new Color(0.502f, 0.812f, 0.584f, 1f);
+    private static readonly Color RedColor   = new Color(0.902f, 0.224f, 0.275f, 1f);
+    private static readonly Color TextColor  = new Color(0.863f, 0.863f, 0.863f, 1f);
+
+    private int _gewaehltesJahr = DateTime.Today.Year;
+
     private void Start()
     {
         StartCoroutine(InitUI());
@@ -17,9 +25,33 @@ public class Finanzen1 : MonoBehaviour
     private IEnumerator InitUI()
     {
         yield return new WaitForEndOfFrame();
+        RegistriereJahresAuswahl();
         AktualisiereTabellen();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(uiDocument.rootVisualElement);
+    }
+
+    // FIX: Vorher gab es keine Möglichkeit, sich vergangene Jahre anzusehen -
+    // die Auswertung war immer fest auf das aktuelle Jahr beschränkt. Jetzt
+    // wie im Kassenbuch ein Jahres-Dropdown von 2010 bis heute.
+    private void RegistriereJahresAuswahl()
+    {
+        var dropJahr = uiDocument.rootVisualElement.Q<DropdownField>("dropJahr");
+        if (dropJahr == null) return;
+
+        var jahre = new List<string>();
+        for (int j = DateTime.Today.Year; j >= 2010; j--) jahre.Add(j.ToString());
+
+        dropJahr.choices = jahre;
+        dropJahr.value   = _gewaehltesJahr.ToString();
+        dropJahr.RegisterValueChangedCallback(evt =>
+        {
+            if (int.TryParse(evt.newValue, out int neuesJahr))
+            {
+                _gewaehltesJahr = neuesJahr;
+                AktualisiereTabellen();
+            }
+        });
     }
 
     // ============================================================
@@ -56,8 +88,13 @@ public class Finanzen1 : MonoBehaviour
     {
         if (uiDocument == null || uiDocument.rootVisualElement == null) return;
 
+        int jahr = _gewaehltesJahr;
+
+        var jahrLabel = uiDocument.rootVisualElement.Q<Label>("lbl-jahr");
+        if (jahrLabel != null) jahrLabel.text = $"Auswertung {jahr}";
+
         float gesamtEinn = 0f, personal = 0f, betrieb = 0f;
-        float steuern = 0f, tilgung = 0f, privatentnahme = 0f;
+        float steuern = 0f, tilgung = 0f, privatentnahme = 0f, zinsen = 0f;
         float geldeinlagen = 0f, kredite = 0f, sonstEinz = 0f;
         float[] einnahmenMonat = new float[12];
         float[] ausgabenMonat  = new float[12];
@@ -65,8 +102,6 @@ public class Finanzen1 : MonoBehaviour
         var db = UserDatabaseAccess.getCurrentUserDatabase();
         if (db != null)
         {
-            int jahr = DateTime.Today.Year;
-
             var einkList = db.getAllEinkommenEntries();
             if (einkList != null)
                 foreach (var e in einkList)
@@ -91,119 +126,158 @@ public class Finanzen1 : MonoBehaviour
                         else if (art == "Tilgungsraten")                 tilgung        += a.Amount;
                         else if (art == "Steuern" || art == "Finanzamt") steuern        += a.Amount;
                         else if (art == "Barentnahme / Privatentnahme")  privatentnahme += a.Amount;
+                        // FIX: "Zinsen" hatte vorher keine eigene Art-Kategorie
+                        // im Kassenbuch und stand deshalb immer fest auf 0.
+                        // Jetzt gibt es "Zinsen" als eigene Ausgaben-Kategorie
+                        // im Kassenbuch-Dropdown, wird hier eingerechnet UND
+                        // aus "Betriebsausgaben" rausgehalten (sonst doppelt).
+                        else if (art == "Zinsen")                        zinsen         += a.Amount;
                         else                                             betrieb        += a.Amount;
                     }
         }
 
-        float ueberschuss = gesamtEinn - personal - betrieb - steuern - tilgung - privatentnahme;
+        float ueberschuss = gesamtEinn - personal - betrieb - steuern - tilgung - privatentnahme - zinsen;
 
-        // 1. RENTABILITÄT
+        // Kumulierter Saldo aus ALLEN Buchungen vor dem 1.1. des gewählten Jahres.
+        float anfangsbestand = BerechneKumuliertenSaldoVorJahr(db, jahr);
+        float endbestand = anfangsbestand + ueberschuss;
+
+        // 1. RENTABILITÄT (Farben/Trennlinien wie Finanzen 2: Einnahmen grün,
+        // Kosten rot, Summenzeile grün/rot je nach Vorzeichen)
         var containerRentabilitaet = uiDocument.rootVisualElement.Q<VisualElement>("Rentabilitaet");
         if (containerRentabilitaet != null)
         {
             containerRentabilitaet.Clear();
-            containerRentabilitaet.Add(CreateHeader());
-            containerRentabilitaet.Add(CreateRow("Umsatzerlöse",          gesamtEinn,     0));
-            containerRentabilitaet.Add(CreateRow("Personalausgaben",      personal,       0));
-            containerRentabilitaet.Add(CreateRow("Betriebsausgaben",      betrieb,        0));
-            containerRentabilitaet.Add(CreateRow("Steuern / Finanzamt",   steuern,        0));
-            containerRentabilitaet.Add(CreateRow("Tilgungsraten",         tilgung,        0));
-            containerRentabilitaet.Add(CreateRow("Privatentnahmen",       privatentnahme, 0));
-            containerRentabilitaet.Add(CreateRow("Überschuss/Fehlbetrag", ueberschuss,    0, true));
+            containerRentabilitaet.Add(MakeHeader("Kategorie", "Betrag"));
+            containerRentabilitaet.Add(MakeRow("Umsatzerlöse",        gesamtEinn,     GreenColor));
+            containerRentabilitaet.Add(MakeRow("Personalausgaben",    personal,       RedColor));
+            containerRentabilitaet.Add(MakeRow("Betriebsausgaben",    betrieb,        RedColor));
+            containerRentabilitaet.Add(MakeRow("Steuern / Finanzamt", steuern,        RedColor));
+            containerRentabilitaet.Add(MakeRow("Tilgungsraten",       tilgung,        RedColor));
+            containerRentabilitaet.Add(MakeRow("Privatentnahmen",     privatentnahme, RedColor));
+            containerRentabilitaet.Add(MakeTrenn());
+            containerRentabilitaet.Add(MakeRow("Überschuss/Fehlbetrag", ueberschuss,
+                ueberschuss >= 0 ? GreenColor : RedColor, true));
         }
 
-        // 2. LIQUIDITÄT ZUM GESCHÄFTSBEGINN
+        // 2. LIQUIDITÄT ZUM GESCHÄFTSBEGINN (Einlagen/Kredite = Zufluss -> grün,
+        // Steuern/Tilgung = Abfluss -> rot)
         var containerLiquiditaet = uiDocument.rootVisualElement.Q<VisualElement>("Liquiditaet");
         if (containerLiquiditaet != null)
         {
             containerLiquiditaet.Clear();
-            containerLiquiditaet.Add(CreateHeader2());
-            containerLiquiditaet.Add(CreateRow2("Geldeinlagen",       geldeinlagen));
-            containerLiquiditaet.Add(CreateRow2("Kredite / Darlehen", kredite));
-            containerLiquiditaet.Add(CreateRow2("Sonstige Einzahlung",sonstEinz));
-            containerLiquiditaet.Add(CreateRow2("Steuern",            steuern));
-            containerLiquiditaet.Add(CreateRow2("Tilgungsraten",      tilgung));
+            containerLiquiditaet.Add(MakeHeader("Kategorie", "Gründung"));
+            containerLiquiditaet.Add(MakeRow("Geldeinlagen",        geldeinlagen, GreenColor));
+            containerLiquiditaet.Add(MakeRow("Kredite / Darlehen",  kredite,      GreenColor));
+            containerLiquiditaet.Add(MakeRow("Sonstige Einzahlung", sonstEinz,    GreenColor));
+            containerLiquiditaet.Add(MakeRow("Steuern",             steuern,      RedColor));
+            containerLiquiditaet.Add(MakeRow("Tilgungsraten",       tilgung,      RedColor));
+            containerLiquiditaet.Add(MakeTrenn());
             float liqGesamt = geldeinlagen + kredite + sonstEinz - steuern - tilgung;
-            containerLiquiditaet.Add(CreateRow2("Liquidität gesamt",  liqGesamt, true));
+            containerLiquiditaet.Add(MakeRow("Liquidität gesamt", liqGesamt,
+                liqGesamt >= 0 ? GreenColor : RedColor, true));
         }
 
-        // 3. LIQUIDITÄTSPLANUNG
+        // 3. LIQUIDITÄTSPLANUNG (Anfangsbestand neutral, Umsatz grün, alle
+        // Ausgaben rot, Überschuss/Endbestand grün/rot je nach Vorzeichen)
         var containerGruendung = uiDocument.rootVisualElement.Q<VisualElement>("Gruendung");
         if (containerGruendung != null)
         {
             containerGruendung.Clear();
-            containerGruendung.Add(CreateHeader());
-            containerGruendung.Add(CreateRow("Anfangsbestand",        0f,             0));
-            containerGruendung.Add(CreateRow("Umsatzerlöse",          gesamtEinn,     0));
-            containerGruendung.Add(CreateRow("Personalausgaben",      personal,       0));
-            containerGruendung.Add(CreateRow("Betriebsausgaben",      betrieb,        0));
-            containerGruendung.Add(CreateRow("Zinsen",                0f,             0));
-            containerGruendung.Add(CreateRow("Tilgung",               tilgung,        0));
-            containerGruendung.Add(CreateRow("MwSt / Finanzamt",      steuern,        0));
-            containerGruendung.Add(CreateRow("Privatentnahmen",       privatentnahme, 0));
-            containerGruendung.Add(CreateRow("Überschuss/Fehlbetrag", ueberschuss,    0, true));
-            containerGruendung.Add(CreateRow("Endbestand",            ueberschuss,    0, true));
+            containerGruendung.Add(MakeHeader("Kategorie", "Betrag"));
+            // FIX: Vorher generische Labels ohne Jahresbezug ("Anfangsbestand",
+            // "Überschuss/Fehlbetrag", "Endbestand") - dadurch war nicht klar
+            // erkennbar, auf welches Jahr sich welche Zeile bezieht bzw. dass
+            // der Anfangsbestand aus dem Vorjahr resultiert.
+            containerGruendung.Add(MakeRow($"Anfangsbestand {jahr} aus Vorjahr", anfangsbestand, TextColor));
+            containerGruendung.Add(MakeRow("Umsatzerlöse",     gesamtEinn,     GreenColor));
+            containerGruendung.Add(MakeRow("Personalausgaben", personal,       RedColor));
+            containerGruendung.Add(MakeRow("Betriebsausgaben", betrieb,        RedColor));
+            containerGruendung.Add(MakeRow("Zinsen",           zinsen,         RedColor));
+            containerGruendung.Add(MakeRow("Tilgung",          tilgung,        RedColor));
+            containerGruendung.Add(MakeRow("MwSt / Finanzamt", steuern,        RedColor));
+            containerGruendung.Add(MakeRow("Privatentnahmen",  privatentnahme, RedColor));
+            containerGruendung.Add(MakeTrenn());
+            containerGruendung.Add(MakeRow($"Überschuss {jahr}", ueberschuss,
+                ueberschuss >= 0 ? GreenColor : RedColor, true));
+            containerGruendung.Add(MakeRow($"Endbestand {jahr}", endbestand,
+                endbestand >= 0 ? GreenColor : RedColor, true));
         }
     }
 
+    // Kumulierter Kassenbuch-Saldo aus ALLEN Buchungen VOR dem 1.1. des
+    // übergebenen Jahres - das ist der Anfangsbestand, mit dem das Jahr
+    // rechnerisch startet (analog zum GuV-Export im Kassenbuch).
+    private float BerechneKumuliertenSaldoVorJahr(DataBase db, int jahr)
+    {
+        if (db == null) return 0f;
+        float summe = 0f;
+
+        var einkommen = db.getAllEinkommenEntries();
+        if (einkommen != null)
+            foreach (var e in einkommen)
+                if (DateTime.TryParse(e.getDatum(), out DateTime d) && d.Year < jahr)
+                    summe += e.Amount;
+
+        var ausgaben = db.getAllAusgabenEntries();
+        if (ausgaben != null)
+            foreach (var a in ausgaben)
+                if (DateTime.TryParse(a.getDatum(), out DateTime d) && d.Year < jahr)
+                    summe -= a.Amount;
+
+        return summe;
+    }
+
     // ============================================================
-    // HILFSMETHODEN
+    // HILFSMETHODEN (1:1 identisch zum Aufbau in Finanzen 2 /
+    // FinanceDashboardBinder - gleiche Trennlinien, gleiche Abstände)
     // ============================================================
 
-    private VisualElement CreateHeader()
+    private VisualElement MakeHeader(string links, string rechts)
     {
         var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.marginBottom  = 6;
-        row.style.width         = Length.Percent(100);
-        row.Add(CreateCell("Kategorie", true, 60));
-        row.Add(CreateCell("Betrag",    true, 40));
+        row.style.flexDirection     = FlexDirection.Row;
+        row.style.justifyContent    = Justify.SpaceBetween;
+        row.style.paddingBottom     = 8;
+        row.style.marginBottom      = 4;
+        row.style.borderBottomWidth = 1;
+        row.style.borderBottomColor = new Color(1, 1, 1, 0.2f);
+        row.Add(Lbl(links,  new Color(1, 1, 1), 13, true));
+        row.Add(Lbl(rechts, new Color(1, 1, 1), 13, true));
         return row;
     }
 
-    private VisualElement CreateHeader2()
+    private VisualElement MakeRow(string name, float wert, Color wertFarbe, bool fett = false, string suffix = " €")
     {
         var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.marginBottom  = 6;
-        row.style.width         = Length.Percent(100);
-        row.Add(CreateCell("Kategorie", true, 60));
-        row.Add(CreateCell("Gründung",  true, 40));
+        row.style.flexDirection     = FlexDirection.Row;
+        row.style.justifyContent    = Justify.SpaceBetween;
+        row.style.paddingTop        = 5;
+        row.style.paddingBottom     = 5;
+        row.style.borderBottomWidth = 1;
+        row.style.borderBottomColor = new Color(1, 1, 1, 0.04f);
+        string wertText = (wert < 0 ? "-" : "") + Mathf.Abs(wert).ToString("N0") + suffix;
+        row.Add(Lbl(name,     fett ? new Color(1, 1, 1) : TextColor, 12, fett));
+        row.Add(Lbl(wertText, wertFarbe, 12, fett));
         return row;
     }
 
-    private VisualElement CreateRow(string name, float wert, int unused, bool isBold = false)
+    private VisualElement MakeTrenn()
     {
-        var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.marginBottom  = 4;
-        row.style.width         = Length.Percent(100);
-        row.Add(CreateCell(name, isBold, 60));
-        row.Add(CreateCell(wert.ToString("N0") + " €", isBold, 40));
-        return row;
+        var line = new VisualElement();
+        line.style.height          = 1;
+        line.style.backgroundColor = new Color(1, 1, 1, 0.1f);
+        line.style.marginTop       = 4;
+        line.style.marginBottom    = 4;
+        return line;
     }
 
-    private VisualElement CreateRow2(string name, float wert, bool isBold = false)
+    private Label Lbl(string text, Color farbe, int size, bool fett)
     {
-        var row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.marginBottom  = 4;
-        row.style.width         = Length.Percent(100);
-        row.Add(CreateCell(name, isBold, 60));
-        row.Add(CreateCell(wert.ToString("N0") + " €", isBold, 40));
-        return row;
-    }
-
-    private VisualElement CreateCell(string text, bool isBold, int widthPercent)
-    {
-        var label = new Label(text);
-        label.style.color                   = Color.white;
-        label.style.unityFontStyleAndWeight = isBold ? FontStyle.Bold : FontStyle.Normal;
-        // flex-grow statt Width.Percent damit das Icon im Header-Row
-        // die Spaltenbreiten der Tabellenzeilen nicht beeinflusst
-        label.style.flexGrow                = widthPercent;
-        label.style.flexBasis               = 0;
-        label.style.overflow                = Overflow.Hidden;
-        return label;
+        var l = new Label(text);
+        l.style.color = farbe;
+        l.style.fontSize = size;
+        l.style.unityFontStyleAndWeight = fett ? FontStyle.Bold : FontStyle.Normal;
+        return l;
     }
 }

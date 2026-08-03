@@ -1615,7 +1615,10 @@ public abstract class BelegScreenController : MonoBehaviour
                              ? _datumFeld.value
                              : DateTime.Now.ToString("dd.MM.yyyy");
 
-            db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum);
+            // FIX: Vorher wurde keine Art übergeben, dadurch stand in der
+            // Kassenbuch-Tabelle bei automatisch aus Rechnung/Angebot
+            // gebuchten Einträgen nur ein "-" statt einer echten Kategorie.
+            db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum, "Umsatzerlöse");
         }
         catch (Exception e)
         {
