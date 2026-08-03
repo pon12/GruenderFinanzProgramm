@@ -15,10 +15,12 @@ public static class InvoicePdfExporter
         List<string> anhaenge = null
     )
     {
+        string username = GetSafeFolderName(StateManager.Instance.getCurrentUser().username);
+
         string folderPath = Path.Combine(
             Application.persistentDataPath,
             "PDFs",
-            StateManager.Instance.getCurrentUser().username,
+            username,
             "Rechnungen"
         );
 
@@ -124,8 +126,8 @@ public static class InvoicePdfExporter
 
                 doc.Add(adressen);
                 doc.Add(new Paragraph(" "));
-                
-               // =========================
+
+                // =========================
                 // TITEL
                 // =========================
 
@@ -138,7 +140,7 @@ public static class InvoicePdfExporter
 
                 doc.Add(invoiceTitle);
                 doc.Add(new Paragraph(" "));
-               
+
                 // =========================
                 // RECHNUNGSDATEN
                 // =========================
@@ -159,7 +161,7 @@ public static class InvoicePdfExporter
                 ));
 
                 doc.Add(new Paragraph(" "));
-                
+
                 // =========================
                 // TABELLE
                 // =========================
@@ -180,12 +182,12 @@ public static class InvoicePdfExporter
 
                 foreach (InvoiceItem item in items)
                 {
-                   AddBodyCell(
-                    table, 
-                    item.articleNumber, 
-                    normalFont
-                    );
-                   
+                    AddBodyCell(
+                     table,
+                     item.articleNumber,
+                     normalFont
+                     );
+
                     AddBodyCell(
                         table,
                         item.description,
@@ -220,7 +222,7 @@ public static class InvoicePdfExporter
                 // =========================
                 // SUMMEN
                 // =========================
-                
+
                 double positionenGesamt = 0;
 
                 foreach (InvoiceItem item in items)
@@ -235,7 +237,7 @@ public static class InvoicePdfExporter
                 double mwst = steuerBasis * mwstSatz;
                 double zwischensumme = steuerBasis + mwst;
                 double gesamt = zwischensumme - skonto;
-                
+
                 PdfPTable totals = new PdfPTable(2);
                 totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
@@ -354,6 +356,9 @@ public static class InvoicePdfExporter
 
             return null;
         }
+
+
+
     }
 
     private static void AddHeaderCell(
@@ -390,20 +395,42 @@ public static class InvoicePdfExporter
 
         table.AddCell(cell);
     }
-private static void AddFooterCell(
-    PdfPTable table,
-    string text,
-    iTextSharp.text.Font font
-)
-{
-    PdfPCell cell = new PdfPCell(new Phrase(text, font));
-    cell.Border = Rectangle.NO_BORDER;
-    cell.PaddingTop = 6;
-    cell.PaddingRight = 10;
-    cell.HorizontalAlignment = Element.ALIGN_LEFT;
-    table.AddCell(cell);
-}
+    private static void AddFooterCell(
+        PdfPTable table,
+        string text,
+        iTextSharp.text.Font font
+    )
+    {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.Border = Rectangle.NO_BORDER;
+        cell.PaddingTop = 6;
+        cell.PaddingRight = 10;
+        cell.HorizontalAlignment = Element.ALIGN_LEFT;
+        table.AddCell(cell);
+    }
 
+
+    private static string GetSafeFolderName(string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            return "User";
+        }
+
+        string safeName = folderName.Trim();
+
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+        {
+            safeName = safeName.Replace(invalidChar.ToString(), "");
+        }
+
+        if (string.IsNullOrWhiteSpace(safeName))
+        {
+            return "User";
+        }
+
+        return safeName;
+    }
 
 
 }

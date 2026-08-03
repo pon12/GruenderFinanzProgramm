@@ -55,11 +55,11 @@ public class DebugLogger : MonoBehaviour
             string timestamp = DateTime.Now.ToString("HH:mm:ss");
             string label = type switch
             {
-                LogType.Error     => "[ERROR]",
-                LogType.Warning   => "[WARNING]",
+                LogType.Error => "[ERROR]",
+                LogType.Warning => "[WARNING]",
                 LogType.Exception => "[EXCEPTION]",
-                LogType.Assert    => "[ASSERT]",
-                _                 => "[LOG]"
+                LogType.Assert => "[ASSERT]",
+                _ => "[LOG]"
             };
             string entry = $"[{timestamp}] {label} {logString}";
             if (type == LogType.Error || type == LogType.Exception)
