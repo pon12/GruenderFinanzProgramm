@@ -60,7 +60,12 @@ public class InvoiceItem
     [Ignore]
     public double calculatedTotal
     {
-        get { return quantity * unitPrice; }
+        get
+        {
+            int safeQuantity = quantity < 1 ? 1 : quantity;
+            double safeUnitPrice = unitPrice < 0 ? 0 : unitPrice;
+            return safeQuantity * safeUnitPrice;
+        }
     }
 }
 
@@ -73,7 +78,7 @@ public class Offer
 {
     [PrimaryKey, AutoIncrement]
     public int id { get; set; }
-    public int customerId { get; set; } 
+    public int customerId { get; set; }
     public string offerNumber { get; set; }
     public string date { get; set; }
     public string validUntil { get; set; }
@@ -85,13 +90,13 @@ public class Offer
     public string notes { get; set; }
     public double discount { get; set; }
     public double extraCosts { get; set; }
-   
+
     // Kassenbuch-Anbindung
     public bool bookedToCashbook { get; set; }
     public int cashbookEntryId { get; set; }
     public string bookingDate { get; set; }
     [Ignore]
-   
+
     public string customerName { get; set; }
     [Ignore]
     public string customerAddress { get; set; }
@@ -116,7 +121,12 @@ public class OfferItem
     [Ignore]
     public double calculatedTotal
     {
-        get { return quantity * unitPrice; }
+        get
+        {
+            int safeQuantity = quantity < 1 ? 1 : quantity;
+            double safeUnitPrice = unitPrice < 0 ? 0 : unitPrice;
+            return safeQuantity * safeUnitPrice;
+        }
     }
 }
 
