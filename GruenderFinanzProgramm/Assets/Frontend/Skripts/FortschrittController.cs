@@ -79,6 +79,31 @@ public class FortschrittController : MonoBehaviour
         letzteErfolgeContainer    = root.Q<VisualElement>("letzte-erfolge-container");
 
         BaueUI();
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(root);
+    }
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Diese Seite zeigt deinen gesamten Gründungsfortschritt. " +
+            "Du siehst wie weit du im Gründerpfad bist und welche Schritte noch offen sind.");
+
+        HelpTooltip.Registriere(root, "btn-help-fortschritt",
+            "Der Gesamtfortschritt kombiniert abgeschlossene Gründerpfad-Schritte " +
+            "und ausgefüllte Pflichtdokumente. Ziel: 100 %.");
+
+        HelpTooltip.Registriere(root, "btn-help-gruenderpfad",
+            "Zeigt jede Phase des Gründerpfads mit Mini-Fortschrittsbalken. " +
+            "Abgehakte Schritte im Gründerpfad-Screen füllen diese Balken.");
+
+        HelpTooltip.Registriere(root, "btn-help-naechste-schritte",
+            "Die nächsten offenen Aufgaben aus deinem Gründerpfad. " +
+            "Erledige sie im Gründerpfad-Screen um den Fortschritt zu erhöhen.");
+
+        HelpTooltip.Registriere(root, "btn-help-letzte-erfolge",
+            "Deine zuletzt freigeschalteten Erfolge aus Gründerpfad und Dokumenten. " +
+            "Jeder abgeschlossene Schritt und jedes ausgefüllte Dokument zählt.");
     }
 
     // ============================================================

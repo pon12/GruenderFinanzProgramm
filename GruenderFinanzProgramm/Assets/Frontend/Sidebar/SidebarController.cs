@@ -54,7 +54,6 @@ public class SidebarController : MonoBehaviour
         { "nav-item-export",           "Export-Screen"    },
         { "nav-item-liquidität",        "Finanzen1"        },
         { "nav-item-rentabilität",      "Finanzen2"        },
-        { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
 
@@ -79,7 +78,6 @@ public class SidebarController : MonoBehaviour
         "nav-item-export",
         "nav-item-liquidit\u00e4t",
         "nav-item-rentabilit\u00e4t",
-        "nav-item-kennzahlen",
     };
 
     // ─────────────────────────────────────────────────

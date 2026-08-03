@@ -9,16 +9,22 @@ using Color = UnityEngine.Color;
 
 public static class BelegAnhangController
 {
-    // Exakte Dokumenttitel wie sie in DocumentDashboard als Pflichtdokumente angelegt sind
     public static readonly List<string> AnhangSchluessel = new List<string>
     {
         "AGB",
         "Disclaimer",
         "Barzahlung",
-        "\u00dcberweisung"
+        "Überweisung"
     };
 
-    // Gibt alle Titel aus der Bezahlweise-Kategorie zurück (dynamisch aus dem Pool)
+    // Titel, die zu einer gemeinsamen "Bezahlweise"-Seite zusammengefasst werden
+    private static readonly HashSet<string> BezahlweiseGruppe = new HashSet<string>
+    {
+        "Barzahlung",
+        "Überweisung"
+    };
+
+    // Gibt alle Titel aus der Bezahlweise-Kategorie zurück
     public static List<string> HoleAlleBezahlweiseTitel()
     {
         var titel = new List<string>();
@@ -40,16 +46,10 @@ public static class BelegAnhangController
         return titel;
     }
 
-    // Prüft welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind.
-    // Pflichtdokumente mit Strukturfeldern gelten als vorhanden wenn
-    // mindestens ein Strukturfeld einen Wert enthält.
+    // Prüft, welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
     {
         var ergebnis = new Dictionary<string, bool>();
-
-        foreach (string key in AnhangSchluessel)
-            ergebnis[key] = false;
-
         try
         {
             var alle = DocumentDashboard.GetSavedDocuments();
@@ -57,11 +57,10 @@ public static class BelegAnhangController
 
             foreach (var doc in alle.savedDocs)
             {
+                if (doc.category != "Bezahlweise") continue;
                 if (string.IsNullOrEmpty(doc.title)) continue;
-                if (!AnhangSchluessel.Contains(doc.title)) continue;
 
                 bool hatInhalt = !string.IsNullOrWhiteSpace(doc.inhalt);
-
                 bool hatStrukturfelder = doc.strukturFelder != null
                     && doc.strukturFelder.Count > 0
                     && doc.strukturFelder.Any(f => !string.IsNullOrWhiteSpace(f.wert));
@@ -73,12 +72,12 @@ public static class BelegAnhangController
         {
             Debug.LogWarning("[BelegAnhang] Dokumente konnten nicht geladen werden: " + e.Message);
         }
-
         return ergebnis;
     }
 
-    // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF
-    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt, string status = "")
+    // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF.
+    // Barzahlung und Überweisung werden auf einer gemeinsamen "Bezahlweise"-Seite zusammengefasst.
+    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt, string status = "", string belegTyp = "Rechnung")
     {
         if (ausgewaehlt == null || ausgewaehlt.Count == 0) return;
 
@@ -86,86 +85,114 @@ public static class BelegAnhangController
         {
             var alle = DocumentDashboard.GetSavedDocuments();
 
-            var titelFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
-            var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
-            var linie = new LineSeparator();
+            var titelFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
+            var textFont   = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+            var kursivFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 11);
+            var linie      = new LineSeparator();
 
-            bool barzahlungAusgewaehlt = ausgewaehlt.Contains("Barzahlung");
-            bool ueberweisungAusgewaehlt = ausgewaehlt.Contains("Überweisung");
+            var bezahlweiseAusgewaehlt = ausgewaehlt.Where(k => BezahlweiseGruppe.Contains(k)).ToList();
 
-            if (barzahlungAusgewaehlt || ueberweisungAusgewaehlt)
+            var nurFooter = new HashSet<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen" };
+            var einzelAnhaenge = ausgewaehlt
+                .Where(k => !BezahlweiseGruppe.Contains(k) && !nurFooter.Contains(k))
+                .ToList();
+
+            // Kombinierte Bezahlweise-Seite
+            if (bezahlweiseAusgewaehlt.Count > 0)
             {
-                bool istBezahlt =
-        !string.IsNullOrWhiteSpace(status) &&
-        status.Equals("Bezahlt", StringComparison.OrdinalIgnoreCase);
+                bool hatBar          = bezahlweiseAusgewaehlt.Contains("Barzahlung");
+                bool hatUeberweisung = bezahlweiseAusgewaehlt.Contains("Überweisung");
+                bool istBezahlt      = status == "Bezahlt";
+                bool istAngebot      = belegTyp == "Angebot";
 
-                string methodenText = "";
-
-                if (barzahlungAusgewaehlt)
-                    methodenText += "Barzahlung";
-
-                if (ueberweisungAusgewaehlt)
-                {
-                    if (!string.IsNullOrWhiteSpace(methodenText))
-                        methodenText += " und ";
-
-                    methodenText += "Überweisung";
-                }
-
-                string inhaltText;
-
-                if (istBezahlt)
-                {
-                    inhaltText =
-                        "Die Rechnung wurde per " + methodenText + " bezahlt.";
-                }
+                string zahlungswege;
+                if (hatBar && hatUeberweisung)
+                    zahlungswege = "Barzahlung oder per Banküberweisung";
+                else if (hatBar)
+                    zahlungswege = "Barzahlung";
                 else
-                {
-                    inhaltText =
-                        "Folgende Möglichkeiten zur Begleichung der Gesamtsumme stehen Ihnen zur Verfügung:\n\n";
-
-                    if (barzahlungAusgewaehlt)
-                        inhaltText += "• Barzahlung\n";
-
-                    if (ueberweisungAusgewaehlt)
-                        inhaltText += "• Überweisung\n\nDie Bankdaten finden Sie in der Fußzeile.";
-                }
+                    zahlungswege = "Banküberweisung";
 
                 document.NewPage();
-                document.Add(new Paragraph("Zahlungshinweise", titelFont));
+                document.Add(new Paragraph("Bezahlweise", titelFont));
                 document.Add(new Paragraph(" "));
                 document.Add(new Chunk(linie));
                 document.Add(new Paragraph(" "));
-                document.Add(new Paragraph(inhaltText, textFont));
-            }
 
-            foreach (string key in ausgewaehlt)
-            {
-                if (key == "Barzahlung" || key == "Überweisung")
-                    continue;
+                string einleitung;
+                if (istAngebot)
+                    einleitung =
+                        "Die angebotene Leistung kann mit folgenden Zahlungsmitteln beglichen werden: " +
+                        zahlungswege + ". " +
+                        "Bitte teilen Sie uns bei Auftragserteilung Ihre bevorzugte Zahlungsweise mit.";
+                else if (istBezahlt)
+                    einleitung =
+                        "Der Rechnungsbetrag wurde beglichen über: " +
+                        zahlungswege + ". " +
+                        "Vielen Dank für Ihre Zahlung.";
+                else
+                    einleitung =
+                        "Der angegebene Betrag ist innerhalb der angegebenen Zahlungsfrist zu begleichen über: " +
+                        zahlungswege + ". " +
+                        "Bei Fragen stehen wir Ihnen gerne zur Verfügung.";
 
-                string inhaltText = "";
+                document.Add(new Paragraph(einleitung, textFont));
+                document.Add(new Paragraph(" "));
 
-                var doc = alle?.savedDocs?.Find(d => d.title == key);
-                if (doc == null) continue;
-
-                if (!string.IsNullOrWhiteSpace(doc.inhalt))
+                // Bankverbindung bei Überweisung ausgeben
+                if (hatUeberweisung)
                 {
-                    inhaltText = doc.inhalt;
-                }
-                else if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
-                {
-                    var zeilen = new System.Text.StringBuilder();
+                    string iban           = HoleNutzerPref("settings_iban");
+                    string bic            = HoleNutzerPref("settings_bic");
+                    string kreditinstitut = HoleNutzerPref("settings_kreditinstitut");
+                    string kontoinhaber   = HoleNutzerPref("settings_kontoinhaber");
 
-                    foreach (var feld in doc.strukturFelder)
+                    if (string.IsNullOrEmpty(iban))
                     {
-                        if (!string.IsNullOrWhiteSpace(feld.wert))
-                            zeilen.AppendLine(feld.key + ": " + feld.wert);
+                        var kontoDok = alle.savedDocs.Find(
+                            d => d.category == "Bezahlweise" && d.title == "Kontodaten (IBAN/BIC)");
+                        if (kontoDok?.strukturFelder != null)
+                        {
+                            iban           = HoleFeld(kontoDok, "iban");
+                            bic            = HoleFeld(kontoDok, "bic");
+                            kreditinstitut = HoleFeld(kontoDok, "bank");
+                            kontoinhaber   = HoleFeld(kontoDok, "kontoinhaber");
+                        }
                     }
 
-                    inhaltText = zeilen.ToString().Trim();
+                    document.Add(new Paragraph("Bankverbindung:", titelFont));
+                    document.Add(new Paragraph(" "));
+                    if (!string.IsNullOrEmpty(kreditinstitut))
+                        document.Add(new Paragraph("Kreditinstitut: " + kreditinstitut, textFont));
+                    if (!string.IsNullOrEmpty(iban))
+                        document.Add(new Paragraph("IBAN: " + iban, textFont));
+                    if (!string.IsNullOrEmpty(bic))
+                        document.Add(new Paragraph("BIC: " + bic, textFont));
+                    if (!string.IsNullOrEmpty(kontoinhaber))
+                        document.Add(new Paragraph("Kontoinhaber: " + kontoinhaber, textFont));
+                    document.Add(new Paragraph(" "));
                 }
 
+                // Hinweistext aus dem Barzahlung-Dokument
+                if (hatBar)
+                {
+                    var barDok = alle.savedDocs.Find(
+                        d => d.category == "Bezahlweise" && d.title == "Barzahlung");
+                    if (barDok != null && !string.IsNullOrWhiteSpace(barDok.inhalt))
+                    {
+                        document.Add(new Paragraph(barDok.inhalt, kursivFont));
+                        document.Add(new Paragraph(" "));
+                    }
+                }
+            }
+
+            // Einzelne Anhänge (AGB, Disclaimer etc.)
+            foreach (string key in einzelAnhaenge)
+            {
+                var doc = alle.savedDocs.Find(d => d.category == "Bezahlweise" && d.title == key);
+                if (doc == null) continue;
+
+                string inhaltText = HoleInhalt(doc);
                 if (string.IsNullOrWhiteSpace(inhaltText)) continue;
 
                 document.NewPage();
@@ -180,5 +207,34 @@ public static class BelegAnhangController
         {
             Debug.LogWarning("[BelegAnhang] PDF-Anhang fehlgeschlagen: " + e.Message);
         }
+    }
+
+    // Liest einen PlayerPrefs-Wert nutzerspezifisch aus
+    private static string HoleNutzerPref(string key, string fallback = "")
+    {
+        string prefix    = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
+        return PlayerPrefs.GetString(nutzerKey, PlayerPrefs.GetString(key, fallback));
+    }
+
+    private static string HoleInhalt(DocumentDashboard.DocumentData doc)
+    {
+        if (!string.IsNullOrWhiteSpace(doc.inhalt)) return doc.inhalt;
+        if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var feld in doc.strukturFelder)
+                if (!string.IsNullOrWhiteSpace(feld.wert))
+                    sb.AppendLine(feld.key + ": " + feld.wert);
+            return sb.ToString().Trim();
+        }
+        return "";
+    }
+
+    private static string HoleFeld(DocumentDashboard.DocumentData doc, string key)
+    {
+        if (doc?.strukturFelder == null) return "";
+        var feld = doc.strukturFelder.Find(f => f.key == key);
+        return feld?.wert ?? "";
     }
 }

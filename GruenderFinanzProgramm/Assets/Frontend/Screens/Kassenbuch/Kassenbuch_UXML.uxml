@@ -9,7 +9,7 @@
         <ui:VisualElement name="main-content" class="main grid-item" style="flex-grow: 1; padding-left: 430px; padding-right: 46px; height: 100%;">
             <ui:VisualElement name="Export" class="header-row" style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-between; height: auto; max-height: 70px; width: 100%;">
                 <ui:VisualElement style="flex-direction: row; align-items: center;">
-                    <ui:Label text="Kassenbuch" name="Label" style="font-size: 46px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:Label text="Kassenbuch" name="label-seitentitel" style="font-size: 46px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 8px; width: 36px; height: 36px; min-width: 36px; min-height: 36px; top: 10px;"/>
                 </ui:VisualElement>
                 <ui:DropdownField label="Jahr:" name="dropJahr" class="jahr-dropdown"/>
@@ -30,16 +30,16 @@
                 <ui:Button text="Für Finanzamt exportieren" name="FinanzExport" class="btn-action-3er btn-export-finanzamt"/>
                 <ui:VisualElement name="btn-help-finanzexport" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 0; width: 28px; height: 28px; min-width: 28px; min-height: 28px;"/>
             </ui:VisualElement>
-            <ui:VisualElement name="Tabelle" class="table-wrapper" style="flex-grow: 1; flex-direction: column; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-left-color: rgb(91, 91, 91); border-right-color: rgb(91, 91, 91); border-top-color: rgb(91, 91, 91); border-bottom-color: rgb(91, 91, 91); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;">
-                <ui:VisualElement name="Table-Header" class="table-header-text" style="flex-direction: row; width: 100%; background-color: rgb(44, 44, 44); border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                    <ui:Label text="Name &amp; Verwendungszweck" class="col col-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Buchungstag" class="col col-datum" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Betrag" class="col col-betrag" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Art" class="col col-art" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:Label text="Einnahme / Ausgabe" class="col col-typ" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 16px; color: rgb(255, 255, 255);"/>
-                    <ui:VisualElement class="col col-action" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); -unity-background-scale-mode: scale-to-fit; flex-grow: 0; flex-shrink: 0; width: 50px;" name="btn-help-tabelle"/>
+            <ui:VisualElement name="Tabelle" class="table-wrapper">
+                <ui:VisualElement name="Table-Header" class="row row-header">
+                    <ui:Label text="Name &amp; Verwendungszweck" name="col-header-name"   class="cell cell-name"/>
+                    <ui:Label text="Buchungstag"                 name="col-header-datum"  class="cell cell-datum"/>
+                    <ui:Label text="Betrag"                      name="col-header-betrag" class="cell cell-betrag"/>
+                    <ui:Label text="Art"                         name="col-header-art"    class="cell cell-art"/>
+                    <ui:Label text="Einnahme / Ausgabe"          name="col-header-typ"    class="cell cell-typ"/>
+                    <ui:VisualElement name="btn-help-tabelle" class="cell cell-action" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); -unity-background-scale-mode: scale-to-fit;"/>
                 </ui:VisualElement>
-                <ui:ScrollView name="tableBody" class="table-body" style="flex-grow: 1; border-bottom-width: 0;"/>
+                <ui:ScrollView name="tableBody" class="table-body" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="popup-overlay" class="popup-overlay" style="display: none; top: 2px; left: -2px;">
@@ -47,6 +47,7 @@
                 <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 16px;">
                     <ui:Label name="popup-title" text="Transaktion" class="popup-title h2" style="color: rgb(255, 255, 255); font-size: 28px; flex-grow: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                     <ui:VisualElement name="btn-help-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); flex-shrink: 0; margin-left: 8px; width: 36px; height: 36px; min-width: 36px; min-height: 36px;"/>
+                    <ui:Button name="btn-popup-schliessen" text="✕" class="btn-popup-close" style="flex-shrink: 0; margin-left: 8px; width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-width: 0; background-color: rgba(255,255,255,0.08); color: rgb(220,220,220); font-size: 16px; -unity-text-align: middle-center; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="field-betrag" class="field-group">
                     <ui:Label name="label-betrag" text="Betrag" class="field-label"/>
@@ -129,6 +130,19 @@
                 <ui:VisualElement name="popup-actions" class="popup-actions" style="flex-direction: row; margin-top: 8px;">
                     <ui:Button name="btn-speichern" text="Speichern" class="btn btn-primary"/>
                     <ui:Button name="btn-abbrechen" text="Abbrechen" class="btn btn-secondary"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="confirm-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 40px;">
+            <ui:VisualElement style="width: 100%; max-width: 480px; padding: 28px; flex-direction: column; background-color: rgb(38, 38, 38); border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                    <ui:Label text="⚠ Eintrag löschen?" style="font-size: 20px; color: rgb(255,255,255); -unity-font-style: bold; flex-grow: 1;"/>
+                </ui:VisualElement>
+                <ui:Label text="Möchtest du diesen Eintrag wirklich löschen?" style="font-size: 14px; color: rgb(200,200,200); margin-bottom: 6px;"/>
+                <ui:Label text="Diese Aktion kann nicht widerrufen werden." style="font-size: 13px; color: rgb(150,150,150); margin-bottom: 20px;"/>
+                <ui:VisualElement style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button name="btn-confirm-nein" text="Abbrechen" style="height: 38px; padding-left: 20px; padding-right: 20px; background-color: rgb(60,60,60); color: rgb(255,255,255); border-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; margin-right: 10px;"/>
+                    <ui:Button name="btn-confirm-ja" text="Endgültig löschen" style="height: 38px; padding-left: 20px; padding-right: 20px; background-color: rgba(230,57,70,0); color: rgb(230,57,70); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-color: rgb(230,57,70); border-right-color: rgb(230,57,70); border-bottom-color: rgb(230,57,70); border-left-color: rgb(230,57,70); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -32,6 +32,16 @@ public static class HelpTooltip
     // Speichert die einzelne Ganzkörper-Textur
     private static Texture2D _begleiterTextur;
 
+    // PlayerPrefs-Key für den Begleiter — wird vom Einstellungscontroller gesetzt
+    private static string _begleiterPrefKey = "settings_begleiter";
+
+    // Muss vom Einstellungscontroller beim Start aufgerufen werden
+    // damit der korrekte Key (mit DB-Prefix) genutzt wird
+    public static void SetzeBegleiterPrefKey(string key)
+    {
+        _begleiterPrefKey = key;
+    }
+
     // Für feste Elemente direkt im Root-UXML
     public static void Registriere(VisualElement root, string elementName, string tooltipText)
     {
@@ -191,7 +201,7 @@ public static class HelpTooltip
 
     private static bool BegleiterAktiv()
     {
-        return PlayerPrefs.GetInt("settings_begleiter", 1) == 1;
+        return PlayerPrefs.GetInt(_begleiterPrefKey, 1) == 1;
     }
 
     private static VisualElement ErstelleBegleiter()

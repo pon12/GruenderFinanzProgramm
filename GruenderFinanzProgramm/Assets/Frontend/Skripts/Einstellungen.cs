@@ -15,8 +15,12 @@ public class EinstellungenController : MonoBehaviour
     [SerializeField] private MainLogoutController mainLogoutController;
 
     // ═══════════════════════════════════════════════════════════
-    // PLAYERPREFS KEYS
+    // PLAYERPREFS KEYS – nutzerspezifisch über DB-Namen geprefixed
     // ═══════════════════════════════════════════════════════════
+    private string _pref(string key) => $"{_dbPrefix}{key}";
+
+    private string _dbPrefix = "";
+
     private const string PREF_STEUERSATZ = "settings_steuersatz";
     private const string PREF_STEUER_CUSTOM_AKTIV = "settings_steuer_custom_aktiv";
     private const string PREF_STEUER_CUSTOM_WERT = "settings_steuer_custom_wert";
@@ -37,12 +41,7 @@ public class EinstellungenController : MonoBehaviour
     private const string PREF_EXPORTPFAD = "settings_exportpfad";
     private const string PREF_UST_RECHNUNG = "settings_ust_rechnung";
     private const string PREF_AUTO_NUMMER = "settings_auto_nummer";
-    private const string PREF_STEUERNUMMER = "settings_steuernummer";
-    private const string PREF_USTIDNR = "settings_ustidnr";
-    private const string PREF_HANDELSREG = "settings_handelsreg";
-    private const string PREF_GRUENDUNGSJAHR = "settings_gruendungsjahr";
-    private const string PREF_STRASSE = "settings_strasse";
-    private const string PREF_PLZ = "settings_plz";
+    private const string PREF_IBAN_RECHNUNG = "settings_iban_rechnung";
     private const string PREF_AGB = "settings_agb";
     private const string PREF_DISCLAIMER = "settings_disclaimer";
     private const string PREF_BARZAHLUNG = "settings_barzahlung";
@@ -126,6 +125,7 @@ public class EinstellungenController : MonoBehaviour
     private TextField _inputIban;
     private TextField _inputBic;
     private TextField _inputKreditinstitut;
+    private Toggle _toggleIbanRechnung;
     private Button _btnCloseBank;
     private Button _btnCancelBank;
     private Button _btnSaveBank;
@@ -183,7 +183,7 @@ public class EinstellungenController : MonoBehaviour
     private readonly List<string> _rechtsformOptions = new List<string>
     {
         "GmbH", "KG", "AG", "OHG", "GbR",
-        "UG (haftungsbeschränkt)", "Einzelunternehmen", "GmbH & Co. KG", "eG"
+        "UG (haftungsbeschr\u00e4nkt)", "Einzelunternehmen", "GmbH & Co. KG", "eG"
     };
 
     private readonly List<string> _brancheOptions = new List<string>
@@ -204,6 +204,10 @@ public class EinstellungenController : MonoBehaviour
     {
         authService = new AuthService();
 
+        // Nutzerspezifischen Prefix aus dem DB-Namen ableiten (persistent, stabil)
+        string dbName = UserDatabaseAccess.getCurrentDatabaseName();
+        _dbPrefix = string.IsNullOrEmpty(dbName) ? "" : dbName + "_";
+
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         if (passKeyAuthController == null) passKeyAuthController = FindAnyObjectByType<PassKeyAuthController>();
         if (mainLogoutController == null) mainLogoutController = FindAnyObjectByType<MainLogoutController>();
@@ -216,6 +220,12 @@ public class EinstellungenController : MonoBehaviour
         SetupFeldBeschraenkungen();
         LoadSettings();
         LoadVersionNumber();
+
+        // Begleiter-PrefKey mit DB-Prefix an HelpTooltip übergeben
+        HelpTooltip.SetzeBegleiterPrefKey(_pref(PREF_BEGLEITER));
+
+        RegistriereHelpTooltips();
+        ButtonHoverController.RegistriereAlle(_root);
 
         _root.schedule.Execute(() =>
         {
@@ -297,6 +307,7 @@ public class EinstellungenController : MonoBehaviour
         _inputIban = _root.Q<TextField>("input-iban");
         _inputBic = _root.Q<TextField>("input-bic");
         _inputKreditinstitut = _root.Q<TextField>("input-kreditinstitut");
+        _toggleIbanRechnung = _root.Q<Toggle>("toggle-iban-rechnung");
         _btnCloseBank = _root.Q<Button>("btn-close-bank");
         _btnCancelBank = _root.Q<Button>("btn-cancel-bank");
         _btnSaveBank = _root.Q<Button>("btn-save-bank");
@@ -356,7 +367,6 @@ public class EinstellungenController : MonoBehaviour
 
     private void SetupFeldBeschraenkungen()
     {
-        // Unternehmen-Popup
         SetzeMaxLaenge(_inputFirmenname, MAX_NAME);
         SetzeMaxLaenge(_inputStrasse, MAX_STRASSE);
         SetzeMaxLaenge(_inputStadt, MAX_ORT);
@@ -365,19 +375,13 @@ public class EinstellungenController : MonoBehaviour
         SetzeMaxLaenge(_inputHandelsreg, MAX_HANDELSREG);
         SetzeMaxLaengeNurZahlen(_inputPlz, MAX_PLZ);
         SetzeMaxLaengeNurZahlen(_inputGruendungsjahr, MAX_JAHR);
-
-        // Bank-Popup
         SetzeMaxLaenge(_inputKontoinhaber, MAX_KONTOINHAB);
         SetzeMaxLaenge(_inputIban, MAX_IBAN);
         SetzeMaxLaenge(_inputBic, MAX_BIC);
         SetzeMaxLaenge(_inputKreditinstitut, MAX_KREDITINST);
-
-        // Rechnungsformat-Popup
         SetzeMaxLaenge(_inputRechnrPraefix, MAX_PRAEFIX);
         SetzeMaxLaengeNurZahlen(_inputStartnummer, MAX_STARTNR);
         SetzeMaxLaengeNurZahlen(_inputZahlungsziel, MAX_ZAHLZIEL);
-
-        // Recovery Key: nur Ziffern, max. 16 Stellen, Copy/Paste erlaubt
         SetzeMaxLaengeNurZahlen(_inputSuperkeyReset, 16);
     }
 
@@ -412,7 +416,7 @@ public class EinstellungenController : MonoBehaviour
     {
         if (_dropdownBranche != null) _dropdownBranche.choices = _brancheOptions;
         if (_dropdownRechtsform != null) _dropdownRechtsform.choices = _rechtsformOptions;
-        if (_dropdownWaehrung != null) _dropdownWaehrung.choices = new List<string> { "Euro €", "Dollar $", "Pfund £", "Franken CHF" };
+        if (_dropdownWaehrung != null) _dropdownWaehrung.choices = new List<string> { "Euro \u20ac", "Dollar $", "Pfund \u00a3", "Franken CHF" };
         if (_dropdownDatumsformat != null) _dropdownDatumsformat.choices = new List<string> { "DD.MM.YYYY", "MM/DD/YYYY", "YYYY-MM-DD" };
     }
 
@@ -475,7 +479,7 @@ public class EinstellungenController : MonoBehaviour
                     if (_inputSuperkeyReset != null) _inputSuperkeyReset.value = "";
                 }
                 else
-                    Debug.LogWarning("[Einstellungen] Kein neuer Passkey zurückgegeben.");
+                    Debug.LogWarning("[Einstellungen] Kein neuer Passkey zur\u00fcckgegeben.");
             };
 
         if (_btnDeleteProfile != null) _btnDeleteProfile.clicked += ShowDeleteDialog;
@@ -509,15 +513,10 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadSettings()
     {
-        LoadVersionInfo();
+        if (_labelVersion != null) _labelVersion.text = Versionsnummer.getVersion();
         LoadCompanyData();
         LoadLocalSettings();
         LoadBezahlweiseStatus();
-    }
-
-    private void LoadVersionInfo()
-    {
-        if (_labelVersion != null) _labelVersion.text = Versionsnummer.getVersion();
     }
 
     private void LoadCompanyData()
@@ -526,19 +525,26 @@ public class EinstellungenController : MonoBehaviour
         if (db == null) { Debug.LogWarning("[Einstellungen] Keine aktive NutzerDB."); return; }
 
         var companies = db.getAllCompanies();
-        if (companies == null || companies.Count == 0) return;
+
+        if (companies == null || companies.Count == 0)
+        {
+            db.createCompany("", 0, 0, "", "", "", "", "", 0, "", "Null", "Null");
+            companies = db.getAllCompanies();
+            if (companies == null || companies.Count == 0) return;
+        }
 
         _currentCompany = companies[0];
-        if (_inputFirmenname != null) _inputFirmenname.value = _currentCompany.name ?? "";
-        if (_dropdownBranche != null) _dropdownBranche.index = _currentCompany.industry;
-        if (_dropdownRechtsform != null) _dropdownRechtsform.index = _currentCompany.legalForm;
-        if (_inputStadt != null) _inputStadt.value = _currentCompany.location ?? "";
-        if (_inputStrasse != null) _inputStrasse.value = _currentCompany.strasseuHausNr ?? "";
-        if (_inputPlz != null) _inputPlz.value = _currentCompany.plz.ToString() == "0" ? "" : _currentCompany.plz.ToString();
-        if (_inputSteuernummer != null) _inputSteuernummer.value = _currentCompany.steuerNr ?? "";
-        if (_inputUstidnr != null) _inputUstidnr.value = _currentCompany.ustIdNr ?? "";
-        if (_inputHandelsreg != null) _inputHandelsreg.value = _currentCompany.handelsReg ?? "";
-        if (_inputGruendungsjahr != null) _inputGruendungsjahr.value = _currentCompany.gruendungsJahr ?? "";
+        var c = _currentCompany;
+        if (_inputFirmenname != null) _inputFirmenname.value = c.name ?? "";
+        if (_dropdownBranche != null) _dropdownBranche.index = c.industry;
+        if (_dropdownRechtsform != null) _dropdownRechtsform.index = c.legalForm;
+        if (_inputStadt != null) _inputStadt.value = c.location ?? "";
+        if (_inputStrasse != null) _inputStrasse.value = c.strasseuHausNr ?? "";
+        if (_inputPlz != null) _inputPlz.value = c.plz == 0 ? "" : c.plz.ToString();
+        if (_inputSteuernummer != null) _inputSteuernummer.value = c.steuerNr ?? "";
+        if (_inputUstidnr != null) _inputUstidnr.value = c.ustIdNr ?? "";
+        if (_inputHandelsreg != null) _inputHandelsreg.value = c.handelsReg ?? "";
+        if (_inputGruendungsjahr != null) _inputGruendungsjahr.value = c.gruendungsJahr ?? "";
     }
 
     private void LoadLocalSettings()
@@ -546,32 +552,33 @@ public class EinstellungenController : MonoBehaviour
         SetField(_inputRechnrPraefix, PREF_RECHNR_PRAEFIX, "RE-");
         SetField(_inputStartnummer, PREF_STARTNUMMER, "1");
         SetField(_inputZahlungsziel, PREF_ZAHLUNGSZIEL, "14");
-        SetField(_inputZahlungshinweis, PREF_ZAHLUNGSHINWEIS, "Bitte überweisen Sie den Betrag auf ...");
+        SetField(_inputZahlungshinweis, PREF_ZAHLUNGSHINWEIS, "Bitte \u00fcberweisen Sie den Betrag auf ...");
 
-        if (_dropdownWaehrung != null) _dropdownWaehrung.index = PlayerPrefs.GetInt(PREF_WAEHRUNG, 0);
-        if (_dropdownDatumsformat != null) _dropdownDatumsformat.index = PlayerPrefs.GetInt(PREF_DATUMSFORMAT, 0);
-        if (_toggleUstRechnung != null) _toggleUstRechnung.value = PlayerPrefs.GetInt(PREF_UST_RECHNUNG, 1) == 1;
-        if (_toggleAutoNummer != null) _toggleAutoNummer.value = PlayerPrefs.GetInt(PREF_AUTO_NUMMER, 0) == 1;
+        if (_dropdownWaehrung != null) _dropdownWaehrung.index = PlayerPrefs.GetInt(_pref(PREF_WAEHRUNG), 0);
+        if (_dropdownDatumsformat != null) _dropdownDatumsformat.index = PlayerPrefs.GetInt(_pref(PREF_DATUMSFORMAT), 0);
+        if (_toggleUstRechnung != null) _toggleUstRechnung.value = PlayerPrefs.GetInt(_pref(PREF_UST_RECHNUNG), 1) == 1;
+        if (_toggleAutoNummer != null) _toggleAutoNummer.value = PlayerPrefs.GetInt(_pref(PREF_AUTO_NUMMER), 0) == 1;
 
         SetField(_inputKontoinhaber, PREF_KONTOINHABER, "");
         SetField(_inputIban, PREF_IBAN, "");
         SetField(_inputBic, PREF_BIC, "");
         SetField(_inputKreditinstitut, PREF_KREDITINSTITUT, "");
+        if (_toggleIbanRechnung != null) _toggleIbanRechnung.value = PlayerPrefs.GetInt(_pref(PREF_IBAN_RECHNUNG), 0) == 1;
 
-        if (_toggleLogo != null) _toggleLogo.value = PlayerPrefs.GetInt(PREF_LOGO_RECHNUNG, 1) == 1;
-        if (_toggleSeitenzahl != null) _toggleSeitenzahl.value = PlayerPrefs.GetInt(PREF_SEITENZAHL, 1) == 1;
-        if (_toggleExportpfad != null) _toggleExportpfad.value = PlayerPrefs.GetInt(PREF_EXPORTPFAD, 1) == 1;
+        if (_toggleLogo != null) _toggleLogo.value = PlayerPrefs.GetInt(_pref(PREF_LOGO_RECHNUNG), 1) == 1;
+        if (_toggleSeitenzahl != null) _toggleSeitenzahl.value = PlayerPrefs.GetInt(_pref(PREF_SEITENZAHL), 1) == 1;
+        if (_toggleExportpfad != null) _toggleExportpfad.value = PlayerPrefs.GetInt(_pref(PREF_EXPORTPFAD), 1) == 1;
 
-        _selectedSteuersatz = PlayerPrefs.GetInt(PREF_STEUERSATZ, 19);
-        _customSteuersatz = PlayerPrefs.GetInt(PREF_STEUER_CUSTOM_AKTIV, 0) == 1;
+        _selectedSteuersatz = PlayerPrefs.GetInt(_pref(PREF_STEUERSATZ), 19);
+        _customSteuersatz = PlayerPrefs.GetInt(_pref(PREF_STEUER_CUSTOM_AKTIV), 0) == 1;
         if (_inputSteuerCustom != null)
-            _inputSteuerCustom.value = PlayerPrefs.GetString(PREF_STEUER_CUSTOM_WERT, "0");
+            _inputSteuerCustom.value = PlayerPrefs.GetString(_pref(PREF_STEUER_CUSTOM_WERT), "0");
         UpdateSteuersatzButtons();
 
-        bool isDark = PlayerPrefs.GetInt(PREF_DARK_MODE, 1) == 1;
+        bool isDark = PlayerPrefs.GetInt(_pref(PREF_DARK_MODE), 1) == 1;
         UpdateModeButtons(isDark);
 
-        if (_toggleBegleiter != null) _toggleBegleiter.value = PlayerPrefs.GetInt(PREF_BEGLEITER, 1) == 1;
+        if (_toggleBegleiter != null) _toggleBegleiter.value = PlayerPrefs.GetInt(_pref(PREF_BEGLEITER), 1) == 1;
 
         SetField(_inputAgb, PREF_AGB, "");
         SetField(_inputDisclaimer, PREF_DISCLAIMER, "");
@@ -581,13 +588,12 @@ public class EinstellungenController : MonoBehaviour
 
     private void LadeBezahlweiseAusDokumenten()
     {
-        // Felder aus dem Dokumenten-Pool lesen und in PlayerPrefs + UI schreiben
-        var mapping = new System.Collections.Generic.Dictionary<string, (string pref, TextField feld)>
+        var mapping = new Dictionary<string, (string pref, TextField feld)>
         {
-            { "AGB",              (PREF_AGB,         _inputAgb)         },
-            { "Disclaimer",       (PREF_DISCLAIMER,  _inputDisclaimer)  },
-            { "Barzahlung",       (PREF_BARZAHLUNG,  _inputBarzahlung)  },
-            { "Überweisung", (PREF_UEBERWEISUNG,_inputUeberweisung)},
+            { "AGB",              (PREF_AGB,         _inputAgb)          },
+            { "Disclaimer",       (PREF_DISCLAIMER,  _inputDisclaimer)   },
+            { "Barzahlung",       (PREF_BARZAHLUNG,  _inputBarzahlung)   },
+            { "\u00dcberweisung", (PREF_UEBERWEISUNG,_inputUeberweisung) },
         };
 
         bool geaendert = false;
@@ -596,10 +602,10 @@ public class EinstellungenController : MonoBehaviour
             string inhalt = DocumentDashboard.GetBezahlweiseInhalt(kvp.Key);
             if (string.IsNullOrEmpty(inhalt)) continue;
 
-            string bisheriger = PlayerPrefs.GetString(kvp.Value.pref, "");
+            string bisheriger = PlayerPrefs.GetString(_pref(kvp.Value.pref), "");
             if (inhalt == bisheriger) continue;
 
-            PlayerPrefs.SetString(kvp.Value.pref, inhalt);
+            PlayerPrefs.SetString(_pref(kvp.Value.pref), inhalt);
             if (kvp.Value.feld != null) kvp.Value.feld.SetValueWithoutNotify(inhalt);
             geaendert = true;
         }
@@ -609,10 +615,10 @@ public class EinstellungenController : MonoBehaviour
 
     private void LoadBezahlweiseStatus()
     {
-        SetStatusLabel(_labelStatusAgb, PlayerPrefs.GetString(PREF_AGB, ""));
-        SetStatusLabel(_labelStatusDisclaimer, PlayerPrefs.GetString(PREF_DISCLAIMER, ""));
-        SetStatusLabel(_labelStatusBar, PlayerPrefs.GetString(PREF_BARZAHLUNG, ""));
-        SetStatusLabel(_labelStatusUeberweisung, PlayerPrefs.GetString(PREF_UEBERWEISUNG, ""));
+        SetStatusLabel(_labelStatusAgb, PlayerPrefs.GetString(_pref(PREF_AGB), ""));
+        SetStatusLabel(_labelStatusDisclaimer, PlayerPrefs.GetString(_pref(PREF_DISCLAIMER), ""));
+        SetStatusLabel(_labelStatusBar, PlayerPrefs.GetString(_pref(PREF_BARZAHLUNG), ""));
+        SetStatusLabel(_labelStatusUeberweisung, PlayerPrefs.GetString(_pref(PREF_UEBERWEISUNG), ""));
     }
 
     private void SetStatusLabel(Label label, string inhalt)
@@ -633,6 +639,7 @@ public class EinstellungenController : MonoBehaviour
     {
         SaveCompanyData();
         SaveLocalSettings();
+        SyncAlleToDokumente();
         Debug.Log("[Einstellungen] Alle Einstellungen gespeichert.");
     }
 
@@ -651,14 +658,11 @@ public class EinstellungenController : MonoBehaviour
         string gruendungsJahr = _inputGruendungsjahr?.value ?? "";
         int plz = int.TryParse(_inputPlz?.value ?? "", out int parsedPlz) ? parsedPlz : 0;
         string strasseHausNr = _inputStrasse?.value ?? "";
-        string email = "Null";
-        string handyNr = "Null";
 
         if (_currentCompany == null)
         {
             db.createCompany(name, legalForm, industry, location, steuerNr,
-                gruendungsJahr, handelsReg, strasseHausNr, plz, ustIdNr, email, handyNr);
-            Debug.Log("[Einstellungen] Neue Firma angelegt: " + name);
+                gruendungsJahr, handelsReg, strasseHausNr, plz, ustIdNr, "Null", "Null");
             var all = db.getAllCompanies();
             if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
         }
@@ -675,10 +679,7 @@ public class EinstellungenController : MonoBehaviour
             _currentCompany.plz = plz;
             _currentCompany.strasseuHausNr = strasseHausNr;
             db.updateCompany(_currentCompany);
-            Debug.Log("[Einstellungen] Firma aktualisiert: " + name);
         }
-
-        SyncUnternehmenToDokumente();
     }
 
     private void SaveLocalSettings()
@@ -688,26 +689,27 @@ public class EinstellungenController : MonoBehaviour
         SaveField(PREF_ZAHLUNGSZIEL, _inputZahlungsziel);
         SaveField(PREF_ZAHLUNGSHINWEIS, _inputZahlungshinweis);
 
-        if (_dropdownWaehrung != null) PlayerPrefs.SetInt(PREF_WAEHRUNG, _dropdownWaehrung.index);
-        if (_dropdownDatumsformat != null) PlayerPrefs.SetInt(PREF_DATUMSFORMAT, _dropdownDatumsformat.index);
-        if (_toggleUstRechnung != null) PlayerPrefs.SetInt(PREF_UST_RECHNUNG, _toggleUstRechnung.value ? 1 : 0);
-        if (_toggleAutoNummer != null) PlayerPrefs.SetInt(PREF_AUTO_NUMMER, _toggleAutoNummer.value ? 1 : 0);
+        if (_dropdownWaehrung != null) PlayerPrefs.SetInt(_pref(PREF_WAEHRUNG), _dropdownWaehrung.index);
+        if (_dropdownDatumsformat != null) PlayerPrefs.SetInt(_pref(PREF_DATUMSFORMAT), _dropdownDatumsformat.index);
+        if (_toggleUstRechnung != null) PlayerPrefs.SetInt(_pref(PREF_UST_RECHNUNG), _toggleUstRechnung.value ? 1 : 0);
+        if (_toggleAutoNummer != null) PlayerPrefs.SetInt(_pref(PREF_AUTO_NUMMER), _toggleAutoNummer.value ? 1 : 0);
 
         SaveField(PREF_KONTOINHABER, _inputKontoinhaber);
         SaveField(PREF_IBAN, _inputIban);
         SaveField(PREF_BIC, _inputBic);
         SaveField(PREF_KREDITINSTITUT, _inputKreditinstitut);
+        if (_toggleIbanRechnung != null) PlayerPrefs.SetInt(_pref(PREF_IBAN_RECHNUNG), _toggleIbanRechnung.value ? 1 : 0);
 
-        if (_toggleLogo != null) PlayerPrefs.SetInt(PREF_LOGO_RECHNUNG, _toggleLogo.value ? 1 : 0);
-        if (_toggleSeitenzahl != null) PlayerPrefs.SetInt(PREF_SEITENZAHL, _toggleSeitenzahl.value ? 1 : 0);
-        if (_toggleExportpfad != null) PlayerPrefs.SetInt(PREF_EXPORTPFAD, _toggleExportpfad.value ? 1 : 0);
+        if (_toggleLogo != null) PlayerPrefs.SetInt(_pref(PREF_LOGO_RECHNUNG), _toggleLogo.value ? 1 : 0);
+        if (_toggleSeitenzahl != null) PlayerPrefs.SetInt(_pref(PREF_SEITENZAHL), _toggleSeitenzahl.value ? 1 : 0);
+        if (_toggleExportpfad != null) PlayerPrefs.SetInt(_pref(PREF_EXPORTPFAD), _toggleExportpfad.value ? 1 : 0);
 
-        PlayerPrefs.SetInt(PREF_STEUERSATZ, _selectedSteuersatz);
-        PlayerPrefs.SetInt(PREF_STEUER_CUSTOM_AKTIV, _customSteuersatz ? 1 : 0);
+        PlayerPrefs.SetInt(_pref(PREF_STEUERSATZ), _selectedSteuersatz);
+        PlayerPrefs.SetInt(_pref(PREF_STEUER_CUSTOM_AKTIV), _customSteuersatz ? 1 : 0);
         if (_inputSteuerCustom != null)
-            PlayerPrefs.SetString(PREF_STEUER_CUSTOM_WERT, _inputSteuerCustom.value);
+            PlayerPrefs.SetString(_pref(PREF_STEUER_CUSTOM_WERT), _inputSteuerCustom.value);
 
-        if (_toggleBegleiter != null) PlayerPrefs.SetInt(PREF_BEGLEITER, _toggleBegleiter.value ? 1 : 0);
+        if (_toggleBegleiter != null) PlayerPrefs.SetInt(_pref(PREF_BEGLEITER), _toggleBegleiter.value ? 1 : 0);
 
         SaveField(PREF_AGB, _inputAgb);
         SaveField(PREF_DISCLAIMER, _inputDisclaimer);
@@ -724,6 +726,7 @@ public class EinstellungenController : MonoBehaviour
     private void SaveUnternehmenPopup()
     {
         SaveCompanyData();
+        SyncUnternehmenToDokumente();
         PlayerPrefs.Save();
         HidePopup(_popupUnternehmen);
         ShowGespeichertPopup();
@@ -735,6 +738,8 @@ public class EinstellungenController : MonoBehaviour
         SaveField(PREF_IBAN, _inputIban);
         SaveField(PREF_BIC, _inputBic);
         SaveField(PREF_KREDITINSTITUT, _inputKreditinstitut);
+        if (_toggleIbanRechnung != null)
+            PlayerPrefs.SetInt(_pref(PREF_IBAN_RECHNUNG), _toggleIbanRechnung.value ? 1 : 0);
         PlayerPrefs.Save();
         SyncBankToDokumente();
         HidePopup(_popupBank);
@@ -747,10 +752,10 @@ public class EinstellungenController : MonoBehaviour
         SaveField(PREF_STARTNUMMER, _inputStartnummer);
         SaveField(PREF_ZAHLUNGSZIEL, _inputZahlungsziel);
         SaveField(PREF_ZAHLUNGSHINWEIS, _inputZahlungshinweis);
-        if (_dropdownWaehrung != null) PlayerPrefs.SetInt(PREF_WAEHRUNG, _dropdownWaehrung.index);
-        if (_dropdownDatumsformat != null) PlayerPrefs.SetInt(PREF_DATUMSFORMAT, _dropdownDatumsformat.index);
-        if (_toggleUstRechnung != null) PlayerPrefs.SetInt(PREF_UST_RECHNUNG, _toggleUstRechnung.value ? 1 : 0);
-        if (_toggleAutoNummer != null) PlayerPrefs.SetInt(PREF_AUTO_NUMMER, _toggleAutoNummer.value ? 1 : 0);
+        if (_dropdownWaehrung != null) PlayerPrefs.SetInt(_pref(PREF_WAEHRUNG), _dropdownWaehrung.index);
+        if (_dropdownDatumsformat != null) PlayerPrefs.SetInt(_pref(PREF_DATUMSFORMAT), _dropdownDatumsformat.index);
+        if (_toggleUstRechnung != null) PlayerPrefs.SetInt(_pref(PREF_UST_RECHNUNG), _toggleUstRechnung.value ? 1 : 0);
+        if (_toggleAutoNummer != null) PlayerPrefs.SetInt(_pref(PREF_AUTO_NUMMER), _toggleAutoNummer.value ? 1 : 0);
         PlayerPrefs.Save();
         HidePopup(_popupRechnung);
         ShowGespeichertPopup();
@@ -773,9 +778,13 @@ public class EinstellungenController : MonoBehaviour
     // DOKUMENT-SYNCHRONISATION
     // ═══════════════════════════════════════════════════════════
 
-    // Schreibt Unternehmensdaten in das Pflichtdokument "Unternehmensstammdaten"
-    // (Kategorie "Gründung"). Nur die vier im Dokument definierten Felder:
-    // firma, rechtsform, branche, standort.
+    private void SyncAlleToDokumente()
+    {
+        SyncUnternehmenToDokumente();
+        SyncBankToDokumente();
+        SyncBezahlweiseToDokumente();
+    }
+
     private void SyncUnternehmenToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -785,28 +794,38 @@ public class EinstellungenController : MonoBehaviour
         if (saveData?.savedDocs == null) return;
 
         string rechtsformText = _dropdownRechtsform != null && _dropdownRechtsform.index >= 0
-            ? _dropdownRechtsform.value ?? ""
-            : "";
-
+            ? _dropdownRechtsform.value ?? "" : "";
         string brancheText = _dropdownBranche != null && _dropdownBranche.index >= 0
-            ? _dropdownBranche.value ?? ""
-            : "";
+            ? _dropdownBranche.value ?? "" : "";
 
         foreach (var doc in saveData.savedDocs)
         {
-            if (doc.strukturFelder == null) continue;
-            if (doc.category != "Gründung" || doc.title != "Unternehmensstammdaten") continue;
+            if (doc.category != "Gr\u00fcndung" || doc.title != "Unternehmensstammdaten") continue;
 
-            SetStrukturFeld(doc, "firma", _inputFirmenname?.value ?? "");
-            SetStrukturFeld(doc, "rechtsform", rechtsformText);
-            SetStrukturFeld(doc, "branche", brancheText);
-            SetStrukturFeld(doc, "standort", _inputStadt?.value ?? "");
+            if (doc.strukturFelder != null)
+            {
+                SetStrukturFeld(doc, "firma", _inputFirmenname?.value ?? "");
+                SetStrukturFeld(doc, "rechtsform", rechtsformText);
+                SetStrukturFeld(doc, "branche", brancheText);
+                SetStrukturFeld(doc, "standort", _inputStadt?.value ?? "");
+            }
+
+            doc.inhalt =
+                $"Firmenname: {_inputFirmenname?.value ?? ""}\n" +
+                $"Rechtsform: {rechtsformText}\n" +
+                $"Branche: {brancheText}\n" +
+                $"Standort: {_inputStadt?.value ?? ""}\n" +
+                $"Stra\u00dfe & Hausnummer: {_inputStrasse?.value ?? ""}\n" +
+                $"PLZ: {_inputPlz?.value ?? ""}\n" +
+                $"Steuernummer: {_inputSteuernummer?.value ?? ""}\n" +
+                $"USt-IdNr.: {_inputUstidnr?.value ?? ""}\n" +
+                $"Handelsregisternr.: {_inputHandelsreg?.value ?? ""}\n" +
+                $"Gr\u00fcndungsjahr: {_inputGruendungsjahr?.value ?? ""}";
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
     }
 
-    // Schreibt Bankdaten in das Pflichtdokument "Kontodaten (IBAN/BIC)"
     private void SyncBankToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -817,19 +836,26 @@ public class EinstellungenController : MonoBehaviour
 
         foreach (var doc in saveData.savedDocs)
         {
-            if (doc.strukturFelder == null) continue;
             if (doc.category != "Bezahlweise" || doc.title != "Kontodaten (IBAN/BIC)") continue;
 
-            SetStrukturFeld(doc, "iban", _inputIban?.value ?? "");
-            SetStrukturFeld(doc, "bic", _inputBic?.value ?? "");
-            SetStrukturFeld(doc, "bank", _inputKreditinstitut?.value ?? "");
-            SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value ?? "");
+            if (doc.strukturFelder != null)
+            {
+                SetStrukturFeld(doc, "iban", _inputIban?.value ?? "");
+                SetStrukturFeld(doc, "bic", _inputBic?.value ?? "");
+                SetStrukturFeld(doc, "bank", _inputKreditinstitut?.value ?? "");
+                SetStrukturFeld(doc, "kontoinhaber", _inputKontoinhaber?.value ?? "");
+            }
+
+            doc.inhalt =
+                $"Kontoinhaber: {_inputKontoinhaber?.value ?? ""}\n" +
+                $"IBAN: {_inputIban?.value ?? ""}\n" +
+                $"BIC: {_inputBic?.value ?? ""}\n" +
+                $"Kreditinstitut: {_inputKreditinstitut?.value ?? ""}";
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
     }
 
-    // Schreibt Bezahlweise-Texte in passende Dokumente
     private void SyncBezahlweiseToDokumente()
     {
         string path = DocumentDashboard.GetSaveFilePath();
@@ -838,13 +864,12 @@ public class EinstellungenController : MonoBehaviour
         var saveData = DocumentDashboard.GetSavedDocuments();
         if (saveData?.savedDocs == null) return;
 
-        // Mapping: Dokumenttitel → Feldwert
-        var mapping = new System.Collections.Generic.Dictionary<string, string>
+        var mapping = new Dictionary<string, string>
         {
-            { "AGB",           _inputAgb?.value         ?? "" },
-            { "Disclaimer",    _inputDisclaimer?.value  ?? "" },
-            { "Barzahlung",    _inputBarzahlung?.value  ?? "" },
-            { "Überweisung", _inputUeberweisung?.value ?? "" },
+            { "AGB",              _inputAgb?.value          ?? "" },
+            { "Disclaimer",       _inputDisclaimer?.value   ?? "" },
+            { "Barzahlung",       _inputBarzahlung?.value   ?? "" },
+            { "\u00dcberweisung", _inputUeberweisung?.value ?? "" },
         };
 
         foreach (var doc in saveData.savedDocs)
@@ -908,7 +933,7 @@ public class EinstellungenController : MonoBehaviour
 
     private void SelectMode(bool isDark)
     {
-        PlayerPrefs.SetInt(PREF_DARK_MODE, isDark ? 1 : 0);
+        PlayerPrefs.SetInt(_pref(PREF_DARK_MODE), isDark ? 1 : 0);
         PlayerPrefs.Save();
         UpdateModeButtons(isDark);
     }
@@ -959,7 +984,7 @@ public class EinstellungenController : MonoBehaviour
         { Debug.LogWarning("[Einstellungen] Super-Passkey fehlt."); return; }
 
         if (key1 != key2)
-        { Debug.LogWarning("[Einstellungen] Super-Passkeys stimmen nicht überein."); return; }
+        { Debug.LogWarning("[Einstellungen] Super-Passkeys stimmen nicht \u00fcberein."); return; }
 
         if (mainLogoutController != null) mainLogoutController.logout();
         PlayerPrefs.DeleteAll();
@@ -984,11 +1009,65 @@ public class EinstellungenController : MonoBehaviour
 
     private void SetField(TextField field, string key, string fallback)
     {
-        if (field != null) field.value = PlayerPrefs.GetString(key, fallback);
+        if (field != null) field.value = PlayerPrefs.GetString(_pref(key), fallback);
     }
 
     private void SaveField(string key, TextField field)
     {
-        if (field != null) PlayerPrefs.SetString(key, field.value);
+        if (field != null) PlayerPrefs.SetString(_pref(key), field.value);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // HELP TOOLTIPS
+    // ═══════════════════════════════════════════════════════════
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
+            "Hier verwaltest du alle grundlegenden Einstellungen deines Unternehmens. " +
+            "\u00c4nderungen wirken sich auf Rechnungen, Angebote und PDF-Exporte aus. " +
+            "Speichere am Ende, damit alle \u00c4nderungen \u00fcbernommen werden.");
+
+        HelpTooltip.Registriere(_root, "btn-help-unternehmen",
+            "Hinterlege hier Firmenname, Rechtsform, Adresse und Steuerdaten. " +
+            "Diese Daten erscheinen auf allen erstellten Rechnungen und Angeboten " +
+            "als Absenderinformationen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bank",
+            "Trage hier deine Bankverbindung ein: IBAN, BIC, Kontoinhaber und Kreditinstitut. " +
+            "Die Daten werden auf Wunsch im Fu\u00dfbereich von Rechnungen angezeigt.");
+
+        HelpTooltip.Registriere(_root, "btn-help-rechnungsformat",
+            "Lege fest wie deine Rechnungen nummeriert und aufgebaut werden. " +
+            "Hier stellst du Nummernkreis, Zahlungsziel, W\u00e4hrung " +
+            "und Standardtexte f\u00fcr Kopf- und Fu\u00dfzeile ein.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bezahlweise",
+            "Verwalte hier Dokumente, die als Anh\u00e4nge an Rechnungen angeh\u00e4ngt werden: " +
+            "AGB, Disclaimer, Barzahlungs- und \u00dcberweisungshinweis.");
+
+        HelpTooltip.Registriere(_root, "btn-help-version",
+            "Zeigt die aktuell installierte Programmversion. " +
+            "Hier kannst du nach Updates suchen sowie Credits und Mitwirkende einsehen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-pdf",
+            "Steuere hier das Erscheinungsbild deiner PDF-Exporte: " +
+            "Logo, Seitenzahl und letzten Exportpfad aktivieren oder deaktivieren.");
+
+        HelpTooltip.Registriere(_root, "btn-help-steuersaetze",
+            "W\u00e4hle den Standard-Mehrwertsteuersatz f\u00fcr deine Dienstleistungen. " +
+            "Der ausgew\u00e4hlte Satz wird beim Erstellen neuer Belege automatisch vorausgew\u00e4hlt.");
+
+        HelpTooltip.Registriere(_root, "btn-help-layout",
+            "Wechsle hier zwischen Hell- und Dunkelmodus. " +
+            "Die Einstellung gilt sofort f\u00fcr die gesamte Anwendung.");
+
+
+        HelpTooltip.Registriere(_root, "btn-help-begleiter",
+            "Aktiviert oder deaktiviert den Begleiter, der neben Hilfe-Tooltips erscheint. " +
+            "Bei aktiviertem Begleiter erscheint eine Figur neben jedem Hilfetext.");
+        HelpTooltip.Registriere(_root, "btn-help-sicherheit",
+            "Setze hier deinen Passkey zur\u00fcck, gib dazu deinen Recovery Key ein. " +
+            "Das L\u00f6schen des Kontos ist endg\u00fcltig und kann nicht r\u00fcckg\u00e4ngig gemacht werden.");
     }
 }

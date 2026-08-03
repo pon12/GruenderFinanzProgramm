@@ -7,13 +7,19 @@ public class FinanzChartElement : VisualElement
     private float[] _einnahmen;
     private float[] _ausgaben;
 
-    private readonly List<Label> _labels = new();
+    private static readonly Color EinnahmenColor     = new Color(0.502f, 0.812f, 0.584f, 1f);
+    private static readonly Color EinnahmenFill      = new Color(0.502f, 0.812f, 0.584f, 0.15f);
+    private static readonly Color AusgabenColor      = new Color(0.902f, 0.224f, 0.275f, 1f);
+    private static readonly Color AusgabenFill       = new Color(0.902f, 0.224f, 0.275f, 0.15f);
+    private static readonly Color GridColor          = new Color(0.25f,  0.25f,  0.25f,  1f);
+    private static readonly Color AxisColor          = new Color(0.4f,   0.4f,   0.4f,   1f);
+    private static readonly Color LabelColor         = new Color(0.627f, 0.627f, 0.627f, 1f);
 
-    private readonly string[] monate =
-    {
-        "Jan","Feb","Mrz","Apr",
-        "Mai","Jun","Jul","Aug",
-        "Sep","Okt","Nov","Dez"
+    private readonly List<Label> _labels = new List<Label>();
+
+    private readonly string[] _monate = {
+        "Jan","Feb","Mär","Apr","Mai","Jun",
+        "Jul","Aug","Sep","Okt","Nov","Dez"
     };
 
     public FinanzChartElement()
@@ -24,172 +30,121 @@ public class FinanzChartElement : VisualElement
     public void SetData(float[] einnahmen, float[] ausgaben)
     {
         _einnahmen = einnahmen;
-        _ausgaben = ausgaben;
-
+        _ausgaben  = ausgaben;
         MarkDirtyRepaint();
     }
 
-    void ClearLabels()
+    private void ClearLabels()
     {
-        foreach (var l in _labels)
-            l.RemoveFromHierarchy();
-
+        foreach (var l in _labels) l.RemoveFromHierarchy();
         _labels.Clear();
     }
 
     private void Draw(MeshGenerationContext ctx)
     {
-        if (_einnahmen == null || _ausgaben == null)
-            return;
-
         ClearLabels();
 
-        float width = contentRect.width;
-        float height = contentRect.height;
+        if (_einnahmen == null || _ausgaben == null) return;
 
-        float leftPad = 70;
-        float bottomPad = 50;
-        float topPad = 30;
-        float rightPad = 20;
+        float w        = contentRect.width;
+        float h        = contentRect.height;
+        float padLeft  = 55f;
+        float padRight = 12f;
+        float padTop   = 20f;
+        float padBot   = 30f;
 
-        var painter = ctx.painter2D;
+        float chartW = w - padLeft - padRight;
+        float chartH = h - padTop  - padBot;
 
-        float maxValue = 0;
+        var p = ctx.painter2D;
+
+        // Max-Wert bestimmen
+        float maxVal = 1f;
+        for (int i = 0; i < 12; i++)
+        {
+            if (_einnahmen[i] > maxVal) maxVal = _einnahmen[i];
+            if (_ausgaben[i]  > maxVal) maxVal = _ausgaben[i];
+        }
+        maxVal *= 1.1f;
+
+        // Grid + Y-Achse Labels
+        for (int g = 0; g <= 4; g++)
+        {
+            float t  = g / 4f;
+            float yg = padTop + chartH * t;
+            float val = maxVal * (1f - t);
+
+            p.strokeColor = GridColor;
+            p.lineWidth   = 0.5f;
+            p.BeginPath();
+            p.MoveTo(new Vector2(padLeft, yg));
+            p.LineTo(new Vector2(w - padRight, yg));
+            p.Stroke();
+
+            string valText = val >= 1000 ? $"€{val/1000:0.#}k" : $"€{val:0}";
+            var lbl = MakeChartLabel(valText, padLeft - 4, yg - 9, LabelColor, 10, TextAnchor.MiddleRight);
+            Add(lbl); _labels.Add(lbl);
+        }
+
+        // X-Achse Monatsbeschriftung + Punkte berechnen
+        var ePts = new Vector2[12];
+        var aPts = new Vector2[12];
 
         for (int i = 0; i < 12; i++)
         {
-            maxValue = Mathf.Max(maxValue, _einnahmen[i]);
-            maxValue = Mathf.Max(maxValue, _ausgaben[i]);
+            float x = padLeft + chartW * i / 11f;
+            ePts[i] = new Vector2(x, padTop + chartH * (1f - _einnahmen[i] / maxVal));
+            aPts[i] = new Vector2(x, padTop + chartH * (1f - _ausgaben[i]  / maxVal));
+
+            var mLbl = MakeChartLabel(_monate[i], x - 12, h - padBot + 4, LabelColor, 10, TextAnchor.UpperCenter);
+            Add(mLbl); _labels.Add(mLbl);
         }
 
-        if (maxValue <= 0)
-            maxValue = 100;
+        // Füllfläche Einnahmen
+        p.fillColor = EinnahmenFill;
+        p.BeginPath();
+        p.MoveTo(new Vector2(ePts[0].x, padTop + chartH));
+        foreach (var pt in ePts) p.LineTo(pt);
+        p.LineTo(new Vector2(ePts[11].x, padTop + chartH));
+        p.ClosePath(); p.Fill();
 
-        maxValue *= 1.1f;
+        // Füllfläche Ausgaben
+        p.fillColor = AusgabenFill;
+        p.BeginPath();
+        p.MoveTo(new Vector2(aPts[0].x, padTop + chartH));
+        foreach (var pt in aPts) p.LineTo(pt);
+        p.LineTo(new Vector2(aPts[11].x, padTop + chartH));
+        p.ClosePath(); p.Fill();
 
-        // =====================
-        // ACHSEN
-        // =====================
+        // Linie Einnahmen
+        p.strokeColor = EinnahmenColor; p.lineWidth = 2.5f;
+        p.BeginPath(); p.MoveTo(ePts[0]);
+        for (int i = 1; i < 12; i++) p.LineTo(ePts[i]);
+        p.Stroke();
 
-        painter.strokeColor = Color.white;
-        painter.lineWidth = 2;
+        // Linie Ausgaben
+        p.strokeColor = AusgabenColor; p.lineWidth = 2.5f;
+        p.BeginPath(); p.MoveTo(aPts[0]);
+        for (int i = 1; i < 12; i++) p.LineTo(aPts[i]);
+        p.Stroke();
 
-        painter.BeginPath();
-        painter.MoveTo(new Vector2(leftPad, topPad));
-        painter.LineTo(new Vector2(leftPad, height - bottomPad));
-        painter.Stroke();
+        // Punkte Einnahmen
+        p.fillColor = EinnahmenColor;
+        foreach (var pt in ePts) { p.BeginPath(); p.Arc(pt, 3.5f, 0, 360); p.Fill(); }
 
-        painter.BeginPath();
-        painter.MoveTo(new Vector2(leftPad, height - bottomPad));
-        painter.LineTo(new Vector2(width - rightPad, height - bottomPad));
-        painter.Stroke();
+        // Punkte Ausgaben
+        p.fillColor = AusgabenColor;
+        foreach (var pt in aPts) { p.BeginPath(); p.Arc(pt, 3.5f, 0, 360); p.Fill(); }
+    }
 
-        // =====================
-        // Y SKALA
-        // =====================
-
-        int gridLines = 5;
-
-        for (int i = 0; i <= gridLines; i++)
-        {
-            float t = i / (float)gridLines;
-
-            float value = maxValue * (1f - t);
-
-            float y =
-                topPad +
-                (height - topPad - bottomPad) * t;
-
-            painter.strokeColor =
-                new Color(1, 1, 1, 0.15f);
-
-            painter.lineWidth = 1;
-
-            painter.BeginPath();
-            painter.MoveTo(new Vector2(leftPad, y));
-            painter.LineTo(new Vector2(width - rightPad, y));
-            painter.Stroke();
-
-            Label label = new Label(value.ToString("0") + " €");
-
-            label.style.position = Position.Absolute;
-            label.style.left = 5;
-            label.style.top = y - 10;
-
-            Add(label);
-            _labels.Add(label);
-        }
-
-        // =====================
-// SÄULEN
-// =====================
-
-float groupWidth =
-    (width - leftPad - rightPad) / 12f;
-
-float barWidth = groupWidth * 0.30f;
-
-for (int i = 0; i < 12; i++)
-{
-    float centerX =
-        leftPad + groupWidth * i + groupWidth * 0.5f;
-
-    float einnahmenHeight =
-        (_einnahmen[i] / maxValue)
-        * (height - topPad - bottomPad);
-
-    float ausgabenHeight =
-        (_ausgaben[i] / maxValue)
-        * (height - topPad - bottomPad);
-
-    // ==================================
-    // EINNAHMEN (GRÜN)
-    // ==================================
-
-    float ex = centerX - barWidth - 2;
-    float ey = height - bottomPad - einnahmenHeight;
-
-    painter.fillColor = Color.green;
-
-    painter.BeginPath();
-    painter.MoveTo(new Vector2(ex, ey));
-    painter.LineTo(new Vector2(ex + barWidth, ey));
-    painter.LineTo(new Vector2(ex + barWidth, height - bottomPad));
-    painter.LineTo(new Vector2(ex, height - bottomPad));
-    painter.LineTo(new Vector2(ex, ey));
-    painter.Fill();
-
-    // ==================================
-    // AUSGABEN (ROT)
-    // ==================================
-
-    float ax = centerX + 2;
-    float ay = height - bottomPad - ausgabenHeight;
-
-    painter.fillColor = Color.red;
-
-    painter.BeginPath();
-    painter.MoveTo(new Vector2(ax, ay));
-    painter.LineTo(new Vector2(ax + barWidth, ay));
-    painter.LineTo(new Vector2(ax + barWidth, height - bottomPad));
-    painter.LineTo(new Vector2(ax, height - bottomPad));
-    painter.LineTo(new Vector2(ax, ay));
-    painter.Fill();
-
-    // ==================================
-    // MONATSBESCHRIFTUNG
-    // ==================================
-
-    Label monat = new Label(monate[i]);
-
-    monat.style.position = Position.Absolute;
-    monat.style.left = centerX - 15;
-    monat.style.top = height - bottomPad + 5;
-    monat.style.color = Color.white;
-    monat.style.fontSize = 10;
-
-    Add(monat);
-    _labels.Add(monat);
-}
+    private Label MakeChartLabel(string text, float x, float y, Color farbe, int size, TextAnchor anchor)
+    {
+        var l = new Label(text);
+        l.style.position  = Position.Absolute;
+        l.style.left      = x;
+        l.style.top       = y;
+        l.style.color     = farbe;
+        l.style.fontSize  = size;
+        return l;
     }
 }

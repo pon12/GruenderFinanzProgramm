@@ -23,6 +23,7 @@
     margin-bottom: 16px;
     align-self: flex-end;
 }
+
 .add-btn:hover {
     background-color: rgb(179, 226, 196);
 }
@@ -53,7 +54,7 @@
 }
 
 .tabelle-header-zelle {
-    color: #80CF95;
+    color: rgb(128, 207, 149);
     font-size: 16px;
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
@@ -74,10 +75,12 @@
 
 .tabelle-zeile:hover {
     background-color: rgb(50, 50, 50);
+    border-width: 2px;
+    border-color: rgb(128, 207, 149);
 }
 
 .tabelle-zelle {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
     font-size: 15px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
     -unity-text-align: middle-center;
@@ -140,7 +143,7 @@
     padding: 0;
 }
 
-.zeile-btn {
+.zeile-btn-bearbeiten {
     flex-grow: 0;
     height: 32px;
     border-radius: 6px;
@@ -152,7 +155,7 @@
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
     color: rgb(0, 0, 0);
-    background-color: #80CF95;
+    background-color: rgb(128, 207, 149);
     margin-right: 8px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -160,10 +163,18 @@
     border-bottom-left-radius: 8px;
 }
 
+.zeile-btn-bearbeiten:hover {
+    background-color: rgb(179, 226, 196);
+}
+
 .zeile-btn-loeschen {
-    background-color: rgb(207, 80, 80);
+    background-color: rgb(230, 57, 70);
     color: rgb(255, 255, 255);
     margin-right: 0;
+}
+
+.zeile-btn-loeschen:hover {
+    background-color: rgb(229, 103, 112);
 }
 
 .popup-overlay {
@@ -178,13 +189,11 @@
 }
 
 .popup-box {
+    position: relative;
     width: 600px;
     background-color: rgb(38, 38, 38);
     border-radius: 16px;
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
+    border-width: 2px;
     border-color: rgb(128, 207, 149);
     padding-top: 32px;
     padding-bottom: 32px;
@@ -215,6 +224,10 @@
     color: rgb(255, 255, 255);
     font-size: 15px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+}
+
+.popup-input:placeholder {
+    color: rgba(255, 255, 255, 0.35);
 }
 
 .popup-input > .unity-base-field__input {
@@ -255,12 +268,59 @@
     border-left-width: 0;
     height: 50px;
     margin-top: 8px;
+    width: 50%;
 }
+
 .popup-btn-fertig:hover {
     background-color: rgb(179, 226, 196);
 }
 
 .popup-btn-fertig:active {
-    background-color: rgb(102, 165, 11);
+    background-color: rgb(102, 165, 119);
 }
 
+.popup-btn-abbrechen {
+    background-color: rgb(100, 100, 100);
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    border-radius: 10px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    height: 50px;
+    margin-top: 8px;
+    width: 50%;
+}
+
+.popup-btn-abbrechen:hover {
+    background-color: rgb(142, 141, 141);
+}
+
+.popup-btn-abbrechen:active {
+    background-color: rgb(56, 54, 54);
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(100, 100, 100);
+    background-color: transparent;
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.close-btn:hover {
+    color: rgb(229, 103, 112);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}

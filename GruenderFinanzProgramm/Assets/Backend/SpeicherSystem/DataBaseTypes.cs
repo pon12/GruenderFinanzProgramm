@@ -30,7 +30,7 @@ public class Company
     public int plz { get; set; }         // Postleitzahl 
     public string ustIdNr { get; set; }         // Umsatzsteuer-Identifikationsnummer 
     public string email { get; set; }       // E-Mail-Adresse
-    public string handyNr   { get; set; }    // Standort
+    public string handyNr { get; set; }    // Standort
     // --- Mapping Listen ---
     public static readonly List<string> LegalForms = new List<string>
     {
@@ -139,19 +139,37 @@ public class TextDocumentMeta
 public class Settings
 {
     [PrimaryKey, AutoIncrement]
-    public int id { get; set; } 
+    public int id { get; set; }
+
+    // Nutzerbezug
+    public int userId { get; set; }
+    public string nutzer { get; set; }
+
+    // Rechnung / Nummerierung
     public string rechnungsNrPräfix { get; set; }
     public string startNr { get; set; }
-    public string zahlungsziel { get; set; } 
+    public string zahlungsziel { get; set; }
+    public bool autoNummer { get; set; }
+
+    // Darstellung / Format
     public int waehrung { get; set; }
     public int dtmFormat { get; set; }
     public bool ustRechnung { get; set; }
-    public bool autoNummer { get; set; }
+
+    // Zahlung / Bankdaten
     public string zahlungshinweis { get; set; }
     public string kontoInhaber { get; set; }
     public string iban { get; set; }
     public string bic { get; set; }
     public string kreditinstitut { get; set; }
+
+    // Fehlende PlayerPrefs
+    public string barzahlung { get; set; }
+    public string ueberweisung { get; set; }
+    public string agb { get; set; }
+    public string disclaimer { get; set; }
+
+    // Weitere bestehende Einstellungen
     public bool ibanRechnung { get; set; }
     public bool logo { get; set; }
     public bool seitenzahl { get; set; }
@@ -161,7 +179,6 @@ public class Settings
     public string emailFirma { get; set; }
     public string teleponNrFirma { get; set; }
     public string websitefrima { get; set; }
-    public string nutzer { get; set; }
 }
 
 public class Finanzdaten
