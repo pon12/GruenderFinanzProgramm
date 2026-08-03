@@ -18,40 +18,43 @@ public abstract class BelegScreenController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
 
-    protected const string PositionenListeName      = "positionen-liste";
-    protected const string KundensucheName          = "input-kundensuche";
-    protected const string AbsenderLabelName        = "label-absender";
-    protected const string NummerFeldName           = "input-nummer";
-    protected const string StatusDropdownName       = "dropdown-status";
-    protected const string DatumFeldName            = "input-datum";
-    protected const string FristFeldName            = "input-frist";
-    protected const string ReferenzFeldName         = "input-referenz";
-    protected const string RabattTypDropdownName    = "dropdown-rabatt-typ";
-    protected const string RabattWertFeldName       = "input-rabatt-wert";
-    protected const string SkontoWertFeldName       = "input-skonto-wert";
-    protected const string NotizenFeldName          = "input-notizen";
-    protected const string NettoLabelName           = "label-netto";
-    protected const string RabattLabelName          = "label-rabatt";
-    protected const string SkontoLabelName          = "label-skonto";
-    protected const string GesamtLabelName          = "label-gesamt-total";
-    protected const string MwstLabelName            = "label-steuer";
+    protected const string PositionenListeName = "positionen-liste";
+    protected const string KundensucheName = "input-kundensuche";
+    protected const string AbsenderLabelName = "label-absender";
+    protected const string NummerFeldName = "input-nummer";
+    protected const string StatusDropdownName = "dropdown-status";
+    protected const string DatumFeldName = "input-datum";
+    protected const string FristFeldName = "input-frist";
+    protected const string ReferenzFeldName = "input-referenz";
+    protected const string RabattTypDropdownName = "dropdown-rabatt-typ";
+    protected const string RabattWertFeldName = "input-rabatt-wert";
+    protected const string SkontoWertFeldName = "input-skonto-wert";
+    protected const string NotizenFeldName = "input-notizen";
+    protected const string NettoLabelName = "label-netto";
+    protected const string RabattLabelName = "label-rabatt";
+    protected const string SkontoLabelName = "label-skonto";
+    protected const string GesamtLabelName = "label-gesamt-total";
+    protected const string MwstLabelName = "label-steuer";
     protected const string MwstBezeichnungLabelName = "label-steuer-bezeichnung";
-    protected const string SpeichernButtonName      = "btn-speichern";
-    protected const string AngenommenButtonName     = "btn-angenommen";
-    protected const string AbgelehntButtonName      = "btn-abgelehnt";
-    protected const string UmwandelnButtonName      = "btn-umwandeln";
-    protected const string PositionAddButtonName    = "btn-position-hinzufuegen";
-    protected const string AnhangKarteName          = "card-anhaenge";
+    protected const string SpeichernButtonName = "btn-speichern";
+    protected const string AngenommenButtonName = "btn-angenommen";
+    protected const string AbgelehntButtonName = "btn-abgelehnt";
+    protected const string UmwandelnButtonName = "btn-umwandeln";
+    protected const string PositionAddButtonName = "btn-position-hinzufuegen";
+    protected const string AnhangKarteName = "card-anhaenge";
 
     protected const int ReferenzMaxLaenge = 10;
-    protected const int NotizenMaxLaenge  = 150;
+    protected const int NotizenMaxLaenge = 150;
+
+    protected const float MaxPositionsPreis = 1_000_000f;
+    protected const int MaxPositionsMenge = 9999;
 
     protected static readonly CultureInfo De = CultureInfo.GetCultureInfo("de-DE");
 
-    private static readonly Color Gruen     = new Color(128f / 255f, 207f / 255f, 149f / 255f);
-    private static readonly Color Rot       = new Color(230f / 255f,  57f / 255f,  70f / 255f);
-    private static readonly Color FeldFarbe = new Color( 70f / 255f,  70f / 255f,  70f / 255f);
-    private static readonly Color KartenFarbe = new Color(38f / 255f, 38f / 255f,  38f / 255f);
+    private static readonly Color Gruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
+    private static readonly Color Rot = new Color(230f / 255f, 57f / 255f, 70f / 255f);
+    private static readonly Color FeldFarbe = new Color(70f / 255f, 70f / 255f, 70f / 255f);
+    private static readonly Color KartenFarbe = new Color(38f / 255f, 38f / 255f, 38f / 255f);
 
     protected VisualElement Root;
 
@@ -64,18 +67,18 @@ public abstract class BelegScreenController : MonoBehaviour
                         _rabattWertFeld, _skontoWertFeld, _notizenFeld;
     protected DropdownField _statusDropdown, _rabattTypDropdown;
     private VisualElement _suchErgebnisListe;
-    protected string _ausgewaehlterKunde        = "";
-    protected int    _ausgewaehlterKundeId      = 0;
+    protected string _ausgewaehlterKunde = "";
+    protected int _ausgewaehlterKundeId = 0;
     protected string _ausgewaehlterKundeAdresse = "";
-    private Button        _umwandelnButton;
-    private Label         _rabattWertBezeichnungLabel;
-    private bool          _buttonsRegistriert = false;
+    private Button _umwandelnButton;
+    private Label _rabattWertBezeichnungLabel;
+    private bool _buttonsRegistriert = false;
     private readonly Dictionary<string, bool> _anhangAusgewaehlt = new Dictionary<string, bool>();
     private VisualElement _anhangBereich;
 
-    private VisualElement  _dienstleistungPopup;
-    private VisualElement  _kalenderPopup;
-    private List<Service>  _dienstleistungen = new List<Service>();
+    private VisualElement _dienstleistungPopup;
+    private VisualElement _kalenderPopup;
+    private List<Service> _dienstleistungen = new List<Service>();
 
     private readonly string[] _monatsNamen =
     {
@@ -83,7 +86,7 @@ public abstract class BelegScreenController : MonoBehaviour
         "Juli", "August", "September", "Oktober", "November", "Dezember"
     };
 
-    protected abstract string BelegTyp      { get; }
+    protected abstract string BelegTyp { get; }
     protected abstract string NummernPrefix { get; }
     protected abstract List<string> StatusOptionen { get; }
     protected virtual void RegistriereZusatzButtons() { }
@@ -91,8 +94,8 @@ public abstract class BelegScreenController : MonoBehaviour
     protected class PositionsZeile
     {
         public VisualElement Wurzel;
-        public Label         Artikel, Beschreibung, Einheit, Preis, Gesamt;
-        public TextField     Menge;
+        public Label Artikel, Beschreibung, Einheit, Preis, Gesamt;
+        public TextField Menge;
     }
 
     protected virtual void OnEnable()
@@ -130,7 +133,7 @@ public abstract class BelegScreenController : MonoBehaviour
         AktualisiereUmwandelnButton();
 
         ButtonHoverController.Registriere(Root);
-        
+
     }
 
     private void RegistriereHelpTooltips()
@@ -188,20 +191,20 @@ public abstract class BelegScreenController : MonoBehaviour
         if (_positionenListe != null)
             _positionenListe.verticalScrollerVisibility = ScrollerVisibility.Auto;
 
-        _nettoLabel           = Root.Q<Label>(NettoLabelName);
-        _rabattLabel          = Root.Q<Label>(RabattLabelName);
-        _skontoLabel          = Root.Q<Label>(SkontoLabelName);
-        _gesamtLabel          = Root.Q<Label>(GesamtLabelName);
-        _mwstLabel            = Root.Q<Label>(MwstLabelName);
+        _nettoLabel = Root.Q<Label>(NettoLabelName);
+        _rabattLabel = Root.Q<Label>(RabattLabelName);
+        _skontoLabel = Root.Q<Label>(SkontoLabelName);
+        _gesamtLabel = Root.Q<Label>(GesamtLabelName);
+        _mwstLabel = Root.Q<Label>(MwstLabelName);
         _mwstBezeichnungLabel = Root.Q<Label>(MwstBezeichnungLabelName);
 
-        _kundensuche    = Root.Q<TextField>(KundensucheName);
-        _nummerFeld     = Root.Q<TextField>(NummerFeldName);
-        _datumFeld      = Root.Q<TextField>(DatumFeldName);
-        _fristFeld      = Root.Q<TextField>(FristFeldName);
-        _notizenFeld    = Root.Q<TextField>(NotizenFeldName);
+        _kundensuche = Root.Q<TextField>(KundensucheName);
+        _nummerFeld = Root.Q<TextField>(NummerFeldName);
+        _datumFeld = Root.Q<TextField>(DatumFeldName);
+        _fristFeld = Root.Q<TextField>(FristFeldName);
+        _notizenFeld = Root.Q<TextField>(NotizenFeldName);
 
-        _statusDropdown    = Root.Q<DropdownField>(StatusDropdownName);
+        _statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
         _rabattTypDropdown = Root.Q<DropdownField>(RabattTypDropdownName);
 
         _umwandelnButton = Root.Q<Button>(UmwandelnButtonName);
@@ -225,8 +228,8 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         foreach (var box in boxen)
         {
-            box.style.flexGrow   = 1f;
-            box.style.alignSelf  = Align.Stretch;
+            box.style.flexGrow = 1f;
+            box.style.alignSelf = Align.Stretch;
             box.style.flexShrink = 0f;
         }
     }
@@ -237,8 +240,8 @@ public abstract class BelegScreenController : MonoBehaviour
         AdressTitel(box, ueberschrift);
 
         var platzhalter = new Label("Noch nicht ausgew\u00e4hlt");
-        platzhalter.style.fontSize  = 12;
-        platzhalter.style.color     = new Color(0.59f, 0.59f, 0.59f);
+        platzhalter.style.fontSize = 12;
+        platzhalter.style.color = new Color(0.59f, 0.59f, 0.59f);
         platzhalter.style.marginTop = 2;
         box.Add(platzhalter);
     }
@@ -260,11 +263,11 @@ public abstract class BelegScreenController : MonoBehaviour
     private static void AdressTitel(VisualElement box, string text)
     {
         var label = new Label(text);
-        label.style.fontSize                    = 10;
-        label.style.color                       = new Color(0.5f, 0.5f, 0.5f);
-        label.style.unityFontStyleAndWeight     = FontStyle.Normal;
-        label.style.marginBottom                = 6;
-        label.style.letterSpacing              = 0.5f;
+        label.style.fontSize = 10;
+        label.style.color = new Color(0.5f, 0.5f, 0.5f);
+        label.style.unityFontStyleAndWeight = FontStyle.Normal;
+        label.style.marginBottom = 6;
+        label.style.letterSpacing = 0.5f;
         box.Add(label);
     }
 
@@ -272,26 +275,26 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         var zeile = new VisualElement();
         zeile.style.flexDirection = FlexDirection.Row;
-        zeile.style.marginBottom  = 3;
-        zeile.style.alignItems    = Align.FlexStart;
+        zeile.style.marginBottom = 3;
+        zeile.style.alignItems = Align.FlexStart;
 
         if (!string.IsNullOrEmpty(bezeichnung))
         {
             var key = new Label(bezeichnung);
-            key.style.fontSize    = 10;
-            key.style.color       = new Color(0.5f, 0.5f, 0.5f);
-            key.style.minWidth    = 52;
+            key.style.fontSize = 10;
+            key.style.color = new Color(0.5f, 0.5f, 0.5f);
+            key.style.minWidth = 52;
             key.style.marginRight = 4;
-            key.style.marginTop   = 1;
-            key.style.whiteSpace  = WhiteSpace.NoWrap;
+            key.style.marginTop = 1;
+            key.style.whiteSpace = WhiteSpace.NoWrap;
             zeile.Add(key);
         }
 
         var val = new Label(wert);
-        val.style.fontSize    = 12;
-        val.style.color       = new Color(0.88f, 0.88f, 0.88f);
-        val.style.whiteSpace  = WhiteSpace.Normal;
-        val.style.flexShrink  = 1;
+        val.style.fontSize = 12;
+        val.style.color = new Color(0.88f, 0.88f, 0.88f);
+        val.style.whiteSpace = WhiteSpace.Normal;
+        val.style.flexShrink = 1;
         zeile.Add(val);
 
         box.Add(zeile);
@@ -302,15 +305,15 @@ public abstract class BelegScreenController : MonoBehaviour
         box.Clear();
 
         var titel = new Label(ueberschrift);
-        titel.style.fontSize                = 13;
+        titel.style.fontSize = 13;
         titel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        titel.style.color                   = Color.white;
-        titel.style.marginBottom            = 6;
+        titel.style.color = Color.white;
+        titel.style.marginBottom = 6;
         box.Add(titel);
 
         var text = new Label(inhalt);
-        text.style.fontSize  = 12;
-        text.style.color     = string.IsNullOrEmpty(inhalt) || inhalt == "Kunde ausw\u00e4hlen"
+        text.style.fontSize = 12;
+        text.style.color = string.IsNullOrEmpty(inhalt) || inhalt == "Kunde ausw\u00e4hlen"
             ? new Color(0.59f, 0.59f, 0.59f)
             : new Color(0.78f, 0.78f, 0.78f);
         text.style.whiteSpace = WhiteSpace.Normal;
@@ -375,8 +378,8 @@ public abstract class BelegScreenController : MonoBehaviour
         if (BelegTyp != "Rechnung") return;
         if (!BelegTransferData.hasTransfer) return;
 
-        _ausgewaehlterKundeId      = BelegTransferData.customerId;
-        _ausgewaehlterKunde        = BelegTransferData.customerName;
+        _ausgewaehlterKundeId = BelegTransferData.customerId;
+        _ausgewaehlterKunde = BelegTransferData.customerName;
         _ausgewaehlterKundeAdresse = BelegTransferData.customerAddress;
 
         _kundensuche?.SetValueWithoutNotify(_ausgewaehlterKunde);
@@ -393,10 +396,10 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             Service service = new Service
             {
-                name       = item.articleNumber,
+                name = item.articleNumber,
                 description = item.description,
-                priceModel  = "St\u00fcck",
-                price       = item.unitPrice
+                priceModel = "St\u00fcck",
+                price = item.unitPrice
             };
             FuegeZeileAusDienstleistungHinzu(service, item.quantity);
         }
@@ -411,7 +414,7 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         try
         {
-            var db       = UserDatabaseAccess.getCurrentUserDatabase();
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
             var eintraege = db.getAllOffers();
             int naechste = (eintraege != null ? eintraege.Count : 0) + 1;
             return string.Format("{0}-{1:D4}", NummernPrefix, naechste);
@@ -447,7 +450,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected virtual void AktualisiereStatusButtons(string status)
     {
         SetzeButtonAktiv(FindeButton(AngenommenButtonName, "Angenommen"), status != "Angenommen" && status != "Bezahlt" && status != "Storniert" && status != "Abgelehnt");
-        SetzeButtonAktiv(FindeButton(AbgelehntButtonName,  "Abgelehnt"),  status != "Abgelehnt"  && status != "Storniert");
+        SetzeButtonAktiv(FindeButton(AbgelehntButtonName, "Abgelehnt"), status != "Abgelehnt" && status != "Storniert");
     }
 
     protected static void SetzeButtonAktiv(Button btn, bool aktiv)
@@ -459,7 +462,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void LadeAbsenderdaten()
     {
-        var boxen     = Root.Query(className: "angebot-address-box").ToList();
+        var boxen = Root.Query(className: "angebot-address-box").ToList();
         NormalisiereAdressBoxen(boxen);
         var senderBox = boxen.Count > 1 ? boxen[1] : null;
 
@@ -467,7 +470,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
         try
         {
-            var db     = UserDatabaseAccess.getCurrentUserDatabase();
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
             var firmen = db?.getAllCompanies();
 
             if (firmen == null || firmen.Count == 0)
@@ -476,12 +479,12 @@ public abstract class BelegScreenController : MonoBehaviour
                 return;
             }
 
-            Company f      = firmen[firmen.Count - 1];
-            string name    = f.name           ?? "";
+            Company f = firmen[firmen.Count - 1];
+            string name = f.name ?? "";
             string strasse = f.strasseuHausNr ?? "";
-            string plz     = f.plz > 0 ? f.plz.ToString() : "";
-            string ort     = f.location       ?? "";
-            string plzOrt  = (plz + " " + ort).Trim();
+            string plz = f.plz > 0 ? f.plz.ToString() : "";
+            string ort = f.location ?? "";
+            string plzOrt = (plz + " " + ort).Trim();
 
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -552,10 +555,10 @@ public abstract class BelegScreenController : MonoBehaviour
         if (_buttonsRegistriert) return;
         _buttonsRegistriert = true;
 
-        FindeButton(SpeichernButtonName,   "Speichern")?.RegisterCallback<ClickEvent>(_ => SpeichernGeklickt());
-        FindeButton(AngenommenButtonName,  "Angenommen")?.RegisterCallback<ClickEvent>(_ => StatusGeklickt(true));
-        FindeButton(AbgelehntButtonName,   "Abgelehnt")?.RegisterCallback<ClickEvent>(_ => StatusGeklickt(false));
-        FindeButton("btn-export",          "Als PDF")?.RegisterCallback<ClickEvent>(_ => ExportierePDF());
+        FindeButton(SpeichernButtonName, "Speichern")?.RegisterCallback<ClickEvent>(_ => SpeichernGeklickt());
+        FindeButton(AngenommenButtonName, "Angenommen")?.RegisterCallback<ClickEvent>(_ => StatusGeklickt(true));
+        FindeButton(AbgelehntButtonName, "Abgelehnt")?.RegisterCallback<ClickEvent>(_ => StatusGeklickt(false));
+        FindeButton("btn-export", "Als PDF")?.RegisterCallback<ClickEvent>(_ => ExportierePDF());
         FindeButton(PositionAddButtonName, "+")?.RegisterCallback<ClickEvent>(_ => OeffneDienstleistungsPopup());
         FindeButton("btn-zuruecksetzen", "Zur\u00fccksetzen")
             ?.RegisterCallback<ClickEvent>(_ => ResetBelegFormular());
@@ -631,44 +634,44 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (start < DateTime.Today) start = DateTime.Today;
 
-        int jahr  = start.Year;
+        int jahr = start.Year;
         int monat = start.Month;
 
         var overlay = new VisualElement();
-        overlay.style.position        = Position.Absolute;
-        overlay.style.left            = 0; overlay.style.right  = 0;
-        overlay.style.top             = 0; overlay.style.bottom = 0;
+        overlay.style.position = Position.Absolute;
+        overlay.style.left = 0; overlay.style.right = 0;
+        overlay.style.top = 0; overlay.style.bottom = 0;
         overlay.style.backgroundColor = new Color(0f, 0f, 0f, 0.4f);
-        overlay.style.alignItems      = Align.Center;
-        overlay.style.justifyContent  = Justify.Center;
+        overlay.style.alignItems = Align.Center;
+        overlay.style.justifyContent = Justify.Center;
 
         var karte = new VisualElement();
-        karte.style.width                  = 322;
-        karte.style.backgroundColor        = KartenFarbe;
-        karte.style.borderTopLeftRadius    = 12; karte.style.borderTopRightRadius    = 12;
+        karte.style.width = 322;
+        karte.style.backgroundColor = KartenFarbe;
+        karte.style.borderTopLeftRadius = 12; karte.style.borderTopRightRadius = 12;
         karte.style.borderBottomLeftRadius = 12; karte.style.borderBottomRightRadius = 12;
-        karte.style.borderTopWidth         = 2;  karte.style.borderRightWidth        = 2;
-        karte.style.borderBottomWidth      = 2;  karte.style.borderLeftWidth         = 2;
-        karte.style.borderTopColor         = Gruen; karte.style.borderRightColor  = Gruen;
-        karte.style.borderBottomColor      = Gruen; karte.style.borderLeftColor   = Gruen;
-        karte.style.paddingTop             = 18; karte.style.paddingBottom        = 18;
-        karte.style.paddingLeft            = 18; karte.style.paddingRight         = 18;
+        karte.style.borderTopWidth = 2; karte.style.borderRightWidth = 2;
+        karte.style.borderBottomWidth = 2; karte.style.borderLeftWidth = 2;
+        karte.style.borderTopColor = Gruen; karte.style.borderRightColor = Gruen;
+        karte.style.borderBottomColor = Gruen; karte.style.borderLeftColor = Gruen;
+        karte.style.paddingTop = 18; karte.style.paddingBottom = 18;
+        karte.style.paddingLeft = 18; karte.style.paddingRight = 18;
 
         var kopf = new VisualElement();
-        kopf.style.flexDirection   = FlexDirection.Row;
-        kopf.style.justifyContent  = Justify.SpaceBetween;
-        kopf.style.alignItems      = Align.Center;
-        kopf.style.marginBottom    = 12;
+        kopf.style.flexDirection = FlexDirection.Row;
+        kopf.style.justifyContent = Justify.SpaceBetween;
+        kopf.style.alignItems = Align.Center;
+        kopf.style.marginBottom = 12;
 
-        var btnVorig   = new Button { text = "\u2039" };
+        var btnVorig = new Button { text = "\u2039" };
         StileNavButton(btnVorig);
 
         var monatLabel = new Label();
-        monatLabel.style.color                   = Color.white;
-        monatLabel.style.fontSize                = 14;
+        monatLabel.style.color = Color.white;
+        monatLabel.style.fontSize = 14;
         monatLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        monatLabel.style.flexGrow                = 1;
-        monatLabel.style.unityTextAlign          = TextAnchor.MiddleCenter;
+        monatLabel.style.flexGrow = 1;
+        monatLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
 
         var btnNaechst = new Button { text = "\u203a" };
         StileNavButton(btnNaechst);
@@ -679,21 +682,21 @@ public abstract class BelegScreenController : MonoBehaviour
         karte.Add(kopf);
 
         const int zellBreite = 36;
-        const int zellHoehe  = 36;
+        const int zellHoehe = 36;
         const int zellMargin = 2;
 
         var wochenHeader = new VisualElement();
         wochenHeader.style.flexDirection = FlexDirection.Row;
-        wochenHeader.style.marginBottom  = 4;
+        wochenHeader.style.marginBottom = 4;
         string[] wochentage = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
         foreach (var wt in wochentage)
         {
             var wl = new Label(wt);
-            wl.style.width           = zellBreite + zellMargin * 2;
-            wl.style.height          = 24;
-            wl.style.fontSize        = 11;
-            wl.style.color           = new Color(0.6f, 0.6f, 0.6f);
-            wl.style.unityTextAlign  = TextAnchor.MiddleCenter;
+            wl.style.width = zellBreite + zellMargin * 2;
+            wl.style.height = 24;
+            wl.style.fontSize = 11;
+            wl.style.color = new Color(0.6f, 0.6f, 0.6f);
+            wl.style.unityTextAlign = TextAnchor.MiddleCenter;
             wochenHeader.Add(wl);
         }
         karte.Add(wochenHeader);
@@ -705,15 +708,15 @@ public abstract class BelegScreenController : MonoBehaviour
         void BaueTagButton(VisualElement zeile, int tag, bool istImMonat)
         {
             var btn = new Button();
-            btn.style.width          = zellBreite;
-            btn.style.height         = zellHoehe;
-            btn.style.marginTop      = zellMargin; btn.style.marginBottom = zellMargin;
-            btn.style.marginLeft     = zellMargin; btn.style.marginRight  = zellMargin;
-            btn.style.borderTopWidth = 0; btn.style.borderRightWidth  = 0;
+            btn.style.width = zellBreite;
+            btn.style.height = zellHoehe;
+            btn.style.marginTop = zellMargin; btn.style.marginBottom = zellMargin;
+            btn.style.marginLeft = zellMargin; btn.style.marginRight = zellMargin;
+            btn.style.borderTopWidth = 0; btn.style.borderRightWidth = 0;
             btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth = 0;
-            btn.style.borderTopLeftRadius    = 6; btn.style.borderTopRightRadius    = 6;
+            btn.style.borderTopLeftRadius = 6; btn.style.borderTopRightRadius = 6;
             btn.style.borderBottomLeftRadius = 6; btn.style.borderBottomRightRadius = 6;
-            btn.style.fontSize   = 12;
+            btn.style.fontSize = 12;
             btn.style.paddingTop = 0; btn.style.paddingBottom = 0;
             btn.style.paddingLeft = 0; btn.style.paddingRight = 0;
 
@@ -726,7 +729,7 @@ public abstract class BelegScreenController : MonoBehaviour
             else
             {
                 btn.text = tag.ToString();
-                var heute    = DateTime.Today;
+                var heute = DateTime.Today;
                 bool istHeute = tag == heute.Day && monat == heute.Month && jahr == heute.Year;
 
                 btn.style.backgroundColor = istHeute
@@ -735,10 +738,10 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 if (istHeute)
                 {
-                    btn.style.borderTopWidth    = 1; btn.style.borderRightWidth  = 1;
-                    btn.style.borderBottomWidth = 1; btn.style.borderLeftWidth   = 1;
-                    btn.style.borderTopColor    = Gruen; btn.style.borderRightColor  = Gruen;
-                    btn.style.borderBottomColor = Gruen; btn.style.borderLeftColor   = Gruen;
+                    btn.style.borderTopWidth = 1; btn.style.borderRightWidth = 1;
+                    btn.style.borderBottomWidth = 1; btn.style.borderLeftWidth = 1;
+                    btn.style.borderTopColor = Gruen; btn.style.borderRightColor = Gruen;
+                    btn.style.borderBottomColor = Gruen; btn.style.borderLeftColor = Gruen;
                 }
 
                 int lokalTag = tag, lokalMonat = monat, lokalJahr = jahr;
@@ -766,12 +769,12 @@ public abstract class BelegScreenController : MonoBehaviour
             grid.Clear();
             monatLabel.text = _monatsNamen[monat - 1] + " " + jahr;
 
-            var ersterTag    = new DateTime(jahr, monat, 1);
-            int tageImMonat  = DateTime.DaysInMonth(jahr, monat);
-            int startSlot    = ((int)ersterTag.DayOfWeek + 6) % 7;
+            var ersterTag = new DateTime(jahr, monat, 1);
+            int tageImMonat = DateTime.DaysInMonth(jahr, monat);
+            int startSlot = ((int)ersterTag.DayOfWeek + 6) % 7;
             int benotigteSlots = startSlot + tageImMonat;
-            int zeilenAnzahl   = (int)Math.Ceiling(benotigteSlots / 7.0);
-            int tagZaehler     = 1;
+            int zeilenAnzahl = (int)Math.Ceiling(benotigteSlots / 7.0);
+            int tagZaehler = 1;
 
             for (int z = 0; z < zeilenAnzahl; z++)
             {
@@ -781,9 +784,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 for (int s = 0; s < 7; s++)
                 {
-                    int  slot       = z * 7 + s;
+                    int slot = z * 7 + s;
                     bool istImMonat = slot >= startSlot && tagZaehler <= tageImMonat;
-                    int  tag        = istImMonat ? tagZaehler : 0;
+                    int tag = istImMonat ? tagZaehler : 0;
                     if (istImMonat) tagZaehler++;
                     BaueTagButton(zeile, tag, istImMonat);
                 }
@@ -822,17 +825,17 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private static void StileNavButton(Button btn)
     {
-        btn.style.width              = 28;
-        btn.style.height             = 28;
-        btn.style.backgroundColor   = FeldFarbe;
-        btn.style.color             = Color.white;
-        btn.style.fontSize          = 16;
-        btn.style.borderTopWidth    = 0; btn.style.borderRightWidth  = 0;
-        btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth   = 0;
-        btn.style.borderTopLeftRadius    = 6; btn.style.borderTopRightRadius    = 6;
+        btn.style.width = 28;
+        btn.style.height = 28;
+        btn.style.backgroundColor = FeldFarbe;
+        btn.style.color = Color.white;
+        btn.style.fontSize = 16;
+        btn.style.borderTopWidth = 0; btn.style.borderRightWidth = 0;
+        btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth = 0;
+        btn.style.borderTopLeftRadius = 6; btn.style.borderTopRightRadius = 6;
         btn.style.borderBottomLeftRadius = 6; btn.style.borderBottomRightRadius = 6;
-        btn.style.paddingTop    = 0; btn.style.paddingBottom = 0;
-        btn.style.paddingLeft   = 0; btn.style.paddingRight  = 0;
+        btn.style.paddingTop = 0; btn.style.paddingBottom = 0;
+        btn.style.paddingLeft = 0; btn.style.paddingRight = 0;
     }
 
     // ============================================================
@@ -883,9 +886,9 @@ public abstract class BelegScreenController : MonoBehaviour
                 return false;
             }
 
-            Company firma      = firmen[firmen.Count - 1];
-            string firmenname  = LiesFeld(firma, "name");
-            string adresse     = LiesFeld(firma, "location", "ort", "adresse", "address");
+            Company firma = firmen[firmen.Count - 1];
+            string firmenname = LiesFeld(firma, "name");
+            string adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
 
             if (string.IsNullOrWhiteSpace(firmenname) || string.IsNullOrWhiteSpace(adresse))
             {
@@ -917,34 +920,34 @@ public abstract class BelegScreenController : MonoBehaviour
         LadeDienstleistungen();
 
         var overlay = new VisualElement();
-        overlay.style.position        = Position.Absolute;
-        overlay.style.left            = 0; overlay.style.right  = 0;
-        overlay.style.top             = 0; overlay.style.bottom = 0;
+        overlay.style.position = Position.Absolute;
+        overlay.style.left = 0; overlay.style.right = 0;
+        overlay.style.top = 0; overlay.style.bottom = 0;
         overlay.style.backgroundColor = new Color(0f, 0f, 0f, 0.5f);
-        overlay.style.alignItems      = Align.Center;
-        overlay.style.justifyContent  = Justify.Center;
+        overlay.style.alignItems = Align.Center;
+        overlay.style.justifyContent = Justify.Center;
 
         var karte = new VisualElement();
-        karte.style.width                  = 500;
-        karte.style.backgroundColor        = KartenFarbe;
-        karte.style.borderTopLeftRadius    = 12; karte.style.borderTopRightRadius    = 12;
+        karte.style.width = 500;
+        karte.style.backgroundColor = KartenFarbe;
+        karte.style.borderTopLeftRadius = 12; karte.style.borderTopRightRadius = 12;
         karte.style.borderBottomLeftRadius = 12; karte.style.borderBottomRightRadius = 12;
-        karte.style.borderTopWidth         = 2;  karte.style.borderRightWidth        = 2;
-        karte.style.borderBottomWidth      = 2;  karte.style.borderLeftWidth         = 2;
-        karte.style.borderTopColor         = Gruen; karte.style.borderRightColor  = Gruen;
-        karte.style.borderBottomColor      = Gruen; karte.style.borderLeftColor   = Gruen;
-        karte.style.paddingTop             = 24; karte.style.paddingBottom        = 24;
-        karte.style.paddingLeft            = 24; karte.style.paddingRight         = 24;
+        karte.style.borderTopWidth = 2; karte.style.borderRightWidth = 2;
+        karte.style.borderBottomWidth = 2; karte.style.borderLeftWidth = 2;
+        karte.style.borderTopColor = Gruen; karte.style.borderRightColor = Gruen;
+        karte.style.borderBottomColor = Gruen; karte.style.borderLeftColor = Gruen;
+        karte.style.paddingTop = 24; karte.style.paddingBottom = 24;
+        karte.style.paddingLeft = 24; karte.style.paddingRight = 24;
 
         var titelZeile = new VisualElement();
-        titelZeile.style.flexDirection  = FlexDirection.Row;
+        titelZeile.style.flexDirection = FlexDirection.Row;
         titelZeile.style.justifyContent = Justify.SpaceBetween;
-        titelZeile.style.alignItems     = Align.Center;
-        titelZeile.style.marginBottom   = 16;
+        titelZeile.style.alignItems = Align.Center;
+        titelZeile.style.marginBottom = 16;
 
         var titel = new Label("Dienstleistung ausw\u00e4hlen");
-        titel.style.fontSize                = 16;
-        titel.style.color                   = Color.white;
+        titel.style.fontSize = 16;
+        titel.style.color = Color.white;
         titel.style.unityFontStyleAndWeight = FontStyle.Bold;
 
         var schliessen = new Button(() =>
@@ -953,11 +956,11 @@ public abstract class BelegScreenController : MonoBehaviour
             _dienstleistungPopup = null;
         })
         { text = "\u2715" };
-        schliessen.style.backgroundColor   = Color.clear;
-        schliessen.style.color             = new Color(0.7f, 0.7f, 0.7f);
-        schliessen.style.fontSize          = 14;
-        schliessen.style.borderTopWidth    = 0; schliessen.style.borderRightWidth  = 0;
-        schliessen.style.borderBottomWidth = 0; schliessen.style.borderLeftWidth   = 0;
+        schliessen.style.backgroundColor = Color.clear;
+        schliessen.style.color = new Color(0.7f, 0.7f, 0.7f);
+        schliessen.style.fontSize = 14;
+        schliessen.style.borderTopWidth = 0; schliessen.style.borderRightWidth = 0;
+        schliessen.style.borderBottomWidth = 0; schliessen.style.borderLeftWidth = 0;
 
         titelZeile.Add(titel);
         titelZeile.Add(schliessen);
@@ -968,18 +971,18 @@ public abstract class BelegScreenController : MonoBehaviour
             var hinweis = new Label(
                 "Keine Dienstleistungen hinterlegt.\n" +
                 "Bitte zuerst im Bereich Dienstleistungen anlegen.");
-            hinweis.style.color           = new Color(0.6f, 0.6f, 0.6f);
-            hinweis.style.fontSize        = 13;
-            hinweis.style.whiteSpace      = WhiteSpace.Normal;
-            hinweis.style.unityTextAlign  = TextAnchor.MiddleCenter;
-            hinweis.style.marginTop       = 20; hinweis.style.marginBottom = 20;
+            hinweis.style.color = new Color(0.6f, 0.6f, 0.6f);
+            hinweis.style.fontSize = 13;
+            hinweis.style.whiteSpace = WhiteSpace.Normal;
+            hinweis.style.unityTextAlign = TextAnchor.MiddleCenter;
+            hinweis.style.marginTop = 20; hinweis.style.marginBottom = 20;
             karte.Add(hinweis);
         }
         else
         {
             var dropdownLabel = new Label("Dienstleistung");
-            dropdownLabel.style.fontSize    = 12;
-            dropdownLabel.style.color       = new Color(0.7f, 0.7f, 0.7f);
+            dropdownLabel.style.fontSize = 12;
+            dropdownLabel.style.color = new Color(0.7f, 0.7f, 0.7f);
             dropdownLabel.style.marginBottom = 4;
             karte.Add(dropdownLabel);
 
@@ -995,19 +998,19 @@ public abstract class BelegScreenController : MonoBehaviour
             var eingabe = dropdown.Q(className: "unity-base-popup-field__input");
             if (eingabe != null)
             {
-                eingabe.style.backgroundColor        = FeldFarbe;
-                eingabe.style.color                  = Color.white;
-                eingabe.style.borderTopWidth         = 0; eingabe.style.borderRightWidth  = 0;
-                eingabe.style.borderBottomWidth      = 0; eingabe.style.borderLeftWidth   = 0;
-                eingabe.style.borderTopLeftRadius    = 6; eingabe.style.borderTopRightRadius    = 6;
+                eingabe.style.backgroundColor = FeldFarbe;
+                eingabe.style.color = Color.white;
+                eingabe.style.borderTopWidth = 0; eingabe.style.borderRightWidth = 0;
+                eingabe.style.borderBottomWidth = 0; eingabe.style.borderLeftWidth = 0;
+                eingabe.style.borderTopLeftRadius = 6; eingabe.style.borderTopRightRadius = 6;
                 eingabe.style.borderBottomLeftRadius = 6; eingabe.style.borderBottomRightRadius = 6;
                 eingabe.style.paddingLeft = 10;
             }
             karte.Add(dropdown);
 
             var mengeLabel = new Label("Menge");
-            mengeLabel.style.fontSize     = 12;
-            mengeLabel.style.color        = new Color(0.7f, 0.7f, 0.7f);
+            mengeLabel.style.fontSize = 12;
+            mengeLabel.style.color = new Color(0.7f, 0.7f, 0.7f);
             mengeLabel.style.marginBottom = 4;
             karte.Add(mengeLabel);
 
@@ -1023,9 +1026,9 @@ public abstract class BelegScreenController : MonoBehaviour
                 if (idx < 0 || idx >= _dienstleistungen.Count) return;
 
                 var service = _dienstleistungen[idx];
-                int menge   = 1;
+                int menge = 1;
                 int.TryParse(mengeFeld.value, out menge);
-                if (menge < 1) menge = 1;
+                menge = BegrenzeMenge(menge);
 
                 FuegeZeileAusDienstleistungHinzu(service, menge);
                 overlay.RemoveFromHierarchy();
@@ -1033,15 +1036,15 @@ public abstract class BelegScreenController : MonoBehaviour
             })
             { text = "Hinzuf\u00fcgen" };
 
-            btnHinzufuegen.style.height                    = 40;
-            btnHinzufuegen.style.backgroundColor           = Gruen;
-            btnHinzufuegen.style.color                     = new Color(0.12f, 0.12f, 0.12f);
-            btnHinzufuegen.style.fontSize                  = 13;
-            btnHinzufuegen.style.unityFontStyleAndWeight   = FontStyle.Bold;
-            btnHinzufuegen.style.borderTopWidth            = 0; btnHinzufuegen.style.borderRightWidth  = 0;
-            btnHinzufuegen.style.borderBottomWidth         = 0; btnHinzufuegen.style.borderLeftWidth   = 0;
-            btnHinzufuegen.style.borderTopLeftRadius       = 8; btnHinzufuegen.style.borderTopRightRadius    = 8;
-            btnHinzufuegen.style.borderBottomLeftRadius    = 8; btnHinzufuegen.style.borderBottomRightRadius = 8;
+            btnHinzufuegen.style.height = 40;
+            btnHinzufuegen.style.backgroundColor = Gruen;
+            btnHinzufuegen.style.color = new Color(0.12f, 0.12f, 0.12f);
+            btnHinzufuegen.style.fontSize = 13;
+            btnHinzufuegen.style.unityFontStyleAndWeight = FontStyle.Bold;
+            btnHinzufuegen.style.borderTopWidth = 0; btnHinzufuegen.style.borderRightWidth = 0;
+            btnHinzufuegen.style.borderBottomWidth = 0; btnHinzufuegen.style.borderLeftWidth = 0;
+            btnHinzufuegen.style.borderTopLeftRadius = 8; btnHinzufuegen.style.borderTopRightRadius = 8;
+            btnHinzufuegen.style.borderBottomLeftRadius = 8; btnHinzufuegen.style.borderBottomRightRadius = 8;
             karte.Add(btnHinzufuegen);
         }
 
@@ -1065,59 +1068,62 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         if (_positionenListe == null) return;
 
-        var zeile  = new PositionsZeile();
+        menge = BegrenzeMenge(menge);
+        float preisProEinheit = BegrenzePreis((float)service.price);
+
+        var zeile = new PositionsZeile();
         var wurzel = new VisualElement();
         wurzel.AddToClassList("angebot-position-row");
         wurzel.style.flexDirection = FlexDirection.Row;
-        wurzel.style.alignItems    = Align.Center;
-        wurzel.style.paddingTop    = 6;
+        wurzel.style.alignItems = Align.Center;
+        wurzel.style.paddingTop = 6;
         wurzel.style.paddingBottom = 6;
 
         var punkt = new VisualElement();
-        punkt.style.width              = 10; punkt.style.height = 10;
-        punkt.style.borderTopLeftRadius    = 5; punkt.style.borderTopRightRadius    = 5;
+        punkt.style.width = 10; punkt.style.height = 10;
+        punkt.style.borderTopLeftRadius = 5; punkt.style.borderTopRightRadius = 5;
         punkt.style.borderBottomLeftRadius = 5; punkt.style.borderBottomRightRadius = 5;
         punkt.style.backgroundColor = Gruen;
-        punkt.style.flexShrink      = 0; punkt.style.marginRight = 8;
+        punkt.style.flexShrink = 0; punkt.style.marginRight = 8;
 
         zeile.Artikel = ErstelleZeilenLabel(service.name, true);
         zeile.Artikel.style.flexGrow = 1;
         zeile.Artikel.style.minWidth = 120;
 
         zeile.Beschreibung = ErstelleZeilenLabel(service.description, false);
-        zeile.Beschreibung.style.width       = 220;
+        zeile.Beschreibung.style.width = 220;
         zeile.Beschreibung.style.marginRight = 8;
 
         zeile.Menge = NeuesTextFeld();
-        zeile.Menge.style.width       = 70;
+        zeile.Menge.style.width = 70;
         zeile.Menge.style.marginRight = 8;
         zeile.Menge.SetValueWithoutNotify(menge.ToString());
         NurGanzeZahlen(zeile.Menge);
 
         zeile.Einheit = ErstelleZeilenLabel(
             string.IsNullOrEmpty(service.priceModel) ? "St\u00fcck" : service.priceModel, false);
-        zeile.Einheit.style.width       = 110;
+        zeile.Einheit.style.width = 110;
         zeile.Einheit.style.marginRight = 8;
 
-        zeile.Preis = ErstelleZeilenLabel(((float)service.price).ToString("F2", De), false);
-        zeile.Preis.style.width       = 110;
+        zeile.Preis = ErstelleZeilenLabel(preisProEinheit.ToString("F2", De), false);
+        zeile.Preis.style.width = 110;
         zeile.Preis.style.marginRight = 8;
 
-        float gesamt  = menge * (float)service.price;
-        zeile.Gesamt  = new Label(FormatBetrag(gesamt));
-        zeile.Gesamt.style.width          = 110;
-        zeile.Gesamt.style.fontSize       = 13;
-        zeile.Gesamt.style.color          = new Color(0.86f, 0.86f, 0.86f);
+        float gesamt = menge * preisProEinheit;
+        zeile.Gesamt = new Label(FormatBetrag(gesamt));
+        zeile.Gesamt.style.width = 110;
+        zeile.Gesamt.style.fontSize = 13;
+        zeile.Gesamt.style.color = new Color(0.86f, 0.86f, 0.86f);
         zeile.Gesamt.style.unityTextAlign = TextAnchor.MiddleRight;
 
         var loeschen = new Button { text = "\u2715" };
-        loeschen.style.width              = 26; loeschen.style.height = 26;
-        loeschen.style.marginLeft         = 8;
-        loeschen.style.backgroundColor   = Color.clear;
-        loeschen.style.color             = new Color(0.6f, 0.6f, 0.6f);
-        loeschen.style.fontSize          = 12;
-        loeschen.style.borderTopWidth    = 0; loeschen.style.borderRightWidth  = 0;
-        loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth   = 0;
+        loeschen.style.width = 26; loeschen.style.height = 26;
+        loeschen.style.marginLeft = 8;
+        loeschen.style.backgroundColor = Color.clear;
+        loeschen.style.color = new Color(0.6f, 0.6f, 0.6f);
+        loeschen.style.fontSize = 12;
+        loeschen.style.borderTopWidth = 0; loeschen.style.borderRightWidth = 0;
+        loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth = 0;
         loeschen.RegisterCallback<MouseEnterEvent>(_ => loeschen.style.color = Rot);
         loeschen.RegisterCallback<MouseLeaveEvent>(_ =>
             loeschen.style.color = new Color(0.6f, 0.6f, 0.6f));
@@ -1128,12 +1134,17 @@ public abstract class BelegScreenController : MonoBehaviour
             BerechneSummen();
         });
 
-        float preisProEinheit = (float)service.price;
         zeile.Menge.RegisterValueChangedCallback(_ =>
         {
             int m = 1;
             int.TryParse(zeile.Menge.value, out m);
-            if (m < 1) m = 1;
+            m = BegrenzeMenge(m);
+
+            if (zeile.Menge.value != m.ToString())
+            {
+                zeile.Menge.SetValueWithoutNotify(m.ToString());
+            }
+
             zeile.Gesamt.text = FormatBetrag(m * preisProEinheit);
             BerechneSummen();
         });
@@ -1157,11 +1168,11 @@ public abstract class BelegScreenController : MonoBehaviour
     protected Label ErstelleZeilenLabel(string text, bool bold)
     {
         var label = new Label(text);
-        label.style.fontSize                = 13;
-        label.style.color                   = new Color(0.86f, 0.86f, 0.86f);
+        label.style.fontSize = 13;
+        label.style.color = new Color(0.86f, 0.86f, 0.86f);
         label.style.unityFontStyleAndWeight = bold ? FontStyle.Bold : FontStyle.Normal;
-        label.style.overflow                = Overflow.Hidden;
-        label.style.whiteSpace              = WhiteSpace.NoWrap;
+        label.style.overflow = Overflow.Hidden;
+        label.style.whiteSpace = WhiteSpace.NoWrap;
         return label;
     }
 
@@ -1174,35 +1185,35 @@ public abstract class BelegScreenController : MonoBehaviour
         float netto = 0f;
         foreach (var zeile in _zeilen)
         {
-            int   menge = 1;
-            float preis = 0f;
+            int menge = 1;
             int.TryParse(zeile.Menge.value, out menge);
-            if (menge < 1) menge = 1;
-            preis = ParseBetrag(zeile.Preis.text);
+            menge = BegrenzeMenge(menge);
+
+            float preis = BegrenzePreis(ParseBetrag(zeile.Preis.text));
             float gz = menge * preis;
             zeile.Gesamt.text = FormatBetrag(gz);
             netto += gz;
         }
 
         float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
-        string typ       = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-        float rabatt     = 0f;
-        if (typ == "Prozent")      rabatt = netto * rabattWert / 100f;
+        string typ = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
+        float rabatt = 0f;
+        if (typ == "Prozent") rabatt = netto * rabattWert / 100f;
         else if (typ == "Festbetrag") rabatt = rabattWert;
 
         float nettoNachRabatt = netto - rabatt;
-        float skontoWert      = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-        float skonto          = nettoNachRabatt * skontoWert / 100f;
+        float skontoWert = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+        float skonto = nettoNachRabatt * skontoWert / 100f;
 
-        float mwstSatz    = HoleMwstSatz();
-        float mwst        = nettoNachRabatt * mwstSatz;
+        float mwstSatz = HoleMwstSatz();
+        float mwst = nettoNachRabatt * mwstSatz;
         float gesamtSumme = nettoNachRabatt + mwst - skonto;
 
-        if (_nettoLabel           != null) _nettoLabel.text           = FormatBetrag(netto);
-        if (_rabattLabel          != null) _rabattLabel.text          = FormatBetrag(rabatt);
-        if (_mwstLabel            != null) _mwstLabel.text            = FormatBetrag(mwst);
-        if (_skontoLabel          != null) _skontoLabel.text          = FormatBetrag(skonto);
-        if (_gesamtLabel          != null) _gesamtLabel.text          = FormatBetrag(gesamtSumme);
+        if (_nettoLabel != null) _nettoLabel.text = FormatBetrag(netto);
+        if (_rabattLabel != null) _rabattLabel.text = FormatBetrag(rabatt);
+        if (_mwstLabel != null) _mwstLabel.text = FormatBetrag(mwst);
+        if (_skontoLabel != null) _skontoLabel.text = FormatBetrag(skonto);
+        if (_gesamtLabel != null) _gesamtLabel.text = FormatBetrag(gesamtSumme);
         if (_mwstBezeichnungLabel != null) _mwstBezeichnungLabel.text = "MwSt. (" + HoleMwstProzentAnzeige() + ")";
     }
 
@@ -1223,13 +1234,13 @@ public abstract class BelegScreenController : MonoBehaviour
         if (_kundensuche == null) return;
 
         _suchErgebnisListe = new VisualElement();
-        _suchErgebnisListe.style.display             = DisplayStyle.None;
-        _suchErgebnisListe.style.backgroundColor     = new Color(45f / 255f, 45f / 255f, 45f / 255f);
-        _suchErgebnisListe.style.borderTopWidth      = 1; _suchErgebnisListe.style.borderRightWidth  = 1;
-        _suchErgebnisListe.style.borderBottomWidth   = 1; _suchErgebnisListe.style.borderLeftWidth   = 1;
-        _suchErgebnisListe.style.borderTopColor      = Gruen; _suchErgebnisListe.style.borderRightColor  = Gruen;
-        _suchErgebnisListe.style.borderBottomColor   = Gruen; _suchErgebnisListe.style.borderLeftColor   = Gruen;
-        _suchErgebnisListe.style.borderTopLeftRadius    = 6; _suchErgebnisListe.style.borderTopRightRadius    = 6;
+        _suchErgebnisListe.style.display = DisplayStyle.None;
+        _suchErgebnisListe.style.backgroundColor = new Color(45f / 255f, 45f / 255f, 45f / 255f);
+        _suchErgebnisListe.style.borderTopWidth = 1; _suchErgebnisListe.style.borderRightWidth = 1;
+        _suchErgebnisListe.style.borderBottomWidth = 1; _suchErgebnisListe.style.borderLeftWidth = 1;
+        _suchErgebnisListe.style.borderTopColor = Gruen; _suchErgebnisListe.style.borderRightColor = Gruen;
+        _suchErgebnisListe.style.borderBottomColor = Gruen; _suchErgebnisListe.style.borderLeftColor = Gruen;
+        _suchErgebnisListe.style.borderTopLeftRadius = 6; _suchErgebnisListe.style.borderTopRightRadius = 6;
         _suchErgebnisListe.style.borderBottomLeftRadius = 6; _suchErgebnisListe.style.borderBottomRightRadius = 6;
         _suchErgebnisListe.style.marginTop = 4;
 
@@ -1255,18 +1266,18 @@ public abstract class BelegScreenController : MonoBehaviour
             return;
         }
 
-        string suche   = suchtext.Trim().ToLowerInvariant();
-        var    treffer = kunden
+        string suche = suchtext.Trim().ToLowerInvariant();
+        var treffer = kunden
             .Where(k => KundenAnzeige(k).ToLowerInvariant().Contains(suche))
             .Take(6).ToList();
 
         if (treffer.Count == 0)
         {
             var hinweis = new Label("Kein Kunde gefunden");
-            hinweis.style.color         = new Color(0.6f, 0.6f, 0.6f);
-            hinweis.style.fontSize      = 12;
-            hinweis.style.paddingLeft   = 10;
-            hinweis.style.paddingTop    = 6;
+            hinweis.style.color = new Color(0.6f, 0.6f, 0.6f);
+            hinweis.style.fontSize = 12;
+            hinweis.style.paddingLeft = 10;
+            hinweis.style.paddingTop = 6;
             hinweis.style.paddingBottom = 6;
             _suchErgebnisListe.Add(hinweis);
         }
@@ -1275,12 +1286,12 @@ public abstract class BelegScreenController : MonoBehaviour
             foreach (var kunde in treffer)
             {
                 var aktuellerKunde = kunde;
-                var eintrag        = new Label(KundenAnzeige(aktuellerKunde));
-                eintrag.style.color         = Color.white;
-                eintrag.style.fontSize      = 13;
-                eintrag.style.paddingLeft   = 10;
-                eintrag.style.paddingRight  = 10;
-                eintrag.style.paddingTop    = 6;
+                var eintrag = new Label(KundenAnzeige(aktuellerKunde));
+                eintrag.style.color = Color.white;
+                eintrag.style.fontSize = 13;
+                eintrag.style.paddingLeft = 10;
+                eintrag.style.paddingRight = 10;
+                eintrag.style.paddingTop = 6;
                 eintrag.style.paddingBottom = 6;
                 eintrag.RegisterCallback<MouseEnterEvent>(_ =>
                     eintrag.style.backgroundColor = new Color(Gruen.r, Gruen.g, Gruen.b, 0.2f));
@@ -1295,9 +1306,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void WaehleKunde(Customer kunde)
     {
-        _ausgewaehlterKundeId      = kunde.id;
+        _ausgewaehlterKundeId = kunde.id;
         _ausgewaehlterKundeAdresse = KundenAdresse(kunde);
-        _ausgewaehlterKunde        = KundenAnzeige(kunde);
+        _ausgewaehlterKunde = KundenAnzeige(kunde);
         _kundensuche.SetValueWithoutNotify(_ausgewaehlterKunde);
         _suchErgebnisListe.style.display = DisplayStyle.None;
 
@@ -1320,38 +1331,38 @@ public abstract class BelegScreenController : MonoBehaviour
         _anhangAusgewaehlt.Clear();
 
         var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
-        var alleTitel  = BelegAnhangController.HoleAlleBezahlweiseTitel();
+        var alleTitel = BelegAnhangController.HoleAlleBezahlweiseTitel();
 
         foreach (string key in alleTitel)
         {
-            bool vorhanden  = verfuegbar.ContainsKey(key) && verfuegbar[key];
+            bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
             _anhangAusgewaehlt[key] = false;
             string lokalerKey = key;
 
             var zeile = new VisualElement();
-            zeile.style.flexDirection  = FlexDirection.Row;
-            zeile.style.alignItems     = Align.Center;
-            zeile.style.marginBottom   = 4;
-            zeile.style.paddingTop     = 4; zeile.style.paddingBottom = 4;
-            zeile.style.paddingLeft    = 8; zeile.style.paddingRight  = 8;
-            zeile.style.borderTopLeftRadius    = 6; zeile.style.borderTopRightRadius    = 6;
+            zeile.style.flexDirection = FlexDirection.Row;
+            zeile.style.alignItems = Align.Center;
+            zeile.style.marginBottom = 4;
+            zeile.style.paddingTop = 4; zeile.style.paddingBottom = 4;
+            zeile.style.paddingLeft = 8; zeile.style.paddingRight = 8;
+            zeile.style.borderTopLeftRadius = 6; zeile.style.borderTopRightRadius = 6;
             zeile.style.borderBottomLeftRadius = 6; zeile.style.borderBottomRightRadius = 6;
             zeile.style.backgroundColor = vorhanden
                 ? new Color(55f / 255f, 55f / 255f, 55f / 255f)
                 : new Color(40f / 255f, 40f / 255f, 40f / 255f);
 
             var box = new VisualElement();
-            box.style.width              = 18; box.style.height = 18;
-            box.style.flexShrink         = 0; box.style.marginRight = 8;
-            box.style.borderTopLeftRadius    = 4; box.style.borderTopRightRadius    = 4;
+            box.style.width = 18; box.style.height = 18;
+            box.style.flexShrink = 0; box.style.marginRight = 8;
+            box.style.borderTopLeftRadius = 4; box.style.borderTopRightRadius = 4;
             box.style.borderBottomLeftRadius = 4; box.style.borderBottomRightRadius = 4;
-            box.style.borderTopWidth    = 1; box.style.borderRightWidth  = 1;
-            box.style.borderBottomWidth = 1; box.style.borderLeftWidth   = 1;
-            box.style.alignItems    = Align.Center;
+            box.style.borderTopWidth = 1; box.style.borderRightWidth = 1;
+            box.style.borderBottomWidth = 1; box.style.borderLeftWidth = 1;
+            box.style.alignItems = Align.Center;
             box.style.justifyContent = Justify.Center;
 
             var haken = new Label("");
-            haken.style.fontSize       = 11;
+            haken.style.fontSize = 11;
             haken.style.unityTextAlign = TextAnchor.MiddleCenter;
             box.Add(haken);
 
@@ -1359,7 +1370,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
             var label = new Label(key);
             label.style.fontSize = 12;
-            label.style.color    = vorhanden ? Color.white : new Color(0.5f, 0.5f, 0.5f);
+            label.style.color = vorhanden ? Color.white : new Color(0.5f, 0.5f, 0.5f);
             label.style.flexGrow = 1;
 
             zeile.Add(box);
@@ -1368,9 +1379,9 @@ public abstract class BelegScreenController : MonoBehaviour
             if (!vorhanden)
             {
                 var fehlt = new Label("(nicht im Pool)");
-                fehlt.style.fontSize    = 10;
-                fehlt.style.color       = new Color(0.4f, 0.4f, 0.4f);
-                fehlt.style.marginLeft  = 4;
+                fehlt.style.fontSize = 10;
+                fehlt.style.color = new Color(0.4f, 0.4f, 0.4f);
+                fehlt.style.marginLeft = 4;
                 zeile.Add(fehlt);
             }
 
@@ -1407,34 +1418,34 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         if (!vorhanden)
         {
-            box.style.backgroundColor   = new Color(35f / 255f, 35f / 255f, 35f / 255f);
-            box.style.borderTopColor    = new Color(0.3f, 0.3f, 0.3f);
-            box.style.borderRightColor  = new Color(0.3f, 0.3f, 0.3f);
+            box.style.backgroundColor = new Color(35f / 255f, 35f / 255f, 35f / 255f);
+            box.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f);
+            box.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f);
             box.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f);
-            box.style.borderLeftColor   = new Color(0.3f, 0.3f, 0.3f);
-            haken.text        = "";
+            box.style.borderLeftColor = new Color(0.3f, 0.3f, 0.3f);
+            haken.text = "";
             haken.style.color = Color.clear;
             return;
         }
 
         if (ausgewaehlt)
         {
-            box.style.backgroundColor   = Gruen;
-            box.style.borderTopColor    = Gruen;
-            box.style.borderRightColor  = Gruen;
+            box.style.backgroundColor = Gruen;
+            box.style.borderTopColor = Gruen;
+            box.style.borderRightColor = Gruen;
             box.style.borderBottomColor = Gruen;
-            box.style.borderLeftColor   = Gruen;
-            haken.text        = "\u2713";
+            box.style.borderLeftColor = Gruen;
+            haken.text = "\u2713";
             haken.style.color = new Color(38f / 255f, 38f / 255f, 38f / 255f);
         }
         else
         {
-            box.style.backgroundColor   = new Color(70f / 255f, 70f / 255f, 70f / 255f);
-            box.style.borderTopColor    = new Color(100f / 255f, 100f / 255f, 100f / 255f);
-            box.style.borderRightColor  = new Color(100f / 255f, 100f / 255f, 100f / 255f);
+            box.style.backgroundColor = new Color(70f / 255f, 70f / 255f, 70f / 255f);
+            box.style.borderTopColor = new Color(100f / 255f, 100f / 255f, 100f / 255f);
+            box.style.borderRightColor = new Color(100f / 255f, 100f / 255f, 100f / 255f);
             box.style.borderBottomColor = new Color(100f / 255f, 100f / 255f, 100f / 255f);
-            box.style.borderLeftColor   = new Color(100f / 255f, 100f / 255f, 100f / 255f);
-            haken.text        = "";
+            box.style.borderLeftColor = new Color(100f / 255f, 100f / 255f, 100f / 255f);
+            haken.text = "";
             haken.style.color = Color.clear;
         }
     }
@@ -1466,21 +1477,21 @@ public abstract class BelegScreenController : MonoBehaviour
                 return;
             }
 
-            float netto      = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+            float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
             float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
             string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-            float rabatt     = 0f;
+            float rabatt = 0f;
 
-            if (rabattTyp == "Prozent")         rabatt = netto * rabattWert / 100f;
+            if (rabattTyp == "Prozent") rabatt = netto * rabattWert / 100f;
             else if (rabattTyp == "Festbetrag") rabatt = rabattWert;
 
-            float mwstSatz       = HoleMwstSatz();
-            float steuerBasis    = netto - rabatt;
-            float steuer         = steuerBasis * mwstSatz;
+            float mwstSatz = HoleMwstSatz();
+            float steuerBasis = netto - rabatt;
+            float steuer = steuerBasis * mwstSatz;
             float zwischenbetrag = steuerBasis + steuer;
-            float skontoProzent  = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-            float skonto         = zwischenbetrag * skontoProzent / 100f;
-            float finalTotal     = zwischenbetrag - skonto;
+            float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+            float skonto = zwischenbetrag * skontoProzent / 100f;
+            float finalTotal = zwischenbetrag - skonto;
 
             PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
             string rawUserId = currentUser.userId.Replace("user_", "");
@@ -1490,24 +1501,24 @@ public abstract class BelegScreenController : MonoBehaviour
             {
                 Offer offer = new Offer
                 {
-                    customerId      = _ausgewaehlterKundeId,
-                    customerName    = _ausgewaehlterKunde,
+                    customerId = _ausgewaehlterKundeId,
+                    customerName = _ausgewaehlterKunde,
                     customerAddress = _ausgewaehlterKundeAdresse,
-                    companyName     = HoleCompanyName(db),
-                    companyAddress  = HoleCompanyAddress(db),
-                    offerNumber     = _nummerFeld != null ? _nummerFeld.value : "",
-                    date            = _datumFeld  != null ? _datumFeld.value  : DateTime.Now.ToString("dd.MM.yyyy"),
-                    validUntil      = _fristFeld  != null ? _fristFeld.value  : "",
-                    status          = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
-                    subtotal        = netto,
-                    discount        = rabatt,
-                    extraCosts      = skonto,
-                    tax             = steuer,
-                    total           = finalTotal,
-                    notes           = _notizenFeld != null ? _notizenFeld.value : "",
+                    companyName = HoleCompanyName(db),
+                    companyAddress = HoleCompanyAddress(db),
+                    offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                    date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                    validUntil = _fristFeld != null ? _fristFeld.value : "",
+                    status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                    subtotal = netto,
+                    discount = rabatt,
+                    extraCosts = skonto,
+                    tax = steuer,
+                    total = finalTotal,
+                    notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
-                    cashbookEntryId  = 0,
-                    bookingDate      = ""
+                    cashbookEntryId = 0,
+                    bookingDate = ""
                 };
 
                 int offerId = db.createOffer(offer);
@@ -1517,11 +1528,11 @@ public abstract class BelegScreenController : MonoBehaviour
                 {
                     OfferItem item = new OfferItem
                     {
-                        offerId       = offerId,
-                        articleNumber = zeile.Artikel     != null ? zeile.Artikel.text     : "",
-                        description   = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                        quantity      = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-                        unitPrice     = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                        offerId = offerId,
+                        articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+                        description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                        quantity = BegrenzeMenge(Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"))),
+                        unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
                     };
                     db.createOfferItem(item);
                     items.Add(item);
@@ -1533,24 +1544,24 @@ public abstract class BelegScreenController : MonoBehaviour
             {
                 Invoice invoice = new Invoice
                 {
-                    customerId      = _ausgewaehlterKundeId,
-                    customerName    = _ausgewaehlterKunde,
+                    customerId = _ausgewaehlterKundeId,
+                    customerName = _ausgewaehlterKunde,
                     customerAddress = _ausgewaehlterKundeAdresse,
-                    companyName     = HoleCompanyName(db),
-                    companyAddress  = HoleCompanyAddress(db),
-                    invoiceNumber   = _nummerFeld != null ? _nummerFeld.value : "",
-                    date            = _datumFeld  != null ? _datumFeld.value  : DateTime.Now.ToString("dd.MM.yyyy"),
-                    dueDate         = _fristFeld  != null ? _fristFeld.value  : "",
-                    status          = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
-                    subtotal        = netto,
-                    discount        = rabatt,
-                    extraCosts      = skonto,
-                    tax             = steuer,
-                    total           = finalTotal,
-                    notes           = _notizenFeld != null ? _notizenFeld.value : "",
+                    companyName = HoleCompanyName(db),
+                    companyAddress = HoleCompanyAddress(db),
+                    invoiceNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                    date = _datumFeld != null ? _datumFeld.value : DateTime.Now.ToString("dd.MM.yyyy"),
+                    dueDate = _fristFeld != null ? _fristFeld.value : "",
+                    status = _statusDropdown != null ? _statusDropdown.value : "Entwurf",
+                    subtotal = netto,
+                    discount = rabatt,
+                    extraCosts = skonto,
+                    tax = steuer,
+                    total = finalTotal,
+                    notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
-                    cashbookEntryId  = 0,
-                    bookingDate      = ""
+                    cashbookEntryId = 0,
+                    bookingDate = ""
                 };
 
                 int invoiceId = db.createInvoice(invoice);
@@ -1559,11 +1570,11 @@ public abstract class BelegScreenController : MonoBehaviour
                 {
                     InvoiceItem item = new InvoiceItem
                     {
-                        invoiceId     = invoiceId,
-                        articleNumber = zeile.Artikel     != null ? zeile.Artikel.text     : "",
-                        description   = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                        quantity      = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-                        unitPrice     = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                        invoiceId = invoiceId,
+                        articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+                        description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                        quantity = BegrenzeMenge(Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"))),
+                        unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
                     };
                     db.createInvoiceItem(item);
                 }
@@ -1572,9 +1583,9 @@ public abstract class BelegScreenController : MonoBehaviour
                 InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db, HoleAusgewaehlteAnhaenge());
             }
 
-           NachSpeichernHook();
-           ResetBelegFormular();
-           FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
+            NachSpeichernHook();
+            ResetBelegFormular();
+            FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
         }
         catch (Exception e)
         {
@@ -1606,12 +1617,12 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         try
         {
-            var db     = UserDatabaseAccess.getCurrentUserDatabase();
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
             float gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
             string nummer = _nummerFeld != null ? _nummerFeld.value : "";
-            string kunde  = !string.IsNullOrEmpty(_ausgewaehlterKunde)
+            string kunde = !string.IsNullOrEmpty(_ausgewaehlterKunde)
                              ? " - " + _ausgewaehlterKunde : "";
-            string datum  = _datumFeld != null && !string.IsNullOrWhiteSpace(_datumFeld.value)
+            string datum = _datumFeld != null && !string.IsNullOrWhiteSpace(_datumFeld.value)
                              ? _datumFeld.value
                              : DateTime.Now.ToString("dd.MM.yyyy");
 
@@ -1638,8 +1649,8 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string nummer      = _nummerFeld != null ? _nummerFeld.value : BelegTyp;
-            string zielPfad    = System.IO.Path.Combine(desktopPath, nummer + "_" + zeitstempel + ".pdf");
+            string nummer = _nummerFeld != null ? _nummerFeld.value : BelegTyp;
+            string zielPfad = System.IO.Path.Combine(desktopPath, nummer + "_" + zeitstempel + ".pdf");
 
             using (var fs = new System.IO.FileStream(
                 zielPfad, System.IO.FileMode.Create,
@@ -1651,11 +1662,11 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 var titelFont = iTextSharp.text.FontFactory.GetFont(
                     iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
-                var textFont  = iTextSharp.text.FontFactory.GetFont(
+                var textFont = iTextSharp.text.FontFactory.GetFont(
                     iTextSharp.text.FontFactory.HELVETICA, 11);
-                var subFont   = iTextSharp.text.FontFactory.GetFont(
+                var subFont = iTextSharp.text.FontFactory.GetFont(
                     iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
-                var fettFont  = iTextSharp.text.FontFactory.GetFont(
+                var fettFont = iTextSharp.text.FontFactory.GetFont(
                     iTextSharp.text.FontFactory.HELVETICA_BOLD, 13);
 
                 var linie = new iTextSharp.text.pdf.draw.LineSeparator();
@@ -1672,9 +1683,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 foreach (var zeile in _zeilen)
                 {
-                    int   menge  = 1;
+                    int menge = 1;
                     int.TryParse(zeile.Menge.value, out menge);
-                    float preis  = ParseBetrag(zeile.Preis.text);
+                    float preis = ParseBetrag(zeile.Preis.text);
                     float gesamt = menge * preis;
 
                     string zeileText = zeile.Artikel.text
@@ -1692,7 +1703,7 @@ public abstract class BelegScreenController : MonoBehaviour
                 document.Add(new iTextSharp.text.Paragraph(" "));
 
                 document.Add(new iTextSharp.text.Paragraph(
-                    "Netto (EUR):       " + (_nettoLabel  != null ? _nettoLabel.text  : ""), textFont));
+                    "Netto (EUR):       " + (_nettoLabel != null ? _nettoLabel.text : ""), textFont));
                 document.Add(new iTextSharp.text.Paragraph(
                     "Rabatt:            " + (_rabattLabel != null ? _rabattLabel.text : ""), textFont));
                 document.Add(new iTextSharp.text.Paragraph(
@@ -1707,7 +1718,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName       = zielPfad,
+                FileName = zielPfad,
                 UseShellExecute = true
             });
 
@@ -1773,7 +1784,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
         feld.RegisterValueChangedCallback(evt =>
         {
-            string neu = evt.newValue   ?? "";
+            string neu = evt.newValue ?? "";
             string alt = evt.previousValue ?? "";
             if (neu.Length <= alt.Length) return;
 
@@ -1794,16 +1805,16 @@ public abstract class BelegScreenController : MonoBehaviour
 
             if (formatiert == neu) return;
 
-            int cursorVorher  = feld.cursorIndex;
+            int cursorVorher = feld.cursorIndex;
             int cursorNachher = cursorVorher + (formatiert.Length - neu.Length);
-            if (cursorNachher < 0)               cursorNachher = 0;
+            if (cursorNachher < 0) cursorNachher = 0;
             if (cursorNachher > formatiert.Length) cursorNachher = formatiert.Length;
 
             feld.SetValueWithoutNotify(formatiert);
             feld.schedule.Execute(() =>
             {
-                feld.cursorIndex  = cursorNachher;
-                feld.selectIndex  = cursorNachher;
+                feld.cursorIndex = cursorNachher;
+                feld.selectIndex = cursorNachher;
             });
         });
     }
@@ -1817,11 +1828,11 @@ public abstract class BelegScreenController : MonoBehaviour
         var eingabe = feld.Q(className: "unity-base-field__input");
         if (eingabe != null)
         {
-            eingabe.style.backgroundColor        = FeldFarbe;
-            eingabe.style.color                  = Color.white;
-            eingabe.style.borderTopWidth         = 0; eingabe.style.borderRightWidth  = 0;
-            eingabe.style.borderBottomWidth      = 0; eingabe.style.borderLeftWidth   = 0;
-            eingabe.style.borderTopLeftRadius    = 6; eingabe.style.borderTopRightRadius    = 6;
+            eingabe.style.backgroundColor = FeldFarbe;
+            eingabe.style.color = Color.white;
+            eingabe.style.borderTopWidth = 0; eingabe.style.borderRightWidth = 0;
+            eingabe.style.borderBottomWidth = 0; eingabe.style.borderLeftWidth = 0;
+            eingabe.style.borderTopLeftRadius = 6; eingabe.style.borderTopRightRadius = 6;
             eingabe.style.borderBottomLeftRadius = 6; eingabe.style.borderBottomRightRadius = 6;
             eingabe.style.paddingLeft = 8;
         }
@@ -1881,9 +1892,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
     protected string KundenAnzeige(object kunde)
     {
-        string vorname  = LiesFeld(kunde, "vorname", "firstName");
+        string vorname = LiesFeld(kunde, "vorname", "firstName");
         string nachname = LiesFeld(kunde, "nachname", "lastName", "name", "firma");
-        string anzeige  = (vorname + " " + nachname).Trim();
+        string anzeige = (vorname + " " + nachname).Trim();
         return string.IsNullOrEmpty(anzeige) ? "Unbenannter Kunde" : anzeige;
     }
 
@@ -1915,8 +1926,8 @@ public abstract class BelegScreenController : MonoBehaviour
     protected string HoleCompanyAddress(DataBase db)
     {
         string strasse = "";
-        string plz     = "";
-        string ort     = "";
+        string plz = "";
+        string ort = "";
 
         if (db != null)
         {
@@ -1924,9 +1935,9 @@ public abstract class BelegScreenController : MonoBehaviour
             if (companies != null && companies.Count > 0)
             {
                 Company f = companies[companies.Count - 1];
-                strasse   = f.strasseuHausNr ?? "";
-                plz       = f.plz > 0 ? f.plz.ToString() : "";
-                ort       = f.location ?? "";
+                strasse = f.strasseuHausNr ?? "";
+                plz = f.plz > 0 ? f.plz.ToString() : "";
+                ort = f.location ?? "";
             }
         }
 
@@ -1943,17 +1954,17 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         var snap = new BelegSessionDaten.BelegSnapshot
         {
-            Nummer      = _nummerFeld     != null ? _nummerFeld.value     : "",
-            Status      = _statusDropdown != null ? _statusDropdown.value : "",
-            Datum       = _datumFeld      != null ? _datumFeld.value      : "",
-            Frist       = _fristFeld      != null ? _fristFeld.value      : "",
-            Referenz    = Root.Q<TextField>(ReferenzFeldName)?.value ?? "",
-            RabattTyp   = _rabattTypDropdown != null ? _rabattTypDropdown.value : "",
-            RabattWert  = _rabattWertFeld    != null ? _rabattWertFeld.value    : "",
-            SkontoWert  = _skontoWertFeld    != null ? _skontoWertFeld.value    : "",
-            Notiz       = _notizenFeld       != null ? _notizenFeld.value       : "",
-            KundeId     = _ausgewaehlterKundeId,
-            KundeName   = _ausgewaehlterKunde,
+            Nummer = _nummerFeld != null ? _nummerFeld.value : "",
+            Status = _statusDropdown != null ? _statusDropdown.value : "",
+            Datum = _datumFeld != null ? _datumFeld.value : "",
+            Frist = _fristFeld != null ? _fristFeld.value : "",
+            Referenz = Root.Q<TextField>(ReferenzFeldName)?.value ?? "",
+            RabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "",
+            RabattWert = _rabattWertFeld != null ? _rabattWertFeld.value : "",
+            SkontoWert = _skontoWertFeld != null ? _skontoWertFeld.value : "",
+            Notiz = _notizenFeld != null ? _notizenFeld.value : "",
+            KundeId = _ausgewaehlterKundeId,
+            KundeName = _ausgewaehlterKunde,
             KundeAdresse = _ausgewaehlterKundeAdresse,
             AusgewaehlteAnhaenge = HoleAusgewaehlteAnhaenge(),
         };
@@ -1962,11 +1973,11 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             snap.Positionen.Add(new BelegSessionDaten.PositionsEintrag
             {
-                Artikel      = zeile.Artikel      != null ? zeile.Artikel.text      : "",
-                Beschreibung = zeile.Beschreibung  != null ? zeile.Beschreibung.text : "",
-                Menge        = zeile.Menge         != null ? zeile.Menge.value       : "1",
-                Einheit      = zeile.Einheit       != null ? zeile.Einheit.text      : "",
-                Preis        = zeile.Preis         != null ? zeile.Preis.text        : "",
+                Artikel = zeile.Artikel != null ? zeile.Artikel.text : "",
+                Beschreibung = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                Menge = zeile.Menge != null ? zeile.Menge.value : "1",
+                Einheit = zeile.Einheit != null ? zeile.Einheit.text : "",
+                Preis = zeile.Preis != null ? zeile.Preis.text : "",
             });
         }
 
@@ -2007,68 +2018,68 @@ public abstract class BelegScreenController : MonoBehaviour
         {
             if (_positionenListe == null) break;
 
-            var zeile  = new PositionsZeile();
+            var zeile = new PositionsZeile();
             var wurzel = new VisualElement();
             wurzel.AddToClassList("angebot-position-row");
             wurzel.style.flexDirection = FlexDirection.Row;
-            wurzel.style.alignItems    = Align.Center;
-            wurzel.style.paddingTop    = 6;
+            wurzel.style.alignItems = Align.Center;
+            wurzel.style.paddingTop = 6;
             wurzel.style.paddingBottom = 6;
 
             var punkt = new VisualElement();
-            punkt.style.width              = 10; punkt.style.height = 10;
-            punkt.style.borderTopLeftRadius    = 5; punkt.style.borderTopRightRadius    = 5;
+            punkt.style.width = 10; punkt.style.height = 10;
+            punkt.style.borderTopLeftRadius = 5; punkt.style.borderTopRightRadius = 5;
             punkt.style.borderBottomLeftRadius = 5; punkt.style.borderBottomRightRadius = 5;
             punkt.style.backgroundColor = Gruen;
-            punkt.style.flexShrink      = 0;
-            punkt.style.marginRight     = 8;
+            punkt.style.flexShrink = 0;
+            punkt.style.marginRight = 8;
 
             zeile.Artikel = ErstelleZeilenLabel(eintrag.Artikel, true);
             zeile.Artikel.style.flexGrow = 1;
             zeile.Artikel.style.minWidth = 120;
 
             zeile.Beschreibung = ErstelleZeilenLabel(eintrag.Beschreibung, false);
-            zeile.Beschreibung.style.width       = 220;
+            zeile.Beschreibung.style.width = 220;
             zeile.Beschreibung.style.marginRight = 8;
 
             zeile.Menge = NeuesTextFeld();
-            zeile.Menge.style.width       = 70;
+            zeile.Menge.style.width = 70;
             zeile.Menge.style.marginRight = 8;
             zeile.Menge.SetValueWithoutNotify(eintrag.Menge);
             NurGanzeZahlen(zeile.Menge);
 
             zeile.Einheit = ErstelleZeilenLabel(eintrag.Einheit, false);
-            zeile.Einheit.style.width       = 110;
+            zeile.Einheit.style.width = 110;
             zeile.Einheit.style.marginRight = 8;
 
             zeile.Preis = ErstelleZeilenLabel(eintrag.Preis, false);
-            zeile.Preis.style.width       = 110;
+            zeile.Preis.style.width = 110;
             zeile.Preis.style.marginRight = 8;
 
-            float preisWert  = ParseBetrag(eintrag.Preis);
-            int   mengeWert  = 1;
+            float preisWert = ParseBetrag(eintrag.Preis);
+            int mengeWert = 1;
             int.TryParse(eintrag.Menge, out mengeWert);
             if (mengeWert < 1) mengeWert = 1;
 
             zeile.Gesamt = new Label(FormatBetrag(mengeWert * preisWert));
-            zeile.Gesamt.style.width          = 110;
-            zeile.Gesamt.style.fontSize       = 13;
-            zeile.Gesamt.style.color          = new Color(0.86f, 0.86f, 0.86f);
+            zeile.Gesamt.style.width = 110;
+            zeile.Gesamt.style.fontSize = 13;
+            zeile.Gesamt.style.color = new Color(0.86f, 0.86f, 0.86f);
             zeile.Gesamt.style.unityTextAlign = TextAnchor.MiddleRight;
 
             var loeschen = new Button { text = "\u2715" };
-            loeschen.style.width              = 26; loeschen.style.height = 26;
-            loeschen.style.marginLeft         = 8;
-            loeschen.style.backgroundColor   = Color.clear;
-            loeschen.style.color             = new Color(0.6f, 0.6f, 0.6f);
-            loeschen.style.fontSize          = 12;
-            loeschen.style.borderTopWidth    = 0; loeschen.style.borderRightWidth  = 0;
-            loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth   = 0;
+            loeschen.style.width = 26; loeschen.style.height = 26;
+            loeschen.style.marginLeft = 8;
+            loeschen.style.backgroundColor = Color.clear;
+            loeschen.style.color = new Color(0.6f, 0.6f, 0.6f);
+            loeschen.style.fontSize = 12;
+            loeschen.style.borderTopWidth = 0; loeschen.style.borderRightWidth = 0;
+            loeschen.style.borderBottomWidth = 0; loeschen.style.borderLeftWidth = 0;
             loeschen.RegisterCallback<MouseEnterEvent>(_ => loeschen.style.color = Rot);
             loeschen.RegisterCallback<MouseLeaveEvent>(_ =>
                 loeschen.style.color = new Color(0.6f, 0.6f, 0.6f));
 
-            var lokalZeile  = zeile;
+            var lokalZeile = zeile;
             var lokalWurzel = wurzel;
             loeschen.RegisterCallback<ClickEvent>(_ =>
             {
@@ -2103,8 +2114,8 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (!string.IsNullOrEmpty(snap.KundeName))
         {
-            _ausgewaehlterKunde        = snap.KundeName;
-            _ausgewaehlterKundeId      = snap.KundeId;
+            _ausgewaehlterKunde = snap.KundeName;
+            _ausgewaehlterKundeId = snap.KundeId;
             _ausgewaehlterKundeAdresse = snap.KundeAdresse;
             _kundensuche?.SetValueWithoutNotify(snap.KundeName);
 
@@ -2114,9 +2125,9 @@ public abstract class BelegScreenController : MonoBehaviour
                 NormalisiereAdressBoxen(boxen);
                 if (boxen.Count > 0)
                 {
-                    var db     = UserDatabaseAccess.getCurrentUserDatabase();
+                    var db = UserDatabaseAccess.getCurrentUserDatabase();
                     var kunden = db.getAllCustomers();
-                    var kunde  = kunden?.Find(k => k.id == snap.KundeId);
+                    var kunde = kunden?.Find(k => k.id == snap.KundeId);
                     if (kunde != null)
                         SetzeAdresseStrukturiert(boxen[0], HoleEmpfaengerBezeichnung(),
                             new (string, string)[]
@@ -2144,8 +2155,8 @@ public abstract class BelegScreenController : MonoBehaviour
 
         Root.Query<TextField>().ForEach(feld => feld.SetValueWithoutNotify(""));
 
-        _ausgewaehlterKunde        = "";
-        _ausgewaehlterKundeId      = 0;
+        _ausgewaehlterKunde = "";
+        _ausgewaehlterKundeId = 0;
         _ausgewaehlterKundeAdresse = "";
 
         var boxen = Root.Query(className: "angebot-address-box").ToList();
@@ -2175,6 +2186,41 @@ public abstract class BelegScreenController : MonoBehaviour
         string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
         string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
         return PlayerPrefs.GetInt(nutzerKey, PlayerPrefs.GetInt(key, fallback));
+    }
+
+    protected static int BegrenzeMenge(int menge)
+    {
+        if (menge < 1)
+        {
+            return 1;
+        }
+
+        if (menge > MaxPositionsMenge)
+        {
+            return MaxPositionsMenge;
+        }
+
+        return menge;
+    }
+
+    protected static float BegrenzePreis(float preis)
+    {
+        if (float.IsNaN(preis) || float.IsInfinity(preis))
+        {
+            return 0f;
+        }
+
+        if (preis < 0f)
+        {
+            return 0f;
+        }
+
+        if (preis > MaxPositionsPreis)
+        {
+            return MaxPositionsPreis;
+        }
+
+        return Mathf.Round(preis * 100f) / 100f;
     }
 
     protected float HoleMwstSatz()
@@ -2228,9 +2274,9 @@ public abstract class BelegScreenController : MonoBehaviour
             }
             else
             {
-                Company firma  = firmen[firmen.Count - 1];
-                string  name   = LiesFeld(firma, "name");
-                string  adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
+                Company firma = firmen[firmen.Count - 1];
+                string name = LiesFeld(firma, "name");
+                string adresse = LiesFeld(firma, "location", "ort", "adresse", "address");
 
                 if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(adresse))
                     fehlend.Add(VoraussetzungsBereich.Unternehmensdaten);
