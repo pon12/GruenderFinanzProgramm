@@ -1,50 +1,111 @@
-using System;
-using System.Text;
-using UnityEngine;
 using System.IO;
-
-
-
+using UnityEngine;
 
 public class Versionsnummer
 {
+    private const string FileName = "version.txt";
+    private const string FallbackVersion = "Version unbekannt";
 
-
-    static string fileName = "version.txt";
-    // Funktion zum Schreiben der Versionsnummer in eine Datei
     public static void writeVersionToFile(string version)
     {
-        string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);
+        string filePath = GetWritableVersionFilePath();
+
+        try
         {
-            // Versionsnummer in die  Datei schreiben
-            using (StreamWriter sw = File.CreateText(filePath))
-            {
-                sw.WriteLine(version + "\n");
-            }
-            // Debug-Ausgabe des Pfads zur Datei
-            Debug.Log($"Versionsnummer in folgende Datei angehängt: {fileName}");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            File.WriteAllText(filePath, NormalizeVersion(version));
+            Debug.Log("[Versionsnummer] Versionsnummer gespeichert: " + filePath);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("[Versionsnummer] Versionsnummer konnte nicht geschrieben werden: " + ex.Message);
         }
     }
 
-    // Funktion zum Lesen der Versionsnummer aus einer Datei
     public static string getVersion()
     {
-        // Pfad zur Datei erstellen
-        string filePath = Path.Combine(Application.dataPath, "Backend/Versionsnummer/" + fileName);
-        if (File.Exists(filePath))
+        string unityVersion = GetUnityApplicationVersion();
+
+        if (!string.IsNullOrWhiteSpace(unityVersion))
+            return unityVersion;
+
+        string version = TryReadVersionFromPath(GetStreamingAssetsVersionFilePath());
+
+        if (!string.IsNullOrWhiteSpace(version))
+            return NormalizeVersion(version);
+
+        version = TryReadVersionFromPath(GetEditorAssetsVersionFilePath());
+
+        if (!string.IsNullOrWhiteSpace(version))
+            return NormalizeVersion(version);
+
+        version = TryReadVersionFromPath(GetWritableVersionFilePath());
+
+        if (!string.IsNullOrWhiteSpace(version))
+            return NormalizeVersion(version);
+
+        Debug.LogWarning("[Versionsnummer] Keine gültige Versionsnummer gefunden. Fallback wird angezeigt.");
+        return FallbackVersion;
+    }
+
+    private static string GetUnityApplicationVersion()
+    {
+        string version = Application.version;
+
+        if (string.IsNullOrWhiteSpace(version))
+            return null;
+
+        // Unity-Default ignorieren, falls nicht bewusst gesetzt.
+        if (version.Trim() == "1.0")
+            return null;
+
+        return "Version: " + version.Trim();
+    }
+
+    private static string TryReadVersionFromPath(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return null;
+
+        try
         {
-            // Versionsnummer aus der Datei lesen
-            using (StreamReader sr = new StreamReader(filePath))
-            {
-                string version = sr.ReadToEnd();
-                return version;
-            }
+            if (!File.Exists(filePath))
+                return null;
+
+            return File.ReadAllText(filePath).Trim();
         }
-        else
+        catch (System.Exception ex)
         {
-            // Datei nicht gefunden
-            Debug.LogError($"Datei nicht gefunden: {fileName}");
+            Debug.LogWarning("[Versionsnummer] Konnte Versionsdatei nicht lesen: " + filePath + " | " + ex.Message);
             return null;
         }
+    }
+
+    private static string GetStreamingAssetsVersionFilePath()
+    {
+        return Path.Combine(Application.streamingAssetsPath, FileName);
+    }
+
+    private static string GetEditorAssetsVersionFilePath()
+    {
+        return Path.Combine(Application.dataPath, "Backend", "Versionsnummer", FileName);
+    }
+
+    private static string GetWritableVersionFilePath()
+    {
+        return Path.Combine(Application.persistentDataPath, FileName);
+    }
+
+    private static string NormalizeVersion(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+            return FallbackVersion;
+
+        version = version.Trim();
+
+        if (version.StartsWith("Version:"))
+            return version;
+
+        return "Version: " + version;
     }
 }
