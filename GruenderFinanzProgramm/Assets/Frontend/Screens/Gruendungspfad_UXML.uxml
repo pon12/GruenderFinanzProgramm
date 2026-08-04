@@ -7,7 +7,7 @@
             <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <ui:VisualElement style="flex-direction: row; align-items: center;">
                     <ui:VisualElement>
-                        <ui:Label text="Gründungspfad" class="page-title"/>
+                        <ui:Label text="Gründerpfad" emoji-fallback-support="false" class="page-title"/>
                         <ui:Label text="Deine persönliche Roadmap von der Idee zur erfolgreichen Gründung" class="page-subtitle"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 236px; bottom: 15px;"/>

@@ -120,10 +120,10 @@
     flex-shrink: 0;
     height: 82px;
     overflow: hidden;
-    background-color: rgb(50, 50, 50);
+    background-color: rgb(30, 30, 30);
     border-radius: 8px;
     border-width: 1px;
-    border-color: rgb(65, 65, 65);
+    border-color: rgb(63, 63, 63);
     padding: 12px;
     flex-direction: row;
     align-items: center;
@@ -132,7 +132,7 @@
     transition-duration: 0.12s;
 }
 .doc-mini-slot:hover {
-    border-color: rgb(100, 100, 100);
+    background-color: #313131;
 }
 
 .doc-mini-icon {

@@ -11,17 +11,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c9b04849-62dd-48ee-a981-e0371bfeb1a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/indexLayout.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Document_UXML.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Document_UXML.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Gruendungspfad_UXML.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Gruendungspfad_UXML.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/RadioButtonGroupTemp.uxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/RadioButtonGroupTemp.uxml.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/SidebarController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Sidebar/SidebarController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/sidebar.uxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/sidebar.uxml.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/DashboardStyles.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/DashboardStyles.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Doc-Screen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Doc-Screen.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/CategoryCard.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/CategoryCard.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/sidebar.uxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/sidebar.uxml.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Gründungspfad.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Gründungspfad.unity.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +64,7 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Alina-will-nicht-mehr&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Design-&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -189,6 +194,21 @@
       <workItem from="1782432266411" duration="5000" />
       <workItem from="1782432297312" duration="11000" />
       <workItem from="1782432388139" duration="6000" />
+      <workItem from="1785853204328" duration="44000" />
+      <workItem from="1785853380614" duration="755000" />
+      <workItem from="1785854174100" duration="7000" />
+      <workItem from="1785854200381" duration="6000" />
+      <workItem from="1785854222922" duration="79000" />
+      <workItem from="1785854319722" duration="57000" />
+      <workItem from="1785855726384" duration="261000" />
+      <workItem from="1785856006051" duration="24000" />
+      <workItem from="1785856465715" duration="638000" />
+      <workItem from="1785857711792" duration="237000" />
+      <workItem from="1785857993125" duration="196000" />
+      <workItem from="1785858439924" duration="135000" />
+      <workItem from="1785858588604" duration="36000" />
+      <workItem from="1785858637749" duration="57000" />
+      <workItem from="1785858712537" duration="31000" />
     </task>
     <servers />
   </component>

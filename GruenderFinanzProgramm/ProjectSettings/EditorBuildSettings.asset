@@ -36,7 +36,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Angebot.unity
     guid: 4d18be9d94918b04486f37264d8f222d
   - enabled: 1
-    path: "Assets/Scenes/Gr\xFCndungspfad.unity"
+    path: "Assets/Scenes/Gr\xFCnderpfad.unity"
     guid: dbd37b72ebe3795418633166cc352807
   - enabled: 1
     path: Assets/Scenes/Rechnung.unity

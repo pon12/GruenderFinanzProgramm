@@ -16,28 +16,27 @@
                 <ui:Label text="Kategorie" class="category-meta"/>
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1;"/>
-
         </ui:VisualElement>
         <ui:VisualElement class="category-doc-grid-2x2">
             <ui:VisualElement name="Slot-0" class="doc-mini-slot">
-                <ui:VisualElement name="Slot-0-Icon"    class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-0-Icon" class="doc-mini-icon"/>
                 <ui:VisualElement name="Slot-0-Content" class="doc-mini-content"/>
-                <ui:Button        name="Slot-0-Plus" text="+" class="doc-mini-plus"/>
+                <ui:Button name="Slot-0-Plus" text="+" class="doc-mini-plus"/>
             </ui:VisualElement>
             <ui:VisualElement name="Slot-1" class="doc-mini-slot">
-                <ui:VisualElement name="Slot-1-Icon"    class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-1-Icon" class="doc-mini-icon"/>
                 <ui:VisualElement name="Slot-1-Content" class="doc-mini-content"/>
-                <ui:Button        name="Slot-1-Plus" text="+" class="doc-mini-plus"/>
+                <ui:Button name="Slot-1-Plus" text="+" class="doc-mini-plus"/>
             </ui:VisualElement>
             <ui:VisualElement name="Slot-2" class="doc-mini-slot">
-                <ui:VisualElement name="Slot-2-Icon"    class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-2-Icon" class="doc-mini-icon"/>
                 <ui:VisualElement name="Slot-2-Content" class="doc-mini-content"/>
-                <ui:Button        name="Slot-2-Plus" text="+" class="doc-mini-plus"/>
+                <ui:Button name="Slot-2-Plus" text="+" class="doc-mini-plus"/>
             </ui:VisualElement>
             <ui:VisualElement name="Slot-3" class="doc-mini-slot">
-                <ui:VisualElement name="Slot-3-Icon"    class="doc-mini-icon"/>
+                <ui:VisualElement name="Slot-3-Icon" class="doc-mini-icon"/>
                 <ui:VisualElement name="Slot-3-Content" class="doc-mini-content"/>
-                <ui:Button        name="Slot-3-Plus" text="+" class="doc-mini-plus"/>
+                <ui:Button name="Slot-3-Plus" text="+" class="doc-mini-plus"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Button text="Alle anzeigen" name="btnPlus" class="doc-btn-add-inline"/>

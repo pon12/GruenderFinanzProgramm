@@ -252,7 +252,7 @@
     margin: 0 6px;
     background-color: #646464;
     border-color: #646464;
-    border-width: 1px;
+    border-width: 0px;
     border-radius: 6px;
     color: #ffffff;
     font-size: 13px;
@@ -327,7 +327,7 @@
     border-radius: 6px;
 }
 .cal-day-today:hover {
-    background-color: #6BBF82;
+    background-color: #B3E2C4;
     color: #1E1E1E;
 }
 .cal-day-other-month {
