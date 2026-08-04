@@ -46,7 +46,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected const int ReferenzMaxLaenge = 10;
     protected const int NotizenMaxLaenge = 150;
 
-    protected const float MaxPositionsPreis = 1_000_000f;
+    protected const double MaxPositionsPreis = 1_000_000.0;
     protected const int MaxPositionsMenge = 9999;
 
     protected static readonly CultureInfo De = CultureInfo.GetCultureInfo("de-DE");
@@ -1069,7 +1069,7 @@ public abstract class BelegScreenController : MonoBehaviour
         if (_positionenListe == null) return;
 
         menge = BegrenzeMenge(menge);
-        float preisProEinheit = BegrenzePreis((float)service.price);
+        double preisProEinheit = BegrenzePreis(service.price);
 
         var zeile = new PositionsZeile();
         var wurzel = new VisualElement();
@@ -1109,7 +1109,7 @@ public abstract class BelegScreenController : MonoBehaviour
         zeile.Preis.style.width = 110;
         zeile.Preis.style.marginRight = 8;
 
-        float gesamt = menge * preisProEinheit;
+        double gesamt = Math.Round(menge * preisProEinheit, 2, MidpointRounding.AwayFromZero);
         zeile.Gesamt = new Label(FormatBetrag(gesamt));
         zeile.Gesamt.style.width = 110;
         zeile.Gesamt.style.fontSize = 13;
@@ -1182,32 +1182,46 @@ public abstract class BelegScreenController : MonoBehaviour
 
     protected void BerechneSummen()
     {
-        float netto = 0f;
+        double netto = 0.0;
+
         foreach (var zeile in _zeilen)
         {
             int menge = 1;
             int.TryParse(zeile.Menge.value, out menge);
             menge = BegrenzeMenge(menge);
 
-            float preis = BegrenzePreis(ParseBetrag(zeile.Preis.text));
-            float gz = menge * preis;
+            double preis = BegrenzePreis(ParseBetrag(zeile.Preis.text));
+            double gz = Math.Round(menge * preis, 2, MidpointRounding.AwayFromZero);
+
             zeile.Gesamt.text = FormatBetrag(gz);
             netto += gz;
         }
 
-        float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+        netto = Math.Round(netto, 2, MidpointRounding.AwayFromZero);
+
+        double rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
         string typ = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-        float rabatt = 0f;
-        if (typ == "Prozent") rabatt = netto * rabattWert / 100f;
-        else if (typ == "Festbetrag") rabatt = rabattWert;
 
-        float nettoNachRabatt = netto - rabatt;
-        float skontoWert = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-        float skonto = nettoNachRabatt * skontoWert / 100f;
+        double rabatt = 0.0;
 
-        float mwstSatz = HoleMwstSatz();
-        float mwst = nettoNachRabatt * mwstSatz;
-        float gesamtSumme = nettoNachRabatt + mwst - skonto;
+        if (typ == "Prozent")
+        {
+            rabatt = Math.Round(netto * rabattWert / 100.0, 2, MidpointRounding.AwayFromZero);
+        }
+        else if (typ == "Festbetrag")
+        {
+            rabatt = Math.Round(rabattWert, 2, MidpointRounding.AwayFromZero);
+        }
+
+        double nettoNachRabatt = Math.Round(netto - rabatt, 2, MidpointRounding.AwayFromZero);
+
+        double skontoWert = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+        double skonto = Math.Round(nettoNachRabatt * skontoWert / 100.0, 2, MidpointRounding.AwayFromZero);
+
+        double mwstSatz = HoleMwstSatz();
+        double mwst = Math.Round(nettoNachRabatt * mwstSatz, 2, MidpointRounding.AwayFromZero);
+
+        double gesamtSumme = Math.Round(nettoNachRabatt + mwst - skonto, 2, MidpointRounding.AwayFromZero);
 
         if (_nettoLabel != null) _nettoLabel.text = FormatBetrag(netto);
         if (_rabattLabel != null) _rabattLabel.text = FormatBetrag(rabatt);
@@ -1477,21 +1491,30 @@ public abstract class BelegScreenController : MonoBehaviour
                 return;
             }
 
-            float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
-            float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+            double netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+            double rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
             string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-            float rabatt = 0f;
 
-            if (rabattTyp == "Prozent") rabatt = netto * rabattWert / 100f;
-            else if (rabattTyp == "Festbetrag") rabatt = rabattWert;
+            double rabatt = 0.0;
 
-            float mwstSatz = HoleMwstSatz();
-            float steuerBasis = netto - rabatt;
-            float steuer = steuerBasis * mwstSatz;
-            float zwischenbetrag = steuerBasis + steuer;
-            float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-            float skonto = zwischenbetrag * skontoProzent / 100f;
-            float finalTotal = zwischenbetrag - skonto;
+            if (rabattTyp == "Prozent")
+            {
+                rabatt = Math.Round(netto * rabattWert / 100.0, 2, MidpointRounding.AwayFromZero);
+            }
+            else if (rabattTyp == "Festbetrag")
+            {
+                rabatt = Math.Round(rabattWert, 2, MidpointRounding.AwayFromZero);
+            }
+
+            double mwstSatz = HoleMwstSatz();
+            double steuerBasis = Math.Round(netto - rabatt, 2, MidpointRounding.AwayFromZero);
+            double steuer = Math.Round(steuerBasis * mwstSatz, 2, MidpointRounding.AwayFromZero);
+            double zwischenbetrag = Math.Round(steuerBasis + steuer, 2, MidpointRounding.AwayFromZero);
+
+            double skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+            double skonto = Math.Round(zwischenbetrag * skontoProzent / 100.0, 2, MidpointRounding.AwayFromZero);
+
+            double finalTotal = Math.Round(zwischenbetrag - skonto, 2, MidpointRounding.AwayFromZero);
 
             PassKeyRecord currentUser = StateManager.Instance.getCurrentUser();
             string rawUserId = currentUser.userId.Replace("user_", "");
@@ -1531,7 +1554,7 @@ public abstract class BelegScreenController : MonoBehaviour
                         offerId = offerId,
                         articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
                         description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                        quantity = BegrenzeMenge(Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"))),
+                        quantity = BegrenzeMenge((int)Math.Round(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"), MidpointRounding.AwayFromZero)),
                         unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
                     };
                     db.createOfferItem(item);
@@ -1573,7 +1596,7 @@ public abstract class BelegScreenController : MonoBehaviour
                         invoiceId = invoiceId,
                         articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
                         description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                        quantity = BegrenzeMenge(Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"))),
+                        quantity = BegrenzeMenge((int)Math.Round(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"), MidpointRounding.AwayFromZero)),
                         unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
                     };
                     db.createInvoiceItem(item);
@@ -1618,7 +1641,7 @@ public abstract class BelegScreenController : MonoBehaviour
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
-            float gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
+            double gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
             string nummer = _nummerFeld != null ? _nummerFeld.value : "";
             string kunde = !string.IsNullOrEmpty(_ausgewaehlterKunde)
                              ? " - " + _ausgewaehlterKunde : "";
@@ -1629,7 +1652,7 @@ public abstract class BelegScreenController : MonoBehaviour
             // FIX: Vorher wurde keine Art übergeben, dadurch stand in der
             // Kassenbuch-Tabelle bei automatisch aus Rechnung/Angebot
             // gebuchten Einträgen nur ein "-" statt einer echten Kategorie.
-            db.createEinkommen(gesamt, BelegTyp + " " + nummer + kunde, datum, "Umsatzerlöse");
+            db.createEinkommen((float)Math.Round(gesamt, 2, MidpointRounding.AwayFromZero), BelegTyp + " " + nummer + kunde, datum, "Umsatzerlöse");
         }
         catch (Exception e)
         {
@@ -1685,8 +1708,8 @@ public abstract class BelegScreenController : MonoBehaviour
                 {
                     int menge = 1;
                     int.TryParse(zeile.Menge.value, out menge);
-                    float preis = ParseBetrag(zeile.Preis.text);
-                    float gesamt = menge * preis;
+                    double preis = ParseBetrag(zeile.Preis.text);
+                    double gesamt = Math.Round(menge * preis, 2, MidpointRounding.AwayFromZero);
 
                     string zeileText = zeile.Artikel.text
                         + "   " + zeile.Beschreibung.text
@@ -1839,7 +1862,7 @@ public abstract class BelegScreenController : MonoBehaviour
         return feld;
     }
 
-    protected float ParseBetrag(string text)
+    protected double ParseBetrag(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return 0f;
 
@@ -1849,20 +1872,21 @@ public abstract class BelegScreenController : MonoBehaviour
             .Replace("\u00a0", "")
             .Trim();
 
-        if (float.TryParse(bereinigt, NumberStyles.Number, De, out float wert))
+        if (double.TryParse(bereinigt, NumberStyles.Number, De, out double wert))
             return wert;
 
         bereinigt = bereinigt.Replace(".", "").Replace(",", ".");
 
-        if (float.TryParse(bereinigt, NumberStyles.Number, CultureInfo.InvariantCulture, out wert))
+        if (double.TryParse(bereinigt, NumberStyles.Number, CultureInfo.InvariantCulture, out wert))
             return wert;
 
         return 0f;
     }
 
-    protected string FormatBetrag(float wert)
+    protected string FormatBetrag(double wert)
     {
-        return wert.ToString("N2", De) + " EUR";
+        double gerundet = Math.Round(wert, 2, MidpointRounding.AwayFromZero);
+        return gerundet.ToString("N2", De) + " EUR";
     }
 
     protected string LiesFeld(object objekt, params string[] feldNamen)
@@ -2056,12 +2080,12 @@ public abstract class BelegScreenController : MonoBehaviour
             zeile.Preis.style.width = 110;
             zeile.Preis.style.marginRight = 8;
 
-            float preisWert = ParseBetrag(eintrag.Preis);
+            double preisWert = ParseBetrag(eintrag.Preis);
             int mengeWert = 1;
             int.TryParse(eintrag.Menge, out mengeWert);
             if (mengeWert < 1) mengeWert = 1;
 
-            zeile.Gesamt = new Label(FormatBetrag(mengeWert * preisWert));
+            zeile.Gesamt = new Label(FormatBetrag(Math.Round(mengeWert * preisWert, 2, MidpointRounding.AwayFromZero)));
             zeile.Gesamt.style.width = 110;
             zeile.Gesamt.style.fontSize = 13;
             zeile.Gesamt.style.color = new Color(0.86f, 0.86f, 0.86f);
@@ -2088,15 +2112,15 @@ public abstract class BelegScreenController : MonoBehaviour
                 BerechneSummen();
             });
 
-            float preisProEinheit = preisWert;
+            double preisProEinheit = preisWert;
             zeile.Menge.RegisterValueChangedCallback(_ =>
-            {
-                int m = 1;
-                int.TryParse(zeile.Menge.value, out m);
-                if (m < 1) m = 1;
-                zeile.Gesamt.text = FormatBetrag(m * preisProEinheit);
-                BerechneSummen();
-            });
+                        {
+                            int m = 1;
+                            int.TryParse(zeile.Menge.value, out m);
+                            if (m < 1) m = 1;
+                            zeile.Gesamt.text = FormatBetrag(m * preisProEinheit);
+                            BerechneSummen();
+                        });
 
             wurzel.Add(punkt);
             wurzel.Add(zeile.Artikel);
@@ -2203,16 +2227,16 @@ public abstract class BelegScreenController : MonoBehaviour
         return menge;
     }
 
-    protected static float BegrenzePreis(float preis)
+    protected static double BegrenzePreis(double preis)
     {
-        if (float.IsNaN(preis) || float.IsInfinity(preis))
+        if (double.IsNaN(preis) || double.IsInfinity(preis))
         {
-            return 0f;
+            return 0.0;
         }
 
-        if (preis < 0f)
+        if (preis < 0.0)
         {
-            return 0f;
+            return 0.0;
         }
 
         if (preis > MaxPositionsPreis)
@@ -2220,22 +2244,22 @@ public abstract class BelegScreenController : MonoBehaviour
             return MaxPositionsPreis;
         }
 
-        return Mathf.Round(preis * 100f) / 100f;
+        return Math.Round(preis, 2, MidpointRounding.AwayFromZero);
     }
 
-    protected float HoleMwstSatz()
+    protected double HoleMwstSatz()
     {
         if (HoleNutzerPrefInt("settings_steuer_custom_aktiv", 0) == 1)
         {
             string customStr = HoleNutzerPref("settings_steuer_custom_wert", "0");
-            if (float.TryParse(customStr,
+            if (double.TryParse(customStr,
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture,
-                out float customSatz) && customSatz > 0)
-                return customSatz / 100f;
+                out double customSatz) && customSatz > 0)
+                return customSatz / 100.0;
         }
         int steuersatz = HoleNutzerPrefInt("settings_steuersatz", 19);
-        return steuersatz / 100f;
+        return steuersatz / 100.0;
     }
 
     protected string HoleMwstProzentAnzeige()
@@ -2243,10 +2267,10 @@ public abstract class BelegScreenController : MonoBehaviour
         if (HoleNutzerPrefInt("settings_steuer_custom_aktiv", 0) == 1)
         {
             string customStr = HoleNutzerPref("settings_steuer_custom_wert", "0");
-            if (float.TryParse(customStr,
+            if (double.TryParse(customStr,
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture,
-                out float customSatz) && customSatz > 0)
+                out double customSatz) && customSatz > 0)
                 return customSatz.ToString("0.##") + " %";
         }
         return HoleNutzerPrefInt("settings_steuersatz", 19) + " %";

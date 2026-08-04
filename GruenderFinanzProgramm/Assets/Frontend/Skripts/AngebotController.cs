@@ -52,27 +52,27 @@ public class AngebotController : BelegScreenController
 
             _statusDropdown?.SetValueWithoutNotify("Angenommen");
 
-            float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+            double netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
 
-            float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+            double rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
             string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
 
-            float rabatt = 0f;
+            double rabatt = 0.0;
 
             if (rabattTyp == "Prozent")
-                rabatt = netto * rabattWert / 100f;
+                rabatt = System.Math.Round(netto * rabattWert / 100.0, 2, System.MidpointRounding.AwayFromZero);
             else if (rabattTyp == "Festbetrag")
-                rabatt = rabattWert;
+                rabatt = System.Math.Round(rabattWert, 2, System.MidpointRounding.AwayFromZero);
 
-            float mwstSatz = HoleMwstSatz();
-            float steuerBasis = netto - rabatt;
-            float steuer = steuerBasis * mwstSatz;
-            float zwischenbetrag = steuerBasis + steuer;
+            double mwstSatz = HoleMwstSatz();
+            double steuerBasis = System.Math.Round(netto - rabatt, 2, System.MidpointRounding.AwayFromZero);
+            double steuer = System.Math.Round(steuerBasis * mwstSatz, 2, System.MidpointRounding.AwayFromZero);
+            double zwischenbetrag = System.Math.Round(steuerBasis + steuer, 2, System.MidpointRounding.AwayFromZero);
 
-            float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-            float skonto = zwischenbetrag * skontoProzent / 100f;
+            double skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+            double skonto = System.Math.Round(zwischenbetrag * skontoProzent / 100.0, 2, System.MidpointRounding.AwayFromZero);
 
-            float finalTotal = zwischenbetrag - skonto;
+            double finalTotal = System.Math.Round(zwischenbetrag - skonto, 2, System.MidpointRounding.AwayFromZero);
 
             Offer offer = new Offer
             {
@@ -107,8 +107,8 @@ public class AngebotController : BelegScreenController
             BelegTransferData.date = _datumFeld != null ? _datumFeld.value : "";
             BelegTransferData.dueDate = _fristFeld != null ? _fristFeld.value : "";
             BelegTransferData.notes = _notizenFeld != null ? _notizenFeld.value : "";
-            BelegTransferData.rabatt = rabatt;
-            BelegTransferData.skonto = skonto;
+            BelegTransferData.rabatt = (float)System.Math.Round(rabatt, 2, System.MidpointRounding.AwayFromZero);
+            BelegTransferData.skonto = (float)System.Math.Round(skonto, 2, System.MidpointRounding.AwayFromZero);
 
             foreach (var zeile in _zeilen.ToList())
             {
@@ -117,7 +117,7 @@ public class AngebotController : BelegScreenController
                     offerId = offerId,
                     articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
                     description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                    quantity = BegrenzeMenge(Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"))),
+                    quantity = BegrenzeMenge((int)System.Math.Round(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"), System.MidpointRounding.AwayFromZero)),
                     unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
                 };
 
