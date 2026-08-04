@@ -72,15 +72,7 @@ public class DienstleistungenScreenController : MonoBehaviour
 
             var btnDel = new Button(() =>
             {
-                DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-                if (db == null)
-                {
-                    Debug.LogError("[Dienstleistungen] Keine aktive UserDB gefunden.");
-                    return;
-                }
-                db.deleteService(daten[index].id);
-                LadeDienstleistungenAusDatenbank();
-                TabelleAktualisieren();
+                OeffneLoeschenConfirmDialog(index);
             });
 
             btnDel.text = "L\u00f6schen";
@@ -303,6 +295,62 @@ public class DienstleistungenScreenController : MonoBehaviour
         confirmOverlay.Add(box);
         rootElement.Add(confirmOverlay);
     }
+
+    private void OeffneLoeschenConfirmDialog(int index)
+{
+    // 1. Overlay
+    var confirmOverlay = new VisualElement();
+    confirmOverlay.name = "confirm-overlay";
+    confirmOverlay.AddToClassList("confirm-overlay");
+
+    // 2. Box
+    var box = new VisualElement();
+    box.AddToClassList("confirm-box");
+
+    // 3. Titel
+    var titel = new Label("Eintrag löschen?");
+    titel.AddToClassList("confirm-titel");
+    box.Add(titel); // Wichtig für Anzeige!
+
+    // 4. Beschreibungstext
+    string serviceName = (daten != null && index >= 0 && index < daten.Count) ? daten[index].name : "diesen Eintrag";
+    var text = new Label($"Möchtest du '{serviceName}' wirklich unwiderruflich löschen?");
+    text.AddToClassList("confirm-text");
+    box.Add(text); // Wichtig für Anzeige!
+
+    // 5. Button-Zeile
+    var btnZeile = new VisualElement();
+    btnZeile.AddToClassList("confirm-btn-zeile");
+
+    // Abbrechen-Button
+    var btnAbbrechen = new Button(() => rootElement.Remove(confirmOverlay));
+    btnAbbrechen.text = "Abbrechen";
+    btnAbbrechen.AddToClassList("btn-dialog-abbrechen");
+
+    // Löschen-Button
+    var btnBestaetigen = new Button(() =>
+    {
+        rootElement.Remove(confirmOverlay);
+
+        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db != null)
+        {
+            db.deleteService(daten[index].id);
+            LadeDienstleistungenAusDatenbank();
+            TabelleAktualisieren();
+        }
+    });
+    btnBestaetigen.text = "Löschen";
+    btnBestaetigen.AddToClassList("btn-dialog-loeschen");
+
+    // Zusammenbauen
+    btnZeile.Add(btnAbbrechen);
+    btnZeile.Add(btnBestaetigen);
+    box.Add(btnZeile);
+
+    confirmOverlay.Add(box);
+    rootElement.Add(confirmOverlay);
+}
 
     // =========================================================
     // SPEICHERN-LOGIK (ausgelagert, wird von Fertig + Confirm-Ja genutzt)
