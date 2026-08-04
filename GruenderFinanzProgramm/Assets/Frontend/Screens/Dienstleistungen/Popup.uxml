@@ -1,24 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Stylesheets/Dienstleistungen.uss?fileID=7433441132597879392&amp;guid=01fec56cd8896774fab0da40d32297db&amp;type=3#Dienstleistungen"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
-    <ui:VisualElement class="popup-box">
+    <ui:VisualElement name="container-popup" class="popup-box">
         <ui:Button name="btn-close-popup" text="✕" class="close-btn"/>
-        <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px; margin-right: 8px;">
-            <ui:Label text="Dienstleistung" class="popup-titel" style="margin-bottom: 0; margin-top: 0; margin-right: 16px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
+        <ui:VisualElement name="row-popup-titel" style="flex-direction: row; align-items: center; margin-bottom: 8px; margin-right: 8px;">
+            <ui:Label text="Dienstleistung" name="label-popup-titel" class="popup-titel" style="margin-bottom: 0; margin-top: 0; margin-right: 16px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;"/>
             <ui:VisualElement name="btn-help-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 0; align-self: auto; align-items: stretch;"/>
         </ui:VisualElement>
-        <ui:Label text="Name" class="popup-label"/>
+        <ui:Label text="Name" name="label-feld-titel" class="popup-label"/>
         <ui:TextField name="feld-titel" placeholder-text="Name" hide-placeholder-on-focus="true" class="popup-input"/>
-        <ui:Label text="Beschreibung" class="popup-label"/>
+        <ui:Label text="Beschreibung" name="label-feld-beschreibung" class="popup-label"/>
         <ui:TextField name="feld-beschreibung" placeholder-text="Beschreibung" hide-placeholder-on-focus="true" class="popup-input"/>
-        <ui:VisualElement style="flex-direction: row; align-items: center; margin-right: 8px;">
-            <ui:Label text="Preismodell" class="popup-label" style="flex-grow: 1; margin-bottom: 0;"/>
+        <ui:VisualElement name="row-preismodell" style="flex-direction: row; align-items: center; margin-right: 8px;">
+            <ui:Label text="Preismodell" name="label-feld-preismodell" class="popup-label" style="flex-grow: 1; margin-bottom: 0;"/>
             <ui:VisualElement name="btn-help-preismodell-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px; margin-bottom: 6px; margin-right: 0;"/>
         </ui:VisualElement>
         <ui:DropdownField name="feld-preismodell" choices="Festpreis,Stundensatz,Pauschal" index="0" class="popup-dropdown"/>
-        <ui:Label text="Betrag" class="popup-label"/>
+        <ui:Label text="Betrag" name="label-feld-betrag" class="popup-label"/>
         <ui:TextField name="feld-betrag" placeholder-text="Betrag" hide-placeholder-on-focus="true" class="popup-input"/>
-        <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement name="row-popup-buttons" style="flex-grow: 1; flex-direction: row;">
             <ui:Button name="btn-abbrechen" text="Abbrechen" class="popup-btn-abbrechen"/>
             <ui:Button name="btn-fertig" text="Fertig" class="popup-btn-fertig"/>
         </ui:VisualElement>

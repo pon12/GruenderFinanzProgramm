@@ -8,8 +8,8 @@
         <ui:VisualElement name="Logos" style="flex-grow: 1; flex-direction: row;">
             <ui:Image name="HSMWLogo" source="project://database/Assets/Frontend/Bilder/start_HSMW_powered_by_1080p.png?fileID=2800000&amp;guid=b0f876a22f6fad746ae1a81ebf8888b7&amp;type=3#start_HSMW_powered_by_1080p" style="width: auto; height: auto; top: 207px; left: 931px; position: absolute;"/>
             <ui:Image name="UnityLogo" source="project://database/Assets/Frontend/Bilder/start_UNITY_powered_by_1080p.png?fileID=2800000&amp;guid=dc132b5aebc772c43aa007818c0b6601&amp;type=3#start_UNITY_powered_by_1080p" style="top: 206px; left: 466px; width: auto; height: auto; position: absolute;"/>
-            <ui:Image source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="position: absolute; height: 101px; width: 442px; top: 115px; left: 1136px;"/>
-            <ui:Image source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="height: 93px; width: 465px; position: absolute; top: 121px; left: 323px;"/>
+            <ui:Image name="icon-balken-rechts" source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="position: absolute; height: 101px; width: 442px; top: 115px; left: 1136px;"/>
+            <ui:Image name="icon-balken-links" source="project://database/Assets/Frontend/Bilder/start_element_balken.png?fileID=2800000&amp;guid=5c2c2afeaa6331045a18a464da770b44&amp;type=3#start_element_balken" style="height: 93px; width: 465px; position: absolute; top: 121px; left: 323px;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
