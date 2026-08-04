@@ -34,44 +34,54 @@ public static class TextDocumentService
             fileName = title;
         }
 
-        documentType = NormalizeDocumentType(documentType);
-
-        string folderPath = GetUserTextDocumentFolder(userId, documentType);
-        string safeFileName = MakeSafeFileName(fileName);
-
-        if (!safeFileName.EndsWith(".txt"))
+        try
         {
-            safeFileName += ".txt";
+            documentType = NormalizeDocumentType(documentType);
+
+            string folderPath = GetUserTextDocumentFolder(userId, documentType);
+            Directory.CreateDirectory(folderPath);
+
+            string safeFileName = MakeSafeFileName(fileName);
+
+            if (!safeFileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            {
+                safeFileName += ".txt";
+            }
+
+            string storedFileName = Guid.NewGuid().ToString() + ".txt";
+            string filePath = Path.Combine(folderPath, storedFileName);
+
+            string fileContent =
+                "[DOCTYPE " + documentType + "]" + Environment.NewLine +
+                "[TITLE " + title + "]" + Environment.NewLine +
+                Environment.NewLine +
+                (content ?? "");
+
+            File.WriteAllText(filePath, fileContent);
+
+            TextDocumentMeta meta = new TextDocumentMeta
+            {
+                userId = userId,
+                title = title,
+                originalFileName = safeFileName,
+                storedFileName = storedFileName,
+                filePath = filePath,
+                documentType = documentType,
+                createdAt = DateTime.Now,
+                lastUpdated = DateTime.Now
+            };
+
+            db.createTextDocumentMeta(meta);
+
+            Debug.Log("[TextDocument] Datei erstellt: " + filePath);
+
+            return meta;
         }
-
-        string storedFileName = Guid.NewGuid().ToString() + ".txt";
-        string filePath = Path.Combine(folderPath, storedFileName);
-
-        string fileContent =
-            "[DOCTYPE " + documentType + "]" + Environment.NewLine +
-            "[TITLE " + title + "]" + Environment.NewLine +
-            Environment.NewLine +
-            content;
-
-        File.WriteAllText(filePath, fileContent);
-
-        TextDocumentMeta meta = new TextDocumentMeta
+        catch (Exception exception)
         {
-            userId = userId,
-            title = title,
-            originalFileName = safeFileName,
-            storedFileName = storedFileName,
-            filePath = filePath,
-            documentType = documentType,
-            createdAt = DateTime.Now,
-            lastUpdated = DateTime.Now
-        };
-
-        db.createTextDocumentMeta(meta);
-
-        Debug.Log("[TextDocument] Datei erstellt: " + filePath);
-
-        return meta;
+            Debug.LogError("[TextDocument] Fehler beim Erstellen: " + exception.Message);
+            return null;
+        }
     }
 
     public static ParsedTextDocument ReadTextDocument(TextDocumentMeta document)
@@ -85,6 +95,12 @@ public static class TextDocumentService
         if (string.IsNullOrEmpty(document.filePath))
         {
             Debug.LogError("[TextDocumentService] Dokument hat keinen Dateipfad.");
+            return null;
+        }
+
+        if (!File.Exists(document.filePath))
+        {
+            Debug.LogError("[TextDocumentService] Datei existiert nicht: " + document.filePath);
             return null;
         }
 
@@ -129,19 +145,26 @@ public static class TextDocumentService
             return false;
         }
 
-        string documentType = NormalizeDocumentType(newDocumentType);
-
-        string fileContent =
-            "[DOCTYPE " + documentType + "]" + Environment.NewLine +
-            "[TITLE " + newTitle + "]" + Environment.NewLine +
-            Environment.NewLine +
-            newContent;
-
         try
         {
+            string documentType = NormalizeDocumentType(newDocumentType);
+
+            string directoryPath = Path.GetDirectoryName(document.filePath);
+
+            if (!string.IsNullOrWhiteSpace(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            string fileContent =
+                "[DOCTYPE " + documentType + "]" + Environment.NewLine +
+                "[TITLE " + (newTitle ?? "") + "]" + Environment.NewLine +
+                Environment.NewLine +
+                (newContent ?? "");
+
             File.WriteAllText(document.filePath, fileContent);
 
-            document.title = newTitle;
+            document.title = newTitle ?? "";
             document.documentType = documentType;
             document.lastUpdated = DateTime.Now;
 
@@ -236,6 +259,11 @@ public static class TextDocumentService
 
     private static string MakeSafeFileName(string fileName)
     {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return "Textdokument";
+        }
+
         string safeName = fileName.Trim();
 
         foreach (char invalidChar in Path.GetInvalidFileNameChars())

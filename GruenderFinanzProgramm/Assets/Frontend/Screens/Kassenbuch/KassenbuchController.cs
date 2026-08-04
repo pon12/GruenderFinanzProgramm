@@ -30,8 +30,8 @@ public class KassenbuchController : MonoBehaviour
     private Label letzteAktualLabel;
 
     private Label fehlerLabel;
-   
-    private VisualElement datumKlickLabel;          
+
+    private VisualElement datumKlickLabel;
     private VisualElement meinUxmlKalender;
 
 
@@ -96,7 +96,7 @@ public class KassenbuchController : MonoBehaviour
     void OnEnable()
     {
 
-        
+
         // Holt die aktive Nutzer-Datenbank laut Dokumentation
         db = UserDatabaseAccess.getCurrentUserDatabase();
 
@@ -116,10 +116,10 @@ public class KassenbuchController : MonoBehaviour
 
 
         _overlay = root.Q<VisualElement>("popup-overlay");
-       
+
         // Greift sich das Element "tableBody" für deine Dokumente/Einträge
         tableInput = root.Q<VisualElement>("tableBody") ?? root.Q<VisualElement>("unity-content-container");
-       
+
         balanceLabel = root.Q<Label>("balanceLabel") ?? root.Q<Label>("label-kontostand");
         letzteAktualLabel = root.Q<Label>("letzteAktual");
 
@@ -134,22 +134,22 @@ public class KassenbuchController : MonoBehaviour
             root.Q<Button>("btn-confirm-nein")?.RegisterCallback<ClickEvent>(_ =>
             {
                 _confirmOverlay.style.display = DisplayStyle.None;
-                _pendingDeleteId  = -1;
+                _pendingDeleteId = -1;
                 _pendingDeleteTyp = "";
             });
         }
 
         if (_overlay != null)
-{
-    fehlerLabel = _overlay.Q<Label>("FehlerText");
+        {
+            fehlerLabel = _overlay.Q<Label>("FehlerText");
 
-    if (fehlerLabel != null)
-    {
-        fehlerLabel.text = "";
-        fehlerLabel.style.display = DisplayStyle.None;
-        fehlerLabel.style.color = UnityEngine.Color.red;
-    }
-}
+            if (fehlerLabel != null)
+            {
+                fehlerLabel.text = "";
+                fehlerLabel.style.display = DisplayStyle.None;
+                fehlerLabel.style.color = UnityEngine.Color.red;
+            }
+        }
 
 
         // --- DASHBOARD LABELS ZUWEISEN ---
@@ -182,8 +182,8 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        var today     = DateTime.Today;
-        _currentYear  = today.Year;
+        var today = DateTime.Today;
+        _currentYear = today.Year;
         _currentMonth = today.Month;
 
 
@@ -192,11 +192,11 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // SORTIERBARE SPALTENKÖPFE REGISTRIEREN
         // ==========================================
-        RegisterSortHeader(root.Q<Label>("col-header-name"),   "Name");
-        RegisterSortHeader(root.Q<Label>("col-header-datum"),  "Datum");
+        RegisterSortHeader(root.Q<Label>("col-header-name"), "Name");
+        RegisterSortHeader(root.Q<Label>("col-header-datum"), "Datum");
         RegisterSortHeader(root.Q<Label>("col-header-betrag"), "Betrag");
-        RegisterSortHeader(root.Q<Label>("col-header-art"),    "Art");
-        RegisterSortHeader(root.Q<Label>("col-header-typ"),    "Typ");
+        RegisterSortHeader(root.Q<Label>("col-header-art"), "Art");
+        RegisterSortHeader(root.Q<Label>("col-header-typ"), "Typ");
         AktualisiereSortPfeile();
 
 
@@ -296,9 +296,9 @@ public class KassenbuchController : MonoBehaviour
 
         artDropdown = _overlay.Q<DropdownField>("Art");
 
-    if (artDropdown != null)
-    {
-        artDropdown.choices = new List<string>()
+        if (artDropdown != null)
+        {
+            artDropdown.choices = new List<string>()
         {
             "Marketing",
             "Reisekosten",
@@ -321,8 +321,8 @@ public class KassenbuchController : MonoBehaviour
             "Grundausstattung"
         };
 
-        artDropdown.value = "Marketing";
-    }
+            artDropdown.value = "Marketing";
+        }
 
 
         createList();
@@ -422,66 +422,67 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-       field.RegisterValueChangedCallback(evt =>
-{
-    string original = evt.newValue;
+        field.RegisterValueChangedCallback(evt =>
+ {
+     string original = evt.newValue;
 
-    // FIX: Den Platzhalter selbst nicht anfassen - vorher wurde "0,00"
-    // (der Platzhalter) durch diese Logik in "0" OHNE Komma zerlegt,
-    // sobald ClosePopup() das Feld programmgesteuert zurückgesetzt hat.
-    if (original == placeholder)
-    {
-        return;
-    }
+     // FIX: Den Platzhalter selbst nicht anfassen - vorher wurde "0,00"
+     // (der Platzhalter) durch diese Logik in "0" OHNE Komma zerlegt,
+     // sobald ClosePopup() das Feld programmgesteuert zurückgesetzt hat.
+     if (original == placeholder)
+     {
+         return;
+     }
 
-    // FIX (3. Anlauf): Die bisherigen Versuche haben aus dem Text ein
-    // Dezimaltrennzeichen (Komma/Punkt) herausgelesen - das ging schief,
-    // sobald die eigene Live-Formatierung selbst schon einen Punkt als
-    // Tausendertrennzeichen eingefügt hatte (z.B. nach "1.000" wurde eine
-    // weitere getippte Ziffer fälschlich als Cent-Stelle hinter DIESEM
-    // Punkt gelesen -> Sprung auf "1,00 €" statt "10.000 €").
-    //
-    // Jetzt wie vom Chef vorgeschlagen: ein reines Cent-Eingabefeld nach
-    // Kassenautomaten-Prinzip. Es werden IMMER nur die Ziffern gelesen -
-    // Kommas/Punkte werden komplett ignoriert, egal ob vom Nutzer oder von
-    // der eigenen Formatierung eingefügt. Die letzten 2 Ziffern sind IMMER
-    // die Cent-Stellen, alles davor volle Euro. Kein Rätselraten mehr,
-    // welches Zeichen das Dezimaltrennzeichen sein soll - es gibt keins
-    // mehr zu erraten.
-    string ziffern = new string(original.Where(char.IsDigit).ToArray());
+     // FIX (3. Anlauf): Die bisherigen Versuche haben aus dem Text ein
+     // Dezimaltrennzeichen (Komma/Punkt) herausgelesen - das ging schief,
+     // sobald die eigene Live-Formatierung selbst schon einen Punkt als
+     // Tausendertrennzeichen eingefügt hatte (z.B. nach "1.000" wurde eine
+     // weitere getippte Ziffer fälschlich als Cent-Stelle hinter DIESEM
+     // Punkt gelesen -> Sprung auf "1,00 €" statt "10.000 €").
+     //
+     // Jetzt wie vom Chef vorgeschlagen: ein reines Cent-Eingabefeld nach
+     // Kassenautomaten-Prinzip. Es werden IMMER nur die Ziffern gelesen -
+     // Kommas/Punkte werden komplett ignoriert, egal ob vom Nutzer oder von
+     // der eigenen Formatierung eingefügt. Die letzten 2 Ziffern sind IMMER
+     // die Cent-Stellen, alles davor volle Euro. Kein Rätselraten mehr,
+     // welches Zeichen das Dezimaltrennzeichen sein soll - es gibt keins
+     // mehr zu erraten.
+     string ziffern = new string(original.Where(char.IsDigit).ToArray());
 
-    if (ziffern.Length == 0)
-    {
-        field.SetValueWithoutNotify("");
-        return;
-    }
+     if (ziffern.Length == 0)
+     {
+         field.SetValueWithoutNotify("");
+         return;
+     }
 
-    // Sicherheitsnetz gegen extrem lange Eingaben (Überlauf-Schutz)
-    if (ziffern.Length > 10) ziffern = ziffern.Substring(ziffern.Length - 10);
+     // Sicherheitsnetz gegen extrem lange Eingaben (Überlauf-Schutz)
+     if (ziffern.Length > 10) ziffern = ziffern.Substring(ziffern.Length - 10);
 
-    long centWert = long.Parse(ziffern);
+     long centWert = long.Parse(ziffern);
 
-    // 10 Millionen Euro Limit (in Cent)
-    const long MAX_CENT = 10_000_000L * 100L;
-    if (centWert > MAX_CENT) centWert = MAX_CENT;
+     // 10 Millionen Euro Limit (in Cent)
+     const long MAX_CENT = 10_000_000L * 100L;
+     if (centWert > MAX_CENT) centWert = MAX_CENT;
 
-    long euroTeil = centWert / 100;
-    long centTeil = centWert % 100;
+     long euroTeil = centWert / 100;
+     long centTeil = centWert % 100;
 
-    string formatiert = euroTeil.ToString("N0", KassenbuchController.DeKultur)
-        + "," + centTeil.ToString("D2");
+     string formatiert = euroTeil.ToString("N0", KassenbuchController.DeKultur)
+         + "," + centTeil.ToString("D2");
 
-    field.SetValueWithoutNotify(formatiert);
+     field.SetValueWithoutNotify(formatiert);
 
-    // Cursor ans Ende setzen
-    field.schedule.Execute(() =>
-    {
-        field.cursorIndex = formatiert.Length;
-        field.selectIndex = formatiert.Length;
-    });
-});
+     // Cursor ans Ende setzen
+     field.schedule.Execute(() =>
+     {
+         field.cursorIndex = formatiert.Length;
+         field.selectIndex = formatiert.Length;
+     });
+ });
 
-        field.RegisterCallback<FocusInEvent>(evt => {
+        field.RegisterCallback<FocusInEvent>(evt =>
+        {
             if (field.value == placeholder)
             {
                 field.SetValueWithoutNotify("");
@@ -497,7 +498,8 @@ public class KassenbuchController : MonoBehaviour
         });
 
 
-        field.RegisterCallback<FocusOutEvent>(evt => {
+        field.RegisterCallback<FocusOutEvent>(evt =>
+        {
             string aktuellerText = field.value.Trim();
 
 
@@ -527,7 +529,8 @@ public class KassenbuchController : MonoBehaviour
         }
 
 
-        field.RegisterCallback<FocusInEvent>(evt => {
+        field.RegisterCallback<FocusInEvent>(evt =>
+        {
             if (field.value == placeholder)
             {
                 field.value = "";
@@ -536,7 +539,8 @@ public class KassenbuchController : MonoBehaviour
         });
 
 
-        field.RegisterCallback<FocusOutEvent>(evt => {
+        field.RegisterCallback<FocusOutEvent>(evt =>
+        {
             if (string.IsNullOrEmpty(field.value.Trim()))
             {
                 field.value = placeholder;
@@ -571,13 +575,13 @@ public class KassenbuchController : MonoBehaviour
     void SetupDashboardCalendar(VisualElement root)
     {
         var dropMonat = root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = root.Q<DropdownField>("dropdown-jahr");
 
 
         if (dropMonat != null)
         {
             dropMonat.choices = new List<string>(_monthNames);
-            dropMonat.index   = _currentMonth - 1;
+            dropMonat.index = _currentMonth - 1;
             dropMonat.RegisterValueChangedCallback(_ =>
             {
                 _currentMonth = dropMonat.index + 1;
@@ -597,7 +601,7 @@ public class KassenbuchController : MonoBehaviour
 
 
             dropJahr.choices = jahre;
-            dropJahr.value   = _currentYear.ToString();
+            dropJahr.value = _currentYear.ToString();
             dropJahr.RegisterValueChangedCallback(evt =>
             {
                 if (int.TryParse(evt.newValue, out int y))
@@ -621,14 +625,14 @@ public class KassenbuchController : MonoBehaviour
     void WechsleMonat(VisualElement root, int delta)
     {
         _currentMonth += delta;
-        if (_currentMonth < 1)  { _currentMonth = 12; _currentYear--; }
-        if (_currentMonth > 12) { _currentMonth = 1;  _currentYear++; }
+        if (_currentMonth < 1) { _currentMonth = 12; _currentYear--; }
+        if (_currentMonth > 12) { _currentMonth = 1; _currentYear++; }
 
 
         var dropMonat = root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = root.Q<DropdownField>("dropdown-jahr");
         if (dropMonat != null) dropMonat.index = _currentMonth - 1;
-        if (dropJahr  != null) dropJahr.value  = _currentYear.ToString();
+        if (dropJahr != null) dropJahr.value = _currentYear.ToString();
 
 
         RenderKalender(root);
@@ -637,10 +641,10 @@ public class KassenbuchController : MonoBehaviour
 
     void RenderKalender(VisualElement root)
     {
-        var today          = DateTime.Today;
-        var ersterTag      = new DateTime(_currentYear, _currentMonth, 1);
-        int tageImMonat    = DateTime.DaysInMonth(_currentYear, _currentMonth);
-       
+        var today = DateTime.Today;
+        var ersterTag = new DateTime(_currentYear, _currentMonth, 1);
+        int tageImMonat = DateTime.DaysInMonth(_currentYear, _currentMonth);
+
         int startWochentag = ((int)ersterTag.DayOfWeek + 6) % 7;
 
 
@@ -653,7 +657,7 @@ public class KassenbuchController : MonoBehaviour
             btn.RemoveFromClassList("cal-day-today");
             btn.style.backgroundColor = new StyleColor(StyleKeyword.Null);
             btn.style.color = new StyleColor(StyleKeyword.Null);
-           
+
             btn.style.display = DisplayStyle.Flex;
 
 
@@ -716,7 +720,7 @@ public class KassenbuchController : MonoBehaviour
             var inputDatum = _overlay.Q<TextField>("input-datum");
             if (inputDatum != null) inputDatum.value = _ausgewaehltesDatum.Value.ToString("dd.MM.yyyy");
         }
-       
+
         if (meinUxmlKalender != null)
         {
             meinUxmlKalender.style.display = DisplayStyle.None;
@@ -799,7 +803,7 @@ public class KassenbuchController : MonoBehaviour
 
         _overlay.style.display = DisplayStyle.Flex;
     }
-       private void ClosePopup()
+    private void ClosePopup()
     {
         if (_overlay == null) return;
 
@@ -819,7 +823,7 @@ public class KassenbuchController : MonoBehaviour
 
 
         _overlay.Q<TextField>("input-datum").value = "";
-       
+
         if (meinUxmlKalender != null)
         {
             meinUxmlKalender.style.display = DisplayStyle.None;
@@ -829,7 +833,7 @@ public class KassenbuchController : MonoBehaviour
         _overlay.style.display = DisplayStyle.None;
     }
 
- private void Fehleranzeigen(string text)
+    private void Fehleranzeigen(string text)
     {
         if (fehlerLabel == null)
             return;
@@ -839,170 +843,170 @@ public class KassenbuchController : MonoBehaviour
     }
 
     private void OnSpeichern()
-{
-    if (fehlerLabel != null)
     {
-        fehlerLabel.text = "";
-        fehlerLabel.style.display = DisplayStyle.None;
+        if (fehlerLabel != null)
+        {
+            fehlerLabel.text = "";
+            fehlerLabel.style.display = DisplayStyle.None;
+        }
+
+        if (_overlay == null)
+            return;
+
+        if (fehlerLabel != null)
+        {
+            fehlerLabel.text = "";
+            fehlerLabel.style.display = DisplayStyle.None;
+        }
+
+        string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
+        string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
+        string datum = _overlay.Q<TextField>("input-datum").value.Trim();
+
+        if (betragText == PLACEHOLDER_BETRAG)
+            betragText = "";
+
+        if (zweck == PLACEHOLDER_ZWECK)
+            zweck = "";
+
+        betragText = betragText.Replace("€", "").Trim();
+
+        // ==========================
+        // BETRAG PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(betragText))
+        {
+            Fehleranzeigen("Bitte einen Betrag eingeben.");
+            return;
+        }
+
+        betragText = betragText.Replace(".", "");
+        betragText = betragText.Replace("€", "").Trim();
+
+        if (!float.TryParse(
+                betragText.Replace(",", "."),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out float betrag))
+        {
+            ShowFehler("Ungültiger Betrag.");
+            return;
+        }
+
+        // Zusätzliche Absicherung zum Limit in SetupBetragInputAnpassung -
+        // falls z.B. per Copy&Paste eine zu hohe Zahl reinrutscht.
+        // HINWEIS: Chef wollte prüfen lassen, ob diese Grenze zusätzlich auf
+        // DB-Ebene (mit Alex) erzwungen werden soll, statt nur hier im UI.
+        const float MAX_BETRAG_EURO = 10_000_000f;
+        if (betrag > MAX_BETRAG_EURO)
+        {
+            ShowFehler("Der Betrag darf maximal 10.000.000 € betragen.");
+            return;
+        }
+
+        // ==========================
+        // ZWECK PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(zweck))
+        {
+            Fehleranzeigen("Bitte einen Verwendungszweck eingeben.");
+            return;
+        }
+
+        // ==========================
+        // DATUM PRÜFEN
+        // ==========================
+
+        if (string.IsNullOrWhiteSpace(datum))
+        {
+            ShowFehler("Bitte ein Datum auswählen.");
+            return;
+        }
+
+        if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
+        {
+            ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
+            return;
+        }
+        datum = normalisiertesDatum;
+
+        // ==========================
+        // SPEICHERN
+        // ==========================
+
+        var eintrag = new KassenbuchEintrag(
+            _aktuellerTyp,
+            betrag,
+            zweck,
+            datum
+        );
+
+        Debug.Log("Betrag: '" + betragText + "'");
+        Debug.Log("Zweck: '" + zweck + "'");
+
+        if (betragText == PLACEHOLDER_BETRAG)
+            betragText = "";
+
+        if (zweck == PLACEHOLDER_ZWECK)
+            zweck = "";
+
+        // Beide fehlen
+        if (string.IsNullOrWhiteSpace(betragText) &&
+            string.IsNullOrWhiteSpace(zweck))
+        {
+            ShowFehler("Bitte Betrag und Verwendungszweck eingeben.");
+            return;
+        }
+
+        // Nur Betrag fehlt
+        if (string.IsNullOrWhiteSpace(betragText))
+        {
+            ShowFehler("Bitte einen Betrag eingeben.");
+            return;
+        }
+
+        // Nur Zweck fehlt
+        if (string.IsNullOrWhiteSpace(zweck))
+        {
+            ShowFehler("Bitte einen Verwendungszweck eingeben.");
+            return;
+        }
+
+        eintrag.Art = artDropdown?.value ?? "";
+        SpeichereEintrag(eintrag);
+
+        ClosePopup();
+        createList();
     }
 
-    if (_overlay == null)
-        return;
-
-    if (fehlerLabel != null)
+    // ==========================================
+    // DATUM-VALIDIERUNG
+    //
+    // Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
+    // normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
+    // Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
+    // unbemerkt in der DB landen und spätere Berechnungen verfälschen.
+    // ==========================================
+    private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
     {
-        fehlerLabel.text = "";
-        fehlerLabel.style.display = DisplayStyle.None;
+        normalisiert = "";
+
+        string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+        var none = System.Globalization.DateTimeStyles.None;
+
+        if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
+            return false;
+
+        // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
+        if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
+            return false;
+
+        normalisiert = ergebnis.ToString("dd.MM.yyyy");
+        return true;
     }
-
-    string betragText = _overlay.Q<TextField>("input-betrag").value.Trim();
-    string zweck = _overlay.Q<TextField>("input-verwendungzweck").value.Trim();
-    string datum = _overlay.Q<TextField>("input-datum").value.Trim();
-
-    if (betragText == PLACEHOLDER_BETRAG)
-        betragText = "";
-
-    if (zweck == PLACEHOLDER_ZWECK)
-        zweck = "";
-
-    betragText = betragText.Replace("€", "").Trim();
-
-    // ==========================
-    // BETRAG PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(betragText))
-    {
-        Fehleranzeigen("Bitte einen Betrag eingeben.");
-        return;
-    }
-
-    betragText = betragText.Replace(".", "");
-betragText = betragText.Replace("€", "").Trim();
-
-    if (!float.TryParse(
-            betragText.Replace(",", "."),
-            System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture,
-            out float betrag))
-    {
-        ShowFehler("Ungültiger Betrag.");
-        return;
-    }
-
-    // Zusätzliche Absicherung zum Limit in SetupBetragInputAnpassung -
-    // falls z.B. per Copy&Paste eine zu hohe Zahl reinrutscht.
-    // HINWEIS: Chef wollte prüfen lassen, ob diese Grenze zusätzlich auf
-    // DB-Ebene (mit Alex) erzwungen werden soll, statt nur hier im UI.
-    const float MAX_BETRAG_EURO = 10_000_000f;
-    if (betrag > MAX_BETRAG_EURO)
-    {
-        ShowFehler("Der Betrag darf maximal 10.000.000 € betragen.");
-        return;
-    }
-
-    // ==========================
-    // ZWECK PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(zweck))
-    {
-        Fehleranzeigen("Bitte einen Verwendungszweck eingeben.");
-        return;
-    }
-
-    // ==========================
-    // DATUM PRÜFEN
-    // ==========================
-
-    if (string.IsNullOrWhiteSpace(datum))
-    {
-        ShowFehler("Bitte ein Datum auswählen.");
-        return;
-    }
-
-    if (!TryParseUndNormalisiereDatum(datum, out string normalisiertesDatum))
-    {
-        ShowFehler("Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben (z.B. 22.01.2026).");
-        return;
-    }
-    datum = normalisiertesDatum;
-
-    // ==========================
-    // SPEICHERN
-    // ==========================
-
-    var eintrag = new KassenbuchEintrag(
-        _aktuellerTyp,
-        betrag,
-        zweck,
-        datum
-    );
-
-    Debug.Log("Betrag: '" + betragText + "'");
-Debug.Log("Zweck: '" + zweck + "'");
-
-    if (betragText == PLACEHOLDER_BETRAG)
-    betragText = "";
-
-    if (zweck == PLACEHOLDER_ZWECK)
-    zweck = "";
-
-    // Beide fehlen
-    if (string.IsNullOrWhiteSpace(betragText) &&
-        string.IsNullOrWhiteSpace(zweck))
-    {
-        ShowFehler("Bitte Betrag und Verwendungszweck eingeben.");
-        return;
-    }
-
-    // Nur Betrag fehlt
-    if (string.IsNullOrWhiteSpace(betragText))
-    {
-        ShowFehler("Bitte einen Betrag eingeben.");
-        return;
-    }
-
-    // Nur Zweck fehlt
-    if (string.IsNullOrWhiteSpace(zweck))
-    {
-        ShowFehler("Bitte einen Verwendungszweck eingeben.");
-        return;
-    }
-
-    eintrag.Art = artDropdown?.value ?? "";
-    SpeichereEintrag(eintrag);
-
-    ClosePopup();
-    createList();
-}
-
-// ==========================================
-// DATUM-VALIDIERUNG
-//
-// Prüft ob 'eingabe' ein gültiges Datum ist, und schreibt es
-// normalisiert im Format "dd.MM.yyyy" zurück. Verhindert
-// Tippfehler wie "22.012.2026" (3-stelliger Monat) die sonst
-// unbemerkt in der DB landen und spätere Berechnungen verfälschen.
-// ==========================================
-private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisiert)
-{
-    normalisiert = "";
-
-    string[] erlaubteFormate = { "dd.MM.yyyy", "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy" };
-    var inv  = System.Globalization.CultureInfo.InvariantCulture;
-    var none = System.Globalization.DateTimeStyles.None;
-
-    if (!DateTime.TryParseExact(eingabe, erlaubteFormate, inv, none, out DateTime ergebnis))
-        return false;
-
-    // Zusätzliche Plausibilitäts-Prüfung: Jahr in sinnvollem Bereich
-    if (ergebnis.Year < 2000 || ergebnis.Year > 2100)
-        return false;
-
-    normalisiert = ergebnis.ToString("dd.MM.yyyy");
-    return true;
-}
 
 
     private void SpeichereEintrag(KassenbuchEintrag eintrag)
@@ -1010,10 +1014,12 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         if (db == null) return;
 
 
-        if (eintrag.Typ == "Einnahme") {
+        if (eintrag.Typ == "Einnahme")
+        {
             db.createEinkommen(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
         }
-        else {
+        else
+        {
             db.createAusgaben(eintrag.Betrag, eintrag.Beschreibung, eintrag.Datum, eintrag.Art, artDropdown.value);
         }
     }
@@ -1059,7 +1065,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             kv.Value.text = aktiv ? basisText + pfeil : basisText;
             kv.Value.style.color = aktiv
                 ? new StyleColor(UnityEngine.Color.white)
-                : new StyleColor(new UnityEngine.Color(170f/255f, 170f/255f, 170f/255f));
+                : new StyleColor(new UnityEngine.Color(170f / 255f, 170f / 255f, 170f / 255f));
         }
     }
 
@@ -1067,12 +1073,12 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
     {
         IEnumerable<KassenbuchZeile> sorted = _sortColumn switch
         {
-            "Name"   => liste.OrderBy(z => z.Name, StringComparer.OrdinalIgnoreCase),
-            "Datum"  => liste.OrderBy(z => z.DatumSort),
+            "Name" => liste.OrderBy(z => z.Name, StringComparer.OrdinalIgnoreCase),
+            "Datum" => liste.OrderBy(z => z.DatumSort),
             "Betrag" => liste.OrderBy(z => z.Betrag),
-            "Art"    => liste.OrderBy(z => z.Art, StringComparer.OrdinalIgnoreCase),
-            "Typ"    => liste.OrderBy(z => z.Typ, StringComparer.OrdinalIgnoreCase),
-            _        => liste.OrderByDescending(z => z.DatumSort)
+            "Art" => liste.OrderBy(z => z.Art, StringComparer.OrdinalIgnoreCase),
+            "Typ" => liste.OrderBy(z => z.Typ, StringComparer.OrdinalIgnoreCase),
+            _ => liste.OrderByDescending(z => z.DatumSort)
         };
 
         return _sortAscending ? sorted : sorted.Reverse();
@@ -1098,8 +1104,8 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         {
             balanceLabel.text = differenz.ToString("N2", DeKultur) + " €";
             balanceLabel.style.color = differenz < 0
-                ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
-                : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
+                ? new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f))   // Rot #E63946
+                : new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f)); // Gruen #80CF95
         }
 
         // FIX: 'Letzte Aktualisierung' war bisher ein fester Platzhalter
@@ -1120,7 +1126,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         {
             var heute = System.DateTime.Today;
             float umsatzJahr = 0f;
-            float[] monate   = new float[12];
+            float[] monate = new float[12];
 
 
             var einkommenListe = db.getAllEinkommenEntries();
@@ -1162,7 +1168,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
 
         List<Einkommen> einkommenList = db.getAllEinkommenEntries();
-        List<Ausgaben>  ausgabenList  = db.getAllAusgabenEntries();
+        List<Ausgaben> ausgabenList = db.getAllAusgabenEntries();
 
         // Tabelle nach gewähltem Jahr filtern, falls ein gültiges Jahr gewählt ist
         if (jahresFilterAktiv)
@@ -1191,13 +1197,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 float.TryParse(e.getAmount(), out float betrag);
                 alleEintraege.Add(new KassenbuchZeile
                 {
-                    Id        = e.getId(),
-                    Typ       = "Einnahme",
-                    Name      = e.getDescription(),
-                    Datum     = e.getDatum(),
+                    Id = e.getId(),
+                    Typ = "Einnahme",
+                    Name = e.getDescription(),
+                    Datum = e.getDatum(),
                     DatumSort = datumSort,
-                    Betrag    = betrag,
-                    Art       = e.getArt()
+                    Betrag = betrag,
+                    Art = e.getArt()
                 });
             }
         }
@@ -1210,13 +1216,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 float.TryParse(a.getAmount(), out float betrag);
                 alleEintraege.Add(new KassenbuchZeile
                 {
-                    Id        = a.getId(),
-                    Typ       = "Ausgabe",
-                    Name      = a.getDescription(),
-                    Datum     = a.getDatum(),
+                    Id = a.getId(),
+                    Typ = "Ausgabe",
+                    Name = a.getDescription(),
+                    Datum = a.getDatum(),
                     DatumSort = datumSort,
-                    Betrag    = betrag,
-                    Art       = a.getArt()
+                    Betrag = betrag,
+                    Art = a.getArt()
                 });
             }
         }
@@ -1225,12 +1231,12 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         {
             VisualElement newEntryCopy = outputTemplate.Instantiate();
 
-            Label nameLabel       = newEntryCopy.Q<Label>("Name");
-            Label typLabel        = newEntryCopy.Q<Label>("Typ");
-            Label betragLabel     = newEntryCopy.Q<Label>("Betrag");
+            Label nameLabel = newEntryCopy.Q<Label>("Name");
+            Label typLabel = newEntryCopy.Q<Label>("Typ");
+            Label betragLabel = newEntryCopy.Q<Label>("Betrag");
             Label erstellTagLabel = newEntryCopy.Q<Label>("ErstellTag");
-            Label artLabel        = newEntryCopy.Q<Label>("Art");
-            Button loeschenBtn    = newEntryCopy.Q<Button>("BtnLoeschen");
+            Label artLabel = newEntryCopy.Q<Label>("Art");
+            Button loeschenBtn = newEntryCopy.Q<Button>("BtnLoeschen");
 
             if (nameLabel == null) { Debug.LogError("Label 'Name' nicht gefunden!"); continue; }
 
@@ -1246,8 +1252,8 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             if (betragLabel != null)
             {
                 betragLabel.style.color = istEinnahme
-                    ? new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f))
-                    : new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                    ? new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f))
+                    : new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
             }
 
             // Loeschen Button & Hover
@@ -1259,13 +1265,13 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
                 loeschenBtn.RegisterCallback<MouseEnterEvent>(_ =>
                 {
-                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
-                    loeschenBtn.style.color           = new StyleColor(UnityEngine.Color.white);
+                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
+                    loeschenBtn.style.color = new StyleColor(UnityEngine.Color.white);
                 });
                 loeschenBtn.RegisterCallback<MouseLeaveEvent>(_ =>
                 {
-                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f, 0.15f));
-                    loeschenBtn.style.color           = new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f));
+                    loeschenBtn.style.backgroundColor = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f, 0.15f));
+                    loeschenBtn.style.color = new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f));
                 });
             }
 
@@ -1274,20 +1280,20 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
     }
 
 
-    
+
 
     private void BestaetigenLoeschen()
     {
         if (_confirmOverlay != null) _confirmOverlay.style.display = DisplayStyle.None;
         if (_pendingDeleteId >= 0) deleteEntry(_pendingDeleteId);
-        _pendingDeleteId  = -1;
+        _pendingDeleteId = -1;
         _pendingDeleteTyp = "";
     }
 
     public void Loeschen(string typ, int id)
     {
         if (_confirmOverlay == null) { deleteEntry(id); return; }
-        _pendingDeleteId  = id;
+        _pendingDeleteId = id;
         _pendingDeleteTyp = typ;
         _confirmOverlay.style.display = DisplayStyle.Flex;
     }
@@ -1304,7 +1310,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             "yyyy/MM/dd"
         };
 
-        var inv  = System.Globalization.CultureInfo.InvariantCulture;
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
         var deDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
         var none = System.Globalization.DateTimeStyles.None;
 
@@ -1372,7 +1378,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
         }
 
         var einkommen = db.getAllEinkommenEntries();
-        var ausgaben  = db.getAllAusgabenEntries();
+        var ausgaben = db.getAllAusgabenEntries();
 
         // Nur Einträge des gewählten Jahres, ueber echtes geparstes Datum
         // gefiltert (vorher: fehleranfaelliger String-Vergleich
@@ -1411,16 +1417,18 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             .ToList();
 
         float summeHaben = habenPosten.Sum(p => p.Betrag);
-        float summeSoll  = sollPosten.Sum(p => p.Betrag);
-        float gewinn     = summeHaben - summeSoll;
+        float summeSoll = sollPosten.Sum(p => p.Betrag);
+        float gewinn = summeHaben - summeSoll;
 
         float anfangsbestandJahr = BerechneKumulierterKontostandBisEndeJahr(jahrZahl - 1);
-        float endbestandJahr     = anfangsbestandJahr + gewinn;
+        float endbestandJahr = anfangsbestandJahr + gewinn;
+
+        string username = GetSafeFolderName(StateManager.Instance.getCurrentUser().username);
 
         string folderPath = Path.Combine(
             Application.persistentDataPath,
             "PDFs",
-            StateManager.Instance.getCurrentUser().username,
+            username,
             "Finanzamt-Export"
         );
         Directory.CreateDirectory(folderPath);
@@ -1445,14 +1453,14 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 doc.AddTitle("Gewinn- und Verlustrechnung " + jahr);
                 doc.Open();
 
-                var titleFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
                 var headerFontWeiss = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, iTextSharp.text.Color.WHITE);
                 var normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
-                var boldFont   = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
-                var grayFont   = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
+                var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
+                var grayFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
 
                 var gruenBrand = new iTextSharp.text.Color(102, 165, 119);
-                var rotBrand   = new iTextSharp.text.Color(210, 70, 80);
+                var rotBrand = new iTextSharp.text.Color(210, 70, 80);
 
                 doc.Add(new Paragraph("Gewinn- und Verlustrechnung " + jahr, titleFont));
                 doc.Add(new Paragraph("Generiert am: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm"), grayFont));
@@ -1464,9 +1472,9 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 table.SetWidths(new float[] { 3f, 2f, 3f, 2f });
 
                 AddGuvHeaderCell(table, "Haben (Einnahmen)", headerFontWeiss, gruenBrand);
-                AddGuvHeaderCell(table, "Betrag",            headerFontWeiss, gruenBrand);
-                AddGuvHeaderCell(table, "Soll (Ausgaben)",   headerFontWeiss, rotBrand);
-                AddGuvHeaderCell(table, "Betrag",            headerFontWeiss, rotBrand);
+                AddGuvHeaderCell(table, "Betrag", headerFontWeiss, gruenBrand);
+                AddGuvHeaderCell(table, "Soll (Ausgaben)", headerFontWeiss, rotBrand);
+                AddGuvHeaderCell(table, "Betrag", headerFontWeiss, rotBrand);
 
                 int zeilenAnzahl = Math.Max(habenPosten.Count, sollPosten.Count);
                 for (int i = 0; i < zeilenAnzahl; i++)
@@ -1505,7 +1513,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
                 // Jahresauswertung: Anfangsbestand, Gewinn/Verlust, Endbestand
                 var auswertungFarbe = gewinn >= 0 ? gruenBrand : rotBrand;
-                var auswertungFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, auswertungFarbe);
+                var auswertungFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, auswertungFarbe);
 
                 string gewinnText = gewinn >= 0
                     ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N2", DeKultur) + " €"
@@ -1530,7 +1538,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName        = filePath,
+                    FileName = filePath,
                     UseShellExecute = true
                 });
             }
@@ -1604,6 +1612,29 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
         table.AddCell(cell);
     }
+
+
+    private static string GetSafeFolderName(string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            return "User";
+        }
+
+        string safeName = folderName.Trim();
+
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+        {
+            safeName = safeName.Replace(invalidChar.ToString(), "");
+        }
+
+        if (string.IsNullOrWhiteSpace(safeName))
+        {
+            return "User";
+        }
+
+        return safeName;
+    }
 }
 
 
@@ -1630,7 +1661,7 @@ public class KassenbuchEintrag
     public string Art;
 
 
-   public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
+    public KassenbuchEintrag(string typ, float betrag, string beschreibung, string datum)
     {
         Id = 0;
         Typ = typ;

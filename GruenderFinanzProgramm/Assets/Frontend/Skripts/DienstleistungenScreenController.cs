@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System;
 
 public class DienstleistungenScreenController : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class DienstleistungenScreenController : MonoBehaviour
 
     private List<Service> daten = new List<Service>();
     private VisualElement rootElement;
+
+    private const double MaxServicePreis = 1_000_000.00;
+    private const int MaxServiceNameLaenge = 100;
+    private const int MaxServiceBeschreibungLaenge = 300;
 
     private ScrollView tabelleBody;
     private VisualElement popupOverlay;
@@ -23,8 +28,8 @@ public class DienstleistungenScreenController : MonoBehaviour
     private void OnEnable()
     {
         var root = uiDocument.rootVisualElement;
-        rootElement  = root;
-        tabelleBody  = root.Query<ScrollView>("tabelle-body").First();
+        rootElement = root;
+        tabelleBody = root.Query<ScrollView>("tabelle-body").First();
         popupOverlay = root.Query<VisualElement>("popup-overlay").First();
 
         var btnNeu = root.Q<Button>("btn-neu");
@@ -53,10 +58,10 @@ public class DienstleistungenScreenController : MonoBehaviour
             var zeile = new VisualElement();
             zeile.AddToClassList("tabelle-zeile");
 
-            zeile.Add(Zelle(d.name,                            "col-titel"));
-            zeile.Add(Zelle(d.description,                     "col-beschreibung"));
-            zeile.Add(Zelle(d.priceModel,                      "col-preismodell"));
-            zeile.Add(Zelle(d.price.ToString("F2") + " \u20ac","col-betrag"));
+            zeile.Add(Zelle(d.name, "col-titel"));
+            zeile.Add(Zelle(d.description, "col-beschreibung"));
+            zeile.Add(Zelle(d.priceModel, "col-preismodell"));
+            zeile.Add(Zelle(d.price.ToString("F2") + " \u20ac", "col-betrag"));
 
             var aktionen = new VisualElement();
             aktionen.AddToClassList("col-aktionen");
@@ -101,7 +106,7 @@ public class DienstleistungenScreenController : MonoBehaviour
     private void OeffnePopup(int index)
     {
         editIndex = index;
-        _isDirty  = false; // Dirty-Flag zurücksetzen
+        _isDirty = false; // Dirty-Flag zurücksetzen
         popupOverlay.Clear();
 
         var popup = popupAsset.Instantiate();
@@ -112,21 +117,21 @@ public class DienstleistungenScreenController : MonoBehaviour
             : new Service { name = "", description = "", priceModel = "Festpreis", price = 0.0 };
 
         // ---- Felder befüllen (VOR dem Registrieren der Callbacks, damit setValue kein dirty auslöst) ----
-        var feldTitel        = popup.Q<TextField>("feld-titel");
+        var feldTitel = popup.Q<TextField>("feld-titel");
         var feldBeschreibung = popup.Q<TextField>("feld-beschreibung");
-        var feldPreismodell  = popup.Q<DropdownField>("feld-preismodell");
-        var feldBetrag       = popup.Q<TextField>("feld-betrag");
+        var feldPreismodell = popup.Q<DropdownField>("feld-preismodell");
+        var feldBetrag = popup.Q<TextField>("feld-betrag");
 
-        feldTitel.value        = d.name;
+        feldTitel.value = d.name;
         feldBeschreibung.value = d.description;
-        feldPreismodell.value  = d.priceModel;
-        feldBetrag.value       = d.price.ToString("F2");
+        feldPreismodell.value = d.priceModel;
+        feldBetrag.value = d.price.ToString("F2");
 
         // ---- Dirty-Tracking: erst NACH dem Setzen der Initialwerte registrieren ----
-        feldTitel.RegisterValueChangedCallback(_        => _isDirty = true);
+        feldTitel.RegisterValueChangedCallback(_ => _isDirty = true);
         feldBeschreibung.RegisterValueChangedCallback(_ => _isDirty = true);
-        feldPreismodell.RegisterValueChangedCallback(_  => _isDirty = true);
-        feldBetrag.RegisterValueChangedCallback(_       => _isDirty = true);
+        feldPreismodell.RegisterValueChangedCallback(_ => _isDirty = true);
+        feldBetrag.RegisterValueChangedCallback(_ => _isDirty = true);
 
         // ---- X-Button (Schließen oben rechts) ----
         var btnClose = popup.Q<Button>("btn-close-popup");
@@ -164,67 +169,67 @@ public class DienstleistungenScreenController : MonoBehaviour
         // --- Overlay: liegt über allem, verdunkelt den Hintergrund ---
         var confirmOverlay = new VisualElement();
         confirmOverlay.name = "confirm-overlay";
-        confirmOverlay.style.position        = Position.Absolute;
-        confirmOverlay.style.left            = 0;
-        confirmOverlay.style.top             = 0;
-        confirmOverlay.style.right           = 0;
-        confirmOverlay.style.bottom          = 0;
+        confirmOverlay.style.position = Position.Absolute;
+        confirmOverlay.style.left = 0;
+        confirmOverlay.style.top = 0;
+        confirmOverlay.style.right = 0;
+        confirmOverlay.style.bottom = 0;
         confirmOverlay.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
-        confirmOverlay.style.alignItems      = Align.Center;
-        confirmOverlay.style.justifyContent  = Justify.Center;
+        confirmOverlay.style.alignItems = Align.Center;
+        confirmOverlay.style.justifyContent = Justify.Center;
 
         // --- Card: dunkle Box im Stil von gespeichert.uxml ---
         var box = new VisualElement();
-        box.style.width                  = 340;
-        box.style.backgroundColor        = new Color(56f/255f, 56f/255f, 56f/255f, 1f);
-        box.style.borderTopLeftRadius    = 20;
-        box.style.borderTopRightRadius   = 20;
+        box.style.width = 340;
+        box.style.backgroundColor = new Color(56f / 255f, 56f / 255f, 56f / 255f, 1f);
+        box.style.borderTopLeftRadius = 20;
+        box.style.borderTopRightRadius = 20;
         box.style.borderBottomLeftRadius = 20;
-        box.style.borderBottomRightRadius= 20;
-        box.style.paddingTop             = 32;
-        box.style.paddingBottom          = 28;
-        box.style.paddingLeft            = 28;
-        box.style.paddingRight           = 28;
-        box.style.position               = Position.Relative;
+        box.style.borderBottomRightRadius = 20;
+        box.style.paddingTop = 32;
+        box.style.paddingBottom = 28;
+        box.style.paddingLeft = 28;
+        box.style.paddingRight = 28;
+        box.style.position = Position.Relative;
 
         // --- X-Button oben rechts: schließt nur Confirm, bleibt im Hauptpopup ---
         var btnX = new Button(() => rootElement.Remove(confirmOverlay));
-        btnX.text                            = "✕";
-        btnX.style.position                  = Position.Absolute;
-        btnX.style.top                       = 8;
-        btnX.style.right                     = 8;
-        btnX.style.width                     = 28;
-        btnX.style.height                    = 28;
-        btnX.style.fontSize                  = 16;
-        btnX.style.color                     = new Color(160f/255f, 160f/255f, 160f/255f);
-        btnX.style.backgroundColor           = Color.clear;
-        btnX.style.borderTopWidth            = 0;
-        btnX.style.borderRightWidth          = 0;
-        btnX.style.borderBottomWidth         = 0;
-        btnX.style.borderLeftWidth           = 0;
-        btnX.style.unityTextAlign            = TextAnchor.MiddleCenter;
+        btnX.text = "✕";
+        btnX.style.position = Position.Absolute;
+        btnX.style.top = 8;
+        btnX.style.right = 8;
+        btnX.style.width = 28;
+        btnX.style.height = 28;
+        btnX.style.fontSize = 16;
+        btnX.style.color = new Color(160f / 255f, 160f / 255f, 160f / 255f);
+        btnX.style.backgroundColor = Color.clear;
+        btnX.style.borderTopWidth = 0;
+        btnX.style.borderRightWidth = 0;
+        btnX.style.borderBottomWidth = 0;
+        btnX.style.borderLeftWidth = 0;
+        btnX.style.unityTextAlign = TextAnchor.MiddleCenter;
         box.Add(btnX);
 
         // --- Titel ---
         var titel = new Label("Speichern?");
-        titel.style.fontSize    = 20;
-        titel.style.color       = Color.white;
+        titel.style.fontSize = 20;
+        titel.style.color = Color.white;
         titel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        titel.style.marginBottom= 8;
-        titel.style.marginTop   = 4;
+        titel.style.marginBottom = 8;
+        titel.style.marginTop = 4;
         box.Add(titel);
 
         // --- Beschreibungstext ---
         var text = new Label("M\u00f6chtest du die eingetragenen Daten speichern?");
-        text.style.fontSize    = 14;
-        text.style.color       = new Color(200f/255f, 200f/255f, 200f/255f);
-        text.style.whiteSpace  = WhiteSpace.Normal;
+        text.style.fontSize = 14;
+        text.style.color = new Color(200f / 255f, 200f / 255f, 200f / 255f);
+        text.style.whiteSpace = WhiteSpace.Normal;
         box.Add(text);
 
         // --- Button-Zeile ---
         var btnZeile = new VisualElement();
         btnZeile.style.flexDirection = FlexDirection.Row;
-        btnZeile.style.marginTop     = 20;
+        btnZeile.style.marginTop = 20;
 
         // Nein – kein Speichern, alles schließen
         var btnNein = new Button(() =>
@@ -232,22 +237,22 @@ public class DienstleistungenScreenController : MonoBehaviour
             rootElement.Remove(confirmOverlay);
             SchliessPopup();
         });
-        btnNein.text                            = "Nein";
-        btnNein.style.flexGrow                  = 1;
-        btnNein.style.height                    = 44;
-        btnNein.style.borderTopLeftRadius       = 10;
-        btnNein.style.borderTopRightRadius      = 10;
-        btnNein.style.borderBottomLeftRadius    = 10;
-        btnNein.style.borderBottomRightRadius   = 10;
-        btnNein.style.borderTopWidth            = 0;
-        btnNein.style.borderRightWidth          = 0;
-        btnNein.style.borderBottomWidth         = 0;
-        btnNein.style.borderLeftWidth           = 0;
-        btnNein.style.backgroundColor           = new Color(100f/255f, 100f/255f, 100f/255f);
-        btnNein.style.color                     = Color.white;
-        btnNein.style.fontSize                  = 16;
-        btnNein.style.unityFontStyleAndWeight   = FontStyle.Bold;
-        btnNein.style.marginRight               = 8;
+        btnNein.text = "Nein";
+        btnNein.style.flexGrow = 1;
+        btnNein.style.height = 44;
+        btnNein.style.borderTopLeftRadius = 10;
+        btnNein.style.borderTopRightRadius = 10;
+        btnNein.style.borderBottomLeftRadius = 10;
+        btnNein.style.borderBottomRightRadius = 10;
+        btnNein.style.borderTopWidth = 0;
+        btnNein.style.borderRightWidth = 0;
+        btnNein.style.borderBottomWidth = 0;
+        btnNein.style.borderLeftWidth = 0;
+        btnNein.style.backgroundColor = new Color(100f / 255f, 100f / 255f, 100f / 255f);
+        btnNein.style.color = Color.white;
+        btnNein.style.fontSize = 16;
+        btnNein.style.unityFontStyleAndWeight = FontStyle.Bold;
+        btnNein.style.marginRight = 8;
 
         // Ja – speichern und schließen
         var btnJa = new Button(() =>
@@ -256,21 +261,21 @@ public class DienstleistungenScreenController : MonoBehaviour
             if (currentPopup != null)
                 SpeichernUndSchliessen(currentPopup);
         });
-        btnJa.text                              = "Ja";
-        btnJa.style.flexGrow                    = 1;
-        btnJa.style.height                      = 44;
-        btnJa.style.borderTopLeftRadius         = 10;
-        btnJa.style.borderTopRightRadius        = 10;
-        btnJa.style.borderBottomLeftRadius      = 10;
-        btnJa.style.borderBottomRightRadius     = 10;
-        btnJa.style.borderTopWidth              = 0;
-        btnJa.style.borderRightWidth            = 0;
-        btnJa.style.borderBottomWidth           = 0;
-        btnJa.style.borderLeftWidth             = 0;
-        btnJa.style.backgroundColor             = new Color(128f/255f, 207f/255f, 149f/255f);
-        btnJa.style.color                       = Color.black;
-        btnJa.style.fontSize                    = 16;
-        btnJa.style.unityFontStyleAndWeight     = FontStyle.Bold;
+        btnJa.text = "Ja";
+        btnJa.style.flexGrow = 1;
+        btnJa.style.height = 44;
+        btnJa.style.borderTopLeftRadius = 10;
+        btnJa.style.borderTopRightRadius = 10;
+        btnJa.style.borderBottomLeftRadius = 10;
+        btnJa.style.borderBottomRightRadius = 10;
+        btnJa.style.borderTopWidth = 0;
+        btnJa.style.borderRightWidth = 0;
+        btnJa.style.borderBottomWidth = 0;
+        btnJa.style.borderLeftWidth = 0;
+        btnJa.style.backgroundColor = new Color(128f / 255f, 207f / 255f, 149f / 255f);
+        btnJa.style.color = Color.black;
+        btnJa.style.fontSize = 16;
+        btnJa.style.unityFontStyleAndWeight = FontStyle.Bold;
 
         btnZeile.Add(btnNein);
         btnZeile.Add(btnJa);
@@ -286,19 +291,25 @@ public class DienstleistungenScreenController : MonoBehaviour
 
     private void SpeichernUndSchliessen(VisualElement popup)
     {
-        double.TryParse(
-            popup.Q<TextField>("feld-betrag").value,
-            System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture,
-            out double betrag
+        var feldTitel = popup.Q<TextField>("feld-titel");
+        var feldBeschreibung = popup.Q<TextField>("feld-beschreibung");
+        var feldPreismodell = popup.Q<DropdownField>("feld-preismodell");
+        var feldBetrag = popup.Q<TextField>("feld-betrag");
+
+        string name = feldTitel != null ? feldTitel.value : "";
+        string description = feldBeschreibung != null ? feldBeschreibung.value : "";
+        string priceModel = feldPreismodell != null ? feldPreismodell.value : "Festpreis";
+
+        double betrag = ParseDienstleistungsPreis(
+            feldBetrag != null ? feldBetrag.value : "0"
         );
 
         var neu = new Service
         {
-            name        = popup.Q<TextField>("feld-titel").value,
-            description = popup.Q<TextField>("feld-beschreibung").value,
-            priceModel  = popup.Q<DropdownField>("feld-preismodell").value,
-            price       = betrag
+            name = BegrenzeText(name, MaxServiceNameLaenge),
+            description = BegrenzeText(description, MaxServiceBeschreibungLaenge),
+            priceModel = string.IsNullOrWhiteSpace(priceModel) ? "Festpreis" : priceModel,
+            price = BegrenzeServicePreis(betrag)
         };
 
         DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -328,8 +339,8 @@ public class DienstleistungenScreenController : MonoBehaviour
         popupOverlay.style.display = DisplayStyle.None;
         popupOverlay.Clear();
         currentPopup = null;
-        editIndex    = -1;
-        _isDirty     = false;
+        editIndex = -1;
+        _isDirty = false;
     }
 
     private void LadeDienstleistungenAusDatenbank()
@@ -403,4 +414,72 @@ public class DienstleistungenScreenController : MonoBehaviour
                 "Stundensatz: Preis pro Stunde. " +
                 "Pauschal: Pauschalpreis unabh\u00e4ngig vom Aufwand.");
     }
+
+    private static string BegrenzeText(string text, int maxLaenge)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "";
+        }
+
+        text = text.Trim();
+
+        if (text.Length > maxLaenge)
+        {
+            return text.Substring(0, maxLaenge);
+        }
+
+        return text;
+    }
+
+    private static double BegrenzeServicePreis(double preis)
+    {
+        if (double.IsNaN(preis) || double.IsInfinity(preis))
+        {
+            return 0.0;
+        }
+
+        if (preis < 0.0)
+        {
+            return 0.0;
+        }
+
+        if (preis > MaxServicePreis)
+        {
+            return MaxServicePreis;
+        }
+
+        return Math.Round(preis, 2);
+    }
+
+    private static double ParseDienstleistungsPreis(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return 0.0;
+        }
+
+        text = text.Replace("€", "").Trim();
+
+        if (double.TryParse(
+            text,
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.GetCultureInfo("de-DE"),
+            out double preisDe))
+        {
+            return preisDe;
+        }
+
+        if (double.TryParse(
+            text.Replace(",", "."),
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out double preisInvariant))
+        {
+            return preisInvariant;
+        }
+
+        return 0.0;
+    }
+
 }

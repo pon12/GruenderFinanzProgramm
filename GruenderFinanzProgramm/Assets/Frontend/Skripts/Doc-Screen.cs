@@ -16,51 +16,51 @@ public class DocumentDashboard : MonoBehaviour
 
     // UI-Elemente Hauptbildschirm
     private VisualElement root;
-    private Button        deleteButton;
+    private Button deleteButton;
     private VisualElement gridContainer;
 
     // Erstell-Popup (nur für flexible Kategorien)
     private VisualElement popupOverlay;
-    private Button        popupCancelButton;
-    private Button        popupSubmitButton;
+    private Button popupCancelButton;
+    private Button popupSubmitButton;
     private DropdownField categoryDropdown;
-    private TextField     docNameInput;
-    private Button        btnTypeStandard;
-    private Button        btnTypeDiagramm;
-    private Button        btnTypeChecklist;
+    private TextField docNameInput;
+    private Button btnTypeStandard;
+    private Button btnTypeDiagramm;
+    private Button btnTypeChecklist;
 
     // Kategorie-Listen-Popup
     private VisualElement detailPopupOverlay;
     private VisualElement detailListContainer;
     private VisualElement globalListContainer;
-    private Button        detailCloseButton;
-    private Label         detailPopupTitle;
-    private Button        listCreateNewButton;
+    private Button detailCloseButton;
+    private Label detailPopupTitle;
+    private Button listCreateNewButton;
 
     // Bearbeiten-Popup (flexible Dokumente: Titel + Freitext)
     private VisualElement editPopupOverlay;
-    private TextField     editDocNameInput;
-    private TextField     editInhaltInput;
-    private Button        editPopupSubmitButton;
-    private Button        editPopupCancelButton;
-    private Button        btnEditTypeStandard;
-    private Button        btnEditTypeDiagramm;
-    private Button        btnEditTypeChecklist;
-    private Label         editLockedHint;
+    private TextField editDocNameInput;
+    private TextField editInhaltInput;
+    private Button editPopupSubmitButton;
+    private Button editPopupCancelButton;
+    private Button btnEditTypeStandard;
+    private Button btnEditTypeDiagramm;
+    private Button btnEditTypeChecklist;
+    private Label editLockedHint;
     private VisualElement editTemplateGroup;
     private VisualElement editStrukturFelderBox;
 
     // Lösch-Bestätigungs-Popup
     private VisualElement deleteConfirmOverlay;
-    private Button        deleteConfirmYesButton;
-    private Button        deleteConfirmCancelButton;
-    private Label         deleteConfirmHint;
+    private Button deleteConfirmYesButton;
+    private Button deleteConfirmCancelButton;
+    private Label deleteConfirmHint;
 
     // Systemzustände
-    private string       selectedType          = "Standard";
-    private string       selectedEditType       = "Standard";
-    private string       activeCategoryForList  = "";
-    private DocumentData  activeDocForEditing;
+    private string selectedType = "Standard";
+    private string selectedEditType = "Standard";
+    private string activeCategoryForList = "";
+    private DocumentData activeDocForEditing;
     private List<TextField> aktiveStrukturFelder = new List<TextField>();
 
     // ============================================================
@@ -83,8 +83,8 @@ public class DocumentDashboard : MonoBehaviour
     // ============================================================
     private class KategorieDefinition
     {
-        public string       name;
-        public bool         istFest;
+        public string name;
+        public bool istFest;
         public List<string> pflichtDocs;
     }
 
@@ -107,62 +107,62 @@ public class DocumentDashboard : MonoBehaviour
     // ============================================================
     private readonly Dictionary<string, List<FeldDefinition>> felderProPflichtDoc =
         new Dictionary<string, List<FeldDefinition>>
-    {
-        ["Unternehmensstammdaten"] = new List<FeldDefinition>
+        {
+            ["Unternehmensstammdaten"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "firma",     label = "Firmenname", placeholder = "z.B. Mustermann GmbH" },
             new FeldDefinition { key = "rechtsform", label = "Rechtsform", placeholder = "z.B. GmbH" },
             new FeldDefinition { key = "branche",    label = "Branche",   placeholder = "z.B. IT & Software" },
             new FeldDefinition { key = "standort",   label = "Standort",  placeholder = "z.B. Berlin" },
         },
-        ["Gründungsurkunde"] = new List<FeldDefinition>
+            ["Gründungsurkunde"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "datum",        label = "Gründungsdatum", placeholder = "TT.MM.JJJJ" },
             new FeldDefinition { key = "notar",        label = "Notar",          placeholder = "Name des Notars" },
             new FeldDefinition { key = "aktenzeichen", label = "Aktenzeichen",   placeholder = "z.B. UR-Nr. 123/2026" },
         },
-        ["Handelsregisterauszug"] = new List<FeldDefinition>
+            ["Handelsregisterauszug"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "hrNummer",      label = "HR-Nummer",   placeholder = "z.B. HRB 12345" },
             new FeldDefinition { key = "amtsgericht",   label = "Amtsgericht", placeholder = "z.B. Amtsgericht Berlin" },
             new FeldDefinition { key = "eintragsdatum", label = "Eintragsdatum", placeholder = "TT.MM.JJJJ" },
         },
-        ["Kontodaten (IBAN/BIC)"] = new List<FeldDefinition>
+            ["Kontodaten (IBAN/BIC)"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "iban",         label = "IBAN",         placeholder = "DE00 0000 0000 0000 0000 00" },
             new FeldDefinition { key = "bic",          label = "BIC",          placeholder = "z.B. COBADEFFXXX" },
             new FeldDefinition { key = "bank",         label = "Bank",         placeholder = "z.B. Commerzbank" },
             new FeldDefinition { key = "kontoinhaber", label = "Kontoinhaber", placeholder = "Name laut Konto" },
         },
-        ["Zahlungsbedingungen"] = new List<FeldDefinition>
+            ["Zahlungsbedingungen"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "zahlungsziel", label = "Zahlungsziel (Tage)", placeholder = "z.B. 14" },
             new FeldDefinition { key = "skonto",       label = "Skonto (%)",          placeholder = "z.B. 2" },
             new FeldDefinition { key = "mahnstufe",    label = "Mahnstufe",           placeholder = "z.B. 1. Mahnung nach 7 Tagen" },
         },
-    };
+        };
 
 
     private static readonly Dictionary<string, string> kategorieTooltips =
         new Dictionary<string, string>
-    {
-        ["Gründung"]    = "Enthält Pflichtdokumente zur Unternehmensgründung. " +
+        {
+            ["Gründung"] = "Enthält Pflichtdokumente zur Unternehmensgründung. " +
                                "Fülle Stammdaten, Gründungsurkunde und Handelsregister aus. " +
                                "Diese Kategorie ist geschützt und kann nicht gelöscht werden.",
-        ["Bezahlweise"]       = "Enthält Pflichtdokumente für Zahlungsabwicklung und Rechnungsanhänge. " +
+            ["Bezahlweise"] = "Enthält Pflichtdokumente für Zahlungsabwicklung und Rechnungsanhänge. " +
                                "AGB, Disclaimer, Barzahlung und Überweisung werden als PDF-Anhänge verwendet. " +
                                "Diese Kategorie ist geschützt und kann nicht gelöscht werden.",
-        ["Finanzen"]          = "Flexible Kategorie für finanzielle Dokumente wie Budgetpläne oder Kalkulationen. " +
+            ["Finanzen"] = "Flexible Kategorie für finanzielle Dokumente wie Budgetpläne oder Kalkulationen. " +
                                "Du kannst hier eigene Dokumente anlegen und löschen.",
-        ["Marketing"]         = "Flexible Kategorie für Marketingmaterial wie Konzepte oder Kampagnenpläne. " +
+            ["Marketing"] = "Flexible Kategorie für Marketingmaterial wie Konzepte oder Kampagnenpläne. " +
                                "Du kannst hier eigene Dokumente anlegen und löschen.",
-        ["Steuern"]           = "Flexible Kategorie für steuerrelevante Dokumente wie Belege oder Bescheide. " +
+            ["Steuern"] = "Flexible Kategorie für steuerrelevante Dokumente wie Belege oder Bescheide. " +
                                "Du kannst hier eigene Dokumente anlegen und löschen.",
-        ["Personal"]          = "Flexible Kategorie für Personaldokumente wie Verträge oder Zeugnisse. " +
+            ["Personal"] = "Flexible Kategorie für Personaldokumente wie Verträge oder Zeugnisse. " +
                                "Du kannst hier eigene Dokumente anlegen und löschen.",
-        ["Recht"]             = "Flexible Kategorie für rechtliche Dokumente wie Verträge oder Datenschutzerklärungen. " +
+            ["Recht"] = "Flexible Kategorie für rechtliche Dokumente wie Verträge oder Datenschutzerklärungen. " +
                                "Du kannst hier eigene Dokumente anlegen und löschen.",
-    };
+        };
 
     private const string defaultFest = "Geschützte Pflichtdokument-Kategorie. " +
                                         "Dokumente können bearbeitet, aber nicht gelöscht werden.";
@@ -184,7 +184,7 @@ public class DocumentDashboard : MonoBehaviour
         public string category;
         public string title;
         public string type;
-        public bool   istPflichtdokument;
+        public bool istPflichtdokument;
         public string inhalt;
         public List<StrukturFeldWert> strukturFelder;
     }
@@ -196,7 +196,7 @@ public class DocumentDashboard : MonoBehaviour
     }
 
     private DocumentSaveData speicherDaten = new DocumentSaveData();
-    private string           saveFilePath;
+    private string saveFilePath;
 
     // ─────────────────────────────────────────
     // LIFECYCLE
@@ -204,7 +204,7 @@ public class DocumentDashboard : MonoBehaviour
 
     void OnEnable()
     {
-        saveFilePath = Application.persistentDataPath + "/MyDashboardSave.json";
+        saveFilePath = GetSaveFilePath();
 
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         if (uiDocument == null) return;
@@ -212,44 +212,44 @@ public class DocumentDashboard : MonoBehaviour
         root = uiDocument.rootVisualElement;
 
         // 1. Hauptbildschirm
-        deleteButton  = root.Q<Button>("Delete-Button");
+        deleteButton = root.Q<Button>("Delete-Button");
         gridContainer = root.Q<VisualElement>("Grid-Container");
 
         // 2. Erstell-Popup (nur flexible Kategorien)
-        popupOverlay      = root.Q<VisualElement>("Popup-Overlay");
+        popupOverlay = root.Q<VisualElement>("Popup-Overlay");
         popupCancelButton = root.Q<Button>("Btn-Cancel");
-        var btnAbbrechen  = root.Q<Button>("Btn-Abbrechen");
+        var btnAbbrechen = root.Q<Button>("Btn-Abbrechen");
         if (btnAbbrechen != null) btnAbbrechen.clicked += ClosePopup;
         popupSubmitButton = root.Q<Button>("Btn-Submit");
-        categoryDropdown  = root.Q<DropdownField>("dropKategorie");
-        docNameInput      = root.Q<TextField>("Doc-Name-Input");
+        categoryDropdown = root.Q<DropdownField>("dropKategorie");
+        docNameInput = root.Q<TextField>("Doc-Name-Input");
 
         // 3. Zweispaltiges Listen-Popup
-        detailPopupOverlay  = root.Q<VisualElement>("Detail-Popup-Overlay");
+        detailPopupOverlay = root.Q<VisualElement>("Detail-Popup-Overlay");
         detailListContainer = root.Q<VisualElement>("Detail-List-Container");
         globalListContainer = root.Q<VisualElement>("Global-List-Container");
-        detailCloseButton   = root.Q<Button>("Btn-Detail-Close");
-        detailPopupTitle    = root.Q<Label>("Detail-Popup-Title");
+        detailCloseButton = root.Q<Button>("Btn-Detail-Close");
+        detailPopupTitle = root.Q<Label>("Detail-Popup-Title");
         listCreateNewButton = root.Q<Button>("Btn-List-Create-New");
 
         // 4. Bearbeiten-Popup
-        editPopupOverlay      = root.Q<VisualElement>("Edit-Popup-Overlay");
-        editDocNameInput      = root.Q<TextField>("Edit-Doc-Name-Input");
-        editInhaltInput       = root.Q<TextField>("Edit-Inhalt-Input");
+        editPopupOverlay = root.Q<VisualElement>("Edit-Popup-Overlay");
+        editDocNameInput = root.Q<TextField>("Edit-Doc-Name-Input");
+        editInhaltInput = root.Q<TextField>("Edit-Inhalt-Input");
         editPopupSubmitButton = root.Q<Button>("Btn-Edit-Submit");
         editPopupCancelButton = root.Q<Button>("Btn-Edit-Cancel");
-        btnEditTypeStandard   = root.Q<Button>("Btn-Edit-Type-Standard");
-        btnEditTypeDiagramm   = root.Q<Button>("Btn-Edit-Type-Diagramm");
-        btnEditTypeChecklist  = root.Q<Button>("Btn-Edit-Type-Checklist");
-        editLockedHint        = root.Q<Label>("Edit-Locked-Hint");
-        editTemplateGroup     = root.Q<VisualElement>("Edit-Buttons-Type-Group");
+        btnEditTypeStandard = root.Q<Button>("Btn-Edit-Type-Standard");
+        btnEditTypeDiagramm = root.Q<Button>("Btn-Edit-Type-Diagramm");
+        btnEditTypeChecklist = root.Q<Button>("Btn-Edit-Type-Checklist");
+        editLockedHint = root.Q<Label>("Edit-Locked-Hint");
+        editTemplateGroup = root.Q<VisualElement>("Edit-Buttons-Type-Group");
         editStrukturFelderBox = root.Q<VisualElement>("Edit-Struktur-Felder-Box");
 
         // 5. Lösch-Bestätigungs-Popup
-        deleteConfirmOverlay      = root.Q<VisualElement>("Delete-Confirm-Overlay");
-        deleteConfirmYesButton    = root.Q<Button>("Btn-Delete-Confirm-Yes");
+        deleteConfirmOverlay = root.Q<VisualElement>("Delete-Confirm-Overlay");
+        deleteConfirmYesButton = root.Q<Button>("Btn-Delete-Confirm-Yes");
         deleteConfirmCancelButton = root.Q<Button>("Btn-Delete-Confirm-Cancel");
-        deleteConfirmHint         = root.Q<Label>("Delete-Confirm-Hint");
+        deleteConfirmHint = root.Q<Label>("Delete-Confirm-Hint");
 
         // Dropdown befüllen (nur flexible Kategorien)
         if (categoryDropdown != null)
@@ -267,16 +267,16 @@ public class DocumentDashboard : MonoBehaviour
         if (popupCancelButton != null) popupCancelButton.clicked += ClosePopup;
         if (popupSubmitButton != null) popupSubmitButton.clicked += CreateNewDocumentEntry;
 
-        btnTypeStandard  = root.Q<Button>("Btn-Type-Standard");
-        btnTypeDiagramm  = root.Q<Button>("Btn-Type-Diagramm");
+        btnTypeStandard = root.Q<Button>("Btn-Type-Standard");
+        btnTypeDiagramm = root.Q<Button>("Btn-Type-Diagramm");
         btnTypeChecklist = root.Q<Button>("Btn-Type-Checklist");
 
-        if (btnTypeStandard  != null) btnTypeStandard.clicked  += () => ApplyTemplate("Standard");
-        if (btnTypeDiagramm  != null) btnTypeDiagramm.clicked  += () => ApplyTemplate("Diagramm");
+        if (btnTypeStandard != null) btnTypeStandard.clicked += () => ApplyTemplate("Standard");
+        if (btnTypeDiagramm != null) btnTypeDiagramm.clicked += () => ApplyTemplate("Diagramm");
         if (btnTypeChecklist != null) btnTypeChecklist.clicked += () => ApplyTemplate("Checklist");
 
         // Event-Verdrahtung Listen-Popup
-        if (detailCloseButton   != null) detailCloseButton.clicked += CloseDetailPopup;
+        if (detailCloseButton != null) detailCloseButton.clicked += CloseDetailPopup;
         if (listCreateNewButton != null)
             listCreateNewButton.clicked += () =>
             {
@@ -287,13 +287,13 @@ public class DocumentDashboard : MonoBehaviour
         // Event-Verdrahtung Bearbeiten-Popup
         if (editPopupCancelButton != null) editPopupCancelButton.clicked += CloseEditPopup;
         if (editPopupSubmitButton != null) editPopupSubmitButton.clicked += SaveEditedDocumentEntry;
-        if (btnEditTypeStandard  != null) btnEditTypeStandard.clicked   += () => SelectEditType("Standard");
-        if (btnEditTypeDiagramm  != null) btnEditTypeDiagramm.clicked   += () => SelectEditType("Diagramm");
-        if (btnEditTypeChecklist != null) btnEditTypeChecklist.clicked  += () => SelectEditType("Checklist");
+        if (btnEditTypeStandard != null) btnEditTypeStandard.clicked += () => SelectEditType("Standard");
+        if (btnEditTypeDiagramm != null) btnEditTypeDiagramm.clicked += () => SelectEditType("Diagramm");
+        if (btnEditTypeChecklist != null) btnEditTypeChecklist.clicked += () => SelectEditType("Checklist");
 
         // Event-Verdrahtung Lösch-Bestätigung
         if (deleteConfirmCancelButton != null) deleteConfirmCancelButton.clicked += CloseDeleteConfirmPopup;
-        if (deleteConfirmYesButton    != null) deleteConfirmYesButton.clicked    += ConfirmDeleteAllDocuments;
+        if (deleteConfirmYesButton != null) deleteConfirmYesButton.clicked += ConfirmDeleteAllDocuments;
 
         LoadDataLocally();
         SicherePflichtdokumente();
@@ -322,13 +322,13 @@ public class DocumentDashboard : MonoBehaviour
                 {
                     var neuesDoc = new DocumentData
                     {
-                        id                 = System.Guid.NewGuid().ToString(),
-                        category           = kategorie.name,
-                        title              = pflichtTitel,
-                        type               = "Standard",
+                        id = System.Guid.NewGuid().ToString(),
+                        category = kategorie.name,
+                        title = pflichtTitel,
+                        type = "Standard",
                         istPflichtdokument = true,
-                        inhalt             = "",
-                        strukturFelder     = ErzeugeLeereStrukturFelder(pflichtTitel)
+                        inhalt = "",
+                        strukturFelder = ErzeugeLeereStrukturFelder(pflichtTitel)
                     };
                     speicherDaten.savedDocs.Add(neuesDoc);
                     geaendert = true;
@@ -378,7 +378,7 @@ public class DocumentDashboard : MonoBehaviour
     private void OpenPopup(string preselectedCategory = "")
     {
         if (popupOverlay != null) popupOverlay.style.display = DisplayStyle.Flex;
-        if (docNameInput != null) docNameInput.value         = "";
+        if (docNameInput != null) docNameInput.value = "";
         selectedType = "Standard";
         MarkiereAusgewaehlteVorlage(btnTypeStandard, btnTypeDiagramm, btnTypeChecklist, selectedType);
 
@@ -417,13 +417,13 @@ public class DocumentDashboard : MonoBehaviour
 
         DocumentData newDoc = new DocumentData
         {
-            id                 = System.Guid.NewGuid().ToString(),
-            category           = selectedCategory,
-            title              = docText,
-            type               = selectedType,
+            id = System.Guid.NewGuid().ToString(),
+            category = selectedCategory,
+            title = docText,
+            type = selectedType,
             istPflichtdokument = false,
-            inhalt             = "",
-            strukturFelder     = new List<StrukturFeldWert>()
+            inhalt = "",
+            strukturFelder = new List<StrukturFeldWert>()
         };
 
         speicherDaten.savedDocs.Add(newDoc);
@@ -465,8 +465,8 @@ public class DocumentDashboard : MonoBehaviour
             for (int slotIndex = 0; slotIndex < 4; slotIndex++)
             {
                 VisualElement contentBox = cardInstance.Q<VisualElement>($"Slot-{slotIndex}-Content");
-                VisualElement iconBox    = cardInstance.Q<VisualElement>($"Slot-{slotIndex}-Icon");
-                Button        plusBtn    = cardInstance.Q<Button>($"Slot-{slotIndex}-Plus");
+                VisualElement iconBox = cardInstance.Q<VisualElement>($"Slot-{slotIndex}-Icon");
+                Button plusBtn = cardInstance.Q<Button>($"Slot-{slotIndex}-Plus");
 
                 if (contentBox == null) continue;
                 contentBox.Clear();
@@ -478,15 +478,15 @@ public class DocumentDashboard : MonoBehaviour
                     var aktuellesDoc = kategorieDocs[slotIndex];
 
                     string iconGlyph = aktuellesDoc.istPflichtdokument ? "🔒" :
-                                        aktuellesDoc.type == "Diagramm"  ? "📊" :
+                                        aktuellesDoc.type == "Diagramm" ? "📊" :
                                         aktuellesDoc.type == "Checklist" ? "✅" : "📄";
                     if (iconBox != null)
                     {
                         iconBox.Clear();
                         var iconLabel = new Label(iconGlyph);
-                        iconLabel.style.fontSize        = 13;
-                        iconLabel.style.unityTextAlign  = TextAnchor.MiddleCenter;
-                        iconLabel.style.flexGrow        = 1;
+                        iconLabel.style.fontSize = 13;
+                        iconLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+                        iconLabel.style.flexGrow = 1;
                         iconBox.Add(iconLabel);
                     }
 
@@ -512,7 +512,7 @@ public class DocumentDashboard : MonoBehaviour
 
                     if (plusBtn != null)
                     {
-                        plusBtn.text     = "✎";
+                        plusBtn.text = "✎";
                         plusBtn.clicked += () => OpenEditPopup(aktuellesDoc);
                     }
                 }
@@ -542,9 +542,9 @@ public class DocumentDashboard : MonoBehaviour
             // Icon-Textur setzen (helpIconTexture im Inspector zuweisen)
             if (helpIconTexture != null)
             {
-                karteHelpIcon.style.backgroundImage              = new StyleBackground(helpIconTexture);
+                karteHelpIcon.style.backgroundImage = new StyleBackground(helpIconTexture);
                 karteHelpIcon.style.unityBackgroundImageTintColor = new StyleColor(
-                    new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f));
+                    new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
             }
 
             var headerRow = cardInstance.Q<VisualElement>(className: "category-header-row");
@@ -573,7 +573,7 @@ public class DocumentDashboard : MonoBehaviour
             if (ersterAusgefuellterWert == null) return "";
 
             string label = HoleFeldLabel(doc.title, ersterAusgefuellterWert.key);
-            string wert  = ersterAusgefuellterWert.wert;
+            string wert = ersterAusgefuellterWert.wert;
             if (wert.Length > 18) wert = wert.Substring(0, 15) + "...";
             return $"{label}: {wert}";
         }
@@ -606,7 +606,7 @@ public class DocumentDashboard : MonoBehaviour
     {
         activeCategoryForList = kategorie;
         if (detailPopupOverlay != null) detailPopupOverlay.style.display = DisplayStyle.Flex;
-        if (detailPopupTitle   != null) detailPopupTitle.text            = kategorie;
+        if (detailPopupTitle != null) detailPopupTitle.text = kategorie;
 
         bool istFest = IstKategorieFest(kategorie);
         if (listCreateNewButton != null)
@@ -643,10 +643,10 @@ public class DocumentDashboard : MonoBehaviour
             VisualElement row = new VisualElement();
             row.AddToClassList("list-row-item");
 
-            string icon         = doc.istPflichtdokument ? "🔒" : doc.type == "Diagramm" ? "📊" : doc.type == "Checklist" ? "✅" : "📄";
+            string icon = doc.istPflichtdokument ? "🔒" : doc.type == "Diagramm" ? "📊" : doc.type == "Checklist" ? "✅" : "📄";
             string displayTitle = doc.title.Split('\n')[0];
             if (displayTitle.Length > 30) displayTitle = displayTitle.Substring(0, 27) + "...";
-            string textToShow   = isGlobal
+            string textToShow = isGlobal
                 ? $"{icon} [{doc.category}] {displayTitle}"
                 : $"{icon} {displayTitle}";
 
@@ -683,7 +683,7 @@ public class DocumentDashboard : MonoBehaviour
                 Button editBtn = new Button { text = "Bearbeiten" };
                 editBtn.AddToClassList("btn-action-text");
                 editBtn.AddToClassList("btn-edit-pen");
-                editBtn.tooltip  = "Dokument bearbeiten";
+                editBtn.tooltip = "Dokument bearbeiten";
                 editBtn.clicked += () => OpenEditPopup(doc);
                 btnGroup.Add(editBtn);
 
@@ -692,7 +692,7 @@ public class DocumentDashboard : MonoBehaviour
                     Button deleteBtn = new Button { text = "Löschen" };
                     deleteBtn.AddToClassList("btn-action-text");
                     deleteBtn.AddToClassList("btn-minus-delete");
-                    deleteBtn.tooltip  = "Dokument löschen";
+                    deleteBtn.tooltip = "Dokument löschen";
                     deleteBtn.clicked += () => DeleteSingleDocument(doc.id);
                     btnGroup.Add(deleteBtn);
                 }
@@ -750,7 +750,7 @@ public class DocumentDashboard : MonoBehaviour
     private void OpenEditPopup(DocumentData doc)
     {
         activeDocForEditing = doc;
-        selectedEditType    = doc.type;
+        selectedEditType = doc.type;
 
         if (editPopupOverlay != null)
             editPopupOverlay.style.display = DisplayStyle.Flex;
@@ -798,7 +798,7 @@ public class DocumentDashboard : MonoBehaviour
 
                 foreach (var def in definitionen)
                 {
-                    var bestehenderWert  = doc.strukturFelder.FirstOrDefault(f => f.key == def.key);
+                    var bestehenderWert = doc.strukturFelder.FirstOrDefault(f => f.key == def.key);
                     string aktuellerWert = bestehenderWert?.wert ?? "";
 
                     var feldGroup = new VisualElement();
@@ -809,7 +809,7 @@ public class DocumentDashboard : MonoBehaviour
                     feldGroup.Add(feldLabel);
 
                     var feldInput = new TextField { value = aktuellerWert };
-                    feldInput.name    = $"struktur-feld-{def.key}";
+                    feldInput.name = $"struktur-feld-{def.key}";
                     feldInput.tooltip = def.placeholder;
                     feldGroup.Add(feldInput);
 
@@ -871,7 +871,7 @@ public class DocumentDashboard : MonoBehaviour
             }
             else
             {
-                docInList.type   = selectedEditType;
+                docInList.type = selectedEditType;
                 docInList.inhalt = editInhaltInput != null ? editInhaltInput.value : "";
             }
         }
@@ -889,7 +889,7 @@ public class DocumentDashboard : MonoBehaviour
     private void OpenDeleteConfirmPopup()
     {
         int anzahlGeschuetzt = speicherDaten.savedDocs.Count(d => d.istPflichtdokument);
-        int anzahlLoeschbar  = speicherDaten.savedDocs.Count(d => !d.istPflichtdokument);
+        int anzahlLoeschbar = speicherDaten.savedDocs.Count(d => !d.istPflichtdokument);
 
         if (deleteConfirmHint != null)
         {
@@ -922,14 +922,44 @@ public class DocumentDashboard : MonoBehaviour
 
     private void SaveDataLocally()
     {
-        string json = JsonUtility.ToJson(speicherDaten, true);
-        File.WriteAllText(saveFilePath, json);
+        try
+        {
+            string directoryPath = Path.GetDirectoryName(saveFilePath);
+
+            if (!string.IsNullOrWhiteSpace(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            string json = JsonUtility.ToJson(speicherDaten, true);
+            File.WriteAllText(saveFilePath, json);
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogError("[DocumentDashboard] Fehler beim Speichern der Dokumentdaten: " + exception.Message);
+        }
     }
 
     private void LoadDataLocally()
     {
-        if (File.Exists(saveFilePath))
-            speicherDaten = JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(saveFilePath));
+        try
+        {
+            if (File.Exists(saveFilePath))
+            {
+                string json = File.ReadAllText(saveFilePath);
+                DocumentSaveData loadedData = JsonUtility.FromJson<DocumentSaveData>(json);
+
+                if (loadedData != null && loadedData.savedDocs != null)
+                {
+                    speicherDaten = loadedData;
+                }
+            }
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogError("[DocumentDashboard] Fehler beim Laden der Dokumentdaten: " + exception.Message);
+            speicherDaten = new DocumentSaveData();
+        }
     }
 
     // ─────────────────────────────────────────
@@ -938,7 +968,7 @@ public class DocumentDashboard : MonoBehaviour
 
     public static string GetSaveFilePath()
     {
-        return Application.persistentDataPath + "/MyDashboardSave.json";
+        return Path.Combine(Application.persistentDataPath, "MyDashboardSave.json");
     }
 
     public static DocumentSaveData GetSavedDocuments()
@@ -954,7 +984,7 @@ public class DocumentDashboard : MonoBehaviour
     public static Dictionary<string, string> GetUnternehmenFelder()
     {
         var ergebnis = new Dictionary<string, string>();
-        var alle     = GetSavedDocuments();
+        var alle = GetSavedDocuments();
 
         var doc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Gründung" && d.title == "Unternehmensstammdaten");
@@ -974,7 +1004,7 @@ public class DocumentDashboard : MonoBehaviour
     public static Dictionary<string, string> GetKontodatenFelder()
     {
         var ergebnis = new Dictionary<string, string>();
-        var alle     = GetSavedDocuments();
+        var alle = GetSavedDocuments();
 
         var kontoDoc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Bezahlweise" && d.title == "Kontodaten (IBAN/BIC)");
@@ -999,7 +1029,7 @@ public class DocumentDashboard : MonoBehaviour
     public static string GetBezahlweiseInhalt(string titel)
     {
         var alle = GetSavedDocuments();
-        var doc  = alle.savedDocs.FirstOrDefault(d =>
+        var doc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Bezahlweise" && d.title == titel);
         return doc?.inhalt ?? "";
     }
@@ -1015,8 +1045,8 @@ public class DocumentDashboard : MonoBehaviour
 
         switch (aktiverTyp)
         {
-            case "Standard":  standard?.AddToClassList("selected-template");  break;
-            case "Diagramm":  diagramm?.AddToClassList("selected-template");  break;
+            case "Standard": standard?.AddToClassList("selected-template"); break;
+            case "Diagramm": diagramm?.AddToClassList("selected-template"); break;
             case "Checklist": checklist?.AddToClassList("selected-template"); break;
         }
     }
