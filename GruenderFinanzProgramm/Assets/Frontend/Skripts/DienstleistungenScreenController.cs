@@ -291,22 +291,17 @@ public class DienstleistungenScreenController : MonoBehaviour
 
     private void SpeichernUndSchliessen(VisualElement popup)
     {
-        string name = popup.Q<TextField>("feld-name") != null
-            ? popup.Q<TextField>("feld-name").value
-            : "";
+        var feldTitel = popup.Q<TextField>("feld-titel");
+        var feldBeschreibung = popup.Q<TextField>("feld-beschreibung");
+        var feldPreismodell = popup.Q<DropdownField>("feld-preismodell");
+        var feldBetrag = popup.Q<TextField>("feld-betrag");
 
-        string description = popup.Q<TextField>("feld-beschreibung") != null
-            ? popup.Q<TextField>("feld-beschreibung").value
-            : "";
-
-        string priceModel = popup.Q<DropdownField>("feld-preismodell") != null
-            ? popup.Q<DropdownField>("feld-preismodell").value
-            : "Festpreis";
+        string name = feldTitel != null ? feldTitel.value : "";
+        string description = feldBeschreibung != null ? feldBeschreibung.value : "";
+        string priceModel = feldPreismodell != null ? feldPreismodell.value : "Festpreis";
 
         double betrag = ParseDienstleistungsPreis(
-            popup.Q<TextField>("feld-betrag") != null
-                ? popup.Q<TextField>("feld-betrag").value
-                : "0"
+            feldBetrag != null ? feldBetrag.value : "0"
         );
 
         var neu = new Service
