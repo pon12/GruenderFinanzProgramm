@@ -4,66 +4,66 @@
     <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
     <Style src="project://database/Assets/Styles/USS-Main.uss?fileID=7433441132597879392&amp;guid=09df5e34da794d44e85d99fbe225ca8b&amp;type=3#USS-Main"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/TransactionPopup.uss?fileID=7433441132597879392&amp;guid=701f9ef6a140abe468ef02fb200ea930&amp;type=3#TransactionPopup"/>
-    <ui:VisualElement name="nav-item-finanzdashboard" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; width: 1920px; -unity-text-align: upper-left; background-position-x: center; height: 1080px;">
-        <ui:VisualElement style="flex-grow: 0; width: 388px;"/>
-        <ui:VisualElement style="flex-grow: 1; background-color: rgb(30, 30, 30); margin-left: 5px; padding-bottom: 5px; padding-right: 5px;">
+    <ui:VisualElement name="nav-item-finanzdashboard" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; width: 100%; -unity-text-align: upper-left; background-position-x: center; height: 100%;">
+        <ui:VisualElement name="spacer-sidebar" style="flex-grow: 0; width: 388px;"/>
+        <ui:VisualElement name="container-inhalt" style="flex-grow: 1; background-color: rgb(30, 30, 30); margin-left: 5px; padding-bottom: 5px; padding-right: 5px;">
             <ui:VisualElement name="Finanzdashboard" style="flex-grow: 1; flex-direction: row; align-items: flex-start; align-self: auto; justify-content: flex-start; height: auto; position: relative; min-height: 0; align-content: auto; flex-wrap: nowrap; top: auto; -unity-text-auto-size: none; -unity-text-generator: standard; -unity-background-scale-mode: stretch-to-fill; -unity-text-align: upper-left; opacity: 1; min-width: 0; max-width: 1920px; max-height: 70px; width: 1489px; padding-left: 20px;">
                 <ui:Label text="Renatbilität&#10;" name="Label" style="font-size: 46px; color: rgb(255, 255, 255); flex-direction: row; align-items: auto;"/>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-right: 10px; padding-right: 15px; margin-left: 10px; padding-left: 15px;">
+            <ui:VisualElement name="row-kennzahlen-karten" style="flex-grow: 0; flex-direction: row; margin-right: 10px; padding-right: 15px; margin-left: 10px; padding-left: 15px;">
                 <ui:VisualElement name="Umsatz" style="flex-grow: 1; justify-content: flex-start; height: auto; background-color: rgb(44, 44, 44); margin-right: 10px; margin-left: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
-                    <ui:Label text="Privatentnahemn " style="color: rgb(255, 255, 255); font-size: 26px; -unity-text-align: upper-center;"/>
+                    <ui:Label text="Privatentnahemn " name="label-karte-privatentnahme-titel" style="color: rgb(255, 255, 255); font-size: 26px; -unity-text-align: upper-center;"/>
                     <ui:Label text="0 €" name="Umsatzwert" style="color: rgb(255, 255, 255); -unity-text-align: upper-center; font-size: 20px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Auftragsquote" style="flex-grow: 1; height: auto; background-color: rgb(44, 44, 44); margin-right: 10px; margin-left: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
-                    <ui:Label text="Überschüssiges Kapital" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
+                    <ui:Label text="Überschüssiges Kapital" name="label-karte-kapital-titel" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
                     <ui:Label text="0 €" name="WertAq" style="-unity-text-align: upper-center; color: rgb(255, 255, 255); font-size: 20px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Gewinn" style="flex-grow: 1; height: auto; background-color: rgb(44, 44, 44); margin-left: 10px; margin-right: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-bottom: 10px;">
-                    <ui:Label text="SUmme Fremdkapitalk" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
+                    <ui:Label text="SUmme Fremdkapitalk" name="label-karte-fremdkapital-titel" style="font-size: 26px; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
                     <ui:Label text="0 €" name="gewinnWert" style="font-size: 20px; -unity-text-align: upper-center; color: rgb(255, 255, 255);"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; flex-direction: column; border-left-width: 5px; border-right-width: 1px; padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
-                <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
-                    <ui:VisualElement style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-bottom: 10px; margin-right: 10px; padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; width: 577px; padding-top: 15px; margin-top: 10px; margin-left: 10px;">
-                        <ui:Label text="Kosten" style="color: rgb(255, 255, 255); font-size: 26px;"/>
+            <ui:VisualElement name="container-charts" style="flex-grow: 1; flex-direction: column; border-left-width: 5px; border-right-width: 1px; padding-left: 20px; padding-right: 20px; padding-bottom: 20px;">
+                <ui:VisualElement name="row-kosten-kapitalbedarf" style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
+                    <ui:VisualElement name="card-kosten" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-bottom: 10px; margin-right: 10px; padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; width: 577px; padding-top: 15px; margin-top: 10px; margin-left: 10px;">
+                        <ui:Label text="Kosten" name="label-karte-kosten-titel" style="color: rgb(255, 255, 255); font-size: 26px;"/>
                         <ui:VisualElement name="Inhalt" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
-                        <ui:VisualElement style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-bottom: 10px; margin-right: 10px; padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; width: 577px; padding-top: 15px; margin-top: 10px; margin-left: 10px;">
-                            <ui:Label text="Kapitalbedarf" style="color: rgb(255, 255, 255); font-size: 26px;"/>
+                    <ui:VisualElement name="row-kapitalbedarf-wrapper" style="flex-grow: 1; flex-direction: row; justify-content: flex-start;">
+                        <ui:VisualElement name="card-kapitalbedarf" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); margin-bottom: 10px; margin-right: 10px; padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; width: 577px; padding-top: 15px; margin-top: 10px; margin-left: 10px;">
+                            <ui:Label text="Kapitalbedarf" name="label-karte-kapitalbedarf-titel" style="color: rgb(255, 255, 255); font-size: 26px;"/>
                             <ui:VisualElement name="Diagramm" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
-                    <ui:VisualElement style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-left: 10px; margin-top: 10px; margin-right: 10px;">
-                        <ui:Label text="Rohgewinn" style="color: rgb(255, 255, 255); font-size: 26px;"/>
+                <ui:VisualElement name="row-rohgewinn" style="flex-grow: 1; flex-direction: row;">
+                    <ui:VisualElement name="card-rohgewinn" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); padding-left: 15px; padding-bottom: 15px; padding-right: 15px; background-color: rgb(44, 44, 44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; margin-left: 10px; margin-top: 10px; margin-right: 10px;">
+                        <ui:Label text="Rohgewinn" name="label-karte-rohgewinn-titel" style="color: rgb(255, 255, 255); font-size: 26px;"/>
                         <ui:VisualElement name="tblEInnahemn" style="flex-grow: 1; justify-content: flex-end;">
                             <ui:VisualElement name="chart-container" class="chart-container" style="justify-content: center; flex-direction: row; align-items: stretch; flex-grow: 1;">
                                 <ui:VisualElement name="chart-y-axis" class="chart-y-axis" style="align-items: flex-start; justify-content: space-between;">
-                                    <ui:Label text="€0" class="chart-axis-label"/>
-                                    <ui:Label text="€0" class="chart-axis-label"/>
-                                    <ui:Label text="€0" class="chart-axis-label"/>
-                                    <ui:Label text="€0" class="chart-axis-label"/>
-                                    <ui:Label text="€0" class="chart-axis-label"/>
+                                    <ui:Label text="€0" name="label-chart-achse-1" class="chart-axis-label"/>
+                                    <ui:Label text="€0" name="label-chart-achse-2" class="chart-axis-label"/>
+                                    <ui:Label text="€0" name="label-chart-achse-3" class="chart-axis-label"/>
+                                    <ui:Label text="€0" name="label-chart-achse-4" class="chart-axis-label"/>
+                                    <ui:Label text="€0" name="label-chart-achse-5" class="chart-axis-label"/>
                                 </ui:VisualElement>
                                 <ui:VisualElement name="diagramm" class="chart-canvas" style="height: 100%; width: 100%; flex-shrink: 1; flex-grow: 1; justify-content: center; align-items: flex-start; flex-direction: column;"/>
                             </ui:VisualElement>
                             <ui:VisualElement name="chart-x-axis" class="chart-x-axis" style="flex-direction: row; justify-content: space-around; align-items: auto;">
-                                <ui:Label text="Jan" class="chart-month-label"/>
-                                <ui:Label text="Feb" class="chart-month-label"/>
-                                <ui:Label text="Mär" class="chart-month-label"/>
-                                <ui:Label text="Apr" class="chart-month-label"/>
-                                <ui:Label text="Mai" class="chart-month-label"/>
-                                <ui:Label text="Jun" class="chart-month-label"/>
-                                <ui:Label text="Jul" class="chart-month-label"/>
-                                <ui:Label text="Aug" class="chart-month-label"/>
-                                <ui:Label text="Sep" class="chart-month-label"/>
-                                <ui:Label text="Okt" class="chart-month-label"/>
-                                <ui:Label text="Nov" class="chart-month-label"/>
-                                <ui:Label text="Dez" class="chart-month-label"/>
+                                <ui:Label text="Jan" name="label-chart-monat-jan" class="chart-month-label"/>
+                                <ui:Label text="Feb" name="label-chart-monat-feb" class="chart-month-label"/>
+                                <ui:Label text="Mär" name="label-chart-monat-mar" class="chart-month-label"/>
+                                <ui:Label text="Apr" name="label-chart-monat-apr" class="chart-month-label"/>
+                                <ui:Label text="Mai" name="label-chart-monat-mai" class="chart-month-label"/>
+                                <ui:Label text="Jun" name="label-chart-monat-jun" class="chart-month-label"/>
+                                <ui:Label text="Jul" name="label-chart-monat-jul" class="chart-month-label"/>
+                                <ui:Label text="Aug" name="label-chart-monat-aug" class="chart-month-label"/>
+                                <ui:Label text="Sep" name="label-chart-monat-sep" class="chart-month-label"/>
+                                <ui:Label text="Okt" name="label-chart-monat-okt" class="chart-month-label"/>
+                                <ui:Label text="Nov" name="label-chart-monat-nov" class="chart-month-label"/>
+                                <ui:Label text="Dez" name="label-chart-monat-dez" class="chart-month-label"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>

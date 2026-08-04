@@ -63,6 +63,8 @@
 
 .tabelle-zeile {
     flex-direction: row;
+    align-items: center;
+    width: 100%;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 8px;
@@ -84,8 +86,9 @@
     font-size: 15px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
     -unity-text-align: middle-center;
+    text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    padding-right: 8px;
 }
 
 .col-titel {
@@ -102,7 +105,9 @@
 .col-beschreibung {
     width: 35%;
     flex-shrink: 0;
-    -unity-text-align: middle-center;
+    -unity-text-align: middle-left;
+    text-overflow: ellipsis;
+    white-space: normal;
     margin-top: 8px;
     margin-right: 0;
     margin-bottom: 8px;
@@ -189,11 +194,13 @@
 }
 
 .popup-box {
-    position: relative;
     width: 600px;
     background-color: rgb(38, 38, 38);
     border-radius: 16px;
-    border-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
     border-color: rgb(128, 207, 149);
     padding-top: 32px;
     padding-bottom: 32px;
@@ -226,10 +233,6 @@
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
-.popup-input:placeholder {
-    color: rgba(255, 255, 255, 0.35);
-}
-
 .popup-input > .unity-base-field__input {
     background-color: rgb(55, 55, 55);
     border-color: rgb(80, 80, 80);
@@ -256,7 +259,7 @@
 }
 
 .popup-btn-fertig {
-    background-color: rgb(128, 207, 149);
+    background-color: #80CF95;
     color: rgb(0, 0, 0);
     font-size: 18px;
     -unity-font-style: bold;
@@ -272,15 +275,15 @@
 }
 
 .popup-btn-fertig:hover {
-    background-color: rgb(179, 226, 196);
+    background-color: #B3E2C4;
 }
 
 .popup-btn-fertig:active {
-    background-color: rgb(102, 165, 119);
+    background-color: #66A577;
 }
 
 .popup-btn-abbrechen {
-    background-color: rgb(100, 100, 100);
+    background-color: #646464;
     color: rgb(0, 0, 0);
     font-size: 18px;
     -unity-font-style: bold;
@@ -296,16 +299,20 @@
 }
 
 .popup-btn-abbrechen:hover {
-    background-color: rgb(142, 141, 141);
+    background-color: #8E8D8D
 }
 
 .popup-btn-abbrechen:active {
-    background-color: rgb(56, 54, 54);
+    background-color: #383636
+}
+
+.popup-box {
+    position: relative;
 }
 
 .close-btn {
     position: absolute;
-    top: 16px;
+    top: 8px;
     right: 8px;
     width: 24px;
     height: 24px;
@@ -323,4 +330,83 @@
     color: rgb(229, 103, 112);
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
+}
+
+/* =========================================================
+   CONFIRM SPEICHERN POPUP  (basiert auf gespeichert.uxml)
+   ========================================================= */
+
+/* Abdunkelnder Hintergrund */
+.confirm-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dialog-Box */
+.confirm-box {
+    width: 360px;
+    background-color: rgb(56, 56, 56);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+/* Titel im Dialog */
+.confirm-titel {
+    font-size: 20px;
+    color: white;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+/* Text im Dialog */
+.confirm-text {
+    font-size: 14px;
+    color: rgb(220, 220, 220);
+    white-space: normal;
+    margin-bottom: 20px;
+}
+
+/* Container für die Buttons */
+.confirm-btn-zeile {
+    flex-direction: row;
+}
+
+/* Abbrechen-Button (Standard & Hover) */
+.btn-dialog-abbrechen {
+    flex-grow: 1;
+    height: 44px;
+    border-radius: 10px;
+    border-width: 0;
+    background-color: rgb(90, 90, 90);
+    color: white;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.btn-dialog-abbrechen:hover {
+    background-color: rgb(115, 115, 115);
+    cursor: link;
+}
+
+/* Löschen-Button (Standard & Hover) */
+.btn-dialog-loeschen {
+    flex-grow: 1;
+    height: 44px;
+    border-radius: 10px;
+    border-width: 0;
+    background-color: rgb(215, 65, 65);
+    color: white;
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.btn-dialog-loeschen:hover {
+    background-color: rgb(240, 85, 85);
+    cursor: link;
 }

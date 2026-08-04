@@ -10,44 +10,44 @@
     <ui:VisualElement name="root" class="root fullscreen-bg grid-container"
         style="flex-direction: row; width: 100%; height: 100%; background-color: rgb(30, 30, 30);">
 
-        <ui:VisualElement style="flex-grow: 0; width: 388px;"/>
+        <ui:VisualElement name="spacer-sidebar" style="flex-grow: 0; width: 388px;"/>
 
         <ui:ScrollView name="hauptbereich" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"
             style="flex-grow: 1; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; flex-direction: column;">
 
             <!-- Seitentitel -->
-            <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px; flex-shrink: 0;">
-                <ui:Label text="Finanzierung" style="font-size: 32px; -unity-font-style: bold; color: rgb(255,255,255);"/>
+            <ui:VisualElement name="row-kopfzeile" style="flex-direction: row; align-items: center; margin-bottom: 4px; flex-shrink: 0;">
+                <ui:Label text="Finanzierung" name="label-titel" style="font-size: 32px; -unity-font-style: bold; color: rgb(255,255,255);"/>
                 <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="spacer-kopfzeile" style="flex-grow: 1;"/>
                 <ui:DropdownField label="Jahr:" name="dropJahr" class="jahr-dropdown"/>
             </ui:VisualElement>
             <ui:Label name="lbl-jahr" text="Auswertung 2026" style="font-size: 14px; color: rgb(160,160,160); margin-bottom: 12px; flex-shrink: 0;"/>
 
             <!-- Ertragsquellen (volle Breite) -->
-            <ui:VisualElement style="flex-grow: 0; flex-direction: column; margin-bottom: 12px; flex-shrink: 0; background-color: rgb(44,44,44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; padding-top: 14px; padding-bottom: 14px; padding-left: 16px; padding-right: 16px;">
-                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                    <ui:Label text="Ertragsquellen" style="font-size: 18px; color: rgb(255,255,255); -unity-font-style: bold;"/>
-                    <ui:VisualElement style="flex-grow: 1;"/>
+            <ui:VisualElement name="panel-ertragsquellen" style="flex-grow: 0; flex-direction: column; margin-bottom: 12px; flex-shrink: 0; background-color: rgb(44,44,44); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; padding-top: 14px; padding-bottom: 14px; padding-left: 16px; padding-right: 16px;">
+                <ui:VisualElement name="row-titel-ertragsquellen" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                    <ui:Label text="Ertragsquellen" name="label-titel-ertragsquellen" style="font-size: 18px; color: rgb(255,255,255); -unity-font-style: bold;"/>
+                    <ui:VisualElement name="spacer-titel-ertragsquellen" style="flex-grow: 1;"/>
                     <ui:VisualElement name="btn-help-ertragsquellen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="Ertragsquellen" style="flex-grow: 1;"/>
             </ui:VisualElement>
 
             <!-- Direkte Kosten + Betriebsausgaben -->
-            <ui:VisualElement style="flex-grow: 0; flex-direction: row; margin-bottom: 12px; flex-shrink: 0;">
-                <ui:VisualElement class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Direkte Kosten" class="panel-title" style="margin-bottom: 0;"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+            <ui:VisualElement name="row-direkte-kosten-betriebsausgaben" style="flex-grow: 0; flex-direction: row; margin-bottom: 12px; flex-shrink: 0;">
+                <ui:VisualElement name="panel-direkte-kosten" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
+                    <ui:VisualElement name="row-titel-direkte-kosten" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Direkte Kosten" name="label-titel-direkte-kosten" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:VisualElement name="spacer-titel-direkte-kosten" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-direkte-kosten" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="DirekteKosten" style="flex-grow: 1;"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="panel-half" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Betriebsausgaben" class="panel-title" style="margin-bottom: 0;"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="panel-betriebsausgaben" class="panel-half" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
+                    <ui:VisualElement name="row-titel-betriebsausgaben" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Betriebsausgaben" name="label-titel-betriebsausgaben" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:VisualElement name="spacer-titel-betriebsausgaben" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-betriebsausgaben" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="Betriebsausgaben" style="flex-grow: 1;"/>
@@ -55,34 +55,34 @@
             </ui:VisualElement>
 
             <!-- Investition + Gründerkosten + Kapitalbedarf -->
-            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Investition" class="panel-title" style="margin-bottom: 0;"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+            <ui:VisualElement name="row-investition-gruenderkosten-kapitalbedarf" style="flex-grow: 1; flex-direction: row;">
+                <ui:VisualElement name="panel-investition" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
+                    <ui:VisualElement name="row-titel-investition" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Investition" name="label-titel-investition" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:VisualElement name="spacer-titel-investition" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-investition" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="Investition" style="flex-grow: 1;"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Gründerkosten" class="panel-title" style="margin-bottom: 0;"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="panel-gruenderkosten" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
+                    <ui:VisualElement name="row-titel-gruenderkosten" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Gründerkosten" name="label-titel-gruenderkosten" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:VisualElement name="spacer-titel-gruenderkosten" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-gruenderkosten" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="Grunderkosten" style="flex-grow: 1;"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="panel-half" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Kapitalbedarf" class="panel-title" style="margin-bottom: 0;"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="panel-kapitalbedarf" class="panel-half" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
+                    <ui:VisualElement name="row-titel-kapitalbedarf" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+                        <ui:Label text="Kapitalbedarf" name="label-titel-kapitalbedarf" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:VisualElement name="spacer-titel-kapitalbedarf" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-kapitalbedarf" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <!-- Liquiditätsreserve ist eine reine Planungsgröße (Puffer-Betrag),
                          kein Kassenbuch-Wert - deshalb hier manuell einstellbar. -->
-                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-                        <ui:Label text="Ziel-Liquiditätsreserve (€)" style="font-size: 12px; color: rgb(160,160,160); flex-grow: 1;"/>
-                        <ui:TextField name="input-liquiditaetsreserve" value="0" style="width: 90px; height: 26px; font-size: 12px; -unity-text-align: middle-right;"/>
+                    <ui:VisualElement name="row-liquiditaetsreserve" style="flex-direction: column; margin-bottom: 10px;">
+                        <ui:Label text="Ziel-Liquiditätsreserve (€)" name="label-liquiditaetsreserve" style="font-size: 11px; color: rgb(160,160,160); margin-bottom: 4px;"/>
+                        <ui:TextField name="input-liquiditaetsreserve" value="0" class="field-input" style="width: 100%; height: 28px; font-size: 13px;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="Kapitalbedarf" style="flex-grow: 1;"/>
                 </ui:VisualElement>
