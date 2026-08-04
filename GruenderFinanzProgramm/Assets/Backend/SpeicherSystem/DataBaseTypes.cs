@@ -179,6 +179,10 @@ public class Settings
     public string emailFirma { get; set; }
     public string teleponNrFirma { get; set; }
     public string websitefrima { get; set; }
+
+    // Ziel-Liquiditätsreserve (manuell gesetzter Puffer-Betrag, kein
+    // Buchungswert - fließt in die Kapitalbedarfs-Berechnung bei Finanzen 2 ein)
+    public float liquiditaetsreserveZiel { get; set; }
 }
 
 public class Finanzdaten

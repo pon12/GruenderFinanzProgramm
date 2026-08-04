@@ -676,14 +676,15 @@ public class KassenbuchController : MonoBehaviour
                     && _currentMonth == _ausgewaehltesDatum.Value.Month
                     && _currentYear == _ausgewaehltesDatum.Value.Year;
 
-                // FIX: Die tatsächlich ausgewählte Zahlung hat jetzt Vorrang
-                // (kräftige Füllung). "Heute" bekommt nur noch einen dezenten
-                // Rahmen als Orientierung, falls es nicht der gewählte Tag ist.
+                // Ausgewählter Tag: kräftige Marken-Grün-Füllung (statt Blau,
+                // passt jetzt zum Rest der App: #80CF95).
+                // "Heute" bekommt nur einen dezenten grauen Rahmen, damit die
+                // beiden nicht mehr wie "2 ausgewählte Tage" aussehen.
                 if (istAusgewaehlt)
                 {
                     btn.AddToClassList("cal-day-today");
-                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.6f));
-                    btn.style.color = new StyleColor(UnityEngine.Color.white);
+                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f, 1f));
+                    btn.style.color = new StyleColor(new UnityEngine.Color(0.1f, 0.1f, 0.1f));
                 }
                 else if (istHeute)
                 {
@@ -691,7 +692,7 @@ public class KassenbuchController : MonoBehaviour
                     btn.style.borderBottomWidth = 1;
                     btn.style.borderLeftWidth = 1;
                     btn.style.borderRightWidth = 1;
-                    var heuteRahmen = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.8f));
+                    var heuteRahmen = new StyleColor(new UnityEngine.Color(0.55f, 0.55f, 0.55f, 0.9f));
                     btn.style.borderTopColor = heuteRahmen;
                     btn.style.borderBottomColor = heuteRahmen;
                     btn.style.borderLeftColor = heuteRahmen;

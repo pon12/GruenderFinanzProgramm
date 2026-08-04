@@ -16,6 +16,8 @@
 
 .table-wrapper {
     flex-direction: column;
+    width: 100%;
+    overflow: hidden;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
