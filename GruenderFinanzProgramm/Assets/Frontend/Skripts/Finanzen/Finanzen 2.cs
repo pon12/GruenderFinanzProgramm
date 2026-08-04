@@ -15,6 +15,11 @@ public class FinanceDashboardBinder : MonoBehaviour
 
     private int _gewaehltesJahr = DateTime.Today.Year;
 
+    // Merkt sich die aktuelle DB-Referenz, damit das Eingabefeld für die
+    // Liquiditätsreserve auch außerhalb von BefuelleAlles() speichern kann.
+    private DataBase _db;
+    private const int SETTINGS_USER_ID = 0; // Settings sind je Nutzer-DB-Datei eindeutig
+
     private void Start()
     {
         StartCoroutine(InitUI());
@@ -25,7 +30,94 @@ public class FinanceDashboardBinder : MonoBehaviour
         yield return new WaitForEndOfFrame();
         if (uiDocument == null || uiDocument.rootVisualElement == null) yield break;
 
-        RegistriereJahresAuswahl();
+        _db = UserDatabaseAccess.getCurrentUserDatabase();
+
+        try { RegistriereJahresAuswahl(); }
+        catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereJahresAuswahl fehlgeschlagen: " + e); }
+
+        try { RegistriereHelpTooltips(); }
+        catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereHelpTooltips fehlgeschlagen: " + e); }
+
+        try { RegistriereLiquiditaetsreserveEingabe(); }
+        catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereLiquiditaetsreserveEingabe fehlgeschlagen: " + e); }
+
+        try { BefuelleAlles(); }
+        catch (Exception e) { Debug.LogError("[Finanzierung] BefuelleAlles fehlgeschlagen: " + e); }
+    }
+
+    // FIX: Die 7 Hilfe-Icons im UXML (btn-help-seitentitel, -ertragsquellen,
+    // -direkte-kosten, -betriebsausgaben, -investition, -gruenderkosten,
+    // -kapitalbedarf) waren nie mit HelpTooltip.Registriere(...) verknüpft -
+    // deshalb passierte beim Hovern buchstäblich gar nichts. War schlicht nie
+    // eingebaut worden (kein Regressions-Bug, hat hier einfach noch gefehlt).
+    private void RegistriereHelpTooltips()
+    {
+        var root = uiDocument.rootVisualElement;
+
+        HelpTooltip.Registriere(root, "btn-help-seitentitel",
+            "Diese Seite zeigt dir die Finanzierungs-Übersicht deines Unternehmens: " +
+            "Erträge, Kosten und den Kapitalbedarf für die Gründung.");
+
+        HelpTooltip.Registriere(root, "btn-help-ertragsquellen",
+            "Zeigt, aus welchen Quellen dein Umsatz kommt, sowie Summe Umsätze, " +
+            "Summe Kosten und den daraus resultierenden Rohgewinn.");
+
+        HelpTooltip.Registriere(root, "btn-help-direkte-kosten",
+            "Kosten, die direkt mit deiner Leistungserbringung zusammenhängen, " +
+            "z. B. Gehälter/Honorare und sonstige direkte Kosten.");
+
+        HelpTooltip.Registriere(root, "btn-help-betriebsausgaben",
+            "Laufende Ausgaben für den Geschäftsbetrieb: Marketing, Reisekosten, " +
+            "Steuern, Tilgungsraten und Privatentnahmen.");
+
+        HelpTooltip.Registriere(root, "btn-help-investition",
+            "Anschaffungen zum Start deines Unternehmens, z. B. Büroausstattung, " +
+            "Fuhrpark, Maschinen/Anlagen und Software/Lizenzen.");
+
+        HelpTooltip.Registriere(root, "btn-help-gruenderkosten",
+            "Einmalige Kosten rund um die Gründung: Corporate Design, Homepage, " +
+            "Grundausstattung und sonstige Kosten aus dem Kassenbuch.");
+
+        HelpTooltip.Registriere(root, "btn-help-kapitalbedarf",
+            "Wie viel Kapital du insgesamt für die Gründung brauchst: Investition + " +
+            "Gründerkosten + deine Ziel-Liquiditätsreserve (siehe Eingabefeld oben).");
+    }
+
+    // Ziel-Liquiditätsreserve ist eine reine Planungsgröße (Puffer-Betrag),
+    // kein Kassenbuch-Wert - wird deshalb manuell erfasst und in den
+    // Settings der Nutzer-DB gespeichert (siehe DataBase.getLiquiditaetsreserveZiel).
+    private void RegistriereLiquiditaetsreserveEingabe()
+    {
+        var input = uiDocument.rootVisualElement.Q<TextField>("input-liquiditaetsreserve");
+        if (input == null || _db == null) return;
+
+        float aktuelleReserve = _db.getLiquiditaetsreserveZiel(SETTINGS_USER_ID);
+        input.SetValueWithoutNotify(aktuelleReserve.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")));
+
+        input.RegisterCallback<FocusOutEvent>(_ => SpeichereLiquiditaetsreserve(input));
+        input.RegisterCallback<KeyDownEvent>(evt =>
+        {
+            if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+                SpeichereLiquiditaetsreserve(input);
+        });
+    }
+
+    private void SpeichereLiquiditaetsreserve(TextField input)
+    {
+        if (_db == null) return;
+
+        string text = (input.value ?? "").Replace(".", "").Replace(",", ".");
+        if (!float.TryParse(text, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out float wert))
+        {
+            wert = 0f;
+        }
+        if (wert < 0) wert = 0f;
+
+        _db.setLiquiditaetsreserveZiel(SETTINGS_USER_ID, wert);
+        input.SetValueWithoutNotify(wert.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")));
+
+        // Kapitalbedarf-Block sofort mit dem neuen Wert neu berechnen
         BefuelleAlles();
     }
 
@@ -221,13 +313,14 @@ public class FinanceDashboardBinder : MonoBehaviour
         }
 
         // KAPITALBEDARF
-        // FIX: Rechnete vorher nichts (alle Zwischenwerte fest 0f), nur die
-        // letzte Zeile "Gesamtkapitalbedarf" hatte echte Werte. Jetzt aus
-        // Investition + Gründerkosten hergeleitet.
         var cKapital = root.Q<VisualElement>("Kapitalbedarf");
         if (cKapital != null)
         {
-            float kapitalbedarf = summeInvestition + summeGruenderkosten;
+            float liquiditaetsreserve = db != null ? db.getLiquiditaetsreserveZiel(SETTINGS_USER_ID) : 0f;
+            // Kapitalbedarf = Investition + Gründerkosten + Ziel-Liquiditätsreserve
+            // (Standard-Formel im Kapitalbedarfsplan). Vorher floss die Reserve
+            // gar nicht in die Summe ein, weil sie fest 0 war.
+            float kapitalbedarf = summeInvestition + summeGruenderkosten + liquiditaetsreserve;
             float gesamtKapital = geldeinlagen + kredite;
 
             cKapital.Clear();
@@ -237,11 +330,9 @@ public class FinanceDashboardBinder : MonoBehaviour
             // Kassenbuch-Buchung, daher bewusst ohne automatische Herleitung.
             cKapital.Add(MakeRow("Sacheinlagen",       0f,                  TextColor));
             cKapital.Add(MakeRow("Gründerkosten",      summeGruenderkosten, RedColor));
+            cKapital.Add(MakeRow("Liquiditätsreserve", liquiditaetsreserve, liquiditaetsreserve > 0 ? RedColor : TextColor));
             cKapital.Add(MakeTrenn());
             cKapital.Add(MakeRow("Kapitalbedarf",      kapitalbedarf,       RedColor, true));
-            // Liquiditätsreserve ist ebenfalls eine reine Planungsgröße
-            // (Businessplan-Puffer), kein Kassenbuch-Wert.
-            cKapital.Add(MakeRow("Liquiditätsreserve", 0f,                  TextColor));
             cKapital.Add(MakeTrenn());
             cKapital.Add(MakeRow("Gesamtkapitalbedarf",gesamtKapital,
                 gesamtKapital >= 0 ? GreenColor : RedColor, true));

@@ -25,10 +25,32 @@ public class Finanzen1 : MonoBehaviour
     private IEnumerator InitUI()
     {
         yield return new WaitForEndOfFrame();
-        RegistriereJahresAuswahl();
-        AktualisiereTabellen();
-        RegistriereHelpTooltips();
-        ButtonHoverController.RegistriereAlle(uiDocument.rootVisualElement);
+        if (uiDocument == null || uiDocument.rootVisualElement == null)
+        {
+            Debug.LogWarning("[Finanzen1] uiDocument/rootVisualElement war beim ersten Frame noch null - " +
+                "Initialisierung (inkl. Hilfe-Tooltips) wird verschoben.");
+            yield return null; // einen weiteren Frame warten und erneut versuchen
+            if (uiDocument == null || uiDocument.rootVisualElement == null) yield break;
+        }
+
+        // WICHTIG: Reihenfolge bewusst geändert. Vorher lief AktualisiereTabellen()
+        // (liest/rechnet Kassenbuch-Daten) VOR RegistriereHelpTooltips() - flog dort
+        // eine Exception (z.B. durch einen unerwarteten Dateneintrag), brach die
+        // GESAMTE Coroutine ab und die Tooltips wurden nie registriert, ohne dass
+        // man das ohne Blick in die Console gemerkt hätte. Jetzt: Tooltips + Jahres-
+        // Auswahl zuerst, UND jeder Schritt einzeln try/catch-abgesichert, damit ein
+        // Fehler in einem Bereich nicht die anderen mit runterreißt.
+        try { RegistriereJahresAuswahl(); }
+        catch (Exception e) { Debug.LogError("[Finanzen1] RegistriereJahresAuswahl fehlgeschlagen: " + e); }
+
+        try { RegistriereHelpTooltips(); }
+        catch (Exception e) { Debug.LogError("[Finanzen1] RegistriereHelpTooltips fehlgeschlagen: " + e); }
+
+        try { ButtonHoverController.RegistriereAlle(uiDocument.rootVisualElement); }
+        catch (Exception e) { Debug.LogError("[Finanzen1] ButtonHoverController fehlgeschlagen: " + e); }
+
+        try { AktualisiereTabellen(); }
+        catch (Exception e) { Debug.LogError("[Finanzen1] AktualisiereTabellen fehlgeschlagen: " + e); }
     }
 
     // FIX: Vorher gab es keine Möglichkeit, sich vergangene Jahre anzusehen -

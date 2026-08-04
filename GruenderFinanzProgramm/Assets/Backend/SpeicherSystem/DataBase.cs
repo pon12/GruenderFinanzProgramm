@@ -19,6 +19,7 @@ public class DataBase : DatabaseManager
         try { database.Execute("ALTER TABLE Settings ADD COLUMN ueberweisung TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN agb TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN disclaimer TEXT DEFAULT ''"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN liquiditaetsreserveZiel REAL DEFAULT 0"); } catch { }
 
         createTable<Ausgaben>();
         createTable<Einkommen>();
@@ -873,7 +874,8 @@ public class DataBase : DatabaseManager
             Begleiter = false,
             emailFirma = "",
             teleponNrFirma = "",
-            websitefrima = ""
+            websitefrima = "",
+            liquiditaetsreserveZiel = 0f
         };
 
         insert(settings);
@@ -900,6 +902,21 @@ public class DataBase : DatabaseManager
 
         settings.id = existingSettings.id;
         return update(settings);
+    }
+
+    // Bequeme Zugriffsmethoden für die Ziel-Liquiditätsreserve (manuell
+    // gesetzter Puffer-Betrag, siehe Settings.liquiditaetsreserveZiel).
+    public float getLiquiditaetsreserveZiel(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.liquiditaetsreserveZiel ?? 0f;
+    }
+
+    public void setLiquiditaetsreserveZiel(int userId, float wert)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.liquiditaetsreserveZiel = wert;
+        updateSettingsForUser(settings);
     }
 
     public int deleteSettingsForUser(int userId)

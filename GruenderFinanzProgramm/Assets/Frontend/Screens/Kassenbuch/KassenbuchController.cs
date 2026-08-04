@@ -672,14 +672,15 @@ public class KassenbuchController : MonoBehaviour
                     && _currentMonth == _ausgewaehltesDatum.Value.Month
                     && _currentYear == _ausgewaehltesDatum.Value.Year;
 
-                // FIX: Die tatsächlich ausgewählte Zahlung hat jetzt Vorrang
-                // (kräftige Füllung). "Heute" bekommt nur noch einen dezenten
-                // Rahmen als Orientierung, falls es nicht der gewählte Tag ist.
+                // Ausgewählter Tag: kräftige Marken-Grün-Füllung (statt Blau,
+                // passt jetzt zum Rest der App: #80CF95).
+                // "Heute" bekommt nur einen dezenten grauen Rahmen, damit die
+                // beiden nicht mehr wie "2 ausgewählte Tage" aussehen.
                 if (istAusgewaehlt)
                 {
                     btn.AddToClassList("cal-day-today");
-                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.6f));
-                    btn.style.color = new StyleColor(UnityEngine.Color.white);
+                    btn.style.backgroundColor = new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f, 1f));
+                    btn.style.color = new StyleColor(new UnityEngine.Color(0.1f, 0.1f, 0.1f));
                 }
                 else if (istHeute)
                 {
@@ -687,7 +688,7 @@ public class KassenbuchController : MonoBehaviour
                     btn.style.borderBottomWidth = 1;
                     btn.style.borderLeftWidth = 1;
                     btn.style.borderRightWidth = 1;
-                    var heuteRahmen = new StyleColor(new UnityEngine.Color(0.12f, 0.58f, 0.95f, 0.8f));
+                    var heuteRahmen = new StyleColor(new UnityEngine.Color(0.55f, 0.55f, 0.55f, 0.9f));
                     btn.style.borderTopColor = heuteRahmen;
                     btn.style.borderBottomColor = heuteRahmen;
                     btn.style.borderLeftColor = heuteRahmen;
@@ -1095,7 +1096,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
         if (balanceLabel != null)
         {
-            balanceLabel.text = differenz.ToString("N0", DeKultur) + " €";
+            balanceLabel.text = differenz.ToString("N2", DeKultur) + " €";
             balanceLabel.style.color = differenz < 0
                 ? new StyleColor(new UnityEngine.Color(230f/255f, 57f/255f, 70f/255f))   // Rot #E63946
                 : new StyleColor(new UnityEngine.Color(128f/255f, 207f/255f, 149f/255f)); // Gruen #80CF95
@@ -1237,7 +1238,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
             nameLabel.text = zeile.Name;
             if (artLabel != null) artLabel.text = string.IsNullOrWhiteSpace(zeile.Art) ? "–" : zeile.Art;
-            betragLabel.text = zeile.Betrag.ToString("N0", DeKultur) + " €";
+            betragLabel.text = zeile.Betrag.ToString("N2", DeKultur) + " €";
             erstellTagLabel.text = zeile.Datum;
             typLabel.text = istEinnahme ? "Einkommen" : "Ausgabe";
 
@@ -1473,7 +1474,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                     if (i < habenPosten.Count)
                     {
                         AddGuvBodyCell(table, habenPosten[i].Name, normalFont, Element.ALIGN_LEFT);
-                        AddGuvBodyCell(table, habenPosten[i].Betrag.ToString("N0", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                        AddGuvBodyCell(table, habenPosten[i].Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
                     }
                     else
                     {
@@ -1484,7 +1485,7 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                     if (i < sollPosten.Count)
                     {
                         AddGuvBodyCell(table, sollPosten[i].Name, normalFont, Element.ALIGN_LEFT);
-                        AddGuvBodyCell(table, sollPosten[i].Betrag.ToString("N0", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                        AddGuvBodyCell(table, sollPosten[i].Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
                     }
                     else
                     {
@@ -1495,9 +1496,9 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
 
                 // Summenzeile
                 AddGuvBodyCell(table, "Summe Haben", boldFont, Element.ALIGN_LEFT, true);
-                AddGuvBodyCell(table, summeHaben.ToString("N0", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                AddGuvBodyCell(table, summeHaben.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
                 AddGuvBodyCell(table, "Summe Soll", boldFont, Element.ALIGN_LEFT, true);
-                AddGuvBodyCell(table, summeSoll.ToString("N0", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                AddGuvBodyCell(table, summeSoll.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
 
                 doc.Add(table);
                 doc.Add(new Paragraph(" "));
@@ -1507,16 +1508,16 @@ private bool TryParseUndNormalisiereDatum(string eingabe, out string normalisier
                 var auswertungFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, auswertungFarbe);
 
                 string gewinnText = gewinn >= 0
-                    ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N0", DeKultur) + " €"
-                    : "Jahresergebnis " + jahr + ": Verlust " + Math.Abs(gewinn).ToString("N0", DeKultur) + " €";
+                    ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N2", DeKultur) + " €"
+                    : "Jahresergebnis " + jahr + ": Verlust " + Math.Abs(gewinn).ToString("N2", DeKultur) + " €";
 
                 doc.Add(new Paragraph(
-                    "Anfangsbestand " + jahr + " (aus Vorjahr): " + anfangsbestandJahr.ToString("N0", DeKultur) + " €",
+                    "Anfangsbestand " + jahr + " (aus Vorjahr): " + anfangsbestandJahr.ToString("N2", DeKultur) + " €",
                     normalFont));
                 doc.Add(new Paragraph(gewinnText, auswertungFont));
                 doc.Add(new Paragraph(
                     "Endbestand " + jahr + " / Anfangsbestand " + (jahrZahl + 1) + ": "
-                    + endbestandJahr.ToString("N0", DeKultur) + " €",
+                    + endbestandJahr.ToString("N2", DeKultur) + " €",
                     normalFont));
 
                 doc.Close();
