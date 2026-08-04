@@ -12,8 +12,8 @@ public class Finanzen1 : MonoBehaviour
     // Identische Farben wie in Finanzen 2 (FinanceDashboardBinder), damit
     // beide Screens exakt gleich aussehen.
     private static readonly Color GreenColor = new Color(0.502f, 0.812f, 0.584f, 1f);
-    private static readonly Color RedColor   = new Color(0.902f, 0.224f, 0.275f, 1f);
-    private static readonly Color TextColor  = new Color(0.863f, 0.863f, 0.863f, 1f);
+    private static readonly Color RedColor = new Color(0.902f, 0.224f, 0.275f, 1f);
+    private static readonly Color TextColor = new Color(0.863f, 0.863f, 0.863f, 1f);
 
     private int _gewaehltesJahr = DateTime.Today.Year;
 
@@ -43,7 +43,7 @@ public class Finanzen1 : MonoBehaviour
         for (int j = DateTime.Today.Year; j >= 2010; j--) jahre.Add(j.ToString());
 
         dropJahr.choices = jahre;
-        dropJahr.value   = _gewaehltesJahr.ToString();
+        dropJahr.value = _gewaehltesJahr.ToString();
         dropJahr.RegisterValueChangedCallback(evt =>
         {
             if (int.TryParse(evt.newValue, out int neuesJahr))
@@ -97,7 +97,7 @@ public class Finanzen1 : MonoBehaviour
         float steuern = 0f, tilgung = 0f, privatentnahme = 0f, zinsen = 0f;
         float geldeinlagen = 0f, kredite = 0f, sonstEinz = 0f;
         float[] einnahmenMonat = new float[12];
-        float[] ausgabenMonat  = new float[12];
+        float[] ausgabenMonat = new float[12];
 
         var db = UserDatabaseAccess.getCurrentUserDatabase();
         if (db != null)
@@ -110,9 +110,9 @@ public class Finanzen1 : MonoBehaviour
                         einnahmenMonat[d.Month - 1] += e.Amount;
                         gesamtEinn += e.Amount;
                         string art = e.getArt() ?? "";
-                        if (art == "Privateinzahlung")        geldeinlagen += e.Amount;
-                        else if (art == "Darlehen")           kredite      += e.Amount;
-                        else if (art == "Sonstige Einzahlung") sonstEinz   += e.Amount;
+                        if (art == "Privateinzahlung") geldeinlagen += e.Amount;
+                        else if (art == "Darlehen") kredite += e.Amount;
+                        else if (art == "Sonstige Einzahlung") sonstEinz += e.Amount;
                     }
 
             var ausgList = db.getAllAusgabenEntries();
@@ -122,17 +122,17 @@ public class Finanzen1 : MonoBehaviour
                     {
                         ausgabenMonat[d.Month - 1] += a.Amount;
                         string art = a.getArt() ?? "";
-                        if (art == "Gehälter")                           personal       += a.Amount;
-                        else if (art == "Tilgungsraten")                 tilgung        += a.Amount;
-                        else if (art == "Steuern" || art == "Finanzamt") steuern        += a.Amount;
-                        else if (art == "Barentnahme / Privatentnahme")  privatentnahme += a.Amount;
+                        if (art == "Gehälter") personal += a.Amount;
+                        else if (art == "Tilgungsraten") tilgung += a.Amount;
+                        else if (art == "Steuern" || art == "Finanzamt") steuern += a.Amount;
+                        else if (art == "Barentnahme / Privatentnahme") privatentnahme += a.Amount;
                         // FIX: "Zinsen" hatte vorher keine eigene Art-Kategorie
                         // im Kassenbuch und stand deshalb immer fest auf 0.
                         // Jetzt gibt es "Zinsen" als eigene Ausgaben-Kategorie
                         // im Kassenbuch-Dropdown, wird hier eingerechnet UND
                         // aus "Betriebsausgaben" rausgehalten (sonst doppelt).
-                        else if (art == "Zinsen")                        zinsen         += a.Amount;
-                        else                                             betrieb        += a.Amount;
+                        else if (art == "Zinsen") zinsen += a.Amount;
+                        else betrieb += a.Amount;
                     }
         }
 
@@ -149,12 +149,12 @@ public class Finanzen1 : MonoBehaviour
         {
             containerRentabilitaet.Clear();
             containerRentabilitaet.Add(MakeHeader("Kategorie", "Betrag"));
-            containerRentabilitaet.Add(MakeRow("Umsatzerlöse",        gesamtEinn,     GreenColor));
-            containerRentabilitaet.Add(MakeRow("Personalausgaben",    personal,       RedColor));
-            containerRentabilitaet.Add(MakeRow("Betriebsausgaben",    betrieb,        RedColor));
-            containerRentabilitaet.Add(MakeRow("Steuern / Finanzamt", steuern,        RedColor));
-            containerRentabilitaet.Add(MakeRow("Tilgungsraten",       tilgung,        RedColor));
-            containerRentabilitaet.Add(MakeRow("Privatentnahmen",     privatentnahme, RedColor));
+            containerRentabilitaet.Add(MakeRow("Umsatzerlöse", gesamtEinn, GreenColor));
+            containerRentabilitaet.Add(MakeRow("Personalausgaben", personal, RedColor));
+            containerRentabilitaet.Add(MakeRow("Betriebsausgaben", betrieb, RedColor));
+            containerRentabilitaet.Add(MakeRow("Steuern / Finanzamt", steuern, RedColor));
+            containerRentabilitaet.Add(MakeRow("Tilgungsraten", tilgung, RedColor));
+            containerRentabilitaet.Add(MakeRow("Privatentnahmen", privatentnahme, RedColor));
             containerRentabilitaet.Add(MakeTrenn());
             containerRentabilitaet.Add(MakeRow("Überschuss/Fehlbetrag", ueberschuss,
                 ueberschuss >= 0 ? GreenColor : RedColor, true));
@@ -167,11 +167,11 @@ public class Finanzen1 : MonoBehaviour
         {
             containerLiquiditaet.Clear();
             containerLiquiditaet.Add(MakeHeader("Kategorie", "Gründung"));
-            containerLiquiditaet.Add(MakeRow("Geldeinlagen",        geldeinlagen, GreenColor));
-            containerLiquiditaet.Add(MakeRow("Kredite / Darlehen",  kredite,      GreenColor));
-            containerLiquiditaet.Add(MakeRow("Sonstige Einzahlung", sonstEinz,    GreenColor));
-            containerLiquiditaet.Add(MakeRow("Steuern",             steuern,      RedColor));
-            containerLiquiditaet.Add(MakeRow("Tilgungsraten",       tilgung,      RedColor));
+            containerLiquiditaet.Add(MakeRow("Geldeinlagen", geldeinlagen, GreenColor));
+            containerLiquiditaet.Add(MakeRow("Kredite / Darlehen", kredite, GreenColor));
+            containerLiquiditaet.Add(MakeRow("Sonstige Einzahlung", sonstEinz, GreenColor));
+            containerLiquiditaet.Add(MakeRow("Steuern", steuern, RedColor));
+            containerLiquiditaet.Add(MakeRow("Tilgungsraten", tilgung, RedColor));
             containerLiquiditaet.Add(MakeTrenn());
             float liqGesamt = geldeinlagen + kredite + sonstEinz - steuern - tilgung;
             containerLiquiditaet.Add(MakeRow("Liquidität gesamt", liqGesamt,
@@ -190,13 +190,13 @@ public class Finanzen1 : MonoBehaviour
             // erkennbar, auf welches Jahr sich welche Zeile bezieht bzw. dass
             // der Anfangsbestand aus dem Vorjahr resultiert.
             containerGruendung.Add(MakeRow($"Anfangsbestand {jahr} aus Vorjahr", anfangsbestand, TextColor));
-            containerGruendung.Add(MakeRow("Umsatzerlöse",     gesamtEinn,     GreenColor));
-            containerGruendung.Add(MakeRow("Personalausgaben", personal,       RedColor));
-            containerGruendung.Add(MakeRow("Betriebsausgaben", betrieb,        RedColor));
-            containerGruendung.Add(MakeRow("Zinsen",           zinsen,         RedColor));
-            containerGruendung.Add(MakeRow("Tilgung",          tilgung,        RedColor));
-            containerGruendung.Add(MakeRow("MwSt / Finanzamt", steuern,        RedColor));
-            containerGruendung.Add(MakeRow("Privatentnahmen",  privatentnahme, RedColor));
+            containerGruendung.Add(MakeRow("Umsatzerlöse", gesamtEinn, GreenColor));
+            containerGruendung.Add(MakeRow("Personalausgaben", personal, RedColor));
+            containerGruendung.Add(MakeRow("Betriebsausgaben", betrieb, RedColor));
+            containerGruendung.Add(MakeRow("Zinsen", zinsen, RedColor));
+            containerGruendung.Add(MakeRow("Tilgung", tilgung, RedColor));
+            containerGruendung.Add(MakeRow("MwSt / Finanzamt", steuern, RedColor));
+            containerGruendung.Add(MakeRow("Privatentnahmen", privatentnahme, RedColor));
             containerGruendung.Add(MakeTrenn());
             containerGruendung.Add(MakeRow($"Überschuss {jahr}", ueberschuss,
                 ueberschuss >= 0 ? GreenColor : RedColor, true));
@@ -236,13 +236,13 @@ public class Finanzen1 : MonoBehaviour
     private VisualElement MakeHeader(string links, string rechts)
     {
         var row = new VisualElement();
-        row.style.flexDirection     = FlexDirection.Row;
-        row.style.justifyContent    = Justify.SpaceBetween;
-        row.style.paddingBottom     = 8;
-        row.style.marginBottom      = 4;
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.justifyContent = Justify.SpaceBetween;
+        row.style.paddingBottom = 8;
+        row.style.marginBottom = 4;
         row.style.borderBottomWidth = 1;
         row.style.borderBottomColor = new Color(1, 1, 1, 0.2f);
-        row.Add(Lbl(links,  new Color(1, 1, 1), 13, true));
+        row.Add(Lbl(links, new Color(1, 1, 1), 13, true));
         row.Add(Lbl(rechts, new Color(1, 1, 1), 13, true));
         return row;
     }
@@ -250,14 +250,14 @@ public class Finanzen1 : MonoBehaviour
     private VisualElement MakeRow(string name, float wert, Color wertFarbe, bool fett = false, string suffix = " €")
     {
         var row = new VisualElement();
-        row.style.flexDirection     = FlexDirection.Row;
-        row.style.justifyContent    = Justify.SpaceBetween;
-        row.style.paddingTop        = 5;
-        row.style.paddingBottom     = 5;
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.justifyContent = Justify.SpaceBetween;
+        row.style.paddingTop = 5;
+        row.style.paddingBottom = 5;
         row.style.borderBottomWidth = 1;
         row.style.borderBottomColor = new Color(1, 1, 1, 0.04f);
-        string wertText = (wert < 0 ? "-" : "") + Mathf.Abs(wert).ToString("N0") + suffix;
-        row.Add(Lbl(name,     fett ? new Color(1, 1, 1) : TextColor, 12, fett));
+        string wertText = (wert < 0 ? "-" : "") + Mathf.Abs(wert).ToString("N2") + suffix;
+        row.Add(Lbl(name, fett ? new Color(1, 1, 1) : TextColor, 12, fett));
         row.Add(Lbl(wertText, wertFarbe, 12, fett));
         return row;
     }
@@ -265,10 +265,10 @@ public class Finanzen1 : MonoBehaviour
     private VisualElement MakeTrenn()
     {
         var line = new VisualElement();
-        line.style.height          = 1;
+        line.style.height = 1;
         line.style.backgroundColor = new Color(1, 1, 1, 0.1f);
-        line.style.marginTop       = 4;
-        line.style.marginBottom    = 4;
+        line.style.marginTop = 4;
+        line.style.marginBottom = 4;
         return line;
     }
 

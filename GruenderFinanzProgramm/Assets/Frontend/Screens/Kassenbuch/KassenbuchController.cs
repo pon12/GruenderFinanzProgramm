@@ -1101,7 +1101,7 @@ public class KassenbuchController : MonoBehaviour
 
         if (balanceLabel != null)
         {
-            balanceLabel.text = differenz.ToString("N0", DeKultur) + " €";
+            balanceLabel.text = differenz.ToString("N2", DeKultur) + " €";
             balanceLabel.style.color = differenz < 0
                 ? new StyleColor(new UnityEngine.Color(230f / 255f, 57f / 255f, 70f / 255f))   // Rot #E63946
                 : new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f)); // Gruen #80CF95
@@ -1137,11 +1137,9 @@ public class KassenbuchController : MonoBehaviour
                     if (System.DateTime.TryParse(e.getDatum(), out System.DateTime datum) && datum.Year == heute.Year)
                     {
                         // Falls getAmount() als String zurückgegeben wird, bereinigen wir es, um Fehler zu vermeiden.
-                        if (float.TryParse(e.getAmount().Replace("€", "").Trim(), out float amount))
-                        {
-                            umsatzJahr += amount;
-                            monate[datum.Month - 1] += amount;
-                        }
+                        float amount = e.Amount;
+                        umsatzJahr += amount;
+                        monate[datum.Month - 1] += amount;
                     }
                 }
             }
@@ -1193,7 +1191,7 @@ public class KassenbuchController : MonoBehaviour
             foreach (Einkommen e in einkommenList)
             {
                 TryParseDatum(e.getDatum(), out DateTime datumSort);
-                float.TryParse(e.getAmount(), out float betrag);
+                float betrag = e.Amount;
                 alleEintraege.Add(new KassenbuchZeile
                 {
                     Id = e.getId(),
@@ -1212,7 +1210,7 @@ public class KassenbuchController : MonoBehaviour
             foreach (Ausgaben a in ausgabenList)
             {
                 TryParseDatum(a.getDatum(), out DateTime datumSort);
-                float.TryParse(a.getAmount(), out float betrag);
+                float betrag = a.Amount;
                 alleEintraege.Add(new KassenbuchZeile
                 {
                     Id = a.getId(),
@@ -1243,7 +1241,7 @@ public class KassenbuchController : MonoBehaviour
 
             nameLabel.text = zeile.Name;
             if (artLabel != null) artLabel.text = string.IsNullOrWhiteSpace(zeile.Art) ? "–" : zeile.Art;
-            betragLabel.text = zeile.Betrag.ToString("N0", DeKultur) + " €";
+            betragLabel.text = zeile.Betrag.ToString("N2", DeKultur) + " €";
             erstellTagLabel.text = zeile.Datum;
             typLabel.text = istEinnahme ? "Einkommen" : "Ausgabe";
 
@@ -1481,7 +1479,7 @@ public class KassenbuchController : MonoBehaviour
                     if (i < habenPosten.Count)
                     {
                         AddGuvBodyCell(table, habenPosten[i].Name, normalFont, Element.ALIGN_LEFT);
-                        AddGuvBodyCell(table, habenPosten[i].Betrag.ToString("N0", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                        AddGuvBodyCell(table, habenPosten[i].Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
                     }
                     else
                     {
@@ -1492,7 +1490,7 @@ public class KassenbuchController : MonoBehaviour
                     if (i < sollPosten.Count)
                     {
                         AddGuvBodyCell(table, sollPosten[i].Name, normalFont, Element.ALIGN_LEFT);
-                        AddGuvBodyCell(table, sollPosten[i].Betrag.ToString("N0", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                        AddGuvBodyCell(table, sollPosten[i].Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
                     }
                     else
                     {
@@ -1503,9 +1501,9 @@ public class KassenbuchController : MonoBehaviour
 
                 // Summenzeile
                 AddGuvBodyCell(table, "Summe Haben", boldFont, Element.ALIGN_LEFT, true);
-                AddGuvBodyCell(table, summeHaben.ToString("N0", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                AddGuvBodyCell(table, summeHaben.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
                 AddGuvBodyCell(table, "Summe Soll", boldFont, Element.ALIGN_LEFT, true);
-                AddGuvBodyCell(table, summeSoll.ToString("N0", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                AddGuvBodyCell(table, summeSoll.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
 
                 doc.Add(table);
                 doc.Add(new Paragraph(" "));
@@ -1515,16 +1513,16 @@ public class KassenbuchController : MonoBehaviour
                 var auswertungFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, auswertungFarbe);
 
                 string gewinnText = gewinn >= 0
-                    ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N0", DeKultur) + " €"
-                    : "Jahresergebnis " + jahr + ": Verlust " + Math.Abs(gewinn).ToString("N0", DeKultur) + " €";
+                    ? "Jahresergebnis " + jahr + ": Gewinn " + gewinn.ToString("N2", DeKultur) + " €"
+                    : "Jahresergebnis " + jahr + ": Verlust " + Math.Abs(gewinn).ToString("N2", DeKultur) + " €";
 
                 doc.Add(new Paragraph(
-                    "Anfangsbestand " + jahr + " (aus Vorjahr): " + anfangsbestandJahr.ToString("N0", DeKultur) + " €",
+                    "Anfangsbestand " + jahr + " (aus Vorjahr): " + anfangsbestandJahr.ToString("N2", DeKultur) + " €",
                     normalFont));
                 doc.Add(new Paragraph(gewinnText, auswertungFont));
                 doc.Add(new Paragraph(
                     "Endbestand " + jahr + " / Anfangsbestand " + (jahrZahl + 1) + ": "
-                    + endbestandJahr.ToString("N0", DeKultur) + " €",
+                    + endbestandJahr.ToString("N2", DeKultur) + " €",
                     normalFont));
 
                 doc.Close();

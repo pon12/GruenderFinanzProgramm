@@ -11,9 +11,9 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(UIDocument))]
 public class DashboardController : MonoBehaviour
 {
-    private VisualElement    _root;
-    private int              _currentYear;
-    private int              _currentMonth;
+    private VisualElement _root;
+    private int _currentYear;
+    private int _currentMonth;
     private LineChartElement _chart;
 
     private Dictionary<string, List<string>> _deadlines = new Dictionary<string, List<string>>();
@@ -29,8 +29,8 @@ public class DashboardController : MonoBehaviour
     {
         _root = GetComponent<UIDocument>().rootVisualElement;
 
-        var today     = DateTime.Today;
-        _currentYear  = today.Year;
+        var today = DateTime.Today;
+        _currentYear = today.Year;
         _currentMonth = today.Month;
 
         SetupButtons();
@@ -40,11 +40,11 @@ public class DashboardController : MonoBehaviour
 
         StartCoroutine(LadeNachFrame());
 
-        AppEventManager.OnKundenAnzahlGeaendert         += OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert        += OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert      += OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert            += OnKassenbuch;
-        AppEventManager.OnDokumenteFortschrittGeaendert  += OnDokumenteFortschritt;
+        AppEventManager.OnKundenAnzahlGeaendert += OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert += OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert += OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert += OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert += OnDokumenteFortschritt;
     }
 
     private System.Collections.IEnumerator LadeNachFrame()
@@ -57,11 +57,11 @@ public class DashboardController : MonoBehaviour
 
     void OnDisable()
     {
-        AppEventManager.OnKundenAnzahlGeaendert         -= OnKunden;
-        AppEventManager.OnAngeboteAnzahlGeaendert        -= OnAngebote;
-        AppEventManager.OnRechnungenAnzahlGeaendert      -= OnRechnungen;
-        AppEventManager.OnKassenbuchGeaendert            -= OnKassenbuch;
-        AppEventManager.OnDokumenteFortschrittGeaendert  -= OnDokumenteFortschritt;
+        AppEventManager.OnKundenAnzahlGeaendert -= OnKunden;
+        AppEventManager.OnAngeboteAnzahlGeaendert -= OnAngebote;
+        AppEventManager.OnRechnungenAnzahlGeaendert -= OnRechnungen;
+        AppEventManager.OnKassenbuchGeaendert -= OnKassenbuch;
+        AppEventManager.OnDokumenteFortschrittGeaendert -= OnDokumenteFortschritt;
     }
 
     // ============================================================
@@ -132,18 +132,18 @@ public class DashboardController : MonoBehaviour
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+            if (db == null) { SetzeSegmente(0f, 0f, 0f, 0f, 0f); return; }
 
             var docs = db.getAllUserDocuments();
             var save = docs?.OrderByDescending(d => d.id)
                            .FirstOrDefault(d => d.documentType == 9001);
 
-            if (save == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+            if (save == null) { SetzeSegmente(0f, 0f, 0f, 0f, 0f); return; }
 
             var data = JsonUtility.FromJson<GruendungspfadSpeicher>(save.text);
-            if (data == null) { SetzeSegmente(0f,0f,0f,0f,0f); return; }
+            if (data == null) { SetzeSegmente(0f, 0f, 0f, 0f, 0f); return; }
 
-            var erledigteIds   = data.erledigteIds   ?? new List<string>();
+            var erledigteIds = data.erledigteIds ?? new List<string>();
             var eigeneSchritte = data.eigeneSchritte ?? new List<EigenerSchritt>();
 
             var phasenDef = new (string name, string[] ids)[]
@@ -155,9 +155,9 @@ public class DashboardController : MonoBehaviour
                 ("Sonstiges",    new[] { "sonst_1","sonst_2","sonst_3" }),
             };
 
-            float[] segmente   = new float[5];
-            int gesamtAlle     = 0;
-            int gesamtErled    = 0;
+            float[] segmente = new float[5];
+            int gesamtAlle = 0;
+            int gesamtErled = 0;
 
             for (int i = 0; i < phasenDef.Length; i++)
             {
@@ -171,15 +171,15 @@ public class DashboardController : MonoBehaviour
                 g += eigene.Count;
                 e += eigene.Count(s => erledigteIds.Contains(s.id));
 
-                segmente[i]  = g > 0 ? (float)e / g : 0f;
-                gesamtAlle  += g;
+                segmente[i] = g > 0 ? (float)e / g : 0f;
+                gesamtAlle += g;
                 gesamtErled += e;
             }
 
             var eigeneOhnePhase = eigeneSchritte
                 .Where(s => s.id != null && !phasenDef.Any(p => s.id.StartsWith(p.name + "_eigen_")))
                 .ToList();
-            gesamtAlle  += eigeneOhnePhase.Count;
+            gesamtAlle += eigeneOhnePhase.Count;
             gesamtErled += eigeneOhnePhase.Count(s => erledigteIds.Contains(s.id));
 
             float gesamt = gesamtAlle > 0 ? (float)gesamtErled / gesamtAlle : 0f;
@@ -203,7 +203,7 @@ public class DashboardController : MonoBehaviour
     [System.Serializable]
     private class GruendungspfadSpeicher
     {
-        public List<string>        erledigteIds;
+        public List<string> erledigteIds;
         public List<EigenerSchritt> eigeneSchritte;
     }
 
@@ -236,10 +236,10 @@ public class DashboardController : MonoBehaviour
             SetLabel("lbl-rechnungen", rechnungenImJahr.ToString());
 
             float umsatzJahr = 0f;
-            float[] monate   = BerechneMonatsBilanz(db, jahr, out umsatzJahr);
+            float[] monate = BerechneMonatsBilanz(db, jahr, out umsatzJahr);
             float kontostand = BerechneKontostandBisJahresende(db, jahr);
 
-            SetLabel("lbl-kassenbuch", "\u20ac " + umsatzJahr.ToString("N0"));
+            SetLabel("lbl-kassenbuch", FormatEuro(umsatzJahr));
             SetKontostand(kontostand);
 
             _chart?.SetValues(monate);
@@ -262,7 +262,7 @@ public class DashboardController : MonoBehaviour
             {
                 bool ok = TryParseDatum(e.Datum, out DateTime d);
                 bool zaehlt = ok && d <= stichtag;
-                Debug.Log($"[DEBUG-Kontostand] EINKOMMEN '{e.Datum}' Amount={e.Amount} parsed={ok}->{(ok?d.ToString("yyyy-MM-dd"):"FEHLER")} zaehlt={zaehlt}");
+                Debug.Log($"[DEBUG-Kontostand] EINKOMMEN '{e.Datum}' Amount={e.Amount} parsed={ok}->{(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} zaehlt={zaehlt}");
                 if (zaehlt) summe += e.Amount;
             }
 
@@ -272,7 +272,7 @@ public class DashboardController : MonoBehaviour
             {
                 bool ok = TryParseDatum(a.Datum, out DateTime d);
                 bool zaehlt = ok && d <= stichtag;
-                Debug.Log($"[DEBUG-Kontostand] AUSGABE '{a.Datum}' Amount={a.Amount} parsed={ok}->{(ok?d.ToString("yyyy-MM-dd"):"FEHLER")} zaehlt={zaehlt}");
+                Debug.Log($"[DEBUG-Kontostand] AUSGABE '{a.Datum}' Amount={a.Amount} parsed={ok}->{(ok ? d.ToString("yyyy-MM-dd") : "FEHLER")} zaehlt={zaehlt}");
                 if (zaehlt) summe -= a.Amount;
             }
 
@@ -285,9 +285,7 @@ public class DashboardController : MonoBehaviour
         var lbl = _root.Q<Label>("lbl-kontostand");
         if (lbl == null) return;
 
-        string vorzeichen = wert < 0 ? "- " : "";
-        float  betragAbs  = Mathf.Abs(wert);
-        lbl.text = "\u20ac " + vorzeichen + betragAbs.ToString("N0");
+        lbl.text = FormatEuro(wert);
 
         lbl.RemoveFromClassList("stat-value-green");
         lbl.RemoveFromClassList("stat-value-red");
@@ -299,7 +297,7 @@ public class DashboardController : MonoBehaviour
 
     bool TryParseDatum(string text, out DateTime ergebnis)
     {
-        var inv  = System.Globalization.CultureInfo.InvariantCulture;
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
         var deDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
         var none = System.Globalization.DateTimeStyles.None;
 
@@ -336,13 +334,13 @@ public class DashboardController : MonoBehaviour
         foreach (var v in monatswerte) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
 
         float range = Mathf.Max(maxV - minV, 1f);
-        float vMin  = minV - range * 0.08f;
-        float vMax  = maxV + range * 0.08f;
+        float vMin = minV - range * 0.08f;
+        float vMax = maxV + range * 0.08f;
 
         var labels = yAxisContainer.Query<Label>().ToList();
         for (int i = 0; i < labels.Count; i++)
         {
-            float t    = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
+            float t = labels.Count > 1 ? (float)i / (labels.Count - 1) : 0f;
             float wert = Mathf.Lerp(vMax, vMin, t);
             labels[i].text = FormatiereEuroKompakt(wert);
         }
@@ -351,17 +349,17 @@ public class DashboardController : MonoBehaviour
     string FormatiereEuroKompakt(float wert)
     {
         string vorzeichen = wert < 0 ? "-" : "";
-        float  abs        = Mathf.Abs(wert);
+        float abs = Mathf.Abs(wert);
 
         if (abs >= 1_000_000f) return $"{vorzeichen}\u20ac{(abs / 1_000_000f).ToString("0.#")}M";
-        if (abs >= 1_000f)     return $"{vorzeichen}\u20ac{(abs / 1_000f).ToString("0.#")}k";
+        if (abs >= 1_000f) return $"{vorzeichen}\u20ac{(abs / 1_000f).ToString("0.#")}k";
         return $"{vorzeichen}\u20ac{abs.ToString("0")}";
     }
 
     // ============================================================
     // EVENT-HANDLER
     // ============================================================
-    void OnKunden(int anzahl)    => SetLabel("lbl-kunden", anzahl.ToString());
+    void OnKunden(int anzahl) => SetLabel("lbl-kunden", anzahl.ToString());
 
     void OnAngebote(int anzahl)
     {
@@ -379,7 +377,7 @@ public class DashboardController : MonoBehaviour
 
     void OnKassenbuch(float umsatzJahr, float kontostand, float[] monate)
     {
-        SetLabel("lbl-kassenbuch", "\u20ac " + umsatzJahr.ToString("N0"));
+        SetLabel("lbl-kassenbuch", FormatEuro(umsatzJahr));
         SetKontostand(kontostand);
         if (monate != null && monate.Length == 12)
         {
@@ -397,10 +395,10 @@ public class DashboardController : MonoBehaviour
     void SetzeSegmente(float stammdaten, float vertraege, float steuer, float rechnungen, float sonstiges)
     {
         SetSegment("seg-fill-stammdaten", stammdaten);
-        SetSegment("seg-fill-vertraege",  vertraege);
-        SetSegment("seg-fill-steuer",     steuer);
+        SetSegment("seg-fill-vertraege", vertraege);
+        SetSegment("seg-fill-steuer", steuer);
         SetSegment("seg-fill-rechnungen", rechnungen);
-        SetSegment("seg-fill-sonstiges",  sonstiges);
+        SetSegment("seg-fill-sonstiges", sonstiges);
     }
 
     void SetSegment(string name, float wert)
@@ -419,9 +417,9 @@ public class DashboardController : MonoBehaviour
     // ============================================================
     void SetupButtons()
     {
-        BindScene("btn-nav-kunden",     "KundenDB");
-        BindScene("btn-nav-angebot",    "Angebot");
-        BindScene("btn-nav-rechnung",   "Rechnung");
+        BindScene("btn-nav-kunden", "KundenDB");
+        BindScene("btn-nav-angebot", "Angebot");
+        BindScene("btn-nav-rechnung", "Rechnung");
         BindScene("btn-nav-kassenbuch", "Kassenbuch");
     }
 
@@ -435,7 +433,7 @@ public class DashboardController : MonoBehaviour
                 { exists = true; break; }
 
             if (exists) SceneManager.LoadScene(sceneName);
-            else        Debug.LogWarning($"[Dashboard] Scene '{sceneName}' nicht gefunden.");
+            else Debug.LogWarning($"[Dashboard] Scene '{sceneName}' nicht gefunden.");
         });
     }
 
@@ -445,18 +443,28 @@ public class DashboardController : MonoBehaviour
         if (lbl != null) lbl.text = text;
     }
 
+    string FormatEuro(float wert)
+    {
+        var de = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
+        string vorzeichen = wert < 0 ? "- " : "";
+        float betragAbs = Mathf.Abs(wert);
+
+        return "€ " + vorzeichen + betragAbs.ToString("N2", de);
+    }
+
     // ============================================================
     // KALENDER
     // ============================================================
     void SetupCalendar()
     {
         var dropMonat = _root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = _root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = _root.Q<DropdownField>("dropdown-jahr");
 
         if (dropMonat != null)
         {
             dropMonat.choices = new List<string>(_monthNames);
-            dropMonat.index   = _currentMonth - 1;
+            dropMonat.index = _currentMonth - 1;
             dropMonat.RegisterValueChangedCallback(_ =>
             { _currentMonth = dropMonat.index + 1; RenderKalender(); });
         }
@@ -466,7 +474,7 @@ public class DashboardController : MonoBehaviour
             var jahre = new List<string>();
             for (int y = _currentYear - 3; y <= _currentYear + 3; y++) jahre.Add(y.ToString());
             dropJahr.choices = jahre;
-            dropJahr.value   = _currentYear.ToString();
+            dropJahr.value = _currentYear.ToString();
             dropJahr.RegisterValueChangedCallback(evt =>
             {
                 if (int.TryParse(evt.newValue, out int y))
@@ -493,13 +501,13 @@ public class DashboardController : MonoBehaviour
         int vorherigesJahr = _currentYear;
 
         _currentMonth += delta;
-        if (_currentMonth < 1)  { _currentMonth = 12; _currentYear--; }
-        if (_currentMonth > 12) { _currentMonth = 1;  _currentYear++; }
+        if (_currentMonth < 1) { _currentMonth = 12; _currentYear--; }
+        if (_currentMonth > 12) { _currentMonth = 1; _currentYear++; }
 
         var dropMonat = _root.Q<DropdownField>("dropdown-monat");
-        var dropJahr  = _root.Q<DropdownField>("dropdown-jahr");
+        var dropJahr = _root.Q<DropdownField>("dropdown-jahr");
         if (dropMonat != null) dropMonat.index = _currentMonth - 1;
-        if (dropJahr  != null) dropJahr.value  = _currentYear.ToString();
+        if (dropJahr != null) dropJahr.value = _currentYear.ToString();
 
         RenderKalender();
 
@@ -552,9 +560,9 @@ public class DashboardController : MonoBehaviour
 
     void RenderKalender()
     {
-        var today          = DateTime.Today;
-        var ersterTag      = new DateTime(_currentYear, _currentMonth, 1);
-        int tageImMonat    = DateTime.DaysInMonth(_currentYear, _currentMonth);
+        var today = DateTime.Today;
+        var ersterTag = new DateTime(_currentYear, _currentMonth, 1);
+        int tageImMonat = DateTime.DaysInMonth(_currentYear, _currentMonth);
         int startWochentag = (int)ersterTag.DayOfWeek;
 
         for (int i = 0; i < 42; i++)
@@ -605,7 +613,7 @@ public class DashboardController : MonoBehaviour
         _chart = new LineChartElement(new float[12]);
         canvas.Add(_chart);
         _chart.style.position = Position.Absolute;
-        _chart.style.left = 0; _chart.style.top    = 0;
+        _chart.style.left = 0; _chart.style.top = 0;
         _chart.style.right = 0; _chart.style.bottom = 0;
     }
 
@@ -615,13 +623,13 @@ public class DashboardController : MonoBehaviour
     private class LineChartElement : VisualElement
     {
         private float[] _values;
-        private static readonly Color LineColor  = new Color(0.502f, 0.812f, 0.584f, 1f);
-        private static readonly Color GridColor  = new Color(0.25f,  0.25f,  0.25f,  1f);
-        private static readonly Color FillColor  = new Color(0.502f, 0.812f, 0.584f, 0.12f);
+        private static readonly Color LineColor = new Color(0.502f, 0.812f, 0.584f, 1f);
+        private static readonly Color GridColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+        private static readonly Color FillColor = new Color(0.502f, 0.812f, 0.584f, 0.12f);
         private static readonly Color PointColor = new Color(0.502f, 0.812f, 0.584f, 1f);
 
         public LineChartElement(float[] v) { _values = v; generateVisualContent += Draw; }
-        public void SetValues(float[] v)   { _values = v; MarkDirtyRepaint(); }
+        public void SetValues(float[] v) { _values = v; MarkDirtyRepaint(); }
 
         private void Draw(MeshGenerationContext ctx)
         {
@@ -631,8 +639,8 @@ public class DashboardController : MonoBehaviour
             float maxV = float.MinValue, minV = float.MaxValue;
             foreach (var v in _values) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
             float range = Mathf.Max(maxV - minV, 1f);
-            float vMin  = minV - range * 0.08f;
-            float vMax  = maxV + range * 0.08f;
+            float vMin = minV - range * 0.08f;
+            float vMax = maxV + range * 0.08f;
             float vRange = vMax - vMin;
 
             var p = ctx.painter2D;
@@ -646,13 +654,13 @@ public class DashboardController : MonoBehaviour
             var pts = new Vector2[_values.Length];
             for (int i = 0; i < _values.Length; i++)
                 pts[i] = new Vector2(
-                    padX + (w - 2*padX) * i / (_values.Length - 1),
-                    padY + (h - 2*padY) * (1f - (_values[i] - vMin) / vRange));
+                    padX + (w - 2 * padX) * i / (_values.Length - 1),
+                    padY + (h - 2 * padY) * (1f - (_values[i] - vMin) / vRange));
 
             p.fillColor = FillColor;
             p.BeginPath(); p.MoveTo(new Vector2(pts[0].x, h - padY));
             foreach (var pt in pts) p.LineTo(pt);
-            p.LineTo(new Vector2(pts[pts.Length-1].x, h - padY));
+            p.LineTo(new Vector2(pts[pts.Length - 1].x, h - padY));
             p.ClosePath(); p.Fill();
 
             p.strokeColor = LineColor; p.lineWidth = 2f;
