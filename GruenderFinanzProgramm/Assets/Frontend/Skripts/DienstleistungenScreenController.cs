@@ -11,9 +11,9 @@ public class DienstleistungenScreenController : MonoBehaviour
     private List<Service> daten = new List<Service>();
     private VisualElement rootElement;
 
-    private const double MaxServicePreis = 1_000_000.00;
+    private const double MaxServicePreis = 99_999.99;
     private const int MaxServiceNameLaenge = 100;
-    private const int MaxServiceBeschreibungLaenge = 300;
+    private const int MaxServiceBeschreibungLaenge = 150;
 
     private ScrollView tabelleBody;
     private VisualElement popupOverlay;
@@ -96,12 +96,23 @@ public class DienstleistungenScreenController : MonoBehaviour
     }
 
     private VisualElement Zelle(string text, string spaltenKlasse)
-    {
-        var label = new Label(text);
-        label.AddToClassList("tabelle-zelle");
-        label.AddToClassList(spaltenKlasse);
-        return label;
-    }
+{
+    var label = new Label(text);
+    label.text = text;
+    label.tooltip = text; // Tooltip aktivieren
+
+    label.AddToClassList("tabelle-zelle");
+    label.AddToClassList(spaltenKlasse);
+
+    // WICHTIG: Erlaubt Hover-Events für Tooltips (Standard ist Position)
+    label.pickingMode = PickingMode.Position;
+
+    // Optional: Nutze dein eigenes Runtime-Tooltip-System, falls Unitys C#-Tooltip 
+    // im Build nicht reagiert:
+    // HelpTooltip.RegistriereInKarte(rootElement, label, text);
+
+    return label;
+}
 
     private void OeffnePopup(int index)
     {
@@ -127,11 +138,19 @@ public class DienstleistungenScreenController : MonoBehaviour
         feldPreismodell.value = d.priceModel;
         feldBetrag.value = d.price.ToString("F2");
 
-        // ---- Dirty-Tracking: erst NACH dem Setzen der Initialwerte registrieren ----
-        feldTitel.RegisterValueChangedCallback(_ => _isDirty = true);
-        feldBeschreibung.RegisterValueChangedCallback(_ => _isDirty = true);
+        // ---- Validierungs-Labels erstellen und direkt nach dem jeweiligen Feld einfügen ----
+        var fehlerTitel = ErstelleFehlerLabel("fehler-titel");
+        var fehlerBeschreibung = ErstelleFehlerLabel("fehler-beschreibung");
+        var fehlerBetrag = ErstelleFehlerLabel("fehler-betrag");
+        EinfuegenNach(feldTitel, fehlerTitel);
+        EinfuegenNach(feldBeschreibung, fehlerBeschreibung);
+        EinfuegenNach(feldBetrag, fehlerBetrag);
+
+        // ---- Dirty-Tracking + Live-Validierung: erst NACH dem Setzen der Initialwerte registrieren ----
+        feldTitel.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerTitel, ValidiereName(evt.newValue)); });
+        feldBeschreibung.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerBeschreibung, ValidiereBeschreibung(evt.newValue)); });
         feldPreismodell.RegisterValueChangedCallback(_ => _isDirty = true);
-        feldBetrag.RegisterValueChangedCallback(_ => _isDirty = true);
+        feldBetrag.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerBetrag, ValidiereBetrag(evt.newValue)); });
 
         // ---- X-Button (Schließen oben rechts) ----
         var btnClose = popup.Q<Button>("btn-close-popup");
@@ -299,10 +318,20 @@ public class DienstleistungenScreenController : MonoBehaviour
         string name = feldTitel != null ? feldTitel.value : "";
         string description = feldBeschreibung != null ? feldBeschreibung.value : "";
         string priceModel = feldPreismodell != null ? feldPreismodell.value : "Festpreis";
+        string betragText = feldBetrag != null ? feldBetrag.value : "0";
 
-        double betrag = ParseDienstleistungsPreis(
-            feldBetrag != null ? feldBetrag.value : "0"
-        );
+        // ---- Validierung: Felder prüfen und Fehler-Labels aktualisieren ----
+        string fehlerN  = ValidiereName(name);
+        string fehlerB  = ValidiereBeschreibung(description);
+        string fehlerBt = ValidiereBetrag(betragText);
+
+        ZeigeFehler(popup.Q<Label>("fehler-titel"), fehlerN);
+        ZeigeFehler(popup.Q<Label>("fehler-beschreibung"), fehlerB);
+        ZeigeFehler(popup.Q<Label>("fehler-betrag"), fehlerBt);
+
+        if (fehlerN != null || fehlerB != null || fehlerBt != null) return; // Abbruch bei Fehler
+
+        double betrag = ParseDienstleistungsPreis(betragText);
 
         var neu = new Service
         {
@@ -450,6 +479,96 @@ public class DienstleistungenScreenController : MonoBehaviour
         }
 
         return Math.Round(preis, 2);
+    }
+
+    // =========================================================
+    // VALIDIERUNG & FEHLER-LABELS
+    // =========================================================
+
+    /// Erstellt ein unsichtbares rotes Label mit dem angegebenen Namen.
+    private static Label ErstelleFehlerLabel(string labelName)
+    {
+        var label = new Label();
+        label.name = labelName;
+        label.style.color = Color.red;
+        label.style.fontSize = 11;
+        label.style.marginTop = 2;
+        label.style.display = DisplayStyle.None; // standardmäßig unsichtbar
+        return label;
+    }
+
+    /// Zeigt eine Fehlermeldung im Label an, oder versteckt es wenn nachricht null/leer ist.
+    private static void ZeigeFehler(Label label, string nachricht)
+    {
+        if (label == null) return;
+        if (string.IsNullOrEmpty(nachricht))
+        {
+            label.text = "";
+            label.style.display = DisplayStyle.None;
+        }
+        else
+        {
+            label.text = nachricht;
+            label.style.display = DisplayStyle.Flex;
+        }
+    }
+
+    /// Fügt nachElement direkt nach element in denselben Parent ein.
+    private static void EinfuegenNach(VisualElement element, VisualElement nachElement)
+    {
+        var parent = element?.parent;
+        if (parent == null) return;
+        int index = parent.IndexOf(element);
+        parent.Insert(index + 1, nachElement);
+    }
+
+    private static string ValidiereName(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return "Name darf nicht leer sein.";
+        if (text.Trim().Length > MaxServiceNameLaenge)
+            return $"Maximal {MaxServiceNameLaenge} Zeichen erlaubt.";
+        return null;
+    }
+
+    private static string ValidiereBeschreibung(string text)
+    {
+        if (text != null && text.Trim().Length > MaxServiceBeschreibungLaenge)
+            return $"Maximal {MaxServiceBeschreibungLaenge} Zeichen erlaubt.";
+        return null;
+    }
+
+    private static string ValidiereBetrag(string text)
+    {
+        text = (text ?? "").Replace("\u20ac", "").Trim();
+        if (string.IsNullOrWhiteSpace(text))
+            return "Bitte einen Betrag eingeben.";
+
+        var kultDe = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+        double wert;
+        bool isDeFormat = false;
+
+        // Versuch 1: Deutsches Format (z. B. "1.000,50" oder "12,50")
+        if (double.TryParse(text, System.Globalization.NumberStyles.Any, kultDe, out wert))
+            isDeFormat = true;
+        // Versuch 2: Englisches Format (z. B. "12.50")
+        else if (!double.TryParse(text.Replace(",", "."),
+            System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out wert))
+            return "Bitte eine g\u00fcltige Zahl eingeben (z.\u00a0B. 12,50).";
+
+        if (wert < 0)
+            return "Betrag darf nicht negativ sein.";
+        if (wert > MaxServicePreis)
+            return "Maximal 99.999,99\u00a0\u20ac erlaubt.";
+
+        // Nachkommastellen prüfen: Dezimalzeichen je nach Format suchen
+        char dezSep = isDeFormat ? ',' : '.';
+        int sepIdx = text.LastIndexOf(dezSep);
+        if (sepIdx >= 0 && text.Length - sepIdx - 1 > 2)
+            return "Maximal 2 Nachkommastellen erlaubt.";
+
+        return null;
     }
 
     private static double ParseDienstleistungsPreis(string text)

@@ -63,6 +63,8 @@
 
 .tabelle-zeile {
     flex-direction: row;
+    align-items: center;
+    width: 100%;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 8px;
@@ -84,8 +86,9 @@
     font-size: 15px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
     -unity-text-align: middle-center;
+    text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    padding-right: 8px;
 }
 
 .col-titel {
@@ -102,7 +105,9 @@
 .col-beschreibung {
     width: 35%;
     flex-shrink: 0;
-    -unity-text-align: middle-center;
+    -unity-text-align: middle-left;
+    text-overflow: ellipsis;
+    white-space: normal;
     margin-top: 8px;
     margin-right: 0;
     margin-bottom: 8px;
@@ -189,11 +194,13 @@
 }
 
 .popup-box {
-    position: relative;
     width: 600px;
     background-color: rgb(38, 38, 38);
     border-radius: 16px;
-    border-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
     border-color: rgb(128, 207, 149);
     padding-top: 32px;
     padding-bottom: 32px;
@@ -226,10 +233,6 @@
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
-.popup-input:placeholder {
-    color: rgba(255, 255, 255, 0.35);
-}
-
 .popup-input > .unity-base-field__input {
     background-color: rgb(55, 55, 55);
     border-color: rgb(80, 80, 80);
@@ -256,7 +259,7 @@
 }
 
 .popup-btn-fertig {
-    background-color: rgb(128, 207, 149);
+    background-color: #80CF95;
     color: rgb(0, 0, 0);
     font-size: 18px;
     -unity-font-style: bold;
@@ -272,15 +275,15 @@
 }
 
 .popup-btn-fertig:hover {
-    background-color: rgb(179, 226, 196);
+    background-color: #B3E2C4;
 }
 
 .popup-btn-fertig:active {
-    background-color: rgb(102, 165, 119);
+    background-color: #66A577;
 }
 
 .popup-btn-abbrechen {
-    background-color: rgb(100, 100, 100);
+    background-color: #646464;
     color: rgb(0, 0, 0);
     font-size: 18px;
     -unity-font-style: bold;
@@ -296,16 +299,20 @@
 }
 
 .popup-btn-abbrechen:hover {
-    background-color: rgb(142, 141, 141);
+    background-color: #8E8D8D
 }
 
 .popup-btn-abbrechen:active {
-    background-color: rgb(56, 54, 54);
+    background-color: #383636
+}
+
+.popup-box {
+    position: relative;
 }
 
 .close-btn {
     position: absolute;
-    top: 16px;
+    top: 8px;
     right: 8px;
     width: 24px;
     height: 24px;
@@ -323,4 +330,95 @@
     color: rgb(229, 103, 112);
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
+}
+
+/* =========================================================
+   CONFIRM SPEICHERN POPUP  (basiert auf gespeichert.uxml)
+   ========================================================= */
+
+.confirm-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-box {
+    width: 340px;
+    background-color: rgb(56, 56, 56);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding-top: 32px;
+    padding-bottom: 28px;
+    padding-left: 28px;
+    padding-right: 28px;
+    position: relative;
+}
+
+.confirm-titel {
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    margin-bottom: 8px;
+}
+
+.confirm-text {
+    font-size: 14px;
+    color: rgb(200, 200, 200);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    white-space: normal;
+}
+
+.confirm-btn-ja {
+    flex-grow: 1;
+    height: 44px;
+    border-radius: 10px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    background-color: rgb(128, 207, 149);
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    margin-left: 8px;
+}
+
+.confirm-btn-ja:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+.confirm-btn-ja:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.confirm-btn-nein {
+    flex-grow: 1;
+    height: 44px;
+    border-radius: 10px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+}
+
+.confirm-btn-nein:hover {
+    background-color: rgb(142, 141, 141);
+}
+
+.confirm-btn-nein:active {
+    background-color: rgb(56, 54, 54);
 }
