@@ -224,6 +224,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         // --- Titel ---
         var titel = new Label("Speichern?");
         titel.style.fontSize = 20;
+        titel.style.unityTextAlign = TextAnchor.MiddleCenter;
         titel.style.color = Color.white;
         titel.style.unityFontStyleAndWeight = FontStyle.Bold;
         titel.style.marginBottom = 8;
@@ -240,7 +241,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         // --- Button-Zeile ---
         var btnZeile = new VisualElement();
         btnZeile.style.flexDirection = FlexDirection.Row;
-        btnZeile.style.marginTop = 20;
+        btnZeile.style.marginTop = 24;
 
         // Nein – kein Speichern, alles schließen
         var btnNein = new Button(() =>
@@ -250,7 +251,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         });
         btnNein.text = "Nein";
         btnNein.style.flexGrow = 1;
-        btnNein.style.height = 44;
+        btnNein.style.height = 40;
         btnNein.style.borderTopLeftRadius = 10;
         btnNein.style.borderTopRightRadius = 10;
         btnNein.style.borderBottomLeftRadius = 10;
@@ -274,7 +275,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         });
         btnJa.text = "Ja";
         btnJa.style.flexGrow = 1;
-        btnJa.style.height = 44;
+        btnJa.style.height = 40;
         btnJa.style.borderTopLeftRadius = 10;
         btnJa.style.borderTopRightRadius = 10;
         btnJa.style.borderBottomLeftRadius = 10;
