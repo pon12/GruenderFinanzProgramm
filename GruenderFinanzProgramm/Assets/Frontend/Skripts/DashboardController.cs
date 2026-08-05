@@ -16,7 +16,21 @@ public class DashboardController : MonoBehaviour
     private int _currentMonth;
     private LineChartElement _chart;
 
-    private Dictionary<string, List<string>> _deadlines = new Dictionary<string, List<string>>();
+    // Pro Kalendertag: getrennte Anzahl Angebote/Rechnungen (für die Badge
+    // "A:1 R:2") + die einzelnen Einträge mit Kundennamen (für den Hover-Tooltip)
+    private class TagInfo
+    {
+        public int AngebotAnzahl;
+        public int RechnungAnzahl;
+        public List<string> Eintraege = new List<string>();
+    }
+
+    private Dictionary<string, TagInfo> _deadlines = new Dictionary<string, TagInfo>();
+
+    // Gemeinsames Tooltip-Element für alle Kalendertage (wird einmal erzeugt
+    // und wiederverwendet statt 42 einzelner Tooltips)
+    private VisualElement _kalenderTooltip;
+    private Label _kalenderTooltipLabel;
 
     private readonly string[] _monthNames =
     {
@@ -493,6 +507,7 @@ public class DashboardController : MonoBehaviour
         var grid = _root.Q<VisualElement>("kalender-grid");
         if (grid != null) grid.style.flexGrow = 1;
 
+        SetupKalenderTage();
         RenderKalender();
     }
 
@@ -538,8 +553,9 @@ public class DashboardController : MonoBehaviour
                     {
                         DateTime gueltigBis = erstellt.AddDays(ANGEBOT_GUELTIGKEIT_TAGE);
                         string key = gueltigBis.ToString("yyyy-MM-dd");
-                        if (!_deadlines.ContainsKey(key)) _deadlines[key] = new List<string>();
-                        _deadlines[key].Add($"Angebot {a.offerNumber} g\u00fcltig bis");
+                        string kunde = HoleKundenname(db, a.customerId);
+                        FuegeDeadlineHinzu(key, istAngebot: true,
+                            $"Angebot {a.offerNumber} \u2013 {kunde} (g\u00fcltig bis)");
                     }
 
             var rechnungen = db.getAllInvoices();
@@ -548,13 +564,39 @@ public class DashboardController : MonoBehaviour
                     if (TryParseDatum(r.dueDate, out DateTime faellig))
                     {
                         string key = faellig.ToString("yyyy-MM-dd");
-                        if (!_deadlines.ContainsKey(key)) _deadlines[key] = new List<string>();
-                        _deadlines[key].Add($"Rechnung {r.invoiceNumber} f\u00e4llig");
+                        string kunde = HoleKundenname(db, r.customerId);
+                        FuegeDeadlineHinzu(key, istAngebot: false,
+                            $"Rechnung {r.invoiceNumber} \u2013 {kunde} (f\u00e4llig)");
                     }
         }
         catch (Exception e)
         {
             Debug.LogWarning("[Dashboard] Deadlines laden: " + e.Message);
+        }
+    }
+
+    void FuegeDeadlineHinzu(string key, bool istAngebot, string text)
+    {
+        if (!_deadlines.TryGetValue(key, out var info))
+        {
+            info = new TagInfo();
+            _deadlines[key] = info;
+        }
+        if (istAngebot) info.AngebotAnzahl++;
+        else info.RechnungAnzahl++;
+        info.Eintraege.Add(text);
+    }
+
+    string HoleKundenname(DataBase db, int customerId)
+    {
+        try
+        {
+            var kunde = db.getCustomerById(customerId);
+            return string.IsNullOrEmpty(kunde?.name) ? "Unbekannter Kunde" : kunde.name;
+        }
+        catch
+        {
+            return "Unbekannter Kunde";
         }
     }
 
@@ -570,17 +612,21 @@ public class DashboardController : MonoBehaviour
             var btn = _root.Q<Button>($"cal-day-{i}");
             if (btn == null) continue;
 
+            var zahlLabel = btn.Q<Label>("cal-day-zahl");
+            var badgeLabel = btn.Q<Label>("cal-day-badge");
+
             btn.RemoveFromClassList("cal-day-today");
             btn.RemoveFromClassList("cal-day-other-month");
             btn.RemoveFromClassList("cal-day-deadline");
             btn.RemoveFromClassList("cal-day-empty");
-            btn.tooltip = "";
+            btn.userData = null;
+            if (badgeLabel != null) badgeLabel.text = "";
 
             bool istImAktuellenMonat = i >= startWochentag && i - startWochentag < tageImMonat;
 
             if (!istImAktuellenMonat)
             {
-                btn.text = "";
+                if (zahlLabel != null) zahlLabel.text = "";
                 btn.AddToClassList("cal-day-empty");
                 btn.SetEnabled(false);
                 continue;
@@ -588,18 +634,113 @@ public class DashboardController : MonoBehaviour
 
             btn.SetEnabled(true);
             int tag = i - startWochentag + 1;
-            btn.text = tag.ToString();
+            if (zahlLabel != null) zahlLabel.text = tag.ToString();
 
             if (tag == today.Day && _currentMonth == today.Month && _currentYear == today.Year)
                 btn.AddToClassList("cal-day-today");
 
             string key = new DateTime(_currentYear, _currentMonth, tag).ToString("yyyy-MM-dd");
-            if (_deadlines.TryGetValue(key, out var eintraege))
+            if (_deadlines.TryGetValue(key, out var info))
             {
                 btn.AddToClassList("cal-day-deadline");
-                btn.tooltip = string.Join("\n", eintraege);
+                btn.userData = info;
+
+                var teile = new List<string>();
+                if (info.AngebotAnzahl > 0) teile.Add($"A:{info.AngebotAnzahl}");
+                if (info.RechnungAnzahl > 0) teile.Add($"R:{info.RechnungAnzahl}");
+                if (badgeLabel != null) badgeLabel.text = string.Join(" ", teile);
             }
         }
+    }
+
+    // ============================================================
+    // KALENDER: einmaliger Aufbau der Tages-Zellen (Zahl + Badge)
+    // und des gemeinsamen Hover-Tooltips
+    // ============================================================
+    void SetupKalenderTage()
+    {
+        for (int i = 0; i < 42; i++)
+        {
+            var btn = _root.Q<Button>($"cal-day-{i}");
+            if (btn == null) continue;
+            if (btn.Q<Label>("cal-day-zahl") != null) continue; // schon initialisiert
+
+            btn.text = "";
+
+            var zahl = new Label { name = "cal-day-zahl" };
+            zahl.AddToClassList("cal-day-zahl");
+            btn.Add(zahl);
+
+            var badge = new Label { name = "cal-day-badge" };
+            badge.AddToClassList("cal-day-badge");
+            btn.Add(badge);
+
+            btn.RegisterCallback<PointerEnterEvent>(_ => ZeigeKalenderTooltip(btn));
+            btn.RegisterCallback<PointerLeaveEvent>(_ => VersteckeKalenderTooltip());
+        }
+
+        if (_kalenderTooltip == null)
+        {
+            _kalenderTooltip = new VisualElement { pickingMode = PickingMode.Ignore };
+            _kalenderTooltip.style.position = Position.Absolute;
+            _kalenderTooltip.style.display = DisplayStyle.None;
+            _kalenderTooltip.style.width = 260;
+            _kalenderTooltip.style.backgroundColor = new Color(28f / 255f, 28f / 255f, 28f / 255f, 0.97f);
+            _kalenderTooltip.style.borderTopLeftRadius = 10;
+            _kalenderTooltip.style.borderTopRightRadius = 10;
+            _kalenderTooltip.style.borderBottomLeftRadius = 10;
+            _kalenderTooltip.style.borderBottomRightRadius = 10;
+            _kalenderTooltip.style.borderTopWidth = 1;
+            _kalenderTooltip.style.borderRightWidth = 1;
+            _kalenderTooltip.style.borderBottomWidth = 1;
+            _kalenderTooltip.style.borderLeftWidth = 1;
+            var randFarbe = new Color(230f / 255f, 57f / 255f, 70f / 255f);
+            _kalenderTooltip.style.borderTopColor = randFarbe;
+            _kalenderTooltip.style.borderRightColor = randFarbe;
+            _kalenderTooltip.style.borderBottomColor = randFarbe;
+            _kalenderTooltip.style.borderLeftColor = randFarbe;
+            _kalenderTooltip.style.paddingTop = 12;
+            _kalenderTooltip.style.paddingBottom = 12;
+            _kalenderTooltip.style.paddingLeft = 14;
+            _kalenderTooltip.style.paddingRight = 14;
+
+            _kalenderTooltipLabel = new Label();
+            _kalenderTooltipLabel.style.color = new Color(0.88f, 0.88f, 0.88f);
+            _kalenderTooltipLabel.style.fontSize = 13;
+            _kalenderTooltipLabel.style.whiteSpace = WhiteSpace.Normal;
+            _kalenderTooltip.Add(_kalenderTooltipLabel);
+
+            _root.Add(_kalenderTooltip);
+        }
+    }
+
+    void ZeigeKalenderTooltip(Button tag)
+    {
+        if (!(tag.userData is TagInfo info) || info.Eintraege.Count == 0) return;
+
+        _kalenderTooltipLabel.text = string.Join("\n", info.Eintraege);
+        _kalenderTooltip.style.display = DisplayStyle.Flex;
+
+        _kalenderTooltip.schedule.Execute(() =>
+        {
+            var tagPos = tag.worldBound;
+            var rootPos = _root.worldBound;
+            float hoehe = _kalenderTooltip.resolvedStyle.height > 0 ? _kalenderTooltip.resolvedStyle.height : 60f;
+
+            float left = tagPos.x - rootPos.x + (tagPos.width / 2f) - 130f;
+            float top = tagPos.y - rootPos.y - hoehe - 10f;
+
+            left = Mathf.Clamp(left, 8f, rootPos.width - 260f - 8f);
+            if (top < 8f) top = tagPos.y - rootPos.y + tagPos.height + 10f;
+
+            _kalenderTooltip.style.left = left;
+            _kalenderTooltip.style.top = top;
+        });
+    }
+
+    void VersteckeKalenderTooltip()
+    {
+        if (_kalenderTooltip != null) _kalenderTooltip.style.display = DisplayStyle.None;
     }
 
     // ============================================================
