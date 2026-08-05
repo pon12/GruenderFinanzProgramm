@@ -16,6 +16,9 @@ public class RegestrierungLogik : MonoBehaviour
     private Button        btnZurAnmeldung;
     private TextField     inputProfileingabe;
     private Label         lblPasskey;
+    private Label         lblRecoveryKey;
+    private Button        btnCopyPasskey;
+    private Button        btnCopyRecovery;
     private Button        btnEntschluesseln;
     private Label         lblError;
 
@@ -71,6 +74,9 @@ public class RegestrierungLogik : MonoBehaviour
         btnZurAnmeldung    = root.Q<Button>("btnZurAnmeldung");
         inputProfileingabe = root.Q<TextField>("Profileingabe");
         lblPasskey         = root.Q<Label>("lblPasskey");
+        lblRecoveryKey     = root.Q<Label>("lblRecoveryKey");
+        btnCopyPasskey     = root.Q<Button>("btnCopyPasskey");
+        btnCopyRecovery    = root.Q<Button>("btnCopyRecovery");
         btnEntschluesseln  = root.Q<Button>("btnEntschluesseln");
         lblError           = root.Q<Label>("lblError");
 
@@ -84,24 +90,22 @@ public class RegestrierungLogik : MonoBehaviour
 
         btnLoginSubmit = root.Q<Button>("btnLoginSubmit");
 
-        // Textfeld-Styling – Unity überschreibt background-color auf dem Wrapper,
-        // daher direkt auf das innere Input-Element setzen.
         if (inputProfileingabe != null)
         {
             var input = inputProfileingabe.Q(className: "unity-base-field__input");
             if (input != null)
             {
-                input.style.backgroundColor = new UnityEngine.Color(70f / 255f, 70f / 255f, 70f / 255f);
-                input.style.color           = UnityEngine.Color.white;
-                input.style.borderTopLeftRadius    = 12;
-                input.style.borderTopRightRadius   = 12;
-                input.style.borderBottomLeftRadius = 12;
-                input.style.borderBottomRightRadius= 12;
-                input.style.borderTopWidth    = 0;
-                input.style.borderRightWidth  = 0;
-                input.style.borderBottomWidth = 0;
-                input.style.borderLeftWidth   = 0;
-                input.style.paddingLeft = 20;
+                input.style.backgroundColor          = new UnityEngine.Color(70f / 255f, 70f / 255f, 70f / 255f);
+                input.style.color                    = UnityEngine.Color.white;
+                input.style.borderTopLeftRadius      = 12;
+                input.style.borderTopRightRadius     = 12;
+                input.style.borderBottomLeftRadius   = 12;
+                input.style.borderBottomRightRadius  = 12;
+                input.style.borderTopWidth           = 0;
+                input.style.borderRightWidth         = 0;
+                input.style.borderBottomWidth        = 0;
+                input.style.borderLeftWidth          = 0;
+                input.style.paddingLeft              = 20;
             }
         }
 
@@ -115,6 +119,11 @@ public class RegestrierungLogik : MonoBehaviour
         if (btnZurAnmeldung   != null) btnZurAnmeldung.clicked   += OnZurAnmeldungClicked;
         if (btnEntschluesseln != null) btnEntschluesseln.clicked += OnEntschluesselnClicked;
         if (btnLoginSubmit    != null) btnLoginSubmit.clicked    += OnLoginSubmitted;
+        if (btnCopyPasskey     != null) btnCopyPasskey.clicked     += CopyPasskeyToClipboard;
+        if (btnCopyRecovery    != null) btnCopyRecovery.clicked    += CopyRecoveryKeyToClipboard;
+        
+        
+
 
         if (text2 != null)
         {
@@ -187,25 +196,21 @@ public class RegestrierungLogik : MonoBehaviour
         if (lblPasskey == null) return;
 
         string recoveryKey = authService.recoveryPassKeyGlobal;
-        string passkeyAnzeige;
-        string recoveryAnzeige;
 
         if (istEntschluesselt)
         {
-            passkeyAnzeige  = FormatiereMitLeerzeichen(aktuellerPasskey);
-            recoveryAnzeige = FormatiereMitLeerzeichen(recoveryKey);
+            lblPasskey.text    = "PassKey: "     + FormatiereMitLeerzeichen(aktuellerPasskey);
+            if (lblRecoveryKey != null)
+                lblRecoveryKey.text = "RecoveryKey: " + FormatiereMitLeerzeichen(recoveryKey);
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
         }
         else
         {
-            passkeyAnzeige  = new string('*', aktuellerPasskey.Length);
-            recoveryAnzeige = new string('*', recoveryKey.Length);
-            if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschl\u00fcsseln";
+            lblPasskey.text    = "PassKey: "     + new string('*', aktuellerPasskey.Length);
+            if (lblRecoveryKey != null)
+                lblRecoveryKey.text = "RecoveryKey: " + new string('*', recoveryKey.Length);
+            if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
         }
-
-        lblPasskey.text =
-            "PassKey: "    + passkeyAnzeige  + "\n" +
-            "RecoveryKey: " + recoveryAnzeige;
     }
 
     private void ZeigeEingabeFehler(bool hasText, bool isToggleActive)
@@ -222,13 +227,11 @@ public class RegestrierungLogik : MonoBehaviour
             lblError.text = "Bitte akzeptiere die AGB und Datenschutzrichtlinie.";
     }
 
-    // Schlie\u00dft nur das Popup, kein Weiterleiten
     private void OnPopupCloseClicked()
     {
         if (popuppasskey != null) popuppasskey.style.display = DisplayStyle.None;
     }
 
-    // Schlie\u00dft das Popup und leitet zur Anmeldung weiter
     private void OnZurAnmeldungClicked()
     {
         if (popuppasskey != null) popuppasskey.style.display = DisplayStyle.None;
@@ -277,7 +280,28 @@ public class RegestrierungLogik : MonoBehaviour
         if (btnKeyGenerieren  == null) Debug.LogError("btnKeyGenerieren fehlt");
         if (btnEntschluesseln == null) Debug.LogError("btnEntschluesseln fehlt");
         if (lblPasskey        == null) Debug.LogError("lblPasskey fehlt");
+        if (lblRecoveryKey    == null) Debug.LogError("lblRecoveryKey fehlt");
         if (btnZurAnmeldung   == null) Debug.LogError("btnZurAnmeldung fehlt");
+    }
+    
+    // Copy to Clipboard funktionen
+    private void CopyPasskeyToClipboard()
+    {
+    if (authService == null)
+    {
+        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+        return;
+    }
+    CopyPaste.CopyPasskey(authService.passkeyGlobal);
+    }
+    private void CopyRecoveryKeyToClipboard()   
+    {
+    if (authService == null)
+    {
+        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+        return;
+    }
+    CopyPaste.CopyRecoveryKey(authService.getRecoveryPassKey());
     }
 
     private void OnDisable()
@@ -305,4 +329,5 @@ public class RegestrierungLogik : MonoBehaviour
             textDatenschutz.UnregisterCallback<PointerOutEvent>(OnDatenschutzHoverOut);
         }
     }
+
 }

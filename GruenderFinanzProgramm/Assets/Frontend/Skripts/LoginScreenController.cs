@@ -16,6 +16,7 @@ public class LoginFlowController : MonoBehaviour
     private VisualElement _popupPasskeyLogin;
     private VisualElement _popupErrorLogin;
     private Label         _loginPasskeyDisplay;
+    private Button        _btnAppClose;
     private string        _loginPasskeyInput = "";
 
     void OnEnable()
@@ -38,6 +39,11 @@ public class LoginFlowController : MonoBehaviour
         _popupPasskeyLogin = _root.Q("popup-passkey-login");
         _popupErrorLogin   = _root.Q("popup-error-login");
         _loginPasskeyDisplay = _root.Q<Label>("login-passkey-display");
+        _btnAppClose = _root.Q<Button>("btn-app-close");
+        if (_btnAppClose != null)
+            _btnAppClose.clicked += CloseApplication;
+        else
+            Debug.LogWarning("[LoginFlow] Button 'btn-app-close' nicht gefunden.");
 
         RegisterAllButtons();
         UpdateDisplay();
@@ -147,6 +153,8 @@ public class LoginFlowController : MonoBehaviour
     {
         if (_popupOverlay != null) _popupOverlay.style.display = DisplayStyle.Flex;
         if (popup         != null) popup.style.display         = DisplayStyle.Flex;
+
+        SetCloseButtonEnabled(false);
     }
 
     private void ShowErrorPopup()
@@ -162,6 +170,8 @@ public class LoginFlowController : MonoBehaviour
         // Error-Popup anzeigen
         if (_popupOverlay    != null) _popupOverlay.style.display    = DisplayStyle.Flex;
         if (_popupErrorLogin != null) _popupErrorLogin.style.display = DisplayStyle.Flex;
+
+        SetCloseButtonEnabled(false);
     }
 
     private void OnErrorRetry()
@@ -183,6 +193,8 @@ public class LoginFlowController : MonoBehaviour
 
         _loginPasskeyInput = "";
         UpdateDisplay();
+
+        SetCloseButtonEnabled(true);
     }
 
     // ─────────────────────────────────────────────────
@@ -196,5 +208,23 @@ public class LoginFlowController : MonoBehaviour
             btn.clicked += action;
         else
             Debug.LogWarning($"[LoginFlow] Button '{name}' nicht gefunden.");
+    }
+    // ─────────────────────────────────────────────────
+    // APP SCHLIESSEN
+    // ─────────────────────────────────────────────────
+    public void CloseApplication()
+    {
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+        Application.Quit();
+    #endif
+    }
+
+
+    private void SetCloseButtonEnabled(bool enabled)
+    {
+    if (_btnAppClose == null) return;
+    _btnAppClose.SetEnabled(enabled);
     }
 }

@@ -11,6 +11,7 @@
             <ui:Button text="Anmelden" name="Anmelden" class="Anmelden-button" style="width: 471px; height: 110px; top: 350px; left: 751px; font-size: 30px; margin: 0;"/>
             <ui:Button text="Konto erstellen" name="KontoErstellen" class="Konto-button" style="width: 372px; height: 110px; font-size: 30px; top: 400px; left: 800px; margin: 0;"/>
         </ui:VisualElement>
+        <ui:Button text="Software Beenden" name="btn-app-close" style="position: absolute; top: 24px; right: 24px; width: 270px; height: 64px; margin: 0; background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); border-width: 0; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; font-size: 22px; -unity-font-style: bold;"/>
         <ui:VisualElement name="popup-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center;">
             <ui:VisualElement name="popup-passkey-login" style="background-color: rgb(56, 56, 56); border-top-left-radius: 24px; border-top-right-radius: 24px; border-bottom-right-radius: 24px; border-bottom-left-radius: 24px; width: 860px; height: 820px; align-items: center; justify-content: flex-start; padding: 40px; display: none;">
                 <ui:Label text="Passkey" name="label-passkey-titel" style="font-size: 36px; color: rgb(255, 255, 255); -unity-font-style: bold; margin-bottom: 24px; -unity-text-align: upper-center; width: 100%;"/>

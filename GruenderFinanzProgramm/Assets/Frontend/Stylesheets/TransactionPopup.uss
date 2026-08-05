@@ -261,17 +261,16 @@
     color: rgb(28, 28, 28);
     margin-right: 8px;
 }
-.btn-primary:hover { background-color: rgb(107, 191, 130); }
+.btn-primary:hover { background-color: rgb(179, 226, 196); }
 
 .btn-secondary {
-    background-color: rgb(80, 80, 80);
-    color: rgb(255, 255, 255);
+    background-color: rgb(100, 100, 100);
 }
-.btn-secondary:hover { background-color: rgb(100, 100, 100); }
+.btn-secondary:hover { background-color: rgb(142, 141, 141); }
 
 .btn-popup-close:hover {
-    background-color: rgba(230, 57, 70, 0.7);
-    color: rgb(255, 255, 255);
+    background-color: rgba(230, 103, 112, 0.7);
+    
 }
 
 /* =====================================================
@@ -318,11 +317,11 @@
     -unity-text-align: middle-center;
 }
 .btn-action-3er.btn-red  { background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); }
-.btn-action-3er.btn-red:hover { background-color: rgb(208, 45, 57); }
+.btn-action-3er.btn-red:hover { background-color: rgb(2229, 103, 112); }
 .btn-action-3er.btn-green { background-color: rgb(128, 207, 149); color: rgb(28, 28, 28); }
-.btn-action-3er.btn-green:hover { background-color: rgb(107, 191, 130); }
+.btn-action-3er.btn-green:hover { background-color: rgb(179, 226, 196); }
 .btn-action-3er.btn-export-finanzamt { background-color: rgb(100, 100, 100); color: rgb(255,255,255); }
-.btn-action-3er.btn-export-finanzamt:hover { background-color: rgb(120, 120, 120); }
+.btn-action-3er.btn-export-finanzamt:hover { background-color: rgb(142, 141, 141); }
 
 /* =====================================================
    KALENDER-WIDGET
