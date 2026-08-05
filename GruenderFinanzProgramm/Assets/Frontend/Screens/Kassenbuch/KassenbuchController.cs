@@ -307,6 +307,10 @@ public class KassenbuchController : MonoBehaviour
             "Privateinzahlung",
             "Sonstige Einzahlung",
             "Darlehen",
+            "Kredite",
+            "Sacheinlagen",
+            "Wertpapiere",
+            "Börse / Krypto",
             "Tilgungsraten",
             "Finanzamt",
             "Steuern",
@@ -787,6 +791,10 @@ public class KassenbuchController : MonoBehaviour
                     "Privateinzahlung",
                     "Sonstige Einzahlung",
                     "Darlehen",
+                    "Kredite",
+                    "Sacheinlagen",
+                    "Wertpapiere",
+                    "Börse / Krypto",
                     "Umsatzerlöse",
                     "Sonstige Einnahmen"
                 };
@@ -1065,7 +1073,7 @@ public class KassenbuchController : MonoBehaviour
             kv.Value.text = aktiv ? basisText + pfeil : basisText;
             kv.Value.style.color = aktiv
                 ? new StyleColor(UnityEngine.Color.white)
-                : new StyleColor(new UnityEngine.Color(170f / 255f, 170f / 255f, 170f / 255f));
+                : new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
         }
     }
 

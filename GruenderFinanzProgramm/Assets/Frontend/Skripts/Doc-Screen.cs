@@ -187,6 +187,10 @@ public class DocumentDashboard : MonoBehaviour
         public bool istPflichtdokument;
         public string inhalt;
         public List<StrukturFeldWert> strukturFelder;
+        // Zeitpunkt der letzten Änderung (yyyy-MM-dd) - für die Sortierung
+        // im Export-Screen. Bei alten, bereits gespeicherten Dokumenten
+        // leer, bis sie das nächste Mal bearbeitet werden.
+        public string datum;
     }
 
     [System.Serializable]
@@ -214,6 +218,9 @@ public class DocumentDashboard : MonoBehaviour
         // 1. Hauptbildschirm
         deleteButton = root.Q<Button>("Delete-Button");
         gridContainer = root.Q<VisualElement>("Grid-Container");
+
+        var btnAddDocument = root.Q<Button>("Btn-Add-Document");
+        if (btnAddDocument != null) btnAddDocument.clicked += () => OpenPopup();
 
         // 2. Erstell-Popup (nur flexible Kategorien)
         popupOverlay = root.Q<VisualElement>("Popup-Overlay");
@@ -358,6 +365,26 @@ public class DocumentDashboard : MonoBehaviour
         }
 
         if (geaendert) SaveDataLocally();
+
+        // Backfill: Dokumente, die schon Inhalt haben aber noch kein Datum
+        // (weil sie vor der Einführung des Datum-Felds ausgefüllt wurden),
+        // bekommen einmalig ein Datum gesetzt. Das exakte historische Datum
+        // kennen wir nicht mehr - "heute" ist die ehrlichste Annahme, die wir
+        // treffen können. Ab jetzt wird bei jeder Bearbeitung aktualisiert.
+        bool datumBackfillGeaendert = false;
+        foreach (var doc in speicherDaten.savedDocs)
+        {
+            if (!string.IsNullOrEmpty(doc.datum)) continue;
+
+            bool hatInhalt   = !string.IsNullOrWhiteSpace(doc.inhalt);
+            bool hatFeldwert = doc.strukturFelder != null &&
+                               doc.strukturFelder.Any(f => !string.IsNullOrWhiteSpace(f.wert));
+            if (!hatInhalt && !hatFeldwert) continue;
+
+            doc.datum = System.DateTime.Now.ToString("yyyy-MM-dd");
+            datumBackfillGeaendert = true;
+        }
+        if (datumBackfillGeaendert) SaveDataLocally();
     }
 
     private List<StrukturFeldWert> ErzeugeLeereStrukturFelder(string dokumentTitel)
@@ -423,7 +450,8 @@ public class DocumentDashboard : MonoBehaviour
             type = selectedType,
             istPflichtdokument = false,
             inhalt = "",
-            strukturFelder = new List<StrukturFeldWert>()
+            strukturFelder = new List<StrukturFeldWert>(),
+            datum = System.DateTime.Now.ToString("yyyy-MM-dd")
         };
 
         speicherDaten.savedDocs.Add(newDoc);
@@ -876,6 +904,7 @@ public class DocumentDashboard : MonoBehaviour
             }
         }
 
+        docInList.datum = System.DateTime.Now.ToString("yyyy-MM-dd");
         SaveDataLocally();
         RefreshDetailList();
         SpawnAllCardsAtStart();
@@ -1057,6 +1086,10 @@ public class DocumentDashboard : MonoBehaviour
             "Hier verwaltest du alle deine Dokumente. " +
             "Feste Kategorien (Gründung, Bezahlweise) sind geschützt. " +
             "Eigene Kategorien und Dokumente kannst du frei anlegen.");
+
+        HelpTooltip.Registriere(root, "btn-help-hinzufuegen",
+            "Legt ein neues Dokument an. Du wählst Titel, Kategorie und optional " +
+            "eine Vorlage - das Dokument erscheint danach in der passenden Kategorie-Karte.");
 
         HelpTooltip.Registriere(root, "btn-help-alle-loeschen",
             "Löscht alle selbst erstellten Dokumente endgültig. " +

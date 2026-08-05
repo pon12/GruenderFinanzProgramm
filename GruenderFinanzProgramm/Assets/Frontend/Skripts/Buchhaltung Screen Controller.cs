@@ -12,6 +12,10 @@ public class BuchhaltungScreenController : MonoBehaviour
     private static readonly Color Gruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
     private static readonly Color Rot   = new Color(230f / 255f,  57f / 255f,  70f / 255f);
     private static readonly Color Grau  = new Color(150f / 255f, 150f / 255f, 150f / 255f);
+    // Header-Grundfarbe = Marken-Grün (wie Dienstleistungen/Export), damit
+    // alle Tabellen-Header in der App einheitlich aussehen. Aktiv sortierte
+    // Spalte bleibt weiß, damit man weiterhin sieht wonach sortiert ist.
+    private static readonly Color HeaderGruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
 
     private const float PADDING_EXPANDED  = 430f;
     private const float PADDING_COLLAPSED = 140f;
@@ -252,14 +256,11 @@ public class BuchhaltungScreenController : MonoBehaviour
     private VisualElement ErstelleHeader()
     {
         var header = new VisualElement();
-        header.style.flexDirection = FlexDirection.Row;
+        header.AddToClassList("tabelle-header");
         header.style.alignItems    = Align.Center;
         header.style.width         = Length.Percent(100);
-        header.style.paddingTop    = 4;
-        header.style.paddingBottom = 4;
-        header.style.paddingLeft   = 12;
-        header.style.paddingRight  = 12;
-        header.style.marginBottom  = 2;
+        header.style.paddingLeft   = 20;
+        header.style.paddingRight  = 20;
 
         _hBezeichnung = ErstelleHeaderSpalte("Bezeichnung", "Bezeichnung", "col-bezeichnung");
         _hErstellt    = ErstelleHeaderSpalte("Erstellt",    "Erstellt",    "col-erstellt");
@@ -279,7 +280,8 @@ public class BuchhaltungScreenController : MonoBehaviour
     {
         var lbl = new Label(text);
         lbl.AddToClassList(ussClass);
-        lbl.style.color                   = Grau;
+        lbl.AddToClassList("tabelle-header-zelle");
+        lbl.style.color                   = HeaderGruen;
         lbl.style.fontSize                 = 16;
         lbl.style.unityFontStyleAndWeight  = FontStyle.Bold;
 
@@ -287,7 +289,7 @@ public class BuchhaltungScreenController : MonoBehaviour
 
         lbl.RegisterCallback<MouseEnterEvent>(_ => lbl.style.color = Color.white);
         lbl.RegisterCallback<MouseLeaveEvent>(_ =>
-            lbl.style.color = (_sortColumn == columnKey) ? Color.white : Grau);
+            lbl.style.color = (_sortColumn == columnKey) ? Color.white : HeaderGruen);
         lbl.RegisterCallback<ClickEvent>(_ => SetSortColumn(columnKey));
 
         return lbl;
@@ -301,7 +303,7 @@ public class BuchhaltungScreenController : MonoBehaviour
         {
             bool aktiv  = _sortColumn == key;
             lbl.text    = aktiv ? basisText + pfeil : basisText;
-            lbl.style.color = aktiv ? Color.white : Grau;
+            lbl.style.color = aktiv ? Color.white : HeaderGruen;
         }
 
         Aktualisiere(_hBezeichnung, "Bezeichnung", "Bezeichnung");
@@ -313,60 +315,63 @@ public class BuchhaltungScreenController : MonoBehaviour
     private VisualElement ErstelleZeile(BuchhaltungsEintrag eintrag)
 {
     var zeile = new VisualElement();
-    // ... (Deine bisherigen Styles für die Zeile bleiben genau so!) ...
-    zeile.style.flexDirection = FlexDirection.Row;
-    zeile.style.alignItems = Align.Center;
-    zeile.style.width = Length.Percent(100);
-    zeile.style.paddingTop = 10;
-    zeile.style.paddingBottom = 10;
+    zeile.AddToClassList("tabelle-zeile");
     zeile.style.marginBottom = 4;
-    zeile.style.backgroundColor = new Color(55f / 255f, 55f / 255f, 55f / 255f);
-    // Radius etc...
+    zeile.style.borderTopLeftRadius = 8;
+    zeile.style.borderTopRightRadius = 8;
+    zeile.style.borderBottomLeftRadius = 8;
+    zeile.style.borderBottomRightRadius = 8;
 
     // 1. Bezeichnung
     var lblBezeichnung = new Label(eintrag.Bezeichnung);
     lblBezeichnung.AddToClassList("col-bezeichnung");
+    lblBezeichnung.AddToClassList("tabelle-zelle");
     // ... (bisherige Styles)
 
     // 2. Erstellt
     var lblErstellt = new Label(eintrag.Erstellt);
     lblErstellt.AddToClassList("col-erstellt");
+    lblErstellt.AddToClassList("tabelle-zelle");
 
     // 3. Fällig
     var lblFaellig = new Label(eintrag.Faellig);
     lblFaellig.AddToClassList("col-faellig");
+    lblFaellig.AddToClassList("tabelle-zelle");
 
     // 4. Status
     var statusContainer = new VisualElement();
     statusContainer.AddToClassList("col-status");
     var statusBadge = new Label(eintrag.Status);
-    // ... (bisherige Badge-Erstellung)
+    Color statusFarbe = HoleStatusFarbe(eintrag.Status);
+    statusBadge.style.color                    = statusFarbe;
+    statusBadge.style.backgroundColor          = new Color(statusFarbe.r, statusFarbe.g, statusFarbe.b, 0.16f);
+    statusBadge.style.borderTopColor           = statusFarbe;
+    statusBadge.style.borderBottomColor        = statusFarbe;
+    statusBadge.style.borderLeftColor          = statusFarbe;
+    statusBadge.style.borderRightColor         = statusFarbe;
+    statusBadge.style.borderTopWidth           = 1;
+    statusBadge.style.borderBottomWidth        = 1;
+    statusBadge.style.borderLeftWidth          = 1;
+    statusBadge.style.borderRightWidth         = 1;
+    statusBadge.style.borderTopLeftRadius      = 12;
+    statusBadge.style.borderTopRightRadius     = 12;
+    statusBadge.style.borderBottomLeftRadius   = 12;
+    statusBadge.style.borderBottomRightRadius  = 12;
+    statusBadge.style.paddingLeft              = 10;
+    statusBadge.style.paddingRight             = 10;
+    statusBadge.style.paddingTop               = 3;
+    statusBadge.style.paddingBottom            = 3;
+    statusBadge.style.fontSize                 = 12;
+    statusBadge.style.unityFontStyleAndWeight   = FontStyle.Bold;
+    statusBadge.style.unityTextAlign            = TextAnchor.MiddleCenter;
     statusContainer.Add(statusBadge);
 
     // 5. NEU: Bearbeiten-Button am Ende der Zeile
     var btnBearbeiten = new Button();
     btnBearbeiten.text = "Bearbeiten";
-    btnBearbeiten.style.fontSize = 12;
-    btnBearbeiten.style.paddingLeft = 12;
-    btnBearbeiten.style.paddingRight = 12;
-    btnBearbeiten.style.paddingTop = 6;
-    btnBearbeiten.style.paddingBottom = 6;
-    btnBearbeiten.style.backgroundColor = new Color(75f / 255f, 75f / 255f, 75f / 255f);
-    btnBearbeiten.style.color = Color.white;
-    btnBearbeiten.style.borderTopLeftRadius = 6;
-    btnBearbeiten.style.borderTopRightRadius = 6;
-    btnBearbeiten.style.borderBottomLeftRadius = 6;
-    btnBearbeiten.style.borderBottomRightRadius = 6;
-    btnBearbeiten.style.borderLeftWidth = 0;
-    btnBearbeiten.style.borderRightWidth = 0;
-    btnBearbeiten.style.borderTopWidth = 0;
-    btnBearbeiten.style.borderBottomWidth = 0;
+    btnBearbeiten.AddToClassList("zeile-btn-bearbeiten");
     btnBearbeiten.style.marginLeft = StyleKeyword.Auto; // Schiebt den Button ganz nach rechts
     btnBearbeiten.style.marginRight = 12;
-
-    // Hover-Effekte für den Button
-    btnBearbeiten.RegisterCallback<MouseEnterEvent>(_ => btnBearbeiten.style.backgroundColor = new Color(95f / 255f, 95f / 255f, 95f / 255f));
-    btnBearbeiten.RegisterCallback<MouseLeaveEvent>(_ => btnBearbeiten.style.backgroundColor = new Color(75f / 255f, 75f / 255f, 75f / 255f));
 
     // Klick-Event: Ruft die Weiterleitung auf
     btnBearbeiten.RegisterCallback<ClickEvent>(_ => OnBearbeitenGeklickt(eintrag.Typ, eintrag.Nummer));

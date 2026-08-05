@@ -185,18 +185,11 @@
     -unity-font-style: bold;
     padding: 0;
     -unity-text-align: middle-center;
-    transition-property: background-color, border-color;
-    transition-duration: 0.1s;
 }
-.doc-mini-plus:hover {
-    background-color: rgb(128, 207, 149);
-    border-color: rgb(128, 207, 149);
-    color: rgb(20, 20, 20);
-}
-.doc-mini-plus:active {
-    background-color: rgb(108, 176, 127);
-    border-color: rgb(108, 176, 127);
-}
+/* Hover-/Aktiv-Farbe wird bewusst NICHT mehr per :hover-Pseudoklasse
+   gesteuert (siehe WissensdatenbankController.RegistriereEyeButtonHover) -
+   die blieb bei schnellem Mausbewegen zwischen mehreren Icons hängen.
+   Steuerung läuft jetzt komplett über C#/Inline-Style. */
 
 /* ---------- ALLGEMEINE BUTTONS (Styleguide: Primär #80CF95, Sekundär #646464) ---------- */
 .doc-btn-primary {

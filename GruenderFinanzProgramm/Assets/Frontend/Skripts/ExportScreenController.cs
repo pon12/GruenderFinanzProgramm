@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,7 +28,15 @@ public class ExportScreenController : MonoBehaviour
         public string filePath;
         public bool   isPDF;
         public int    pdfId;
+        public string datum;       // Anzeige, z.B. "05.08.2026"
+        public DateTime datumSort; // für die Sortierung
     }
+
+    // Sortierung (gleiches Muster wie Buchhaltung Screen Controller)
+    private string _sortColumn = "Datum";
+    private bool   _sortAscending = false; // neueste zuerst
+    private Label  _hBezeichnung, _hArt, _hDatum;
+    private static readonly Color HeaderGruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
 
     private void OnEnable()
     {
@@ -38,8 +47,74 @@ public class ExportScreenController : MonoBehaviour
         _root = root;
         exportListContainer = root.Q<ScrollView>("export-list-container");
 
+        RegistriereSortHeader(root);
+
         LadeAlleDaten();
         RegistriereHelpTooltips(root);
+    }
+
+    // ─────────────────────────────────────────
+    // SORTIERUNG (gleiches Muster wie Buchhaltung Screen Controller)
+    // ─────────────────────────────────────────
+
+    private void RegistriereSortHeader(VisualElement root)
+    {
+        _hBezeichnung = root.Q<Label>("header-name");
+        _hArt         = root.Q<Label>("header-type");
+        _hDatum       = root.Q<Label>("header-datum");
+
+        RegistriereEinzelnenHeader(_hBezeichnung, "Bezeichnung");
+        RegistriereEinzelnenHeader(_hArt,         "Art");
+        RegistriereEinzelnenHeader(_hDatum,       "Datum");
+
+        AktualisiereHeaderPfeile();
+    }
+
+    private void RegistriereEinzelnenHeader(Label lbl, string columnKey)
+    {
+        if (lbl == null) return;
+        lbl.pickingMode = PickingMode.Position;
+        lbl.RegisterCallback<ClickEvent>(_ => SetSortColumn(columnKey));
+        lbl.RegisterCallback<MouseEnterEvent>(_ => lbl.style.color = Color.white);
+        lbl.RegisterCallback<MouseLeaveEvent>(_ => lbl.style.color = HeaderGruen);
+    }
+
+    private void SetSortColumn(string spalte)
+    {
+        if (_sortColumn == spalte) _sortAscending = !_sortAscending;
+        else { _sortColumn = spalte; _sortAscending = spalte != "Datum"; }
+
+        AktualisiereHeaderPfeile();
+        RefreshExportListe();
+    }
+
+    private void AktualisiereHeaderPfeile()
+    {
+        string pfeil = _sortAscending ? " ↑" : " ↓";
+
+        void Aktualisiere(Label lbl, string key, string basisText)
+        {
+            if (lbl == null) return;
+            bool aktiv = _sortColumn == key;
+            lbl.text = aktiv ? basisText + pfeil : basisText;
+            lbl.style.color = HeaderGruen;
+        }
+
+        Aktualisiere(_hBezeichnung, "Bezeichnung", "Bezeichnung");
+        Aktualisiere(_hArt,         "Art",         "Art");
+        Aktualisiere(_hDatum,       "Datum",       "Datum");
+    }
+
+    private IEnumerable<DokumentExportEintrag> SortiereEintraege()
+    {
+        IEnumerable<DokumentExportEintrag> sortiert = _sortColumn switch
+        {
+            "Bezeichnung" => dokListe.OrderBy(d => d.bezeichnung, StringComparer.OrdinalIgnoreCase),
+            "Art"         => dokListe.OrderBy(d => d.art, StringComparer.OrdinalIgnoreCase),
+            "Datum"       => dokListe.OrderBy(d => d.datumSort),
+            _             => dokListe.OrderByDescending(d => d.datumSort)
+        };
+        return _sortAscending ? sortiert : sortiert.Reverse();
     }
 
     // ─────────────────────────────────────────
@@ -89,7 +164,9 @@ public class ExportScreenController : MonoBehaviour
                 art         = string.IsNullOrEmpty(pdf.category) ? "Dokument" : pdf.category,
                 filePath    = pdf.filePath,
                 isPDF       = true,
-                pdfId       = pdf.id
+                pdfId       = pdf.id,
+                datum       = pdf.uploadedAt.ToString("dd.MM.yyyy"),
+                datumSort   = pdf.uploadedAt
             });
         }
 
@@ -105,13 +182,23 @@ public class ExportScreenController : MonoBehaviour
 
             foreach (var doc in saveData.savedDocs)
             {
+                DateTime datumSort = DateTime.MinValue;
+                string datumAnzeige = "\u2013"; // – als Platzhalter für alte Dokumente ohne Datum
+                if (!string.IsNullOrEmpty(doc.datum) && DateTime.TryParse(doc.datum, out DateTime geparst))
+                {
+                    datumSort = geparst;
+                    datumAnzeige = geparst.ToString("dd.MM.yyyy");
+                }
+
                 dokListe.Add(new DokumentExportEintrag
                 {
                     bezeichnung = doc.title,
                     art         = doc.category,
                     filePath    = Application.persistentDataPath,
                     isPDF       = false,
-                    pdfId       = -1
+                    pdfId       = -1,
+                    datum       = datumAnzeige,
+                    datumSort   = datumSort
                 });
             }
 
@@ -136,12 +223,13 @@ public class ExportScreenController : MonoBehaviour
 
         if (dokListe.Count == 0) { Debug.Log("[Export] Keine Eintraege."); return; }
 
-        foreach (DokumentExportEintrag eintrag in dokListe)
+        foreach (DokumentExportEintrag eintrag in SortiereEintraege())
         {
             VisualElement neueZeile = exportZeileTemplate.Instantiate();
 
             Label         lblBezeichnung = neueZeile.Q<Label>("row-bezeichnung");
             Label         lblArt         = neueZeile.Q<Label>("row-art");
+            Label         lblDatum       = neueZeile.Q<Label>("row-datum");
             DropdownField dropdown       = neueZeile.Q<DropdownField>("format-dropdown");
             Button        btnFolder      = neueZeile.Q<Button>("btn-open-folder");
             Button        btnExport      = neueZeile.Q<Button>("btn-export");
@@ -152,6 +240,7 @@ public class ExportScreenController : MonoBehaviour
 
             if (lblBezeichnung != null) lblBezeichnung.text = anzeigeText;
             if (lblArt         != null) lblArt.text         = eintrag.art;
+            if (lblDatum       != null) lblDatum.text       = eintrag.datum;
 
             if (dropdown != null)
             {
@@ -318,6 +407,10 @@ public class ExportScreenController : MonoBehaviour
         HelpTooltip.Registriere(root, "btn-help-art",
             "Kategorie des Dokuments, z. B. Gründung, Finanzen oder Bezahlweise. " +
             "Gibt an woher das Dokument stammt.");
+
+        HelpTooltip.Registriere(root, "btn-help-datum",
+            "Datum der letzten Änderung. Klicke auf die Spaltenüberschrift " +
+            "um die Liste danach zu sortieren.");
 
         HelpTooltip.Registriere(root, "btn-help-format",
             "Dateiformat des Exports. " +

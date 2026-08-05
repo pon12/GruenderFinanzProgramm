@@ -15,11 +15,6 @@ public class FinanceDashboardBinder : MonoBehaviour
 
     private int _gewaehltesJahr = DateTime.Today.Year;
 
-    // Merkt sich die aktuelle DB-Referenz, damit das Eingabefeld für die
-    // Liquiditätsreserve auch außerhalb von BefuelleAlles() speichern kann.
-    private DataBase _db;
-    private const int SETTINGS_USER_ID = 0; // Settings sind je Nutzer-DB-Datei eindeutig
-
     private void Start()
     {
         StartCoroutine(InitUI());
@@ -30,16 +25,11 @@ public class FinanceDashboardBinder : MonoBehaviour
         yield return new WaitForEndOfFrame();
         if (uiDocument == null || uiDocument.rootVisualElement == null) yield break;
 
-        _db = UserDatabaseAccess.getCurrentUserDatabase();
-
         try { RegistriereJahresAuswahl(); }
         catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereJahresAuswahl fehlgeschlagen: " + e); }
 
         try { RegistriereHelpTooltips(); }
         catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereHelpTooltips fehlgeschlagen: " + e); }
-
-        try { RegistriereLiquiditaetsreserveEingabe(); }
-        catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereLiquiditaetsreserveEingabe fehlgeschlagen: " + e); }
 
         try { BefuelleAlles(); }
         catch (Exception e) { Debug.LogError("[Finanzierung] BefuelleAlles fehlgeschlagen: " + e); }
@@ -80,45 +70,9 @@ public class FinanceDashboardBinder : MonoBehaviour
 
         HelpTooltip.Registriere(root, "btn-help-kapitalbedarf",
             "Wie viel Kapital du insgesamt für die Gründung brauchst: Investition + " +
-            "Gründerkosten + deine Ziel-Liquiditätsreserve (siehe Eingabefeld oben).");
-    }
-
-    // Ziel-Liquiditätsreserve ist eine reine Planungsgröße (Puffer-Betrag),
-    // kein Kassenbuch-Wert - wird deshalb manuell erfasst und in den
-    // Settings der Nutzer-DB gespeichert (siehe DataBase.getLiquiditaetsreserveZiel).
-    private void RegistriereLiquiditaetsreserveEingabe()
-    {
-        var input = uiDocument.rootVisualElement.Q<TextField>("input-liquiditaetsreserve");
-        if (input == null || _db == null) return;
-
-        float aktuelleReserve = _db.getLiquiditaetsreserveZiel(SETTINGS_USER_ID);
-        input.SetValueWithoutNotify(aktuelleReserve.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")));
-
-        input.RegisterCallback<FocusOutEvent>(_ => SpeichereLiquiditaetsreserve(input));
-        input.RegisterCallback<KeyDownEvent>(evt =>
-        {
-            if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
-                SpeichereLiquiditaetsreserve(input);
-        });
-    }
-
-    private void SpeichereLiquiditaetsreserve(TextField input)
-    {
-        if (_db == null) return;
-
-        string text = (input.value ?? "").Replace(".", "").Replace(",", ".");
-        if (!float.TryParse(text, System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.InvariantCulture, out float wert))
-        {
-            wert = 0f;
-        }
-        if (wert < 0) wert = 0f;
-
-        _db.setLiquiditaetsreserveZiel(SETTINGS_USER_ID, wert);
-        input.SetValueWithoutNotify(wert.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("de-DE")));
-
-        // Kapitalbedarf-Block sofort mit dem neuen Wert neu berechnen
-        BefuelleAlles();
+            "Gründerkosten + Liquiditätsreserve. Die Liquiditätsreserve wird automatisch " +
+            "aus Umsatz, Sacheinlagen, Krediten, Darlehen, Büroausstattung, Wertpapieren " +
+            "und Börse/Krypto des gewählten Jahres berechnet.");
     }
 
     // FIX: Vorher fest auf das aktuelle Jahr beschränkt - keine Möglichkeit,
@@ -164,7 +118,14 @@ public class FinanceDashboardBinder : MonoBehaviour
         float privatentnahme = 0f;
         float sonstigeAusg = 0f;
         float geldeinlagen = 0f;
-        float kredite = 0f;
+        float kredite = 0f; // Kategorie "Darlehen"
+
+        // Bestandteile der Liquiditätsreserve (Formel vom Chef):
+        // Umsatz + Sacheinlagen + Kredite + Darlehen + Büroausstattung + Wertpapiere + Börse/Krypto
+        float sacheinlagen = 0f;
+        float kreditKategorie = 0f; // Kategorie "Kredite" (separat von "Darlehen")
+        float wertpapiere = 0f;
+        float boerseKrypto = 0f;
 
         // FIX: Neue Investitions- und Gründerkosten-Kategorien im Kassenbuch
         // (waren vorher gar nicht vorhanden -> "wieso keine Ausgabe mit
@@ -189,6 +150,10 @@ public class FinanceDashboardBinder : MonoBehaviour
                         einnahmenMap[art] += e.Amount;
                         if (art == "Privateinzahlung") geldeinlagen += e.Amount;
                         else if (art == "Darlehen") kredite += e.Amount;
+                        else if (art == "Sacheinlagen") sacheinlagen += e.Amount;
+                        else if (art == "Kredite") kreditKategorie += e.Amount;
+                        else if (art == "Wertpapiere") wertpapiere += e.Amount;
+                        else if (art == "Börse / Krypto") boerseKrypto += e.Amount;
                     }
 
             var ausgList = db.getAllAusgabenEntries();
@@ -285,11 +250,7 @@ public class FinanceDashboardBinder : MonoBehaviour
             cInvest.Add(MakeRow("Software / Lizenzen", invSoftware, RedColor));
             cInvest.Add(MakeTrenn());
             cInvest.Add(MakeRow("Summe Investition", summeInvestition, RedColor, true));
-            // Sacheinlagen (Geräte etc. die eingebracht statt gekauft werden)
-            // sind keine Kassenbuch-Buchung, sondern eine reine
-            // Businessplan-Angabe - dafür gibt es hier bewusst keine
-            // automatische Herleitung.
-            cInvest.Add(MakeRow("Summe Sacheinlagen", 0f, TextColor, true));
+            cInvest.Add(MakeRow("Summe Sacheinlagen", sacheinlagen, sacheinlagen > 0 ? GreenColor : TextColor, true));
         }
 
         // GRÜNDERKOSTEN
@@ -316,21 +277,24 @@ public class FinanceDashboardBinder : MonoBehaviour
         var cKapital = root.Q<VisualElement>("Kapitalbedarf");
         if (cKapital != null)
         {
-            float liquiditaetsreserve = db != null ? db.getLiquiditaetsreserveZiel(SETTINGS_USER_ID) : 0f;
-            // Kapitalbedarf = Investition + Gründerkosten + Ziel-Liquiditätsreserve
-            // (Standard-Formel im Kapitalbedarfsplan). Vorher floss die Reserve
-            // gar nicht in die Summe ein, weil sie fest 0 war.
+            // Liquiditätsreserve (Formel vom Chef, ersetzt das manuelle
+            // Eingabefeld): Umsatz des gewählten Jahres + Sacheinlagen +
+            // Kredite + Darlehen + Büroausstattung + Wertpapiere + Börse/Krypto
+            float umsatzerloese = einnahmenMap.TryGetValue("Umsatzerlöse", out float ue) ? ue : 0f;
+            float liquiditaetsreserve = umsatzerloese + sacheinlagen + kreditKategorie + kredite
+                + invBueroausstattung + wertpapiere + boerseKrypto;
+
+            // Kapitalbedarf = Investition + Gründerkosten + Liquiditätsreserve
+            // (Standard-Formel im Kapitalbedarfsplan).
             float kapitalbedarf = summeInvestition + summeGruenderkosten + liquiditaetsreserve;
             float gesamtKapital = geldeinlagen + kredite;
 
             cKapital.Clear();
             cKapital.Add(MakeHeader("Kategorie", "Betrag"));
             cKapital.Add(MakeRow("Investition", summeInvestition, RedColor));
-            // Sacheinlagen: siehe Hinweis oben bei "Investition" - keine
-            // Kassenbuch-Buchung, daher bewusst ohne automatische Herleitung.
-            cKapital.Add(MakeRow("Sacheinlagen", 0f, TextColor));
+            cKapital.Add(MakeRow("Sacheinlagen", sacheinlagen, sacheinlagen > 0 ? GreenColor : TextColor));
             cKapital.Add(MakeRow("Gründerkosten", summeGruenderkosten, RedColor));
-            cKapital.Add(MakeRow("Liquiditätsreserve", liquiditaetsreserve, liquiditaetsreserve > 0 ? RedColor : TextColor));
+            cKapital.Add(MakeRow("Liquiditätsreserve", liquiditaetsreserve, liquiditaetsreserve > 0 ? GreenColor : TextColor));
             cKapital.Add(MakeTrenn());
             cKapital.Add(MakeRow("Kapitalbedarf", kapitalbedarf, RedColor, true));
             cKapital.Add(MakeTrenn());

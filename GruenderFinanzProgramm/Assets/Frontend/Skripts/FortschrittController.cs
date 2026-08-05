@@ -112,17 +112,28 @@ public class FortschrittController : MonoBehaviour
 
     private HashSet<string> LadeErledigteSchritte()
     {
+        var erledigt = new HashSet<string>();
+        DataBase db = null;
         try
         {
-            var db   = UserDatabaseAccess.getCurrentUserDatabase();
+            db = UserDatabaseAccess.getCurrentUserDatabase();
             var docs = db?.getAllUserDocuments();
             var save = docs?.FirstOrDefault(d => d.documentType == 9001);
-            if (save == null) return new HashSet<string>();
 
-            var daten = JsonUtility.FromJson<PfadSpeicherDaten>(save.text);
-            return new HashSet<string>(daten?.erledigteIds ?? new List<string>());
+            if (save != null)
+            {
+                var daten = JsonUtility.FromJson<PfadSpeicherDaten>(save.text);
+                if (daten?.erledigteIds != null) erledigt.UnionWith(daten.erledigteIds);
+            }
         }
-        catch { return new HashSet<string>(); }
+        catch { /* ignorieren - unten kommt trotzdem die Auto-Erkennung */ }
+
+        // Zusätzlich: Schritte, die sich aus echten Daten ableiten lassen
+        // (Dokumente, Kassenbuch, Kunden) - unabhängig davon, ob der
+        // Gründerpfad-Screen schon besucht/gespeichert wurde.
+        erledigt.UnionWith(GruenderpfadAutoErkennung.ErmittleAlle(db));
+
+        return erledigt;
     }
 
     private int LadeAnzahlAusgefuelltePflichtDoks()
