@@ -119,16 +119,11 @@ public class RegestrierungLogik : MonoBehaviour
         if (btnZurAnmeldung   != null) btnZurAnmeldung.clicked   += OnZurAnmeldungClicked;
         if (btnEntschluesseln != null) btnEntschluesseln.clicked += OnEntschluesselnClicked;
         if (btnLoginSubmit    != null) btnLoginSubmit.clicked    += OnLoginSubmitted;
+        if (btnCopyPasskey     != null) btnCopyPasskey.clicked     += CopyPasskeyToClipboard;
+        if (btnCopyRecovery    != null) btnCopyRecovery.clicked    += CopyRecoveryKeyToClipboard;
         
-        if (btnCopyPasskey != null) 
-        {
-            btnCopyPasskey.clicked += () => GUIUtility.systemCopyBuffer = aktuellerPasskey;
-        }
         
-        if (btnCopyRecovery != null) 
-        {
-            btnCopyRecovery.clicked += () => GUIUtility.systemCopyBuffer = authService.recoveryPassKeyGlobal; 
-        }
+
 
         if (text2 != null)
         {
@@ -288,6 +283,26 @@ public class RegestrierungLogik : MonoBehaviour
         if (lblRecoveryKey    == null) Debug.LogError("lblRecoveryKey fehlt");
         if (btnZurAnmeldung   == null) Debug.LogError("btnZurAnmeldung fehlt");
     }
+    
+    // Copy to Clipboard funktionen
+    private void CopyPasskeyToClipboard()
+    {
+    if (authService == null)
+    {
+        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+        return;
+    }
+    CopyPaste.CopyPasskey(authService.passkeyGlobal);
+    }
+    private void CopyRecoveryKeyToClipboard()   
+    {
+    if (authService == null)
+    {
+        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+        return;
+    }
+    CopyPaste.CopyRecoveryKey(authService.getRecoveryPassKey());
+    }
 
     private void OnDisable()
     {
@@ -314,4 +329,5 @@ public class RegestrierungLogik : MonoBehaviour
             textDatenschutz.UnregisterCallback<PointerOutEvent>(OnDatenschutzHoverOut);
         }
     }
+
 }
