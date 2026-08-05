@@ -151,6 +151,7 @@
 .erfolg-kachel--erledigt {
     border-color: rgb(128, 207, 149);
     background-color: rgba(128, 207, 149, 0.07);
+    opacity: 1.0;
 }
 .erfolg-kachel--gesperrt {
     opacity: 0.45;

@@ -368,6 +368,26 @@
     background-color: #505050;
 }
 
+.btn-detail {
+    background-color: #646464;
+    color: #ffffff;
+    border-width: 0px;
+    border-radius: 6px;
+    cursor: link;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+
+.btn-detail:hover {
+    background-color: #8E8D8D;
+    border-width: 0;
+    scale: 1 1;
+}
+
+.btn-detail:active {
+    background-color: #383636;
+}
+
 /* Deadline-Marker: kleiner Punkt unter der Zahl wenn an dem Tag
    ein Angebot/Rechnung fällig ist. Wird per C# als Klasse gesetzt. */
 .cal-day-deadline {
