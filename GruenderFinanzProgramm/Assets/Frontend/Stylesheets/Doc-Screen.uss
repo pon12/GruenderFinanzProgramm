@@ -232,20 +232,18 @@
 }
 
 .doc-btn-danger-outline {
-    background-color: transparent;
-    color: rgb(230, 57, 70);
-    border-width: 1px;
-    border-color: rgb(230, 57, 70);
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+    border-width: 0;
     border-radius: 8px;
     padding: 12px 24px;
     font-size: 13px;
     -unity-font-style: bold;
-    transition-property: background-color, color;
+    transition-property: background-color;
     transition-duration: 0.1s;
 }
 .doc-btn-danger-outline:hover {
-    background-color: rgb(230, 57, 70);
-    color: rgb(255, 255, 255);
+    background-color: rgb(229, 103, 112);
 }
 .doc-btn-danger-outline:active {
     background-color: rgb(180, 40, 52);
