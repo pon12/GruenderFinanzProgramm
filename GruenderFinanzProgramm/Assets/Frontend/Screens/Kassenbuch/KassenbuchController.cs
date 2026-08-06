@@ -322,7 +322,8 @@ public class KassenbuchController : MonoBehaviour
             "Software / Lizenzen",
             "Corporate Design",
             "Homepage",
-            "Grundausstattung"
+            "Grundausstattung",
+            "Umlaufvermögen"
         };
 
             artDropdown.value = "Marketing";
@@ -781,7 +782,8 @@ public class KassenbuchController : MonoBehaviour
                     "Software / Lizenzen",
                     "Corporate Design",
                     "Homepage",
-                    "Grundausstattung"
+                    "Grundausstattung",
+                    "Umlaufvermögen"
                 };
             }
             else // Einnahme

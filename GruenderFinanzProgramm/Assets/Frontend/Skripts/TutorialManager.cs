@@ -3,6 +3,12 @@ using UnityEngine.UI;
 
 public class TutorialManager : MonoBehaviour
 {
+    // Singleton, damit UIToolkit-Screens (z.B. Einstellungen.cs) das
+    // Tutorial per Code auslösen können, ohne eine Inspector-Referenz zu
+    // brauchen (Einstellungen nutzt UIToolkit-Buttons, keine uGUI-Buttons,
+    // die man hier im Inspector verdrahten könnte).
+    public static TutorialManager Instance { get; private set; }
+
     private const string ErsterStartSchluessel =
         "TutorialStartDialogAngezeigt";
 
@@ -32,6 +38,7 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
         tutorialPanel.SetActive(false);
 
         // Nur beim ersten Start automatisch anzeigen.

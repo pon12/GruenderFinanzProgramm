@@ -1562,6 +1562,11 @@ public abstract class BelegScreenController : MonoBehaviour
                 }
 
                 OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db, HoleAusgewaehlteAnhaenge());
+
+                // FIX: Event war überall abonniert (Dashboard-Kalender!) aber
+                // wurde nirgends im ganzen Projekt tatsächlich gefeuert -
+                // Dashboard bekam ein neu erstelltes Angebot deshalb nie live mit.
+                AppEventManager.AngeboteAnzahlGeaendert(db.getAllOffers()?.Count ?? 0);
             }
             else if (BelegTyp == "Rechnung")
             {
@@ -1604,6 +1609,9 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
                 InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db, HoleAusgewaehlteAnhaenge());
+
+                // FIX: gleiches Problem wie beim Angebot - Event war nirgends gefeuert.
+                AppEventManager.RechnungenAnzahlGeaendert(db.getAllInvoices()?.Count ?? 0);
             }
 
             NachSpeichernHook();

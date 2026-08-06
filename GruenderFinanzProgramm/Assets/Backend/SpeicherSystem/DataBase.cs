@@ -20,6 +20,8 @@ public class DataBase : DatabaseManager
         try { database.Execute("ALTER TABLE Settings ADD COLUMN agb TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN disclaimer TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN liquiditaetsreserveZiel REAL DEFAULT 0"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN monateAnlaufphase INTEGER DEFAULT 6"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN monatlicherLebensunterhalt REAL DEFAULT -1"); } catch { }
 
         createTable<Ausgaben>();
         createTable<Einkommen>();
@@ -875,7 +877,9 @@ public class DataBase : DatabaseManager
             emailFirma = "",
             teleponNrFirma = "",
             websitefrima = "",
-            liquiditaetsreserveZiel = 0f
+            liquiditaetsreserveZiel = 0f,
+            monateAnlaufphase = 6,
+            monatlicherLebensunterhalt = -1f // -1 = "noch nie gesetzt", siehe getMonatlicherLebensunterhalt
         };
 
         insert(settings);
@@ -916,6 +920,38 @@ public class DataBase : DatabaseManager
     {
         Settings settings = getOrCreateSettingsForUser(userId);
         settings.liquiditaetsreserveZiel = wert;
+        updateSettingsForUser(settings);
+    }
+
+    // Monate der Anlaufphase (für die Gesamtkapitalbedarf-Formel) - reine
+    // Planungszahl, Default 6 Monate.
+    public int getMonateAnlaufphase(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.monateAnlaufphase ?? 6;
+    }
+
+    public void setMonateAnlaufphase(int userId, int monate)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.monateAnlaufphase = monate;
+        updateSettingsForUser(settings);
+    }
+
+    // Monatlicher privater Lebensunterhalt - reine Planungszahl. -1 bedeutet
+    // "noch nie manuell gesetzt"; der Aufrufer (Finanzen 2) füllt in diesem
+    // Fall mit dem Kassenbuch-Schnitt (Ø monatliche Barentnahme/Privatentnahme)
+    // vor, damit man nicht bei 0 anfängt.
+    public float getMonatlicherLebensunterhaltRoh(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.monatlicherLebensunterhalt ?? -1f;
+    }
+
+    public void setMonatlicherLebensunterhalt(int userId, float wert)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.monatlicherLebensunterhalt = wert;
         updateSettingsForUser(settings);
     }
 

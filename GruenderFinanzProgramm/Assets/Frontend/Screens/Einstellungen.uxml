@@ -67,11 +67,26 @@
                             </ui:VisualElement>
                             <ui:VisualElement name="row-version-kopf" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <ui:Label name="label-version" text="Version 1.0.0" style="font-size: 16px; color: rgb(160, 160, 160);"/>
-                                <ui:Button text="Nach Updates suchen" name="btn-update" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; font-size: 14px;"/>
+                                <ui:VisualElement name="row-version-aktionen" style="flex-direction: row; align-items: center;">
+                                    <ui:Button text="Backup erstellen" name="btn-create-backup" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 12px; padding-right: 12px; font-size: 13px; margin-right: 8px;"/>
+                                    <ui:Button text="Neuestes Backup laden" name="btn-restore-backup" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 12px; padding-right: 12px; font-size: 13px; margin-right: 8px;"/>
+                                    <ui:Button text="Nach Updates suchen" name="btn-update" style="background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; font-size: 14px;"/>
+                                </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="row-credits-buttons" style="flex-direction: row;">
                                 <ui:Button text="Credits" name="btn-open-credits" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>
                                 <ui:Button text="Mitwirkende" name="btn-open-mitwirkende" style="flex: 1; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="card-hilfe" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-top: 16px;">
+                            <ui:VisualElement name="row-titel-hilfe" style="flex-direction: row; align-items: center; margin-bottom: 16px;">
+                                <ui:VisualElement name="dot-hilfe" style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
+                                <ui:Label text="Hilfe" name="label-titel-hilfe" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                                <ui:VisualElement name="spacer-titel-hilfe" style="flex-grow: 1;"/>
+                                <ui:VisualElement name="btn-help-hilfe" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement name="row-tutorial-button" style="flex-direction: row; align-items: center;">
+                                <ui:Button text="Tutorial starten" name="btn-start-tutorial" style="flex-grow: 1; background-color: rgb(50, 50, 50); color: rgb(200, 200, 200); border-left-color: rgb(80, 80, 80); border-right-color: rgb(80, 80, 80); border-top-color: rgb(80, 80, 80); border-bottom-color: rgb(80, 80, 80); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -192,7 +207,7 @@
                     <ui:Label text="Straße und Hausnummer" name="label-feld-strasse" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                     <ui:TextField name="input-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                 </ui:VisualElement>
-                <ui:VisualElement name="row-plz-stadt" style="flex-direction: row; margin-bottom: 28px;">
+                <ui:VisualElement name="row-plz-stadt" style="flex-direction: row; margin-bottom: 14px;">
                     <ui:VisualElement name="feld-gruppe-plz" style="flex: 1; margin-right: 8px;">
                         <ui:Label text="Postleitzahl" name="label-feld-plz" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                         <ui:TextField name="input-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
@@ -200,6 +215,16 @@
                     <ui:VisualElement name="feld-gruppe-stadt" style="flex: 2;">
                         <ui:Label text="Stadt" name="label-feld-stadt" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                         <ui:TextField name="input-stadt" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="row-email-telefon" style="flex-direction: row; margin-bottom: 28px;">
+                    <ui:VisualElement name="feld-gruppe-email" style="flex: 1; margin-right: 8px;">
+                        <ui:Label text="E-Mail-Adresse" name="label-feld-email" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField name="input-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="feld-gruppe-telefon" style="flex: 1;">
+                        <ui:Label text="Telefonnummer" name="label-feld-telefon" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField name="input-telefon" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="row-popup-footer-unternehmen" style="flex-direction: row; justify-content: flex-end;">

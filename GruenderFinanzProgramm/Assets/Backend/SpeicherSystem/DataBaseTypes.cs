@@ -183,6 +183,11 @@ public class Settings
     // Ziel-Liquiditätsreserve (manuell gesetzter Puffer-Betrag, kein
     // Buchungswert - fließt in die Kapitalbedarfs-Berechnung bei Finanzen 2 ein)
     public float liquiditaetsreserveZiel { get; set; }
+
+    // Für die Gesamtkapitalbedarf-Formel: reine Planungsgrößen, lassen sich
+    // nicht aus Buchungen ableiten.
+    public int monateAnlaufphase { get; set; }
+    public float monatlicherLebensunterhalt { get; set; }
 }
 
 public class Finanzdaten

@@ -14,6 +14,8 @@ public class FinanceDashboardBinder : MonoBehaviour
     private static readonly Color HeaderColor = new Color(1f, 1f, 1f, 1f);
 
     private int _gewaehltesJahr = DateTime.Today.Year;
+    private float _privatentnahmeAktuellesJahr = 0f; // für die Lebensunterhalt-Vorbefüllung
+    private const int SETTINGS_USER_ID = 0;
 
     private void Start()
     {
@@ -33,6 +35,9 @@ public class FinanceDashboardBinder : MonoBehaviour
 
         try { BefuelleAlles(); }
         catch (Exception e) { Debug.LogError("[Finanzierung] BefuelleAlles fehlgeschlagen: " + e); }
+
+        try { RegistriereKapitalbedarfEingaben(); }
+        catch (Exception e) { Debug.LogError("[Finanzierung] RegistriereKapitalbedarfEingaben fehlgeschlagen: " + e); }
     }
 
     // FIX: Die 7 Hilfe-Icons im UXML (btn-help-seitentitel, -ertragsquellen,
@@ -69,10 +74,11 @@ public class FinanceDashboardBinder : MonoBehaviour
             "Grundausstattung und sonstige Kosten aus dem Kassenbuch.");
 
         HelpTooltip.Registriere(root, "btn-help-kapitalbedarf",
-            "Wie viel Kapital du insgesamt für die Gründung brauchst: Investition + " +
-            "Gründerkosten + Liquiditätsreserve. Die Liquiditätsreserve wird automatisch " +
-            "aus Umsatz, Sacheinlagen, Krediten, Darlehen, Büroausstattung, Wertpapieren " +
-            "und Börse/Krypto des gewählten Jahres berechnet.");
+            "Gesamtkapitalbedarf = Anlagevermögen + Umlaufvermögen + Gründungskosten + " +
+            "(monatliche Betriebskosten × Monate der Anlaufphase) + " +
+            "(monatlicher Lebensunterhalt × Monate der Anlaufphase) + Sicherheitsreserve. " +
+            "Anlaufphase-Monate und Lebensunterhalt trägst du oben selbst ein - " +
+            "der Rest wird automatisch aus dem Kassenbuch berechnet.");
     }
 
     // FIX: Vorher fest auf das aktuelle Jahr beschränkt - keine Möglichkeit,
@@ -133,6 +139,7 @@ public class FinanceDashboardBinder : MonoBehaviour
         // Businessplan-Konvention ergänzt.
         float invBueroausstattung = 0f, invFuhrpark = 0f, invMaschinen = 0f, invSoftware = 0f;
         float gkCorporateDesign = 0f, gkHomepage = 0f, gkGrundausstattung = 0f;
+        float summeUmlaufvermoegen = 0f;
 
         var einnahmenMap = new Dictionary<string, float>();
 
@@ -179,6 +186,7 @@ public class FinanceDashboardBinder : MonoBehaviour
                             case "Corporate Design": gkCorporateDesign += a.Amount; break;
                             case "Homepage": gkHomepage += a.Amount; break;
                             case "Grundausstattung": gkGrundausstattung += a.Amount; break;
+                            case "Umlaufvermögen": summeUmlaufvermoegen += a.Amount; break;
                             default: sonstigeAusg += a.Amount; break;
                         }
                     }
@@ -189,6 +197,7 @@ public class FinanceDashboardBinder : MonoBehaviour
         float gesamtAusgaben = direkteKosten + betriebGesamt;
         float rohgewinn = gesamtEinn - direkteKosten;
         float rohProzent = gesamtEinn > 0 ? (rohgewinn / gesamtEinn) * 100f : 0f;
+        _privatentnahmeAktuellesJahr = privatentnahme;
 
         // ERTRAGSQUELLEN
         var cErtrag = root.Q<VisualElement>("Ertragsquellen");
@@ -277,29 +286,109 @@ public class FinanceDashboardBinder : MonoBehaviour
         var cKapital = root.Q<VisualElement>("Kapitalbedarf");
         if (cKapital != null)
         {
-            // Liquiditätsreserve (Formel vom Chef, ersetzt das manuelle
-            // Eingabefeld): Umsatz des gewählten Jahres + Sacheinlagen +
-            // Kredite + Darlehen + Büroausstattung + Wertpapiere + Börse/Krypto
+            // Sicherheitsreserve = dieselbe Formel wie die frühere
+            // "Liquiditätsreserve" (Chef-Bestätigung: ist dieselbe Sache):
+            // Umsatz + Sacheinlagen + Kredite + Darlehen + Büroausstattung
+            // + Wertpapiere + Börse/Krypto (jeweils gewähltes Jahr)
             float umsatzerloese = einnahmenMap.TryGetValue("Umsatzerlöse", out float ue) ? ue : 0f;
-            float liquiditaetsreserve = umsatzerloese + sacheinlagen + kreditKategorie + kredite
+            float sicherheitsreserve = umsatzerloese + sacheinlagen + kreditKategorie + kredite
                 + invBueroausstattung + wertpapiere + boerseKrypto;
 
-            // Kapitalbedarf = Investition + Gründerkosten + Liquiditätsreserve
-            // (Standard-Formel im Kapitalbedarfsplan).
-            float kapitalbedarf = summeInvestition + summeGruenderkosten + liquiditaetsreserve;
-            float gesamtKapital = geldeinlagen + kredite;
+            // Planungsgrößen aus den Settings (siehe RegistriereKapitalbedarfEingaben)
+            var db2 = UserDatabaseAccess.getCurrentUserDatabase();
+            int monateAnlaufphase = db2?.getMonateAnlaufphase(SETTINGS_USER_ID) ?? 6;
+            float lebensunterhaltMonatlich = HoleLebensunterhaltMonatlich(db2);
+
+            float betriebskostenAnlaufphase = (betriebGesamt / 12f) * monateAnlaufphase;
+            float lebensunterhaltAnlaufphase = lebensunterhaltMonatlich * monateAnlaufphase;
+
+            // GESAMTKAPITALBEDARF (Formel vom Chef):
+            // Anlagevermögen + Umlaufvermögen + Gründungskosten
+            // + (monatliche Betriebskosten * Anlaufphase-Monate)
+            // + (monatlicher Lebensunterhalt * Anlaufphase-Monate)
+            // + Sicherheitsreserve
+            float gesamtKapitalbedarf = summeInvestition + summeUmlaufvermoegen + summeGruenderkosten
+                + betriebskostenAnlaufphase + lebensunterhaltAnlaufphase + sicherheitsreserve;
 
             cKapital.Clear();
             cKapital.Add(MakeHeader("Kategorie", "Betrag"));
-            cKapital.Add(MakeRow("Investition", summeInvestition, RedColor));
+            cKapital.Add(MakeRow("Anlagevermögen (Investition)", summeInvestition, RedColor));
+            cKapital.Add(MakeRow("Umlaufvermögen", summeUmlaufvermoegen, summeUmlaufvermoegen > 0 ? GreenColor : TextColor));
             cKapital.Add(MakeRow("Sacheinlagen", sacheinlagen, sacheinlagen > 0 ? GreenColor : TextColor));
-            cKapital.Add(MakeRow("Gründerkosten", summeGruenderkosten, RedColor));
-            cKapital.Add(MakeRow("Liquiditätsreserve", liquiditaetsreserve, liquiditaetsreserve > 0 ? GreenColor : TextColor));
+            cKapital.Add(MakeRow("Gründungskosten", summeGruenderkosten, RedColor));
+            cKapital.Add(MakeRow($"Betriebskosten ({monateAnlaufphase} Mon. Anlaufphase)", betriebskostenAnlaufphase, RedColor));
+            cKapital.Add(MakeRow($"Lebensunterhalt ({monateAnlaufphase} Mon. Anlaufphase)", lebensunterhaltAnlaufphase, RedColor));
+            cKapital.Add(MakeRow("Sicherheitsreserve", sicherheitsreserve, sicherheitsreserve > 0 ? GreenColor : TextColor));
             cKapital.Add(MakeTrenn());
-            cKapital.Add(MakeRow("Kapitalbedarf", kapitalbedarf, RedColor, true));
-            cKapital.Add(MakeTrenn());
-            cKapital.Add(MakeRow("Gesamtkapitalbedarf", gesamtKapital,
-                gesamtKapital >= 0 ? GreenColor : RedColor, true));
+            cKapital.Add(MakeRow("Gesamtkapitalbedarf", gesamtKapitalbedarf, RedColor, true));
+        }
+    }
+
+    // Lebensunterhalt: -1 in den Settings heißt "noch nie manuell gesetzt" -
+    // dann mit dem Kassenbuch-Schnitt (aktuelles Jahr, Barentnahme/
+    // Privatentnahme / 12) vorbefüllen, statt bei 0 anzufangen.
+    private float HoleLebensunterhaltMonatlich(DataBase db)
+    {
+        if (db == null) return 0f;
+        float roh = db.getMonatlicherLebensunterhaltRoh(SETTINGS_USER_ID);
+        if (roh >= 0f) return roh;
+        return _privatentnahmeAktuellesJahr / 12f;
+    }
+
+    // ============================================================
+    // KAPITALBEDARF-EINGABEN: Anlaufphase (Monate) + Lebensunterhalt (€/Monat)
+    // Beides reine Planungsgrößen, lassen sich nicht aus Buchungen ableiten.
+    // ============================================================
+    private void RegistriereKapitalbedarfEingaben()
+    {
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) return;
+
+        var inputAnlaufphase = uiDocument.rootVisualElement.Q<TextField>("input-anlaufphase");
+        var inputLebensunterhalt = uiDocument.rootVisualElement.Q<TextField>("input-lebensunterhalt");
+        var kulturDE = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
+        if (inputAnlaufphase != null)
+        {
+            int monate = db.getMonateAnlaufphase(SETTINGS_USER_ID);
+            inputAnlaufphase.SetValueWithoutNotify(monate.ToString());
+
+            void SpeichereAnlaufphase()
+            {
+                if (!int.TryParse(inputAnlaufphase.value, out int wert) || wert < 0) wert = 6;
+                db.setMonateAnlaufphase(SETTINGS_USER_ID, wert);
+                inputAnlaufphase.SetValueWithoutNotify(wert.ToString());
+                BefuelleAlles();
+            }
+            inputAnlaufphase.RegisterCallback<FocusOutEvent>(_ => SpeichereAnlaufphase());
+            inputAnlaufphase.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter) SpeichereAnlaufphase();
+            });
+        }
+
+        if (inputLebensunterhalt != null)
+        {
+            float aktuell = HoleLebensunterhaltMonatlich(db);
+            inputLebensunterhalt.SetValueWithoutNotify(aktuell.ToString("N2", kulturDE));
+
+            void SpeichereLebensunterhalt()
+            {
+                string text = (inputLebensunterhalt.value ?? "").Replace(".", "").Replace(",", ".");
+                if (!float.TryParse(text, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out float wert) || wert < 0)
+                {
+                    wert = 0f;
+                }
+                db.setMonatlicherLebensunterhalt(SETTINGS_USER_ID, wert);
+                inputLebensunterhalt.SetValueWithoutNotify(wert.ToString("N2", kulturDE));
+                BefuelleAlles();
+            }
+            inputLebensunterhalt.RegisterCallback<FocusOutEvent>(_ => SpeichereLebensunterhalt());
+            inputLebensunterhalt.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter) SpeichereLebensunterhalt();
+            });
         }
     }
 

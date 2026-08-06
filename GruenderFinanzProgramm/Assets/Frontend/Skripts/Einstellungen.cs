@@ -53,6 +53,8 @@ public class EinstellungenController : MonoBehaviour
     private const int MAX_NAME = 100;
     private const int MAX_ORT = 100;
     private const int MAX_STRASSE = 100;
+    private const int MAX_EMAIL = 150;
+    private const int MAX_TELEFON = 30;
     private const int MAX_PLZ = 5;
     private const int MAX_STEUERNR = 30;
     private const int MAX_USTIDNR = 30;
@@ -97,6 +99,9 @@ public class EinstellungenController : MonoBehaviour
 
     private Label _labelVersion;
     private Button _btnUpdate;
+    private Button _btnCreateBackup;
+    private Button _btnRestoreBackup;
+    private Button _btnStartTutorial;
     private Button _btnOpenCredits;
     private Button _btnOpenMitwirkende;
 
@@ -116,6 +121,8 @@ public class EinstellungenController : MonoBehaviour
     private TextField _inputStrasse;
     private TextField _inputPlz;
     private TextField _inputStadt;
+    private TextField _inputEmail;
+    private TextField _inputTelefon;
     private Button _btnCloseUnternehmen;
     private Button _btnCancelUnternehmen;
     private Button _btnSaveUnternehmen;
@@ -280,6 +287,9 @@ public class EinstellungenController : MonoBehaviour
         _btnDeleteProfile = _root.Q<Button>("btn-delete-profile");
         _labelVersion = _root.Q<Label>("label-version");
         _btnUpdate = _root.Q<Button>("btn-update");
+        _btnCreateBackup = _root.Q<Button>("btn-create-backup");
+        _btnRestoreBackup = _root.Q<Button>("btn-restore-backup");
+        _btnStartTutorial = _root.Q<Button>("btn-start-tutorial");
         _btnOpenCredits = _root.Q<Button>("btn-open-credits");
         _btnOpenMitwirkende = _root.Q<Button>("btn-open-mitwirkende");
         _btnOpenUnternehmen = _root.Q<Button>("btn-open-unternehmen");
@@ -298,6 +308,8 @@ public class EinstellungenController : MonoBehaviour
         _inputStrasse = _root.Q<TextField>("input-strasse");
         _inputPlz = _root.Q<TextField>("input-plz");
         _inputStadt = _root.Q<TextField>("input-stadt");
+        _inputEmail = _root.Q<TextField>("input-email");
+        _inputTelefon = _root.Q<TextField>("input-telefon");
         _btnCloseUnternehmen = _root.Q<Button>("btn-close-unternehmen");
         _btnCancelUnternehmen = _root.Q<Button>("btn-cancel-unternehmen");
         _btnSaveUnternehmen = _root.Q<Button>("btn-save-unternehmen");
@@ -370,6 +382,8 @@ public class EinstellungenController : MonoBehaviour
         SetzeMaxLaenge(_inputFirmenname, MAX_NAME);
         SetzeMaxLaenge(_inputStrasse, MAX_STRASSE);
         SetzeMaxLaenge(_inputStadt, MAX_ORT);
+        SetzeMaxLaenge(_inputEmail, MAX_EMAIL);
+        SetzeMaxLaenge(_inputTelefon, MAX_TELEFON);
         SetzeMaxLaenge(_inputSteuernummer, MAX_STEUERNR);
         SetzeMaxLaenge(_inputUstidnr, MAX_USTIDNR);
         SetzeMaxLaenge(_inputHandelsreg, MAX_HANDELSREG);
@@ -489,6 +503,74 @@ public class EinstellungenController : MonoBehaviour
         if (_btnClosePasskeyPopup != null) _btnClosePasskeyPopup.clicked += () => HidePopup(_popupNewPasskey);
         if (_btnCloseGespeichert != null) _btnCloseGespeichert.clicked += () => HidePopup(_popupGespeichert);
         if (_btnCloseZurueckgesetzt != null) _btnCloseZurueckgesetzt.clicked += () => HidePopup(_popupZurueckgesetzt);
+
+        // ─────────────────────────────────────────────────────
+        // BACKUP: nutzt die bestehenden Bestätigungs-Popups
+        // ("Gespeichert"/"Zurückgesetzt") mit kurzzeitig angepasstem
+        // Text, statt eigene neue Popups zu bauen. Text wird beim
+        // Schließen wieder auf den Original-Text zurückgesetzt, damit
+        // die normalen Speichern/Zurücksetzen-Aktionen weiter den
+        // richtigen Text zeigen.
+        // ─────────────────────────────────────────────────────
+        if (_btnCreateBackup != null)
+            _btnCreateBackup.clicked += () =>
+            {
+                string ergebnis = BackupService.CreateBackup();
+                var label = _root.Q<Label>("label-gespeichert-text");
+                if (label != null)
+                {
+                    label.text = ergebnis != null
+                        ? "Backup wurde erstellt"
+                        : "Backup fehlgeschlagen - keine Datenbank gefunden";
+                }
+                ShowPopup(_popupGespeichert);
+            };
+
+        if (_btnRestoreBackup != null)
+            _btnRestoreBackup.clicked += () =>
+            {
+                bool erfolgreich = BackupService.RestoreLatestBackup();
+                var label = _root.Q<Label>("label-zurueckgesetzt-text");
+                if (label != null)
+                {
+                    label.text = erfolgreich
+                        ? "Neuestes Backup wurde geladen - bitte Ventoriq neu starten"
+                        : "Kein Backup zum Laden gefunden";
+                }
+                ShowPopup(_popupZurueckgesetzt);
+            };
+
+        if (_btnCloseGespeichert != null)
+            _btnCloseGespeichert.clicked += () =>
+            {
+                var label = _root.Q<Label>("label-gespeichert-text");
+                if (label != null) label.text = "Einstellungen wurden gespeichert";
+            };
+
+        if (_btnCloseZurueckgesetzt != null)
+            _btnCloseZurueckgesetzt.clicked += () =>
+            {
+                var label = _root.Q<Label>("label-zurueckgesetzt-text");
+                if (label != null) label.text = "Einstellungen wurden zurückgesetzt";
+            };
+
+        // TUTORIAL: ruft den (neu ergänzten) TutorialManager-Singleton auf.
+        // Falls im aktuellen Szenen-Setup kein TutorialManager existiert,
+        // passiert bewusst NICHT einfach nichts - es gibt eine klare
+        // Debug-Warnung, damit das nicht als "Button tut nix" durchgeht.
+        if (_btnStartTutorial != null)
+            _btnStartTutorial.clicked += () =>
+            {
+                if (TutorialManager.Instance != null)
+                {
+                    TutorialManager.Instance.TutorialAuswahlOeffnen();
+                }
+                else
+                {
+                    Debug.LogWarning("[Einstellungen] Kein TutorialManager in der Szene gefunden - " +
+                        "das Tutorial-System ist aktuell nicht eingerichtet (siehe Chat-Hinweis).");
+                }
+            };
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -528,7 +610,10 @@ public class EinstellungenController : MonoBehaviour
 
         if (companies == null || companies.Count == 0)
         {
-            db.createCompany("", 0, 0, "", "", "", "", "", 0, "", "Null", "Null");
+            // FIX: hier stand vorher buchstäblich der TEXT "Null" statt
+            // eines echten leeren Strings für email/handyNr - dadurch zeigte
+            // die KDB "Null" als E-Mail an statt "keine E-Mail hinterlegt".
+            db.createCompany("", 0, 0, "", "", "", "", "", 0, "", "", "");
             companies = db.getAllCompanies();
             if (companies == null || companies.Count == 0) return;
         }
@@ -545,6 +630,9 @@ public class EinstellungenController : MonoBehaviour
         if (_inputUstidnr != null) _inputUstidnr.value = c.ustIdNr ?? "";
         if (_inputHandelsreg != null) _inputHandelsreg.value = c.handelsReg ?? "";
         if (_inputGruendungsjahr != null) _inputGruendungsjahr.value = c.gruendungsJahr ?? "";
+        // "Null" defensiv abfangen, falls eine ältere DB noch den Text-Bug drin hat
+        if (_inputEmail != null) _inputEmail.value = (c.email == "Null" ? "" : c.email) ?? "";
+        if (_inputTelefon != null) _inputTelefon.value = (c.handyNr == "Null" ? "" : c.handyNr) ?? "";
     }
 
     private void LoadLocalSettings()
@@ -658,11 +746,13 @@ public class EinstellungenController : MonoBehaviour
         string gruendungsJahr = _inputGruendungsjahr?.value ?? "";
         int plz = int.TryParse(_inputPlz?.value ?? "", out int parsedPlz) ? parsedPlz : 0;
         string strasseHausNr = _inputStrasse?.value ?? "";
+        string email = _inputEmail?.value ?? "";
+        string telefon = _inputTelefon?.value ?? "";
 
         if (_currentCompany == null)
         {
             db.createCompany(name, legalForm, industry, location, steuerNr,
-                gruendungsJahr, handelsReg, strasseHausNr, plz, ustIdNr, "Null", "Null");
+                gruendungsJahr, handelsReg, strasseHausNr, plz, ustIdNr, email, telefon);
             var all = db.getAllCompanies();
             if (all != null && all.Count > 0) _currentCompany = all[all.Count - 1];
         }
@@ -678,6 +768,8 @@ public class EinstellungenController : MonoBehaviour
             _currentCompany.gruendungsJahr = gruendungsJahr;
             _currentCompany.plz = plz;
             _currentCompany.strasseuHausNr = strasseHausNr;
+            _currentCompany.email = email;
+            _currentCompany.handyNr = telefon;
             db.updateCompany(_currentCompany);
         }
     }
@@ -1048,7 +1140,12 @@ public class EinstellungenController : MonoBehaviour
 
         HelpTooltip.Registriere(_root, "btn-help-version",
             "Zeigt die aktuell installierte Programmversion. " +
-            "Hier kannst du nach Updates suchen sowie Credits und Mitwirkende einsehen.");
+            "Hier kannst du nach Updates suchen, ein Backup deiner Daten erstellen " +
+            "oder das neueste Backup laden, sowie Credits und Mitwirkende einsehen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-hilfe",
+            "Startet das geführte Tutorial erneut als Popup-Fenster \u2013 " +
+            "du kannst dort zwischen einer langen und einer kurzen Variante w\u00e4hlen.");
 
         HelpTooltip.Registriere(_root, "btn-help-pdf",
             "Steuere hier das Erscheinungsbild deiner PDF-Exporte: " +

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class KundendatenbankController : MonoBehaviour
@@ -59,9 +61,71 @@ public class KundendatenbankController : MonoBehaviour
 
         RegisterEvents();
         LadeKundenAusDatenbank();
+        LadeLokalenNutzer();
 
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(root);
+    }
+
+    // ============================================================
+    // LOKALER NUTZER: Karte oben in der KDB mit den echten Firmen-/
+    // Kontaktdaten aus den Einstellungen befüllen.
+    // FIX: Die 5 Labels (Name/Firma/Adresse/Email/Telefon) waren vorher
+    // reiner Platzhaltertext im UXML ("Max Mustermann" usw.) - es gab im
+    // ganzen Controller keine einzige Zeile, die diese Labels überhaupt
+    // per Q<Label>(...) angefasst hat. Einstellungen und KDB waren also
+    // schlicht nie verbunden.
+    // ============================================================
+    private void LadeLokalenNutzer()
+    {
+        var lblName    = root.Q<Label>("label-lokaler-nutzer-name");
+        var lblFirma   = root.Q<Label>("label-lokaler-nutzer-firma");
+        var lblAdresse = root.Q<Label>("label-lokaler-nutzer-adresse");
+        var lblEmail   = root.Q<Label>("label-lokaler-nutzer-email");
+        var lblTelefon = root.Q<Label>("label-lokaler-nutzer-telefon");
+
+        try
+        {
+            // Profilname kommt aus dem Auth-System (bei der Registrierung
+            // vergeben), nicht aus der Firmen-DB.
+            string profilname = StateManager.Instance?.getCurrentUser()?.username;
+            if (lblName != null)
+                lblName.text = string.IsNullOrWhiteSpace(profilname) ? "Kein Profilname hinterlegt" : profilname;
+
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            var company = db?.getAllCompanies()?.FirstOrDefault();
+
+            if (lblFirma != null)
+                lblFirma.text = string.IsNullOrWhiteSpace(company?.name) ? "Keine Firma hinterlegt" : company.name;
+
+            if (lblAdresse != null)
+            {
+                string strasse = company?.strasseuHausNr;
+                string plzOrt = company != null && company.plz > 0
+                    ? $"{company.plz} {company.location}".Trim()
+                    : company?.location;
+                string adresse = string.Join(" ", new[] { strasse, plzOrt }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                lblAdresse.text = string.IsNullOrWhiteSpace(adresse) ? "Keine Adresse hinterlegt" : adresse;
+            }
+
+            if (lblEmail != null)
+            {
+                string email = company?.email;
+                email = string.IsNullOrWhiteSpace(email) || email == "Null" ? null : email;
+                lblEmail.text = email ?? "Keine E-Mail hinterlegt";
+            }
+
+            if (lblTelefon != null)
+            {
+                string telefon = company?.handyNr;
+                telefon = string.IsNullOrWhiteSpace(telefon) || telefon == "Null" ? null : telefon;
+                lblTelefon.text = telefon ?? "Keine Telefonnummer hinterlegt";
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[KDB] LadeLokalenNutzer: " + e.Message);
+        }
     }
 
     // ============================================================
@@ -76,8 +140,8 @@ public class KundendatenbankController : MonoBehaviour
             "Kunden k\u00f6nnen direkt in Angeboten und Rechnungen ausgew\u00e4hlt werden.");
 
         HelpTooltip.Registriere(root, "btn-help-lokaler-nutzer",
-            "Dies ist dein lokales Nutzerprofil. " +
-            "Klicke auf \u201e\u00c4ndern\u201c um deine eigenen Kontaktdaten anzupassen.");
+            "Dies sind deine eigenen Firmen-/Kontaktdaten aus den Einstellungen. " +
+            "Klicke auf \u201e\u00c4ndern\u201c um direkt zu den Einstellungen zu springen und sie anzupassen.");
 
         HelpTooltip.Registriere(root, "btn-help-kunden",
             "Klicke auf \u201eKunde Hinzuf\u00fcgen\u201c um einen neuen Kunden anzulegen. " +
@@ -138,13 +202,13 @@ public class KundendatenbankController : MonoBehaviour
         if (btnEditSpeichern != null)
             btnEditSpeichern.clicked += SpeichereBearbeitetenKunden;
 
+        // FIX: Öffnete vorher das "Kunde bearbeiten"-Popup mit leeren
+        // Feldern (aktuellBearbeiteterKunde = null) - beim Speichern wäre
+        // das als NEUER Kunde in der KDB gelandet, statt die eigenen
+        // Firmendaten zu ändern. Die echten Firmendaten liegen in den
+        // Einstellungen, also verlinkt "Ändern" jetzt dorthin.
         if (btnEditLocal != null)
-            btnEditLocal.clicked += () =>
-            {
-                aktuellBearbeiteterKunde = null;
-                ClearEditInputs();
-                SetElementVisible(popupBearbeiten, true);
-            };
+            btnEditLocal.clicked += () => SceneManager.LoadScene("Einstellungen");
     }
 
     private void SetElementVisible(VisualElement element, bool visible)

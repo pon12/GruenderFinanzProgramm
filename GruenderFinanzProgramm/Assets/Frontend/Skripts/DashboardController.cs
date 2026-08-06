@@ -124,7 +124,7 @@ public class DashboardController : MonoBehaviour
 
         HelpTooltip.Registriere(_root, "btn-help-kalender",
             "Farbig markierte Tage haben anstehende Fristen: " +
-            "Angebote deren G\u00fcltigkeit abl\u00e4uft (Erstelldatum + 14 Tage) " +
+            "Angebote deren G\u00fcltigkeit abl\u00e4uft (die beim Erstellen festgelegte Frist) " +
             "und Rechnungen mit F\u00e4lligkeitsdatum. " +
             "Fahre mit der Maus \u00fcber einen markierten Tag f\u00fcr Details.");
     }
@@ -541,26 +541,51 @@ public class DashboardController : MonoBehaviour
     void LadeDeadlines()
     {
         _deadlines.Clear();
-        try
-        {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db == null) return;
 
-            var angebote = db.getAllOffers();
-            if (angebote != null)
-                foreach (var a in angebote)
-                    if (TryParseDatum(a.date, out DateTime erstellt))
-                    {
-                        DateTime gueltigBis = erstellt.AddDays(ANGEBOT_GUELTIGKEIT_TAGE);
-                        string key = gueltigBis.ToString("yyyy-MM-dd");
-                        string kunde = HoleKundenname(db, a.customerId);
-                        FuegeDeadlineHinzu(key, istAngebot: true,
-                            $"Angebot {a.offerNumber} \u2013 {kunde} (g\u00fcltig bis)");
-                    }
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) return;
 
-            var rechnungen = db.getAllInvoices();
-            if (rechnungen != null)
-                foreach (var r in rechnungen)
+        // WICHTIG: Jeder Eintrag wird EINZELN abgesichert. Vorher hing die
+        // gesamte Methode in einem try/catch - warf auch nur EIN
+        // fehlerhafter Datensatz (kaputtes Datum, gelöschter Kunde o.ä.)
+        // eine Exception, wurden ALLE nachfolgenden Angebote/Rechnungen in
+        // der Liste stillschweigend gar nicht mehr verarbeitet, auch neu
+        // erstellte, völlig valide Einträge nicht. Jetzt überspringt ein
+        // fehlerhafter Datensatz nur sich selbst.
+        var angebote = db.getAllOffers();
+        if (angebote != null)
+            foreach (var a in angebote)
+            {
+                try
+                {
+                    // FIX: Nutzte vorher immer Erstelldatum+14 Tage, obwohl
+                    // beim Anlegen des Angebots die echte Frist ("validUntil")
+                    // gespeichert wird und vom Nutzer frei geändert werden kann.
+                    DateTime? gueltigBis = null;
+                    if (TryParseDatum(a.validUntil, out DateTime echtGueltig))
+                        gueltigBis = echtGueltig;
+                    else if (TryParseDatum(a.date, out DateTime erstellt))
+                        gueltigBis = erstellt.AddDays(ANGEBOT_GUELTIGKEIT_TAGE); // Fallback für alte Angebote ohne validUntil
+
+                    if (gueltigBis == null) continue;
+
+                    string key = gueltigBis.Value.ToString("yyyy-MM-dd");
+                    string kunde = HoleKundenname(db, a.customerId);
+                    FuegeDeadlineHinzu(key, istAngebot: true,
+                        $"Angebot {a.offerNumber} \u2013 {kunde} (g\u00fcltig bis)");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[Dashboard] Angebot {a?.offerNumber} konnte nicht f\u00fcr den Kalender verarbeitet werden: " + e.Message);
+                }
+            }
+
+        var rechnungen = db.getAllInvoices();
+        if (rechnungen != null)
+            foreach (var r in rechnungen)
+            {
+                try
+                {
                     if (TryParseDatum(r.dueDate, out DateTime faellig))
                     {
                         string key = faellig.ToString("yyyy-MM-dd");
@@ -568,11 +593,12 @@ public class DashboardController : MonoBehaviour
                         FuegeDeadlineHinzu(key, istAngebot: false,
                             $"Rechnung {r.invoiceNumber} \u2013 {kunde} (f\u00e4llig)");
                     }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("[Dashboard] Deadlines laden: " + e.Message);
-        }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[Dashboard] Rechnung {r?.invoiceNumber} konnte nicht f\u00fcr den Kalender verarbeitet werden: " + e.Message);
+                }
+            }
     }
 
     void FuegeDeadlineHinzu(string key, bool istAngebot, string text)
