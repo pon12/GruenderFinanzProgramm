@@ -278,21 +278,13 @@ public class KassenbuchController : MonoBehaviour
         // ==========================================
         // EXPORT BUTTON EVENT VERKNÜPFEN
         // ==========================================
+        // GEÄNDERT: Klick öffnet jetzt ein Auswahl-Popup (EÜR/GuV/
+        // Buchungsjournal + Jahr) statt sofort die GuV zu exportieren.
         var btnExport = root.Q<Button>("FinanzExport") ?? root.Q<Button>("btn-export") ?? root.Q<Button>("Export");
-        Debug.Log($"[DEBUG-Export] Export-Button gefunden: {btnExport != null}");
         if (btnExport != null)
-        {
-            btnExport.clicked += () =>
-            {
-                Debug.Log("[DEBUG-Export] Button wurde geklickt!");
-                var dj = root.Q<DropdownField>("dropJahr");
-                Debug.Log($"[DEBUG-Export] dropJahr gefunden: {dj != null}, Wert: '{dj?.value}'");
-                if (dj != null)
-                {
-                    ExportJahrAlsPdf(dj.value);
-                }
-            };
-        }
+            btnExport.clicked += OeffneExportPopup;
+
+        RegistriereExportPopup(root);
 
         artDropdown = _overlay.Q<DropdownField>("Art");
 
@@ -359,9 +351,10 @@ public class KassenbuchController : MonoBehaviour
             "Einnahmen erhöhen deinen Kontostand.");
 
         HelpTooltip.Registriere(root, "btn-help-finanzexport",
-            "Exportiert alle Kassenbucheinträge des gewählten Jahres als PDF. " +
-            "Die Datei kann direkt an das Finanzamt weitergegeben werden. " +
-            "Das Jahr wählst du über das Dropdown oben rechts.");
+            "Öffnet ein Auswahlfenster: Wähle zwischen Einnahmen-Überschuss-Rechnung " +
+            "(EÜR), Gewinn- und Verlustrechnung (GuV) oder Buchungsjournal, " +
+            "sowie das gewünschte Jahr. Die Datei kann direkt an das Finanzamt " +
+            "weitergegeben werden.");
 
         HelpTooltip.Registriere(root, "btn-help-tabelle",
             "Tabellenspalten: Name (Verwendungszweck der Buchung), " +
@@ -1368,6 +1361,367 @@ public class KassenbuchController : MonoBehaviour
         return entries;
     }
 
+    // ============================================================
+    // EXPORT-AUSWAHL-POPUP (EÜR / GuV / Buchungsjournal + Jahr)
+    // ============================================================
+    private VisualElement _exportOverlay;
+    private VisualElement _karteEuer, _karteGuv, _karteJournal;
+    private DropdownField _dropdownExportJahr;
+    private string _gewaehlterExportTyp = "EUER"; // Default: das, was das Finanzamt am häufigsten will
+
+    private void RegistriereExportPopup(VisualElement root)
+    {
+        _exportOverlay = root.Q<VisualElement>("export-overlay");
+        _karteEuer = root.Q<VisualElement>("karte-export-euer");
+        _karteGuv = root.Q<VisualElement>("karte-export-guv");
+        _karteJournal = root.Q<VisualElement>("karte-export-journal");
+        _dropdownExportJahr = root.Q<DropdownField>("dropdown-export-jahr");
+
+        if (_karteEuer != null) _karteEuer.RegisterCallback<ClickEvent>(_ => WaehleExportTyp("EUER"));
+        if (_karteGuv != null) _karteGuv.RegisterCallback<ClickEvent>(_ => WaehleExportTyp("GUV"));
+        if (_karteJournal != null) _karteJournal.RegisterCallback<ClickEvent>(_ => WaehleExportTyp("JOURNAL"));
+
+        var btnAbbrechen = root.Q<Button>("btn-export-abbrechen");
+        if (btnAbbrechen != null) btnAbbrechen.clicked += SchliesseExportPopup;
+
+        var btnBestaetigen = root.Q<Button>("btn-export-bestaetigen");
+        if (btnBestaetigen != null)
+            btnBestaetigen.clicked += () =>
+            {
+                if (_dropdownExportJahr == null) return;
+                string jahr = _dropdownExportJahr.value;
+
+                switch (_gewaehlterExportTyp)
+                {
+                    case "GUV":     ExportJahrAlsPdf(jahr); break;
+                    case "JOURNAL": ExportBuchungsjournalAlsPdf(jahr); break;
+                    default:        ExportEuerAlsPdf(jahr); break;
+                }
+                SchliesseExportPopup();
+            };
+    }
+
+    private void OeffneExportPopup()
+    {
+        if (_exportOverlay == null) return;
+
+        // Jahres-Dropdown befüllen (gleiche Spanne wie der Haupt-Jahresfilter)
+        if (_dropdownExportJahr != null)
+        {
+            var jahre = new List<string>();
+            int aktuellesJahr = DateTime.Today.Year;
+            for (int i = aktuellesJahr; i >= 2010; i--) jahre.Add(i.ToString());
+            _dropdownExportJahr.choices = jahre;
+
+            // Falls der Haupt-Jahresfilter des Kassenbuchs schon ein Jahr
+            // gewählt hat, das gleich vorauswählen - sonst aktuelles Jahr.
+            string vorausgewaehlt = dropJahrField != null && !string.IsNullOrEmpty(dropJahrField.value)
+                ? dropJahrField.value
+                : aktuellesJahr.ToString();
+            _dropdownExportJahr.value = jahre.Contains(vorausgewaehlt) ? vorausgewaehlt : aktuellesJahr.ToString();
+        }
+
+        WaehleExportTyp(_gewaehlterExportTyp);
+        _exportOverlay.style.display = DisplayStyle.Flex;
+    }
+
+    private void SchliesseExportPopup()
+    {
+        if (_exportOverlay != null) _exportOverlay.style.display = DisplayStyle.None;
+    }
+
+    private void WaehleExportTyp(string typ)
+    {
+        _gewaehlterExportTyp = typ;
+
+        var gruen = new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f));
+        var grau = new StyleColor(new UnityEngine.Color(80f / 255f, 80f / 255f, 80f / 255f));
+
+        SetzeKartenAuswahl(_karteEuer, typ == "EUER", gruen, grau);
+        SetzeKartenAuswahl(_karteGuv, typ == "GUV", gruen, grau);
+        SetzeKartenAuswahl(_karteJournal, typ == "JOURNAL", gruen, grau);
+    }
+
+    private void SetzeKartenAuswahl(VisualElement karte, bool ausgewaehlt, StyleColor gruen, StyleColor grau)
+    {
+        if (karte == null) return;
+        var rand = ausgewaehlt ? gruen : grau;
+        karte.style.borderTopColor = rand;
+        karte.style.borderBottomColor = rand;
+        karte.style.borderLeftColor = rand;
+        karte.style.borderRightColor = rand;
+        karte.style.borderTopWidth = ausgewaehlt ? 2 : 1;
+        karte.style.borderBottomWidth = ausgewaehlt ? 2 : 1;
+        karte.style.borderLeftWidth = ausgewaehlt ? 2 : 1;
+        karte.style.borderRightWidth = ausgewaehlt ? 2 : 1;
+        karte.style.backgroundColor = ausgewaehlt
+            ? new StyleColor(new UnityEngine.Color(128f / 255f, 207f / 255f, 149f / 255f, 0.12f))
+            : new StyleColor(new UnityEngine.Color(50f / 255f, 50f / 255f, 50f / 255f));
+    }
+
+    // ==========================================
+    // EINNAHMEN-ÜBERSCHUSS-RECHNUNG (EÜR)
+    // Standardformat nach §4 Abs. 3 EStG für kleine Unternehmen/
+    // Freiberufler: Betriebseinnahmen und Betriebsausgaben jeweils nach
+    // Kategorie aufgelistet, Gewinn = Einnahmen - Ausgaben.
+    // ==========================================
+    public void ExportEuerAlsPdf(string jahr)
+    {
+        if (db == null) { ShowFehler("Keine Datenbankverbindung vorhanden."); return; }
+        if (!int.TryParse(jahr, out int jahrZahl)) { ShowFehler("Ungültiges Jahr für den Export."); return; }
+
+        var einkommen = db.getAllEinkommenEntries();
+        var ausgaben = db.getAllAusgabenEntries();
+
+        var einkommenJahr = (einkommen ?? new List<Einkommen>())
+            .Where(e => TryParseDatum(e.getDatum(), out DateTime d) && d.Year == jahrZahl)
+            .ToList();
+        var ausgabenJahr = (ausgaben ?? new List<Ausgaben>())
+            .Where(a => TryParseDatum(a.getDatum(), out DateTime d) && d.Year == jahrZahl)
+            .ToList();
+
+        if (einkommenJahr.Count == 0 && ausgabenJahr.Count == 0)
+        {
+            ShowFehler($"Keine Einträge im Jahr {jahr} gefunden.");
+            return;
+        }
+
+        var einnahmenPosten = einkommenJahr
+            .GroupBy(e => string.IsNullOrWhiteSpace(e.getArt()) ? "Sonstige Einzahlung" : e.getArt())
+            .Select(g => (Name: g.Key, Betrag: g.Sum(e => e.Amount)))
+            .OrderByDescending(p => p.Betrag)
+            .ToList();
+
+        var ausgabenPosten = ausgabenJahr
+            .GroupBy(a => string.IsNullOrWhiteSpace(a.getArt()) ? "Sonstige Kosten" : a.getArt())
+            .Select(g => (Name: g.Key, Betrag: g.Sum(a => a.Amount)))
+            .OrderByDescending(p => p.Betrag)
+            .ToList();
+
+        float summeEinnahmen = einnahmenPosten.Sum(p => p.Betrag);
+        float summeAusgaben = ausgabenPosten.Sum(p => p.Betrag);
+        float gewinn = summeEinnahmen - summeAusgaben;
+
+        string username = GetSafeFolderName(StateManager.Instance.getCurrentUser().username);
+        string folderPath = Path.Combine(Application.persistentDataPath, "PDFs", username, "Finanzamt-Export");
+        Directory.CreateDirectory(folderPath);
+        string filePath = Path.Combine(folderPath, "EUER_" + jahr + ".pdf");
+
+        try
+        {
+            Document doc = new Document(PageSize.A4, 50, 50, 50, 50);
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent("", "", true);
+
+                doc.AddAuthor("Ventoriq");
+                doc.AddTitle("Einnahmen-Überschuss-Rechnung " + jahr);
+                doc.Open();
+
+                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                var headerFontWeiss = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, iTextSharp.text.Color.WHITE);
+                var normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+                var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
+                var grayFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
+
+                var gruenBrand = new iTextSharp.text.Color(102, 165, 119);
+                var rotBrand = new iTextSharp.text.Color(210, 70, 80);
+
+                doc.Add(new Paragraph("Einnahmen-Überschuss-Rechnung " + jahr, titleFont));
+                doc.Add(new Paragraph("nach § 4 Abs. 3 EStG", grayFont));
+                doc.Add(new Paragraph("Generiert am: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm"), grayFont));
+                doc.Add(new Paragraph(" "));
+
+                // --- Betriebseinnahmen ---
+                doc.Add(new Paragraph("1. Betriebseinnahmen", boldFont));
+                doc.Add(new Paragraph(" "));
+                PdfPTable tabEin = new PdfPTable(2);
+                tabEin.WidthPercentage = 100f;
+                tabEin.SetWidths(new float[] { 4f, 2f });
+                AddGuvHeaderCell(tabEin, "Kategorie", headerFontWeiss, gruenBrand);
+                AddGuvHeaderCell(tabEin, "Betrag", headerFontWeiss, gruenBrand);
+                foreach (var p in einnahmenPosten)
+                {
+                    AddGuvBodyCell(tabEin, p.Name, normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(tabEin, p.Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                }
+                AddGuvBodyCell(tabEin, "Summe Betriebseinnahmen", boldFont, Element.ALIGN_LEFT, true);
+                AddGuvBodyCell(tabEin, summeEinnahmen.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                doc.Add(tabEin);
+                doc.Add(new Paragraph(" "));
+
+                // --- Betriebsausgaben ---
+                doc.Add(new Paragraph("2. Betriebsausgaben", boldFont));
+                doc.Add(new Paragraph(" "));
+                PdfPTable tabAus = new PdfPTable(2);
+                tabAus.WidthPercentage = 100f;
+                tabAus.SetWidths(new float[] { 4f, 2f });
+                AddGuvHeaderCell(tabAus, "Kategorie", headerFontWeiss, rotBrand);
+                AddGuvHeaderCell(tabAus, "Betrag", headerFontWeiss, rotBrand);
+                foreach (var p in ausgabenPosten)
+                {
+                    AddGuvBodyCell(tabAus, p.Name, normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(tabAus, p.Betrag.ToString("N2", DeKultur) + " €", normalFont, Element.ALIGN_RIGHT);
+                }
+                AddGuvBodyCell(tabAus, "Summe Betriebsausgaben", boldFont, Element.ALIGN_LEFT, true);
+                AddGuvBodyCell(tabAus, summeAusgaben.ToString("N2", DeKultur) + " €", boldFont, Element.ALIGN_RIGHT, true);
+                doc.Add(tabAus);
+                doc.Add(new Paragraph(" "));
+
+                // --- Ergebnis ---
+                var ergebnisFarbe = gewinn >= 0 ? gruenBrand : rotBrand;
+                var ergebnisFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, ergebnisFarbe);
+                string ergebnisText = gewinn >= 0
+                    ? "3. Gewinn " + jahr + ": " + gewinn.ToString("N2", DeKultur) + " €"
+                    : "3. Verlust " + jahr + ": " + Math.Abs(gewinn).ToString("N2", DeKultur) + " €";
+                doc.Add(new Paragraph(ergebnisText, ergebnisFont));
+                doc.Add(new Paragraph(
+                    "(Betriebseinnahmen " + summeEinnahmen.ToString("N2", DeKultur) + " € - Betriebsausgaben "
+                    + summeAusgaben.ToString("N2", DeKultur) + " €)", grayFont));
+
+                doc.Close();
+            }
+            OeffneExportierteDatei(filePath);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Fehler beim EÜR-Export: " + ex.Message);
+            ShowFehler("Export fehlgeschlagen: " + ex.Message);
+        }
+    }
+
+    // ==========================================
+    // BUCHUNGSJOURNAL
+    // Chronologische Liste ALLER Buchungen des Jahres - für Prüfungen und
+    // Nachweise gegenüber dem Finanzamt.
+    // ==========================================
+    public void ExportBuchungsjournalAlsPdf(string jahr)
+    {
+        if (db == null) { ShowFehler("Keine Datenbankverbindung vorhanden."); return; }
+        if (!int.TryParse(jahr, out int jahrZahl)) { ShowFehler("Ungültiges Jahr für den Export."); return; }
+
+        var einkommen = db.getAllEinkommenEntries();
+        var ausgaben = db.getAllAusgabenEntries();
+
+        var buchungen = new List<(DateTime Datum, string Beschreibung, string Art, string Typ, float Betrag)>();
+
+        foreach (var e in einkommen ?? new List<Einkommen>())
+            if (TryParseDatum(e.getDatum(), out DateTime d) && d.Year == jahrZahl)
+                buchungen.Add((d, e.getDescription(), e.getArt(), "Einnahme", e.Amount));
+
+        foreach (var a in ausgaben ?? new List<Ausgaben>())
+            if (TryParseDatum(a.getDatum(), out DateTime d) && d.Year == jahrZahl)
+                buchungen.Add((d, a.getDescription(), a.getArt(), "Ausgabe", a.Amount));
+
+        if (buchungen.Count == 0)
+        {
+            ShowFehler($"Keine Einträge im Jahr {jahr} gefunden.");
+            return;
+        }
+
+        buchungen = buchungen.OrderBy(b => b.Datum).ToList();
+        float summeEinnahmen = buchungen.Where(b => b.Typ == "Einnahme").Sum(b => b.Betrag);
+        float summeAusgaben = buchungen.Where(b => b.Typ == "Ausgabe").Sum(b => b.Betrag);
+
+        string username = GetSafeFolderName(StateManager.Instance.getCurrentUser().username);
+        string folderPath = Path.Combine(Application.persistentDataPath, "PDFs", username, "Finanzamt-Export");
+        Directory.CreateDirectory(folderPath);
+        string filePath = Path.Combine(folderPath, "Buchungsjournal_" + jahr + ".pdf");
+
+        try
+        {
+            Document doc = new Document(PageSize.A4.Rotate(), 40, 40, 50, 50);
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent("", "", true);
+
+                doc.AddAuthor("Ventoriq");
+                doc.AddTitle("Buchungsjournal " + jahr);
+                doc.Open();
+
+                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                var headerFontWeiss = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11, iTextSharp.text.Color.WHITE);
+                var normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+                var boldFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
+                var grayFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
+                var gruenText = FontFactory.GetFont(FontFactory.HELVETICA, 10, new iTextSharp.text.Color(60, 140, 80));
+                var rotText = FontFactory.GetFont(FontFactory.HELVETICA, 10, new iTextSharp.text.Color(190, 60, 70));
+
+                var kopfFarbe = new iTextSharp.text.Color(60, 60, 60);
+
+                doc.Add(new Paragraph("Buchungsjournal " + jahr, titleFont));
+                doc.Add(new Paragraph("Generiert am: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm") +
+                    " \u2013 " + buchungen.Count + " Buchungen", grayFont));
+                doc.Add(new Paragraph(" "));
+
+                PdfPTable table = new PdfPTable(5);
+                table.WidthPercentage = 100f;
+                table.SetWidths(new float[] { 2f, 5f, 3f, 2f, 2.5f });
+
+                AddGuvHeaderCell(table, "Datum", headerFontWeiss, kopfFarbe);
+                AddGuvHeaderCell(table, "Beschreibung", headerFontWeiss, kopfFarbe);
+                AddGuvHeaderCell(table, "Art", headerFontWeiss, kopfFarbe);
+                AddGuvHeaderCell(table, "Typ", headerFontWeiss, kopfFarbe);
+                AddGuvHeaderCell(table, "Betrag", headerFontWeiss, kopfFarbe);
+
+                foreach (var b in buchungen)
+                {
+                    var betragFont = b.Typ == "Einnahme" ? gruenText : rotText;
+                    string vorzeichen = b.Typ == "Einnahme" ? "+" : "-";
+
+                    AddGuvBodyCell(table, b.Datum.ToString("dd.MM.yyyy"), normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(table, b.Beschreibung ?? "", normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(table, string.IsNullOrWhiteSpace(b.Art) ? "-" : b.Art, normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(table, b.Typ, normalFont, Element.ALIGN_LEFT);
+                    AddGuvBodyCell(table, vorzeichen + b.Betrag.ToString("N2", DeKultur) + " €", betragFont, Element.ALIGN_RIGHT);
+                }
+
+                doc.Add(table);
+                doc.Add(new Paragraph(" "));
+
+                float saldo = summeEinnahmen - summeAusgaben;
+                var saldoFarbe = saldo >= 0
+                    ? new iTextSharp.text.Color(102, 165, 119)
+                    : new iTextSharp.text.Color(210, 70, 80);
+                var saldoFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, saldoFarbe);
+
+                doc.Add(new Paragraph("Summe Einnahmen: " + summeEinnahmen.ToString("N2", DeKultur) + " €", boldFont));
+                doc.Add(new Paragraph("Summe Ausgaben: " + summeAusgaben.ToString("N2", DeKultur) + " €", boldFont));
+                doc.Add(new Paragraph("Saldo " + jahr + ": " + saldo.ToString("N2", DeKultur) + " €", saldoFont));
+
+                doc.Close();
+            }
+            OeffneExportierteDatei(filePath);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Fehler beim Buchungsjournal-Export: " + ex.Message);
+            ShowFehler("Export fehlgeschlagen: " + ex.Message);
+        }
+    }
+
+    // Datei nach dem Export direkt öffnen, damit der Erfolg auch sichtbar
+    // ist (gleiches Verhalten wie beim GuV-Export, jetzt für alle 3
+    // Exportarten in eine Hilfsmethode gezogen).
+    private void OeffneExportierteDatei(string filePath)
+    {
+        Debug.Log("PDF erfolgreich exportiert unter: " + filePath);
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception oeffnenEx)
+        {
+            Debug.LogWarning("[Export] PDF erstellt, konnte aber nicht automatisch geöffnet werden: " + oeffnenEx.Message);
+        }
+    }
+
     public void ExportJahrAlsPdf(string jahr)
     {
         Debug.Log($"[DEBUG-Export] ExportJahrAlsPdf wurde aufgerufen mit Jahr='{jahr}'");
@@ -1538,22 +1892,7 @@ public class KassenbuchController : MonoBehaviour
 
                 doc.Close();
             }
-            Debug.Log("PDF erfolgreich exportiert unter: " + filePath);
-
-            // Datei direkt öffnen, damit der Erfolg auch sichtbar ist
-            // (ohne das würde der Export lautlos im Hintergrund passieren)
-            try
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = filePath,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception oeffnenEx)
-            {
-                Debug.LogWarning("[Export] PDF erstellt, konnte aber nicht automatisch geöffnet werden: " + oeffnenEx.Message);
-            }
+            OeffneExportierteDatei(filePath);
         }
         catch (Exception ex)
         {

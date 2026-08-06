@@ -206,9 +206,14 @@ public class KundendatenbankController : MonoBehaviour
         // Feldern (aktuellBearbeiteterKunde = null) - beim Speichern wäre
         // das als NEUER Kunde in der KDB gelandet, statt die eigenen
         // Firmendaten zu ändern. Die echten Firmendaten liegen in den
-        // Einstellungen, also verlinkt "Ändern" jetzt dorthin.
+        // Einstellungen, also verlinkt "Ändern" jetzt dorthin - und öffnet
+        // das Unternehmensdaten-Popup dort gleich automatisch mit.
         if (btnEditLocal != null)
-            btnEditLocal.clicked += () => SceneManager.LoadScene("Einstellungen");
+            btnEditLocal.clicked += () =>
+            {
+                EinstellungenController.OeffneUnternehmenPopupBeimStart = true;
+                SceneManager.LoadScene("Einstellungen");
+            };
     }
 
     private void SetElementVisible(VisualElement element, bool visible)

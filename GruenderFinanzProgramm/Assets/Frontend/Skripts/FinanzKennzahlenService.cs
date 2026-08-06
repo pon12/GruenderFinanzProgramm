@@ -18,6 +18,7 @@ public static class FinanzKennzahlenService
         public float GesamtEinnahmen;
         public float Rohgewinn;
         public float SummeInvestition;
+        public float SummeUmlaufvermoegen;
         public float SummeGruenderkosten;
         public float Sacheinlagen;
         public float Kredite;
@@ -84,6 +85,7 @@ public static class FinanzKennzahlenService
                     case "Corporate Design":
                     case "Homepage":
                     case "Grundausstattung":       k.SummeGruenderkosten += a.Amount; break;
+                    case "Umlaufvermögen":          k.SummeUmlaufvermoegen += a.Amount; break;
                     default:                       sonstigeAusg += a.Amount; break;
                 }
             }
@@ -98,7 +100,10 @@ public static class FinanzKennzahlenService
         k.Liquiditaetsreserve = k.Umsatzerloese + k.Sacheinlagen + k.Kredite + k.Darlehen
             + k.SummeInvestition + k.Wertpapiere + k.BoerseKrypto;
 
-        k.Kapitalbedarf = k.SummeInvestition + k.SummeGruenderkosten + k.Liquiditaetsreserve;
+        // Kapitalbedarf = Anlagevermögen + Umlaufvermögen + Gründungskosten +
+        // Sicherheitsreserve (identische Formel wie "Gesamtkapitalbedarf" in
+        // Finanzen 2 - Liquiditaetsreserve hier entspricht dort "Sicherheitsreserve").
+        k.Kapitalbedarf = k.SummeInvestition + k.SummeUmlaufvermoegen + k.SummeGruenderkosten + k.Liquiditaetsreserve;
         k.GesamtKapital = k.Geldeinlagen + k.Darlehen;
 
         return k;

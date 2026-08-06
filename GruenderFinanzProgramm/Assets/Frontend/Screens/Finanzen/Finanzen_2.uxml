@@ -78,16 +78,6 @@
                         <ui:VisualElement name="spacer-titel-kapitalbedarf" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-kapitalbedarf" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="row-anlaufphase-eingaben" style="flex-direction: row; margin-bottom: 10px;">
-                        <ui:VisualElement name="feld-gruppe-anlaufphase" style="flex: 1; margin-right: 8px; flex-direction: column;">
-                            <ui:Label text="Anlaufphase (Monate)" name="label-anlaufphase" style="font-size: 11px; color: rgb(160,160,160); margin-bottom: 4px;"/>
-                            <ui:TextField name="input-anlaufphase" value="6" class="field-input" style="width: 100%; height: 28px; font-size: 13px;"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement name="feld-gruppe-lebensunterhalt" style="flex: 1; flex-direction: column;">
-                            <ui:Label text="Lebensunterhalt (€/Monat)" name="label-lebensunterhalt" style="font-size: 11px; color: rgb(160,160,160); margin-bottom: 4px;"/>
-                            <ui:TextField name="input-lebensunterhalt" value="0" class="field-input" style="width: 100%; height: 28px; font-size: 13px;"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
                     <ui:VisualElement name="Kapitalbedarf" style="flex-grow: 1;"/>
                 </ui:VisualElement>
             </ui:VisualElement>

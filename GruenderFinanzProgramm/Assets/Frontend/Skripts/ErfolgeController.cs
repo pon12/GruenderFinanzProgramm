@@ -92,7 +92,7 @@ public class ErfolgeController : MonoBehaviour
                 erfolge = new List<Erfolg>
                 {
                     new Erfolg { id = "e_konto",         titel = "Geschäftskonto eröffnet",     beschreibung = "Kontodaten im Dok-Pool hinterlegt",               icon = "🏦", typ = ErfolgTyp.Einmalig },
-                    new Erfolg { id = "e_bilanz",        titel = "Eröffnungsbilanz erstellt",   beschreibung = "Eröffnungsbilanz hinterlegt",                     icon = "📈", typ = ErfolgTyp.Einmalig },
+                    new Erfolg { id = "e_bilanz",        titel = "Eröffnungsbilanz erstellt",   beschreibung = "Echte Kapitalstruktur im Kapitalbedarf-Panel aufgebaut",  icon = "📈", typ = ErfolgTyp.Einmalig },
                     new Erfolg { id = "e_umsatz_1k",     titel = "Erster Umsatz",               beschreibung = "Kassenbuch-Umsatz: €1k / €10k / €100k / €1 Mio.",  icon = "💵", typ = ErfolgTyp.Stackable, stufen = new[] { 1000, 10000, 100000, 1000000 } },
                     new Erfolg { id = "e_kontostand",    titel = "Kontostand aktuell",          beschreibung = "Kassenbuch-Kontostand hinterlegt",                icon = "💳", typ = ErfolgTyp.Einmalig },
                 }
@@ -280,7 +280,6 @@ public class ErfolgeController : MonoBehaviour
             { "Gründungsurkunde / Gesellschaftsvertrag", "e_gesellschaft"  },
             { "Gesellschafterliste",                     "e_gesellschaft"  },
             { "Kontodaten (IBAN/BIC)",                   "e_konto"         },
-            { "Eröffnungsbilanz",                        "e_bilanz"        },
             { "AGB",                                     "e_agb"           },
             { "Datenschutzerklärung (DSGVO)",            "e_dsgvo"         },
             { "Impressum",                               "e_impressum"     },
@@ -337,6 +336,11 @@ public class ErfolgeController : MonoBehaviour
             // Kassenbuch-Fleiß: reine Anzahl an Buchungen, unabhängig vom Betrag
             var kennzahlen = FinanzKennzahlenService.Berechne(db);
             SetzeStackable("e_kassenbuch_fleiss", kennzahlen.AnzahlKassenbuchEintraege);
+
+            // BUG-FIX: "Erster Umsatz" (e_umsatz_1k) wurde nirgends gesetzt -
+            // war ein kompletter Blindgänger, unabhängig vom tatsächlichen
+            // Kassenbuch-Umsatz. Nutzt die Gesamteinnahmen (lebenszeit).
+            SetzeStackable("e_umsatz_1k", Mathf.RoundToInt(kennzahlen.GesamtEinnahmen));
         }
         catch (System.Exception e)
         {
@@ -361,6 +365,13 @@ public class ErfolgeController : MonoBehaviour
 
             SetzeErfolg("fp_investition", k.SummeInvestition > 0);
             SetzeErfolg("fp_gruenderkosten", k.SummeGruenderkosten > 0);
+
+            // GEÄNDERT: "Eröffnungsbilanz erstellt" hing vorher an einem
+            // reinen Freitext-Dokument (jedes Zeichen reichte, egal ob
+            // sinnvoll). Jetzt gekoppelt an echte Kapitalstruktur-Daten aus
+            // dem Kassenbuch - genau das, was eine Eröffnungsbilanz
+            // eigentlich zeigen soll.
+            SetzeErfolg("e_bilanz", k.Kapitalbedarf > 0);
 
             bool kapitalbedarfGedeckt = k.Kapitalbedarf > 0 && k.GesamtKapital >= k.Kapitalbedarf;
             SetzeErfolg("fp_kapitalbedarf_gedeckt", kapitalbedarfGedeckt);
@@ -401,6 +412,13 @@ public class ErfolgeController : MonoBehaviour
             bool bankdatenVollstaendig = settings != null && !string.IsNullOrWhiteSpace(settings.iban);
 
             SetzeErfolg("e_profil", firmendatenVollstaendig && bankdatenVollstaendig);
+
+            // BUG-FIX: "Geschäftskonto eröffnet" (e_konto) prüfte bisher NUR
+            // das alte Dok-Pool-Dokument "Kontodaten (IBAN/BIC)". Seit es die
+            // echte Bankverbindung in Einstellungen gibt (Settings.iban),
+            // tragen viele Nutzer ihre IBAN nur noch DORT ein - der Erfolg
+            // blieb für die dann für immer gesperrt. Zählt jetzt auch.
+            if (bankdatenVollstaendig) SetzeErfolg("e_konto", true);
         }
         catch (System.Exception e)
         {
@@ -436,7 +454,13 @@ public class ErfolgeController : MonoBehaviour
         bool anmeldungFertig    = new[] { "anm_1","anm_2","anm_3","anm_4","anm_5"     }.All(id => erledigt.Contains(id));
         bool finanzenFertig     = new[] { "fin_1","fin_2","fin_3","fin_4"              }.All(id => erledigt.Contains(id));
         bool betriebFertig      = new[] { "betr_1","betr_2","betr_3","betr_4"         }.All(id => erledigt.Contains(id));
-        bool allesFertig        = vorbereitungFertig && anmeldungFertig && finanzenFertig && betriebFertig;
+        // BUG-FIX: "Gründerpfad komplett" prüfte vorher nur 18 der 21
+        // Schritte - die "Sonstiges"-Phase (sonst_1-3: Team, Fördermittel,
+        // Skalierung) fehlte komplett in der Prüfung, obwohl der Erfolg
+        // wörtlich "Alle 21 Schritte" verspricht. Konnte also als
+        // "komplett" erledigt gelten, obwohl noch 3 Schritte offen waren.
+        bool sonstigesFertig    = new[] { "sonst_1","sonst_2","sonst_3" }.All(id => erledigt.Contains(id));
+        bool allesFertig        = vorbereitungFertig && anmeldungFertig && finanzenFertig && betriebFertig && sonstigesFertig;
 
         SetzeErfolg("e_pfad_vorbereitung", vorbereitungFertig);
         SetzeErfolg("e_pfad_anmeldung",    anmeldungFertig);

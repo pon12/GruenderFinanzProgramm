@@ -8,6 +8,10 @@ using System.Collections.Generic;
 
 public class EinstellungenController : MonoBehaviour
 {
+    // Von außen (z.B. KundendatenbankController) setzbar: öffnet das
+    // Unternehmensdaten-Popup automatisch, sobald Einstellungen geladen ist.
+    public static bool OeffneUnternehmenPopupBeimStart = false;
+
     private AuthService authService;
 
     [SerializeField] private UIDocument uiDocument;
@@ -227,6 +231,14 @@ public class EinstellungenController : MonoBehaviour
         SetupFeldBeschraenkungen();
         LoadSettings();
         LoadVersionNumber();
+
+        // Von der Kundendatenbank aus "Ändern" geklickt? Popup direkt mit öffnen,
+        // statt den Nutzer erst manuell auf "Unternehmensdaten" klicken zu lassen.
+        if (OeffneUnternehmenPopupBeimStart)
+        {
+            OeffneUnternehmenPopupBeimStart = false;
+            if (_popupUnternehmen != null) ShowPopup(_popupUnternehmen);
+        }
 
         // Begleiter-PrefKey mit DB-Prefix an HelpTooltip übergeben
         HelpTooltip.SetzeBegleiterPrefKey(_pref(PREF_BEGLEITER));

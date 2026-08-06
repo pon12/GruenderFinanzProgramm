@@ -27,7 +27,7 @@
                 <!-- Links: Finanzen im Überblick -->
                 <ui:VisualElement name="panel-finanzen-ueberblick" class="panel-half" style="flex-grow: 2; flex-basis: 0; margin-right: 12px; flex-direction: column;">
                     <ui:VisualElement name="row-titel-finanzen-ueberblick" style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-                        <ui:Label text="Finanzen im Überblick" name="label-titel-finanzen-ueberblick" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:Label text="Finanzen im Überblick" name="label-titel-finanzen-ueberblick" class="stat-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement name="spacer-titel-finanzen-ueberblick" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-chart" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
@@ -98,7 +98,7 @@
                 <ui:VisualElement name="spalte-rechts" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
                     <ui:VisualElement name="panel-top3-dienstleistungen" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-bottom: 12px;">
                         <ui:VisualElement name="row-titel-top3-dienstleistungen" style="flex-direction: row; align-items: center; margin-bottom: 6px;">
-                            <ui:Label text="Top 3 Dienstleistungen" name="label-titel-top3-dienstleistungen" class="panel-title" style="margin-bottom: 0;"/>
+                            <ui:Label text="Top 3 Dienstleistungen" name="label-titel-top3-dienstleistungen" class="stat-title" style="margin-bottom: 0;"/>
                             <ui:VisualElement name="spacer-titel-top3-dienstleistungen" style="flex-grow: 1;"/>
                             <ui:VisualElement name="btn-help-dienst" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
@@ -106,7 +106,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="panel-status-angebote" class="panel-half" style="flex-grow: 1; flex-basis: 0;">
                         <ui:VisualElement name="row-titel-status-angebote" style="flex-direction: row; align-items: center; margin-bottom: 6px;">
-                            <ui:Label text="Status der Angebote" name="label-titel-status-angebote" class="panel-title" style="margin-bottom: 0;"/>
+                            <ui:Label text="Status der Angebote" name="label-titel-status-angebote" class="stat-title" style="margin-bottom: 0;"/>
                             <ui:VisualElement name="spacer-titel-status-angebote" style="flex-grow: 1;"/>
                             <ui:VisualElement name="btn-help-angebote" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
@@ -122,7 +122,7 @@
                 <!-- Kapitalbedarf -->
                 <ui:VisualElement name="panel-kapitalbedarf" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
                     <ui:VisualElement name="row-titel-kapitalbedarf" style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-                        <ui:Label text="Kapitalbedarf" name="label-titel-kapitalbedarf" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:Label text="Kapitalbedarf" name="label-titel-kapitalbedarf" class="stat-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement name="spacer-titel-kapitalbedarf" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-kapital" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
@@ -136,7 +136,7 @@
                 <!-- Rentabilität -->
                 <ui:VisualElement name="panel-rentabilitaet" class="panel-half" style="flex-grow: 1; flex-basis: 0; margin-right: 12px; flex-direction: column;">
                     <ui:VisualElement name="row-titel-rentabilitaet" style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-                        <ui:Label text="Rentabilität" name="label-titel-rentabilitaet" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:Label text="Rentabilität" name="label-titel-rentabilitaet" class="stat-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement name="spacer-titel-rentabilitaet" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-rentab" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
@@ -160,7 +160,7 @@
                 <!-- Rohgewinn -->
                 <ui:VisualElement name="panel-rohgewinn" class="panel-half" style="flex-grow: 1; flex-basis: 0; flex-direction: column;">
                     <ui:VisualElement name="row-titel-rohgewinn" style="flex-direction: row; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-                        <ui:Label text="Rohgewinn" name="label-titel-rohgewinn" class="panel-title" style="margin-bottom: 0;"/>
+                        <ui:Label text="Rohgewinn" name="label-titel-rohgewinn" class="stat-title" style="margin-bottom: 0;"/>
                         <ui:VisualElement name="spacer-titel-rohgewinn" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-rohgewinn" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
