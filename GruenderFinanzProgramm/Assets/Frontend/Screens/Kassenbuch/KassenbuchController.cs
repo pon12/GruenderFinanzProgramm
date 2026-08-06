@@ -419,65 +419,15 @@ public class KassenbuchController : MonoBehaviour
             field.SetValueWithoutNotify(placeholder);
         }
 
-
-        field.RegisterValueChangedCallback(evt =>
- {
-     string original = evt.newValue;
-
-     // FIX: Den Platzhalter selbst nicht anfassen - vorher wurde "0,00"
-     // (der Platzhalter) durch diese Logik in "0" OHNE Komma zerlegt,
-     // sobald ClosePopup() das Feld programmgesteuert zurückgesetzt hat.
-     if (original == placeholder)
-     {
-         return;
-     }
-
-     // FIX (3. Anlauf): Die bisherigen Versuche haben aus dem Text ein
-     // Dezimaltrennzeichen (Komma/Punkt) herausgelesen - das ging schief,
-     // sobald die eigene Live-Formatierung selbst schon einen Punkt als
-     // Tausendertrennzeichen eingefügt hatte (z.B. nach "1.000" wurde eine
-     // weitere getippte Ziffer fälschlich als Cent-Stelle hinter DIESEM
-     // Punkt gelesen -> Sprung auf "1,00 €" statt "10.000 €").
-     //
-     // Jetzt wie vom Chef vorgeschlagen: ein reines Cent-Eingabefeld nach
-     // Kassenautomaten-Prinzip. Es werden IMMER nur die Ziffern gelesen -
-     // Kommas/Punkte werden komplett ignoriert, egal ob vom Nutzer oder von
-     // der eigenen Formatierung eingefügt. Die letzten 2 Ziffern sind IMMER
-     // die Cent-Stellen, alles davor volle Euro. Kein Rätselraten mehr,
-     // welches Zeichen das Dezimaltrennzeichen sein soll - es gibt keins
-     // mehr zu erraten.
-     string ziffern = new string(original.Where(char.IsDigit).ToArray());
-
-     if (ziffern.Length == 0)
-     {
-         field.SetValueWithoutNotify("");
-         return;
-     }
-
-     // Sicherheitsnetz gegen extrem lange Eingaben (Überlauf-Schutz)
-     if (ziffern.Length > 10) ziffern = ziffern.Substring(ziffern.Length - 10);
-
-     long centWert = long.Parse(ziffern);
-
-     // 10 Millionen Euro Limit (in Cent)
-     const long MAX_CENT = 10_000_000L * 100L;
-     if (centWert > MAX_CENT) centWert = MAX_CENT;
-
-     long euroTeil = centWert / 100;
-     long centTeil = centWert % 100;
-
-     string formatiert = euroTeil.ToString("N0", KassenbuchController.DeKultur)
-         + "," + centTeil.ToString("D2");
-
-     field.SetValueWithoutNotify(formatiert);
-
-     // Cursor ans Ende setzen
-     field.schedule.Execute(() =>
-     {
-         field.cursorIndex = formatiert.Length;
-         field.selectIndex = formatiert.Length;
-     });
- });
+        // 6. Anlauf, jetzt bewusst so einfach wie möglich: KEINE
+        // Live-Formatierung/Neuinterpretation mehr während des Tippens,
+        // kein Cursor-Trick. Das Feld verhält sich wie ein ganz normales
+        // Textfeld - der Nutzer tippt Ziffern und Komma selbst, genau wie
+        // er es gewohnt ist. Die Gültigkeit (echte Zahl, max. 2
+        // Nachkommastellen) wird weiterhin beim Speichern geprüft (siehe
+        // OnSpeichern) - dort kommt bei Unsinn eine klare Fehlermeldung.
+        // Kein automatisches Komma mehr, aber dafür garantiert kein
+        // Verhalten mehr, das sich beim Korrigieren komisch anfühlt.
 
         field.RegisterCallback<FocusInEvent>(evt =>
         {
@@ -488,33 +438,24 @@ public class KassenbuchController : MonoBehaviour
             }
             else
             {
-                // FIX: Vorher "field.value = ..." benutzt, das feuert erneut
-                // den ValueChanged-Handler und das gerade entfernte "€"
-                // wurde von der Formatierungslogik sofort wieder verworfen.
                 field.SetValueWithoutNotify(field.value.Replace("€", "").Trim());
             }
         });
-
 
         field.RegisterCallback<FocusOutEvent>(evt =>
         {
             string aktuellerText = field.value.Trim();
 
-
             if (string.IsNullOrEmpty(aktuellerText))
             {
                 field.SetValueWithoutNotify(placeholder);
             }
-            else
+            else if (!aktuellerText.Contains("€"))
             {
-                if (!aktuellerText.Contains("€"))
-                {
-                    field.SetValueWithoutNotify(aktuellerText + " €");
-                }
+                field.SetValueWithoutNotify(aktuellerText + " €");
             }
         });
     }
-
 
     private void SetupPlaceholderSimulation(TextField field, string placeholder)
     {
