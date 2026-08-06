@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EinstellungenController : MonoBehaviour
 {
@@ -421,17 +422,30 @@ public class EinstellungenController : MonoBehaviour
     {
         if (feld == null) return;
         feld.maxLength = maxLaenge;
+
         feld.RegisterCallback<KeyDownEvent>(evt =>
         {
+
+            if (evt.actionKey) return;
+
             bool erlaubt = char.IsDigit(evt.character)
                         || evt.keyCode == KeyCode.Backspace
                         || evt.keyCode == KeyCode.Delete
                         || evt.keyCode == KeyCode.LeftArrow
                         || evt.keyCode == KeyCode.RightArrow
                         || evt.keyCode == KeyCode.Home
-                        || evt.keyCode == KeyCode.End;
+                        || evt.keyCode == KeyCode.End
+                        || evt.keyCode == KeyCode.Tab;
             if (!erlaubt) { evt.StopPropagation(); evt.PreventDefault(); }
         }, TrickleDown.TrickleDown);
+
+
+        feld.RegisterValueChangedCallback(evt =>
+        {
+            string bereinigt = new string(evt.newValue.Where(char.IsDigit).ToArray());
+            if (bereinigt.Length > maxLaenge) bereinigt = bereinigt.Substring(0, maxLaenge);
+            if (bereinigt != evt.newValue) feld.SetValueWithoutNotify(bereinigt);
+        });
     }
 
     // ═══════════════════════════════════════════════════════════
