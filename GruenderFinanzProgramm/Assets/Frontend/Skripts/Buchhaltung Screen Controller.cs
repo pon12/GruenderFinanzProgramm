@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -44,6 +45,9 @@ public class BuchhaltungScreenController : MonoBehaviour
 
     // Header-Labels aus der UXML (für Sortierung und Pfeil-Anzeige)
     private Label _hBezeichnung, _hArt, _hErstellt, _hFaellig, _hStatus;
+
+    // Merkt sich den zuletzt exportierten Speicherort je Beleg-Nummer (nur für die laufende Session)
+    private readonly Dictionary<string, string> _letzteExportPfade = new();
 
     // ─────────────────────────────────────────────────
     // UNITY LIFECYCLE
@@ -306,7 +310,7 @@ public class BuchhaltungScreenController : MonoBehaviour
         if (dropdownStatus != null)
         {
             dropdownStatus.choices = (eintrag.Typ == "Rechnung")
-                ? new List<string> { "Entwurf", "Versendet", "Bezahlt", "Abgelehnt" }
+                ? new List<string> { "Versendet", "Bezahlt", "Storniert" }
                 : new List<string> { "Entwurf", "Versendet", "Angenommen", "Abgelehnt" };
             dropdownStatus.SetValueWithoutNotify(eintrag.Status);
             dropdownStatus.RegisterValueChangedCallback(evt =>
@@ -330,7 +334,7 @@ public class BuchhaltungScreenController : MonoBehaviour
         return status switch
         {
             "Angenommen" or "Bezahlt" => Gruen,
-            "Abgelehnt" or "Überfällig" => Rot,
+            "Abgelehnt" or "Überfällig" or "Storniert" => Rot,
             "Entwurf" or "Offen" => Grau,
             "Versendet" => new Color(255f / 255f, 195f / 255f, 0f / 255f),
             _ => new Color(180f / 255f, 180f / 255f, 180f / 255f)
@@ -384,14 +388,96 @@ public class BuchhaltungScreenController : MonoBehaviour
 
     private void OeffnePfad(BuchhaltungsEintrag eintrag)
     {
-        // Speicherpfad pro Beleg wird noch angebunden.
-        Debug.Log($"[Buchhaltung] Pfad-Funktion für {eintrag.Typ} {eintrag.Nummer} angefordert – noch nicht angebunden.");
+        if (!_letzteExportPfade.TryGetValue(eintrag.Nummer, out string pfad) || string.IsNullOrEmpty(pfad))
+        {
+            Debug.LogWarning($"[Buchhaltung] {eintrag.Typ} {eintrag.Nummer} wurde noch nicht exportiert.");
+            return;
+        }
+
+        OeffneOrdner(pfad);
+    }
+
+    private void OeffneOrdner(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath)) { Debug.LogWarning("[Buchhaltung] Kein Pfad vorhanden."); return; }
+
+        string ordner = Directory.Exists(filePath)
+            ? filePath
+            : Path.GetDirectoryName(filePath);
+
+        if (string.IsNullOrEmpty(ordner) || !Directory.Exists(ordner))
+        {
+            Debug.LogWarning("[Buchhaltung] Ordner nicht gefunden: " + ordner);
+            return;
+        }
+
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = ordner,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[Buchhaltung] Ordner-Fehler: " + e.Message);
+        }
     }
 
     private void ExportiereBeleg(BuchhaltungsEintrag eintrag)
     {
-        // PDF-Export wird noch an die bestehende Beleg-Erzeugung angebunden.
-        Debug.Log($"[Buchhaltung] Export für {eintrag.Typ} {eintrag.Nummer} angefordert – noch nicht angebunden.");
+        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string dateiname = $"{eintrag.Typ}_{eintrag.Nummer}_{zeitstempel}.pdf";
+        string zielPfad = Path.Combine(desktopPath, dateiname);
+
+        try
+        {
+            ErstellePDF(zielPfad, eintrag);
+            _letzteExportPfade[eintrag.Nummer] = zielPfad;
+
+            Debug.Log("[Buchhaltung] PDF gespeichert: " + zielPfad);
+
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = zielPfad,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[Buchhaltung] Export fehlgeschlagen: " + e.Message);
+        }
+    }
+
+    private void ErstellePDF(string pfad, BuchhaltungsEintrag eintrag)
+    {
+        using (var fs = new FileStream(pfad, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            var document = new iTextSharp.text.Document();
+            iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
+            document.Open();
+
+            var titelFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
+            var subFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 10);
+            var textFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA, 12);
+
+            document.Add(new iTextSharp.text.Paragraph($"{eintrag.Typ} {eintrag.Nummer}", titelFont));
+            document.Add(new iTextSharp.text.Paragraph("Exportiert: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm"), subFont));
+            document.Add(new iTextSharp.text.Paragraph(" "));
+
+            var linie = new iTextSharp.text.pdf.draw.LineSeparator();
+            document.Add(new iTextSharp.text.Chunk(linie));
+            document.Add(new iTextSharp.text.Paragraph(" "));
+
+            document.Add(new iTextSharp.text.Paragraph("Erstellt: " + eintrag.Erstellt, textFont));
+            document.Add(new iTextSharp.text.Paragraph("Fällig: " + eintrag.Faellig, textFont));
+            document.Add(new iTextSharp.text.Paragraph("Status: " + eintrag.Status, textFont));
+
+            document.Close();
+        }
     }
 
     // ─────────────────────────────────────────────────

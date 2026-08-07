@@ -3,7 +3,7 @@
     <Style src="project://database/Assets/Frontend/Stylesheets/Row-Template.uss?fileID=7433441132597879392&amp;guid=9678bb8acbf77654590b8c70e51f738c&amp;type=3#Row-Template"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Buchhaltung.uss?fileID=7433441132597879392&amp;guid=c4b21d31d3241b24c801492892f77c1a&amp;type=3#Buchhaltung"/>
     <ui:VisualElement name="row-item" class="tabelle-zeile">
-        <ui:Label text="Label" name="row-bezeichnung" class="col-bezeichnung tabelle-zelle"/>
+        <ui:Label text="Label" name="row-bezeichnung" class="col-bezeichnung tabelle-zelle" style="padding-right: 38px; padding-left: 60px;"/>
         <ui:Label text="Label" name="row-art" class="col-art tabelle-zelle" style="-unity-text-align: middle-center;"/>
         <ui:Label text="Label" name="row-erstellt" class="col-erstellt tabelle-zelle" style="-unity-text-align: middle-center;"/>
         <ui:Label text="Label" name="row-faellig" class="col-faellig tabelle-zelle" style="-unity-text-align: middle-center;"/>
