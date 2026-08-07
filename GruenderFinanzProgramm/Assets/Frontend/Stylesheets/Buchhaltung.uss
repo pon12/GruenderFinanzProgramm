@@ -110,19 +110,27 @@
     -unity-font-style: bold;
 }
 
-/* Neu balanciertes Grid-Layout für 5 Spalten */
+/* 8-Spalten-Layout: Bezeichnung, Art, Erstellt, Fällig, Status, Bearbeiten, Pfad, Exportieren */
 .col-bezeichnung {
     font-size: 14px;
-    width: 45%;
+    width: 20%;
     flex-grow: 0;
     flex-shrink: 1;
     box-sizing: border-box;
     padding-left: 12px;
 }
 
+.col-art {
+    font-size: 14px;
+    width: 10%;
+    flex-grow: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
+}
+
 .col-erstellt {
     font-size: 14px;
-    width: 15%;
+    width: 12%;
     flex-grow: 0;
     flex-shrink: 1;
     box-sizing: border-box;
@@ -130,29 +138,46 @@
 
 .col-faellig {
     font-size: 14px;
-    width: 15%;
+    width: 12%;
     flex-grow: 0;
     flex-shrink: 1;
     box-sizing: border-box;
-    padding-right: 15px;
 }
 
 .col-status {
-    width: 15%;
+    width: 14%;
     flex-grow: 0;
     flex-shrink: 1;
     box-sizing: border-box;
-    align-items: flex-start;
+    align-items: center;
 }
 
-.col-edit {
-    width: 10%;
+.col-bearbeiten {
+    width: 12%;
     flex-grow: 0;
     flex-shrink: 1;
     box-sizing: border-box;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding-right: 8px;
+}
+
+.col-pfad {
+    width: 8%;
+    flex-grow: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+.col-exportieren {
+    width: 12%;
+    flex-grow: 0;
+    flex-shrink: 1;
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Popup Hintergrund-Schatten / Overlay */

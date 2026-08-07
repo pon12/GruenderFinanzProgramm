@@ -1,0 +1,24 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Row-Template.uss?fileID=7433441132597879392&amp;guid=9678bb8acbf77654590b8c70e51f738c&amp;type=3#Row-Template"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Buchhaltung.uss?fileID=7433441132597879392&amp;guid=c4b21d31d3241b24c801492892f77c1a&amp;type=3#Buchhaltung"/>
+    <ui:VisualElement name="row-item" class="tabelle-zeile">
+        <ui:Label text="Label" name="row-bezeichnung" class="col-bezeichnung tabelle-zelle"/>
+        <ui:Label text="Label" name="row-art" class="col-art tabelle-zelle" style="-unity-text-align: middle-center;"/>
+        <ui:Label text="Label" name="row-erstellt" class="col-erstellt tabelle-zelle" style="-unity-text-align: middle-center;"/>
+        <ui:Label text="Label" name="row-faellig" class="col-faellig tabelle-zelle" style="-unity-text-align: middle-center;"/>
+        <ui:VisualElement name="status-container" class="col-status">
+            <ui:DropdownField label="" name="row-status-dropdown" class="format-dropdown"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="bearbeiten-container" class="col-bearbeiten">
+            <ui:Button text="Bearbeiten" name="btn-bearbeiten" class="zeile-btn-bearbeiten" style="margin-right: 0;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="pfad-container" class="col-pfad">
+            <ui:Button text="" name="btn-open-pfad" class="btn-folder" style="background-image: resource(&quot;Icons/folder&quot;); background-size: 60% 60%; margin-right: 0;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="exportieren-container" class="col-exportieren">
+            <ui:VisualElement name="btn-help-exportieren-zeile" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-right: 8px;"/>
+            <ui:Button text="Exportieren" name="btn-exportieren" class="zeile-btn-bearbeiten" style="margin-right: 0;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
