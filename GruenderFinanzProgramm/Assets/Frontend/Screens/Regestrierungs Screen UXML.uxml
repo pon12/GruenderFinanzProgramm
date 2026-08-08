@@ -1,37 +1,29 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Frontend/Sidebar/Register-Screen.uss?fileID=7433441132597879392&amp;guid=305c4b953cf207248af3018763fed611&amp;type=3#Register-Screen"/>
     <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
-    
-    <ui:VisualElement name="Background" class="fullscreen-bg"/>
+    <ui:VisualElement name="Background" class="fullscreen-bg" style="background-color: rgb(30, 30, 30);"/>
     <ui:VisualElement name="container-inhalt" class="container-main">
-
         <ui:VisualElement name="row-kopf" class="header-row">
             <ui:Button text="Zurück" name="btnclose" class="btn-back"/>
             <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="container-ueberschrift" class="centered-container">
             <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="container-profilname" class="centered-container">
             <ui:Label text="Profilname" name="Profilname" class="Profilname"/>
             <ui:TextField label="" placeholder-text="" name="Profileingabe" class="input-profile"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="container-ueberschrift2" class="container-subheading">
             <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="container-passkey-generieren" class="container-passkey-gen">
             <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder lass dir eine starke PIN erstellen" name="text" class="text"/>
             <ui:Button text="Power-Passkey-generieren" name="btnKeyGenerieren" class="Key-button"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="container-fehler" class="container-error">
             <ui:Label text="" name="lblError" class="lbl-error"/>
         </ui:VisualElement>
-
         <ui:VisualElement name="row-agb-datenschutz" class="row-agb">
             <ui:Toggle label="" name="Toggle" class="toggle-agb"/>
             <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
@@ -39,16 +31,13 @@
             <ui:Label text=" und die " name="normalerText2" class="text2"/>
             <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
         </ui:VisualElement>
-
     </ui:VisualElement>
-
     <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
                 <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
                 <ui:Button text="✕" name="btnpopupclose" class="btn-popup-close"/>
             </ui:VisualElement>
-            
             <ui:VisualElement name="container-passkey-anzeige" class="popup-passkey-display">
                 <ui:VisualElement name="row-passkey" class="popup-row-item">
                     <ui:Label text="" name="lblPasskey" class="lbl-key-display"/>
@@ -59,13 +48,11 @@
                     <ui:Button text="Copy" name="btnCopyRecovery" class="btn-copy"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-
             <ui:Button text="Entschlüsseln" name="btnEntschluesseln" class="btn-decrypt"/>
             <ui:Label text="Bitte notiere deinen Passkey und Recovery-Key sicher." name="label-popup-passkey-hinweis" class="popup-hint"/>
             <ui:Button text="Zur Anmeldung" name="btnZurAnmeldung" class="btn-submit"/>
         </ui:VisualElement>
     </ui:VisualElement>
-
     <ui:VisualElement name="PopUpAGB" class="popup-overlay">
         <ui:VisualElement name="container-popup-agb" class="popup-doc-card">
             <ui:VisualElement name="row-popup-agb-header" class="popup-doc-header">
@@ -77,7 +64,6 @@
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
-
     <ui:VisualElement name="PopUpDatenschutz" class="popup-overlay">
         <ui:VisualElement name="container-popup-datenschutz" class="popup-doc-card">
             <ui:VisualElement name="row-popup-datenschutz-header" class="popup-doc-header">

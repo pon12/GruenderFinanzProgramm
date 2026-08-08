@@ -131,6 +131,11 @@
     border-width: 0;
 }
 
+.input-profile:hover {
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+}
+
 .btn-back {
     position: absolute;
     right: 40px;
@@ -141,9 +146,12 @@
     -unity-font-style: bold;
     -unity-text-align: middle-center;
     color: rgb(255, 255, 255);
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(100, 100, 100);
     border-width: 0;
     border-radius: 10px;
+}
+.btn-back:hover {
+    background-color: rgb(142, 141, 141);
 }
 
 .Key-button {
@@ -157,6 +165,9 @@
     border-radius: 10px;
     border-width: 0;
     padding: 8px 16px;
+}
+.Key-button:hover {
+    background-color: rgb(179, 226, 196);
 }
 
 /* ==========================================
@@ -240,7 +251,7 @@
     padding-left: 8px;
     padding-right: 8px;
     font-size: 16px;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(100, 100, 100);
     border-width: 0;
     border-radius: 10px;
     color: #FFFFFF;
@@ -248,24 +259,27 @@
 
 /* Hover Zustand (Maus drüber) */
 .btn-copy:hover {
-    background-color: #8E8D8D;
+    background-color: rgb(142, 141, 141);
     color: rgb(255, 255, 255);
 }
 
 /* Klick Zustand (Während der Button gedrückt wird) */
 .btn-copy:active {
-    background-color: #383636;
+    background-color: rgb(56, 54, 54);
     color: #FFFFFF;
 }
 
 .btn-decrypt {
     height: 56px;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(100, 100, 100);
     color: rgb(255, 255, 255);
     font-size: 16px;
     border-radius: 10px;
     border-width: 0;
     margin-bottom: 16px;
+}
+.btn-decrypt:hover {
+    background-color: rgb(142, 141, 141);
 }
 
 .popup-hint {
@@ -284,6 +298,9 @@
     -unity-font-style: bold;
     border-radius: 10px;
     border-width: 0;
+}
+.btn-submit:hover {
+    background-color: rgb(179, 226, 196);
 }
 
 /* Document Popups (AGB / Datenschutz) */

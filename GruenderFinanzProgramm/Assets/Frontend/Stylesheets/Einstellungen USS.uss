@@ -167,11 +167,28 @@
     border-right-color: rgba(0, 0, 0, 0);
     border-bottom-color: rgba(0, 0, 0, 0);
     border-left-color: rgba(0, 0, 0, 0);
-    transition-property: border-color;
-    transition-duration: 0.1s;
 }
 
 .btn-steuer:hover {
+    border-top-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+    border-left-color: rgb(128, 207, 149);
+}
+
+
+.btn-modus {
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+}
+
+.btn-modus:hover {
     border-top-color: rgb(128, 207, 149);
     border-right-color: rgb(128, 207, 149);
     border-bottom-color: rgb(128, 207, 149);

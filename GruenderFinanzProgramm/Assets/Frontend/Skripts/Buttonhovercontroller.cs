@@ -21,7 +21,10 @@ public static class ButtonHoverController
         "btn-grey",
         "btn-orange",
         "btn-red",
-        "btn-steuer"
+        "btn-steuer",
+        "btn-modus",
+        ".btn-danger-pop-up",
+        ".btn-danger"
     };
 
     private static bool HatEigenesCssHover(Button btn)
