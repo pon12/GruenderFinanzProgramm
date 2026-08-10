@@ -12,18 +12,18 @@ public class BuchhaltungScreenController : MonoBehaviour
     [SerializeField] private VisualTreeAsset buchhaltungZeileTemplate;
 
     private static readonly Color Gruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
-    private static readonly Color Rot = new Color(230f / 255f, 57f / 255f, 70f / 255f);
-    private static readonly Color Grau = new Color(150f / 255f, 150f / 255f, 150f / 255f);
+    private static readonly Color Rot   = new Color(230f / 255f,  57f / 255f,  70f / 255f);
+    private static readonly Color Grau  = new Color(150f / 255f, 150f / 255f, 150f / 255f);
     // Header-Grundfarbe = Marken-Grün, damit alle Tabellen-Header einheitlich aussehen.
     private static readonly Color HeaderGruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
 
-    private const float PADDING_EXPANDED = 430f;
+    private const float PADDING_EXPANDED  = 430f;
     private const float PADDING_COLLAPSED = 140f;
-    private const float ANIM_DURATION = 0.2f;
+    private const float ANIM_DURATION     = 0.2f;
 
     private VisualElement _root;
     private VisualElement _mainContent;
-    private ScrollView _liste;
+    private ScrollView    _liste;
     private float _currentPadding = PADDING_EXPANDED;
 
     // Einheitliche Struktur für die Anzeige von Angeboten und Rechnungen
@@ -40,29 +40,26 @@ public class BuchhaltungScreenController : MonoBehaviour
     }
 
     private List<BuchhaltungsEintrag> _eintraege = new();
-    private string _sortColumn = "Bezeichnung";
-    private bool _sortAscending = true;
+    private string _sortColumn    = "Bezeichnung";
+    private bool   _sortAscending = true;
 
     // Header-Labels aus der UXML (für Sortierung und Pfeil-Anzeige)
     private Label _hBezeichnung, _hArt, _hErstellt, _hFaellig, _hStatus;
-
-    // Merkt sich den zuletzt exportierten Speicherort je Beleg-Nummer (nur für die laufende Session)
-    private readonly Dictionary<string, string> _letzteExportPfade = new();
 
     // ─────────────────────────────────────────────────
     // UNITY LIFECYCLE
     // ─────────────────────────────────────────────────
 
-    private void OnEnable() => SidebarController.OnToggled += OnSidebarToggled;
+    private void OnEnable()  => SidebarController.OnToggled += OnSidebarToggled;
     private void OnDisable() => SidebarController.OnToggled -= OnSidebarToggled;
 
     private void Start()
     {
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
 
-        _root = uiDocument.rootVisualElement;
+        _root        = uiDocument.rootVisualElement;
         _mainContent = _root.Q<VisualElement>("main-content");
-        _liste = _root.Q<ScrollView>("buchhaltung-list-container");
+        _liste       = _root.Q<ScrollView>("buchhaltung-list-container");
 
         bool collapsed = PlayerPrefs.GetInt("sidebar_collapsed", 0) == 1;
         _currentPadding = collapsed ? PADDING_COLLAPSED : PADDING_EXPANDED;
@@ -90,13 +87,13 @@ public class BuchhaltungScreenController : MonoBehaviour
 
     private IEnumerator AnimatePadding(float targetPadding)
     {
-        float start = _currentPadding;
+        float start   = _currentPadding;
         float elapsed = 0f;
 
         while (elapsed < ANIM_DURATION)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / ANIM_DURATION);
+            float t     = Mathf.Clamp01(elapsed / ANIM_DURATION);
             float eased = t * t * (3f - 2f * t);
             _currentPadding = Mathf.Lerp(start, targetPadding, eased);
             if (_mainContent != null)
@@ -116,16 +113,16 @@ public class BuchhaltungScreenController : MonoBehaviour
     private void RegistriereSortHeader()
     {
         _hBezeichnung = _root.Q<Label>("header-bezeichnung");
-        _hArt = _root.Q<Label>("header-art");
-        _hErstellt = _root.Q<Label>("header-erstellt");
-        _hFaellig = _root.Q<Label>("header-faellig");
-        _hStatus = _root.Q<Label>("header-status");
+        _hArt         = _root.Q<Label>("header-art");
+        _hErstellt    = _root.Q<Label>("header-erstellt");
+        _hFaellig     = _root.Q<Label>("header-faellig");
+        _hStatus      = _root.Q<Label>("header-status");
 
         RegistriereEinzelnenHeader(_hBezeichnung, "Bezeichnung");
-        RegistriereEinzelnenHeader(_hArt, "Art");
-        RegistriereEinzelnenHeader(_hErstellt, "Erstellt");
-        RegistriereEinzelnenHeader(_hFaellig, "Faellig");
-        RegistriereEinzelnenHeader(_hStatus, "Status");
+        RegistriereEinzelnenHeader(_hArt,         "Art");
+        RegistriereEinzelnenHeader(_hErstellt,    "Erstellt");
+        RegistriereEinzelnenHeader(_hFaellig,     "Faellig");
+        RegistriereEinzelnenHeader(_hStatus,      "Status");
 
         AktualisiereHeaderPfeile();
     }
@@ -146,7 +143,7 @@ public class BuchhaltungScreenController : MonoBehaviour
             _sortAscending = !_sortAscending; // gleiche Spalte -> Richtung umkehren
         else
         {
-            _sortColumn = column;
+            _sortColumn    = column;
             _sortAscending = true; // neue Spalte -> aufsteigend starten
         }
 
@@ -161,16 +158,16 @@ public class BuchhaltungScreenController : MonoBehaviour
         void Aktualisiere(Label lbl, string key, string basisText)
         {
             if (lbl == null) return;
-            bool aktiv = _sortColumn == key;
-            lbl.text = aktiv ? basisText + pfeil : basisText;
+            bool aktiv  = _sortColumn == key;
+            lbl.text    = aktiv ? basisText + pfeil : basisText;
             lbl.style.color = aktiv ? Color.white : HeaderGruen;
         }
 
         Aktualisiere(_hBezeichnung, "Bezeichnung", "Bezeichnung");
-        Aktualisiere(_hArt, "Art", "Art");
-        Aktualisiere(_hErstellt, "Erstellt", "Erstellt");
-        Aktualisiere(_hFaellig, "Faellig", "Fällig");
-        Aktualisiere(_hStatus, "Status", "Status");
+        Aktualisiere(_hArt,         "Art",         "Art");
+        Aktualisiere(_hErstellt,    "Erstellt",    "Erstellt");
+        Aktualisiere(_hFaellig,     "Faellig",     "Fällig");
+        Aktualisiere(_hStatus,      "Status",      "Status");
     }
 
     private IEnumerable<BuchhaltungsEintrag> SortiereEintraege()
@@ -178,11 +175,11 @@ public class BuchhaltungScreenController : MonoBehaviour
         IEnumerable<BuchhaltungsEintrag> sortiert = _sortColumn switch
         {
             "Bezeichnung" => _eintraege.OrderBy(e => e.Bezeichnung, StringComparer.OrdinalIgnoreCase),
-            "Art" => _eintraege.OrderBy(e => e.Typ, StringComparer.OrdinalIgnoreCase),
-            "Erstellt" => _eintraege.OrderBy(e => e.TicksErstellt),
-            "Faellig" => _eintraege.OrderBy(e => e.TicksFaellig),
-            "Status" => _eintraege.OrderBy(e => e.Status, StringComparer.OrdinalIgnoreCase),
-            _ => _eintraege.OrderBy(e => e.TicksErstellt)
+            "Art"         => _eintraege.OrderBy(e => e.Typ, StringComparer.OrdinalIgnoreCase),
+            "Erstellt"    => _eintraege.OrderBy(e => e.TicksErstellt),
+            "Faellig"     => _eintraege.OrderBy(e => e.TicksFaellig),
+            "Status"      => _eintraege.OrderBy(e => e.Status, StringComparer.OrdinalIgnoreCase),
+            _             => _eintraege.OrderBy(e => e.TicksErstellt)
         };
 
         return _sortAscending ? sortiert : sortiert.Reverse();
@@ -225,14 +222,14 @@ public class BuchhaltungScreenController : MonoBehaviour
             {
                 _eintraege.Add(new BuchhaltungsEintrag
                 {
-                    Typ = "Angebot",
-                    Nummer = a.offerNumber,
-                    Bezeichnung = a.offerNumber,
-                    Erstellt = a.date,
-                    Faellig = a.validUntil,
-                    Status = a.status,
+                    Typ           = "Angebot",
+                    Nummer        = a.offerNumber,
+                    Bezeichnung   = a.offerNumber,
+                    Erstellt      = a.date,
+                    Faellig       = a.validUntil,
+                    Status        = a.status,
                     TicksErstellt = DatumZuTicks(a.date),
-                    TicksFaellig = DatumZuTicks(a.validUntil)
+                    TicksFaellig  = DatumZuTicks(a.validUntil)
                 });
             }
 
@@ -242,14 +239,14 @@ public class BuchhaltungScreenController : MonoBehaviour
             {
                 _eintraege.Add(new BuchhaltungsEintrag
                 {
-                    Typ = "Rechnung",
-                    Nummer = r.invoiceNumber,
-                    Bezeichnung = r.invoiceNumber,
-                    Erstellt = r.date,
-                    Faellig = r.dueDate,
-                    Status = r.status,
+                    Typ           = "Rechnung",
+                    Nummer        = r.invoiceNumber,
+                    Bezeichnung   = r.invoiceNumber,
+                    Erstellt      = r.date,
+                    Faellig       = r.dueDate,
+                    Status        = r.status,
                     TicksErstellt = DatumZuTicks(r.date),
-                    TicksFaellig = DatumZuTicks(r.dueDate)
+                    TicksFaellig  = DatumZuTicks(r.dueDate)
                 });
             }
 
@@ -291,19 +288,19 @@ public class BuchhaltungScreenController : MonoBehaviour
 
         VisualElement zeile = buchhaltungZeileTemplate.Instantiate();
 
-        Label lblBezeichnung = zeile.Q<Label>("row-bezeichnung");
-        Label lblArt = zeile.Q<Label>("row-art");
-        Label lblErstellt = zeile.Q<Label>("row-erstellt");
-        Label lblFaellig = zeile.Q<Label>("row-faellig");
-        DropdownField dropdownStatus = zeile.Q<DropdownField>("row-status-dropdown");
-        Button btnBearbeiten = zeile.Q<Button>("btn-bearbeiten");
-        Button btnPfad = zeile.Q<Button>("btn-open-pfad");
-        Button btnExportieren = zeile.Q<Button>("btn-exportieren");
+        Label         lblBezeichnung  = zeile.Q<Label>("row-bezeichnung");
+        Label         lblArt          = zeile.Q<Label>("row-art");
+        Label         lblErstellt     = zeile.Q<Label>("row-erstellt");
+        Label         lblFaellig      = zeile.Q<Label>("row-faellig");
+        DropdownField dropdownStatus  = zeile.Q<DropdownField>("row-status-dropdown");
+        Button        btnBearbeiten   = zeile.Q<Button>("btn-bearbeiten");
+        Button        btnPfad         = zeile.Q<Button>("btn-open-pfad");
+        Button        btnExportieren  = zeile.Q<Button>("btn-exportieren");
 
         if (lblBezeichnung != null) lblBezeichnung.text = eintrag.Bezeichnung;
-        if (lblArt != null) lblArt.text = eintrag.Typ;
-        if (lblErstellt != null) lblErstellt.text = eintrag.Erstellt;
-        if (lblFaellig != null) lblFaellig.text = eintrag.Faellig;
+        if (lblArt         != null) lblArt.text         = eintrag.Typ;
+        if (lblErstellt    != null) lblErstellt.text    = eintrag.Erstellt;
+        if (lblFaellig     != null) lblFaellig.text     = eintrag.Faellig;
 
         BuchhaltungsEintrag lokalerEintrag = eintrag;
 
@@ -317,8 +314,8 @@ public class BuchhaltungScreenController : MonoBehaviour
                 AktualisiereStatus(lokalerEintrag, evt.newValue));
         }
 
-        if (btnBearbeiten != null) btnBearbeiten.clicked += () => OnBearbeitenGeklickt(lokalerEintrag.Typ, lokalerEintrag.Nummer);
-        if (btnPfad != null) btnPfad.clicked += () => OeffnePfad(lokalerEintrag);
+        if (btnBearbeiten  != null) btnBearbeiten.clicked  += () => OnBearbeitenGeklickt(lokalerEintrag.Typ, lokalerEintrag.Nummer);
+        if (btnPfad        != null) btnPfad.clicked        += () => OeffnePfad(lokalerEintrag);
         if (btnExportieren != null) btnExportieren.clicked += () => ExportiereBeleg(lokalerEintrag);
 
         var zeilenHelp = zeile.Q<VisualElement>("btn-help-exportieren-zeile");
@@ -333,22 +330,22 @@ public class BuchhaltungScreenController : MonoBehaviour
     {
         return status switch
         {
-            "Angenommen" or "Bezahlt" => Gruen,
-            "Abgelehnt" or "Überfällig" or "Storniert" => Rot,
-            "Entwurf" or "Offen" => Grau,
-            "Versendet" => new Color(255f / 255f, 195f / 255f, 0f / 255f),
-            _ => new Color(180f / 255f, 180f / 255f, 180f / 255f)
+            "Angenommen" or "Bezahlt"                   => Gruen,
+            "Abgelehnt"  or "Überfällig" or "Storniert"  => Rot,
+            "Entwurf"    or "Offen"                      => Grau,
+            "Versendet"                                  => new Color(255f / 255f, 195f / 255f, 0f / 255f),
+            _                                             => new Color(180f / 255f, 180f / 255f, 180f / 255f)
         };
     }
 
     private void ZeigeLeermeldung(string text = "Noch keine Angebote oder Rechnungen vorhanden.")
     {
         var hinweis = new Label(text);
-        hinweis.style.color = Grau;
-        hinweis.style.fontSize = 14;
+        hinweis.style.color          = Grau;
+        hinweis.style.fontSize       = 14;
         hinweis.style.unityTextAlign = TextAnchor.MiddleCenter;
-        hinweis.style.marginTop = 40;
-        hinweis.style.flexGrow = 1;
+        hinweis.style.marginTop      = 40;
+        hinweis.style.flexGrow       = 1;
         _liste.Add(hinweis);
     }
 
@@ -382,19 +379,22 @@ public class BuchhaltungScreenController : MonoBehaviour
 
     private void OnBearbeitenGeklickt(string typ, string nummer)
     {
-        // Navigation zum bestehenden Angebots-/Rechnungsscreen wird noch angebunden.
-        Debug.Log($"[Buchhaltung] Bearbeiten für {typ} {nummer} angefordert – Navigation folgt.");
+        BelegTransfer.AusgewaehlteNummer = nummer;
+        BelegTransfer.IstRechnung = (typ == "Rechnung");
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(typ == "Rechnung" ? "Rechnung" : "Angebot");
     }
 
     private void OeffnePfad(BuchhaltungsEintrag eintrag)
     {
-        if (!_letzteExportPfade.TryGetValue(eintrag.Nummer, out string pfad) || string.IsNullOrEmpty(pfad))
-        {
-            Debug.LogWarning($"[Buchhaltung] {eintrag.Typ} {eintrag.Nummer} wurde noch nicht exportiert.");
-            return;
-        }
+        var currentUser = StateManager.Instance?.getCurrentUser();
+        if (currentUser == null) { Debug.LogWarning("[Buchhaltung] Kein eingeloggter Nutzer."); return; }
 
-        OeffneOrdner(pfad);
+        string username    = GetSafeFolderName(currentUser.username);
+        string unterordner = eintrag.Typ == "Rechnung" ? "Rechnungen" : "Angebote";
+        string ordner       = Path.Combine(Application.persistentDataPath, "PDFs", username, unterordner);
+
+        OeffneOrdner(ordner);
     }
 
     private void OeffneOrdner(string filePath)
@@ -415,9 +415,9 @@ public class BuchhaltungScreenController : MonoBehaviour
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = ordner,
+                FileName        = ordner,
                 UseShellExecute = true,
-                Verb = "open"
+                Verb            = "open"
             });
         }
         catch (Exception e)
@@ -428,56 +428,66 @@ public class BuchhaltungScreenController : MonoBehaviour
 
     private void ExportiereBeleg(BuchhaltungsEintrag eintrag)
     {
-        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        string dateiname = $"{eintrag.Typ}_{eintrag.Nummer}_{zeitstempel}.pdf";
-        string zielPfad = Path.Combine(desktopPath, dateiname);
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) { Debug.LogWarning("[Buchhaltung] Keine Datenbank."); return; }
 
-        try
+        var currentUser = StateManager.Instance?.getCurrentUser();
+        if (currentUser == null) { Debug.LogWarning("[Buchhaltung] Kein eingeloggter Nutzer."); return; }
+
+        string rawUserId = currentUser.userId.Replace("user_", "");
+        if (!int.TryParse(rawUserId, out int userId)) return;
+
+        if (eintrag.Typ == "Rechnung")
         {
-            ErstellePDF(zielPfad, eintrag);
-            _letzteExportPfade[eintrag.Nummer] = zielPfad;
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == eintrag.Nummer);
+            if (rechnung == null) { Debug.LogWarning("[Buchhaltung] Rechnung nicht gefunden: " + eintrag.Nummer); return; }
 
-            Debug.Log("[Buchhaltung] PDF gespeichert: " + zielPfad);
-
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = zielPfad,
-                UseShellExecute = true
-            });
+            var items = db.getItemsByInvoice(rechnung.id) ?? new List<InvoiceItem>();
+            Debug.Log($"[Buchhaltung] Rechnung-id={rechnung.id}, {items.Count} Positionen geladen.");
+            var anhaenge = HoleGespeicherteAnhaenge(rechnung.selectedAttachments);
+            InvoicePdfExporter.ExportInvoiceToPdf(rechnung, items, userId, db, anhaenge);
         }
-        catch (Exception e)
+        else
         {
-            Debug.LogError("[Buchhaltung] Export fehlgeschlagen: " + e.Message);
+            var angebot = db.getAllOffers()?.Find(a => a.offerNumber == eintrag.Nummer);
+            if (angebot == null) { Debug.LogWarning("[Buchhaltung] Angebot nicht gefunden: " + eintrag.Nummer); return; }
+
+            var items = db.getItemsByOffer(angebot.id) ?? new List<OfferItem>();
+            Debug.Log($"[Buchhaltung] Angebot-id={angebot.id}, {items.Count} Positionen geladen.");
+            var anhaenge = HoleGespeicherteAnhaenge(angebot.selectedAttachments);
+            OfferPdfExporter.ExportOfferToPdf(angebot, items, userId, db, anhaenge);
         }
     }
 
-    private void ErstellePDF(string pfad, BuchhaltungsEintrag eintrag)
+    // Liest die beim Speichern gewählten Anhänge aus dem Beleg (kommagetrennt gespeichert).
+    // null = Feld existiert noch nicht befüllt (Beleg vor der Migration) -> Fallback auf alle Pflichtdokumente.
+    // "" (leerer String) = bewusst keine Anhänge ausgewählt -> keine hinzufügen.
+    private List<string> HoleGespeicherteAnhaenge(string gespeichert)
     {
-        using (var fs = new FileStream(pfad, FileMode.Create, FileAccess.Write, FileShare.None))
-        {
-            var document = new iTextSharp.text.Document();
-            iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
-            document.Open();
+        if (gespeichert == null)
+            return new List<string>(BelegAnhangController.AnhangSchluessel);
 
-            var titelFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
-            var subFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 10);
-            var textFont = iTextSharp.text.FontFactory.GetFont(iTextSharp.text.FontFactory.HELVETICA, 12);
+        if (string.IsNullOrWhiteSpace(gespeichert))
+            return new List<string>();
 
-            document.Add(new iTextSharp.text.Paragraph($"{eintrag.Typ} {eintrag.Nummer}", titelFont));
-            document.Add(new iTextSharp.text.Paragraph("Exportiert: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm"), subFont));
-            document.Add(new iTextSharp.text.Paragraph(" "));
+        return gespeichert
+            .Split(',')
+            .Select(s => s.Trim())
+            .Where(s => s.Length > 0)
+            .ToList();
+    }
 
-            var linie = new iTextSharp.text.pdf.draw.LineSeparator();
-            document.Add(new iTextSharp.text.Chunk(linie));
-            document.Add(new iTextSharp.text.Paragraph(" "));
+    // Entspricht GetSafeFolderName aus OfferPdfExporter/InvoicePdfExporter,
+    // damit der Ordnerpfad für den Pfad-Button exakt übereinstimmt.
+    private static string GetSafeFolderName(string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName)) return "User";
 
-            document.Add(new iTextSharp.text.Paragraph("Erstellt: " + eintrag.Erstellt, textFont));
-            document.Add(new iTextSharp.text.Paragraph("Fällig: " + eintrag.Faellig, textFont));
-            document.Add(new iTextSharp.text.Paragraph("Status: " + eintrag.Status, textFont));
+        string safeName = folderName.Trim();
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            safeName = safeName.Replace(invalidChar.ToString(), "");
 
-            document.Close();
-        }
+        return string.IsNullOrWhiteSpace(safeName) ? "User" : safeName;
     }
 
     // ─────────────────────────────────────────────────

@@ -1522,7 +1522,7 @@ public abstract class BelegScreenController : MonoBehaviour
 
             if (BelegTyp == "Angebot")
             {
-                Offer offer = new Offer
+               Offer offer = new Offer
                 {
                     customerId = _ausgewaehlterKundeId,
                     customerName = _ausgewaehlterKunde,
@@ -1541,7 +1541,8 @@ public abstract class BelegScreenController : MonoBehaviour
                     notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
                     cashbookEntryId = 0,
-                    bookingDate = ""
+                    bookingDate = "",
+                    selectedAttachments = string.Join(",", HoleAusgewaehlteAnhaenge())
                 };
 
                 int offerId = db.createOffer(offer);
@@ -1589,7 +1590,8 @@ public abstract class BelegScreenController : MonoBehaviour
                     notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
                     cashbookEntryId = 0,
-                    bookingDate = ""
+                    bookingDate = "",
+                    selectedAttachments = string.Join(",", HoleAusgewaehlteAnhaenge())
                 };
 
                 int invoiceId = db.createInvoice(invoice);

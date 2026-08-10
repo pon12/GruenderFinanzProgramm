@@ -29,6 +29,8 @@ public class Invoice
     public string customerAddress { get; set; }
     public double discount { get; set; }
     public double extraCosts { get; set; }
+    // Kommagetrennte Liste der beim Speichern ausgewählten Anhänge (z. B. "AGB,Disclaimer")
+    public string selectedAttachments { get; set; }
     // AUTOMATISCHE BERECHNUNG
     public void CalculateTotals(List<InvoiceItem> items)
     {
@@ -90,6 +92,8 @@ public class Offer
     public string notes { get; set; }
     public double discount { get; set; }
     public double extraCosts { get; set; }
+    // Kommagetrennte Liste der beim Speichern ausgewählten Anhänge (z. B. "AGB,Disclaimer")
+    public string selectedAttachments { get; set; }
 
     // Kassenbuch-Anbindung
     public bool bookedToCashbook { get; set; }
