@@ -1733,19 +1733,19 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         try
         {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            double gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
-            string nummer = _nummerFeld != null ? _nummerFeld.value : "";
-            string kunde = !string.IsNullOrEmpty(_ausgewaehlterKunde)
-                             ? " - " + _ausgewaehlterKunde : "";
-            string datum = _datumFeld != null && !string.IsNullOrWhiteSpace(_datumFeld.value)
-                             ? _datumFeld.value
-                             : DateTime.Now.ToString("dd.MM.yyyy");
+            if (BelegTyp != "Rechnung") return;
 
-            // FIX: Vorher wurde keine Art übergeben, dadurch stand in der
-            // Kassenbuch-Tabelle bei automatisch aus Rechnung/Angebot
-            // gebuchten Einträgen nur ein "-" statt einer echten Kategorie.
-            db.createEinkommen((float)Math.Round(gesamt, 2, MidpointRounding.AwayFromZero), BelegTyp + " " + nummer + kunde, datum, "Umsatzerlöse");
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) return;
+
+            string nummer = _nummerFeld != null ? _nummerFeld.value : "";
+            if (string.IsNullOrEmpty(nummer)) return;
+
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == nummer);
+            if (rechnung == null) return;
+
+            rechnung.customerName = _ausgewaehlterKunde;
+            KassenbuchVerknuepfungController.Aktualisiere(rechnung, db);
         }
         catch (Exception e)
         {

@@ -67,6 +67,7 @@ public class BuchhaltungScreenController : MonoBehaviour
         if (_mainContent != null)
             _mainContent.style.paddingLeft = _currentPadding;
 
+        LadeGespeicherteSortierung();
         RegistriereSortHeader();
         LadeEintraege();
         RegistriereHelpTooltips();
@@ -147,8 +148,31 @@ public class BuchhaltungScreenController : MonoBehaviour
             _sortAscending = true; // neue Spalte -> aufsteigend starten
         }
 
+        SpeichereSortierung();
         AktualisiereHeaderPfeile();
         RenderListe();
+    }
+
+    // Merkt sich die aktuelle Sortierung nutzerspezifisch, damit sie nach einem
+    // Szenenwechsel (z. B. zurück von Bearbeiten) erhalten bleibt.
+    private void SpeichereSortierung()
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        PlayerPrefs.SetString(prefix + "_buchhaltung_sortColumn", _sortColumn);
+        PlayerPrefs.SetInt(prefix + "_buchhaltung_sortAscending", _sortAscending ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    private void LadeGespeicherteSortierung()
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string gespeicherteSpalte = PlayerPrefs.GetString(prefix + "_buchhaltung_sortColumn", "");
+
+        if (!string.IsNullOrEmpty(gespeicherteSpalte))
+        {
+            _sortColumn = gespeicherteSpalte;
+            _sortAscending = PlayerPrefs.GetInt(prefix + "_buchhaltung_sortAscending", 1) == 1;
+        }
     }
 
     private void AktualisiereHeaderPfeile()
@@ -363,7 +387,18 @@ public class BuchhaltungScreenController : MonoBehaviour
             var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == eintrag.Nummer);
             if (rechnung == null) return;
             rechnung.status = neuerStatus;
+
+            // customerName ist bei Invoice [Ignore] und wird nicht in der DB gespeichert -
+            // muss über customerId aus der Customer-Tabelle nachgeladen werden, damit die
+            // Kassenbuch-Beschreibung auch aus der Buchhaltung heraus den Kundennamen enthält.
+            if (rechnung.customerId > 0)
+            {
+                var kunde = db.getCustomerById(rechnung.customerId);
+                if (kunde != null) rechnung.customerName = kunde.name;
+            }
+
             db.update(rechnung);
+            KassenbuchVerknuepfungController.Aktualisiere(rechnung, db);
         }
         else
         {

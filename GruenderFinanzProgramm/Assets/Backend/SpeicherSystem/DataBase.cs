@@ -337,9 +337,16 @@ public class DataBase : DatabaseManager
 
     public int createEinkommen(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
+        // FIX: insert() gab bisher nur die Zeilenanzahl zurück, nicht die echte ID -
+        // dadurch ließ sich ein Kassenbucheintrag nicht mit einer Rechnung verknüpfen.
+        return insertAndGetId(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
     }
 
+    public int updateEinkommen(Einkommen eintrag)
+    {
+        return update(eintrag);
+    }
+    
     public int createAusgaben(float amount, string description, string datum, string art = "", string kategorie = "")
     {
         return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
