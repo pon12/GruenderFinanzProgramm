@@ -70,6 +70,8 @@ public abstract class BelegScreenController : MonoBehaviour
     protected string _ausgewaehlterKunde = "";
     protected int _ausgewaehlterKundeId = 0;
     protected string _ausgewaehlterKundeAdresse = "";
+    private bool _istBearbeitung = false;
+    private int _bearbeiteId = -1;
     private Button _umwandelnButton;
     private Label _rabattWertBezeichnungLabel;
     private bool _buttonsRegistriert = false;
@@ -115,16 +117,28 @@ public abstract class BelegScreenController : MonoBehaviour
         RegistriereButtons();
         RegistriereKundensuche();
         RegistriereKalenderButtons();
-        RegistriereAnhaenge();
+        List<string> vorausgewaehlteAnhaenge = ErmittleVorausgewaehlteAnhaenge();
+        RegistriereAnhaenge(vorausgewaehlteAnhaenge);
         RegistriereHelpTooltips();
 
-        var session = BelegSessionDaten.Lade(BelegTyp);
-        if (session != null)
-            WiederherstelleSession(session);
+        if (!string.IsNullOrEmpty(BelegTransfer.AusgewaehlteNummer) && BelegTypPasstZuTransfer())
+        {
+            LadeZumBearbeiten(BelegTransfer.AusgewaehlteNummer);
+            BelegTransfer.AusgewaehlteNummer = null;
+        }
         else
         {
-            LeereDemoInhalte();
-            SetzeStandardwerte();
+            _istBearbeitung = false;
+            _bearbeiteId = -1;
+
+            var session = BelegSessionDaten.Lade(BelegTyp);
+            if (session != null)
+                WiederherstelleSession(session);
+            else
+            {
+                LeereDemoInhalte();
+                SetzeStandardwerte();
+            }
         }
 
         UebernimmTransferDatenFallsVorhanden();
@@ -1336,7 +1350,7 @@ public abstract class BelegScreenController : MonoBehaviour
     // ANH\u00c4NGE
     // ============================================================
 
-    private void RegistriereAnhaenge()
+    private void RegistriereAnhaenge(List<string> vorausgewaehlt = null)
     {
         _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
         if (_anhangBereich == null) return;
@@ -1350,7 +1364,8 @@ public abstract class BelegScreenController : MonoBehaviour
         foreach (string key in alleTitel)
         {
             bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
-            _anhangAusgewaehlt[key] = false;
+            bool istVorausgewaehlt = vorausgewaehlt != null && vorausgewaehlt.Contains(key);
+            _anhangAusgewaehlt[key] = istVorausgewaehlt;
             string lokalerKey = key;
 
             var zeile = new VisualElement();
@@ -1361,9 +1376,11 @@ public abstract class BelegScreenController : MonoBehaviour
             zeile.style.paddingLeft = 8; zeile.style.paddingRight = 8;
             zeile.style.borderTopLeftRadius = 6; zeile.style.borderTopRightRadius = 6;
             zeile.style.borderBottomLeftRadius = 6; zeile.style.borderBottomRightRadius = 6;
-            zeile.style.backgroundColor = vorhanden
-                ? new Color(55f / 255f, 55f / 255f, 55f / 255f)
-                : new Color(40f / 255f, 40f / 255f, 40f / 255f);
+            zeile.style.backgroundColor = !vorhanden
+                ? new Color(40f / 255f, 40f / 255f, 40f / 255f)
+                : istVorausgewaehlt
+                    ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
+                    : new Color(55f / 255f, 55f / 255f, 55f / 255f);
 
             var box = new VisualElement();
             box.style.width = 18; box.style.height = 18;
@@ -1380,7 +1397,7 @@ public abstract class BelegScreenController : MonoBehaviour
             haken.style.unityTextAlign = TextAnchor.MiddleCenter;
             box.Add(haken);
 
-            AktualisiereCheckboxOptik(box, haken, false, vorhanden);
+            AktualisiereCheckboxOptik(box, haken, istVorausgewaehlt, vorhanden);
 
             var label = new Label(key);
             label.style.fontSize = 12;
@@ -1425,6 +1442,32 @@ public abstract class BelegScreenController : MonoBehaviour
 
             _anhangBereich.Add(zeile);
         }
+    }
+
+    // Ermittelt, welche Anhänge beim Öffnen des Formulars vorausgewählt sein sollen -
+    // entweder aus einem über Bearbeiten geladenen Beleg oder aus einer laufenden Session.
+    private List<string> ErmittleVorausgewaehlteAnhaenge()
+    {
+        if (!string.IsNullOrEmpty(BelegTransfer.AusgewaehlteNummer) && BelegTypPasstZuTransfer())
+        {
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) return new List<string>();
+
+            string gespeichert = BelegTyp == "Rechnung"
+                ? db.getAllInvoices()?.Find(r => r.invoiceNumber == BelegTransfer.AusgewaehlteNummer)?.selectedAttachments
+                : db.getAllOffers()?.Find(a => a.offerNumber == BelegTransfer.AusgewaehlteNummer)?.selectedAttachments;
+
+            return ParseAnhaengeListe(gespeichert);
+        }
+
+        var session = BelegSessionDaten.Lade(BelegTyp);
+        return session?.AusgewaehlteAnhaenge ?? new List<string>();
+    }
+
+    private static List<string> ParseAnhaengeListe(string gespeichert)
+    {
+        if (string.IsNullOrWhiteSpace(gespeichert)) return new List<string>();
+        return gespeichert.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0).ToList();
     }
 
     private static void AktualisiereCheckboxOptik(
@@ -1541,10 +1584,28 @@ public abstract class BelegScreenController : MonoBehaviour
                     notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
                     cashbookEntryId = 0,
-                    bookingDate = ""
+                    bookingDate = "",
+                    selectedAttachments = string.Join(",", HoleAusgewaehlteAnhaenge())
                 };
 
-                int offerId = db.createOffer(offer);
+                int offerId;
+
+                if (_istBearbeitung && _bearbeiteId > 0)
+                {
+                    offer.id = _bearbeiteId;
+                    offerId = _bearbeiteId;
+                    db.updateOffer(offer);
+
+                    // Alte Positionen entfernen, da sie beim Bearbeiten komplett
+                    // aus dem Formular neu aufgebaut werden.
+                    var alteItems = db.getItemsByOffer(offerId) ?? new List<OfferItem>();
+                    foreach (var altesItem in alteItems)
+                        db.deleteOfferItem(altesItem.id);
+                }
+                else
+                {
+                    offerId = db.createOffer(offer);
+                }
 
                 List<OfferItem> items = new List<OfferItem>();
                 foreach (var zeile in _zeilen.ToList())
@@ -1563,10 +1624,13 @@ public abstract class BelegScreenController : MonoBehaviour
 
                 OfferPdfExporter.ExportOfferToPdf(offer, items, userId, db, HoleAusgewaehlteAnhaenge());
 
-                // FIX: Event war überall abonniert (Dashboard-Kalender!) aber
-                // wurde nirgends im ganzen Projekt tatsächlich gefeuert -
-                // Dashboard bekam ein neu erstelltes Angebot deshalb nie live mit.
-                AppEventManager.AngeboteAnzahlGeaendert(db.getAllOffers()?.Count ?? 0);
+                if (!_istBearbeitung)
+                {
+                    // FIX: Event war überall abonniert (Dashboard-Kalender!) aber
+                    // wurde nirgends im ganzen Projekt tatsächlich gefeuert -
+                    // Dashboard bekam ein neu erstelltes Angebot deshalb nie live mit.
+                    AppEventManager.AngeboteAnzahlGeaendert(db.getAllOffers()?.Count ?? 0);
+                }
             }
             else if (BelegTyp == "Rechnung")
             {
@@ -1589,10 +1653,26 @@ public abstract class BelegScreenController : MonoBehaviour
                     notes = _notizenFeld != null ? _notizenFeld.value : "",
                     bookedToCashbook = false,
                     cashbookEntryId = 0,
-                    bookingDate = ""
+                    bookingDate = "",
+                    selectedAttachments = string.Join(",", HoleAusgewaehlteAnhaenge())
                 };
 
-                int invoiceId = db.createInvoice(invoice);
+                int invoiceId;
+
+                if (_istBearbeitung && _bearbeiteId > 0)
+                {
+                    invoice.id = _bearbeiteId;
+                    invoiceId = _bearbeiteId;
+                    db.updateInvoice(invoice);
+
+                    var alteItems = db.getItemsByInvoice(invoiceId) ?? new List<InvoiceItem>();
+                    foreach (var altesItem in alteItems)
+                        db.deleteInvoiceItem(altesItem.id);
+                }
+                else
+                {
+                    invoiceId = db.createInvoice(invoice);
+                }
 
                 foreach (var zeile in _zeilen.ToList())
                 {
@@ -1610,12 +1690,17 @@ public abstract class BelegScreenController : MonoBehaviour
                 List<InvoiceItem> items = db.getItemsByInvoice(invoiceId);
                 InvoicePdfExporter.ExportInvoiceToPdf(invoice, items, userId, db, HoleAusgewaehlteAnhaenge());
 
-                // FIX: gleiches Problem wie beim Angebot - Event war nirgends gefeuert.
-                AppEventManager.RechnungenAnzahlGeaendert(db.getAllInvoices()?.Count ?? 0);
+                if (!_istBearbeitung)
+                {
+                    // FIX: gleiches Problem wie beim Angebot - Event war nirgends gefeuert.
+                    AppEventManager.RechnungenAnzahlGeaendert(db.getAllInvoices()?.Count ?? 0);
+                }
             }
 
             NachSpeichernHook();
             ResetBelegFormular();
+            _istBearbeitung = false;
+            _bearbeiteId = -1;
             FeedbackPopup.Show(Root, BelegTyp + " gespeichert", FeedbackTyp.Erfolg);
         }
         catch (Exception e)
@@ -1648,19 +1733,19 @@ public abstract class BelegScreenController : MonoBehaviour
     {
         try
         {
-            var db = UserDatabaseAccess.getCurrentUserDatabase();
-            double gesamt = ParseBetrag(_gesamtLabel != null ? _gesamtLabel.text : "0");
-            string nummer = _nummerFeld != null ? _nummerFeld.value : "";
-            string kunde = !string.IsNullOrEmpty(_ausgewaehlterKunde)
-                             ? " - " + _ausgewaehlterKunde : "";
-            string datum = _datumFeld != null && !string.IsNullOrWhiteSpace(_datumFeld.value)
-                             ? _datumFeld.value
-                             : DateTime.Now.ToString("dd.MM.yyyy");
+            if (BelegTyp != "Rechnung") return;
 
-            // FIX: Vorher wurde keine Art übergeben, dadurch stand in der
-            // Kassenbuch-Tabelle bei automatisch aus Rechnung/Angebot
-            // gebuchten Einträgen nur ein "-" statt einer echten Kategorie.
-            db.createEinkommen((float)Math.Round(gesamt, 2, MidpointRounding.AwayFromZero), BelegTyp + " " + nummer + kunde, datum, "Umsatzerlöse");
+            var db = UserDatabaseAccess.getCurrentUserDatabase();
+            if (db == null) return;
+
+            string nummer = _nummerFeld != null ? _nummerFeld.value : "";
+            if (string.IsNullOrEmpty(nummer)) return;
+
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == nummer);
+            if (rechnung == null) return;
+
+            rechnung.customerName = _ausgewaehlterKunde;
+            KassenbuchVerknuepfungController.Aktualisiere(rechnung, db);
         }
         catch (Exception e)
         {
@@ -2174,6 +2259,140 @@ public abstract class BelegScreenController : MonoBehaviour
             }
             catch { }
         }
+    }
+
+    // Prüft, ob der aktuelle Screen zum übergebenen BelegTransfer passt
+    // (verhindert, dass eine Rechnungsnummer versehentlich im Angebotsscreen geladen wird).
+    private bool BelegTypPasstZuTransfer()
+    {
+        return (BelegTyp == "Rechnung") == BelegTransfer.IstRechnung;
+    }
+
+    // Baut die Kundenadresse aus den Customer-Daten zusammen, da customerAddress
+    // bei Offer/Invoice nicht gespeichert wird ([Ignore]) und über customerId
+    // aus der Customer-Tabelle nachgeladen werden muss.
+    private string LadeKundenadresse(int customerId, out string kundenName)
+    {
+        kundenName = "";
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        var kunde = db?.getCustomerById(customerId);
+
+        if (kunde == null)
+            return "";
+
+        kundenName = kunde.name ?? "";
+
+        var zeilen = new List<string>();
+        if (!string.IsNullOrEmpty(kunde.street)) zeilen.Add(kunde.street);
+
+        string ortZeile = string.Join(" ", new[] { kunde.postalCode, kunde.city }
+            .Where(t => !string.IsNullOrEmpty(t)));
+        if (!string.IsNullOrEmpty(ortZeile)) zeilen.Add(ortZeile);
+
+        return string.Join("\n", zeilen);
+    }
+
+    // Lädt einen bestehenden Angebots-/Rechnungseintrag aus der Datenbank ins Formular,
+    // damit er über den Bearbeiten-Button im Buchhaltungs-Dashboard geöffnet werden kann.
+    private void LadeZumBearbeiten(string nummer)
+    {
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null)
+        {
+            SetzeStandardwerte();
+            return;
+        }
+
+        BelegSessionDaten.BelegSnapshot snap = null;
+
+        if (BelegTyp == "Rechnung")
+        {
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == nummer);
+            if (rechnung != null)
+            {
+                _istBearbeitung = true;
+                _bearbeiteId = rechnung.id;
+                var positionen = db.getItemsByInvoice(rechnung.id) ?? new List<InvoiceItem>();
+                string kundenAdresse = LadeKundenadresse(rechnung.customerId, out string kundenName);
+
+                snap = ErstelleSnapshotAusBeleg(
+                    rechnung.invoiceNumber, rechnung.status, rechnung.date, rechnung.dueDate,
+                    rechnung.notes, rechnung.customerId, kundenName, kundenAdresse,
+                    rechnung.discount, rechnung.selectedAttachments,
+                    positionen.Select(i => (i.articleNumber, i.description, i.quantity, i.unitPrice)));
+            }
+        }
+        else
+        {
+            var angebot = db.getAllOffers()?.Find(a => a.offerNumber == nummer);
+            if (angebot != null)
+            {
+                _istBearbeitung = true;
+                _bearbeiteId = angebot.id;
+                var positionen = db.getItemsByOffer(angebot.id) ?? new List<OfferItem>();
+                string kundenAdresse = LadeKundenadresse(angebot.customerId, out string kundenName);
+
+                snap = ErstelleSnapshotAusBeleg(
+                    angebot.offerNumber, angebot.status, angebot.date, angebot.validUntil,
+                    angebot.notes, angebot.customerId, kundenName, kundenAdresse,
+                    angebot.discount, angebot.selectedAttachments,
+                    positionen.Select(i => (i.articleNumber, i.description, i.quantity, i.unitPrice)));
+            }
+        }
+
+        if (snap == null)
+        {
+            Debug.LogWarning("[" + BelegTyp + "] Eintrag '" + nummer + "' zum Bearbeiten nicht gefunden.");
+            LeereDemoInhalte();
+            SetzeStandardwerte();
+            return;
+        }
+
+        WiederherstelleSession(snap);
+    }
+
+    // Baut aus den Datenbankwerten eines Belegs einen BelegSnapshot, damit die bereits
+    // vorhandene WiederherstelleSession(...)-Logik für das Befüllen wiederverwendet werden kann.
+    // Hinweis: Rabatt wird nur als Festbetrag rekonstruiert (der ursprüngliche Rabatt-Typ
+    // Prozent/Festbetrag wird nicht gespeichert). Skonto-Prozentsatz und Einheit werden
+    // aktuell nicht in der Datenbank gespeichert und bleiben daher leer.
+    private BelegSessionDaten.BelegSnapshot ErstelleSnapshotAusBeleg(
+        string nummer, string status, string datum, string frist, string notiz,
+        int kundeId, string kundeName, string kundeAdresse, double rabattBetrag,
+        string gespeicherteAnhaenge,
+        IEnumerable<(string artikelNummer, string beschreibung, int menge, double preis)> positionen)
+    {
+        var snap = new BelegSessionDaten.BelegSnapshot
+        {
+            Nummer = nummer,
+            Status = status,
+            Datum = datum,
+            Frist = frist,
+            Notiz = notiz,
+            KundeId = kundeId,
+            KundeName = kundeName,
+            KundeAdresse = kundeAdresse,
+            RabattTyp = rabattBetrag > 0 ? "Festbetrag" : "Kein Rabatt",
+            RabattWert = rabattBetrag > 0 ? rabattBetrag.ToString(CultureInfo.InvariantCulture) : "0",
+            SkontoWert = "0",
+            AusgewaehlteAnhaenge = string.IsNullOrWhiteSpace(gespeicherteAnhaenge)
+                ? new List<string>()
+                : gespeicherteAnhaenge.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0).ToList()
+        };
+
+        foreach (var p in positionen)
+        {
+            snap.Positionen.Add(new BelegSessionDaten.PositionsEintrag
+            {
+                Artikel = p.artikelNummer,
+                Beschreibung = p.beschreibung,
+                Menge = p.menge.ToString(),
+                Einheit = "",
+                Preis = FormatBetrag(p.preis)
+            });
+        }
+
+        return snap;
     }
 
     private void ResetBelegFormular()
