@@ -118,13 +118,21 @@ public abstract class BelegScreenController : MonoBehaviour
         RegistriereAnhaenge();
         RegistriereHelpTooltips();
 
-        var session = BelegSessionDaten.Lade(BelegTyp);
-        if (session != null)
-            WiederherstelleSession(session);
+        if (!string.IsNullOrEmpty(BelegTransfer.AusgewaehlteNummer) && BelegTypPasstZuTransfer())
+        {
+            LadeZumBearbeiten(BelegTransfer.AusgewaehlteNummer);
+            BelegTransfer.AusgewaehlteNummer = null;
+        }
         else
         {
-            LeereDemoInhalte();
-            SetzeStandardwerte();
+            var session = BelegSessionDaten.Lade(BelegTyp);
+            if (session != null)
+                WiederherstelleSession(session);
+            else
+            {
+                LeereDemoInhalte();
+                SetzeStandardwerte();
+            }
         }
 
         UebernimmTransferDatenFallsVorhanden();
@@ -2176,6 +2184,132 @@ public abstract class BelegScreenController : MonoBehaviour
             }
             catch { }
         }
+    }
+
+    // Prüft, ob der aktuelle Screen zum übergebenen BelegTransfer passt
+    // (verhindert, dass eine Rechnungsnummer versehentlich im Angebotsscreen geladen wird).
+    private bool BelegTypPasstZuTransfer()
+    {
+        return (BelegTyp == "Rechnung") == BelegTransfer.IstRechnung;
+    }
+
+    // Baut die Kundenadresse aus den Customer-Daten zusammen, da customerAddress
+    // bei Offer/Invoice nicht gespeichert wird ([Ignore]) und über customerId
+    // aus der Customer-Tabelle nachgeladen werden muss.
+    private string LadeKundenadresse(int customerId, out string kundenName)
+    {
+        kundenName = "";
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        var kunde = db?.getCustomerById(customerId);
+
+        if (kunde == null)
+            return "";
+
+        kundenName = kunde.name ?? "";
+
+        var zeilen = new List<string>();
+        if (!string.IsNullOrEmpty(kunde.street)) zeilen.Add(kunde.street);
+
+        string ortZeile = string.Join(" ", new[] { kunde.postalCode, kunde.city }
+            .Where(t => !string.IsNullOrEmpty(t)));
+        if (!string.IsNullOrEmpty(ortZeile)) zeilen.Add(ortZeile);
+
+        return string.Join("\n", zeilen);
+    }
+
+    // Lädt einen bestehenden Angebots-/Rechnungseintrag aus der Datenbank ins Formular,
+    // damit er über den Bearbeiten-Button im Buchhaltungs-Dashboard geöffnet werden kann.
+    private void LadeZumBearbeiten(string nummer)
+    {
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null)
+        {
+            SetzeStandardwerte();
+            return;
+        }
+
+        BelegSessionDaten.BelegSnapshot snap = null;
+
+        if (BelegTyp == "Rechnung")
+        {
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == nummer);
+            if (rechnung != null)
+            {
+                var positionen = db.getItemsByInvoice(rechnung.id) ?? new List<InvoiceItem>();
+                string kundenAdresse = LadeKundenadresse(rechnung.customerId, out string kundenName);
+
+                snap = ErstelleSnapshotAusBeleg(
+                    rechnung.invoiceNumber, rechnung.status, rechnung.date, rechnung.dueDate,
+                    rechnung.notes, rechnung.customerId, kundenName, kundenAdresse,
+                    rechnung.discount,
+                    positionen.Select(i => (i.articleNumber, i.description, i.quantity, i.unitPrice)));
+            }
+        }
+        else
+        {
+            var angebot = db.getAllOffers()?.Find(a => a.offerNumber == nummer);
+            if (angebot != null)
+            {
+                var positionen = db.getItemsByOffer(angebot.id) ?? new List<OfferItem>();
+                string kundenAdresse = LadeKundenadresse(angebot.customerId, out string kundenName);
+
+                snap = ErstelleSnapshotAusBeleg(
+                    angebot.offerNumber, angebot.status, angebot.date, angebot.validUntil,
+                    angebot.notes, angebot.customerId, kundenName, kundenAdresse,
+                    angebot.discount,
+                    positionen.Select(i => (i.articleNumber, i.description, i.quantity, i.unitPrice)));
+            }
+        }
+
+        if (snap == null)
+        {
+            Debug.LogWarning("[" + BelegTyp + "] Eintrag '" + nummer + "' zum Bearbeiten nicht gefunden.");
+            LeereDemoInhalte();
+            SetzeStandardwerte();
+            return;
+        }
+
+        WiederherstelleSession(snap);
+    }
+
+    // Baut aus den Datenbankwerten eines Belegs einen BelegSnapshot, damit die bereits
+    // vorhandene WiederherstelleSession(...)-Logik für das Befüllen wiederverwendet werden kann.
+    // Hinweis: Rabatt wird nur als Festbetrag rekonstruiert (der ursprüngliche Rabatt-Typ
+    // Prozent/Festbetrag wird nicht gespeichert). Skonto-Prozentsatz und Einheit werden
+    // aktuell nicht in der Datenbank gespeichert und bleiben daher leer.
+    private BelegSessionDaten.BelegSnapshot ErstelleSnapshotAusBeleg(
+        string nummer, string status, string datum, string frist, string notiz,
+        int kundeId, string kundeName, string kundeAdresse, double rabattBetrag,
+        IEnumerable<(string artikelNummer, string beschreibung, int menge, double preis)> positionen)
+    {
+        var snap = new BelegSessionDaten.BelegSnapshot
+        {
+            Nummer = nummer,
+            Status = status,
+            Datum = datum,
+            Frist = frist,
+            Notiz = notiz,
+            KundeId = kundeId,
+            KundeName = kundeName,
+            KundeAdresse = kundeAdresse,
+            RabattTyp = rabattBetrag > 0 ? "Festbetrag" : "Kein Rabatt",
+            RabattWert = rabattBetrag > 0 ? rabattBetrag.ToString(CultureInfo.InvariantCulture) : "0",
+            SkontoWert = "0"
+        };
+
+        foreach (var p in positionen)
+        {
+            snap.Positionen.Add(new BelegSessionDaten.PositionsEintrag
+            {
+                Artikel = p.artikelNummer,
+                Beschreibung = p.beschreibung,
+                Menge = p.menge.ToString(),
+                Einheit = "",
+                Preis = FormatBetrag(p.preis)
+            });
+        }
+
+        return snap;
     }
 
     private void ResetBelegFormular()
