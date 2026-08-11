@@ -19,7 +19,11 @@ public static class GruenderpfadAutoErkennung
     public static readonly Dictionary<string, string> DokZuSchrittId = new Dictionary<string, string>
     {
         { "Unternehmensstammdaten",                  "vorb_1" },
-        { "Gr\u00fcndungsurkunde / Gesellschaftsvertrag", "anm_2"  },
+        { "Gr\u00fcndungsurkunde",                     "anm_2"  },
+        { "Gesellschaftsvertrag",                     "anm_2"  },
+        { "Fragebogen zur Steuerlichen Erfassung",    "anm_4"  }, // dasselbe Ziel wie "Steuernummer-Bescheid / USt-IdNr" weiter unten
+        { "Anmeldung Berufsgenossenschaft",           "fin_3"  }, // Versicherungen abschließen
+        { "Organigramm",                              "sonst_1"}, // dasselbe Ziel wie "Muster-Arbeitsvertrag" weiter unten
         { "Handelsregisterauszug",                   "anm_3"  },
         { "Gewerbeanmeldung",                        "anm_1"  },
         { "Gesellschafterliste",                     "anm_2"  },
@@ -27,14 +31,20 @@ public static class GruenderpfadAutoErkennung
         { "Zahlungsbedingungen",                     "fin_1"  },
         { "AGB",                                     "betr_3" },
         { "Disclaimer",                              "betr_3" },
+        { "Barzahlung",                              "fin_2"  }, // Buchhaltung einrichten
+        { "Überweisung",                             "fin_2"  }, // Buchhaltung einrichten
         { "SEPA-Basislastschrift-Mandat",            "fin_1"  },
         { "Widerrufsbelehrung",                      "betr_3" },
+        { "Mahnverfahren",                            "betr_3" },
+        { "Ratenzahlungsbestimmungen",                "betr_3" },
         { "Businessplan",                            "vorb_3" },
         { "Markt- & Wettbewerbsanalyse",             "vorb_2" },
         { "Er\u00f6ffnungsbilanz",                   "fin_2"  },
         { "Datenschutzerkl\u00e4rung (DSGVO)",       "betr_3" },
         { "Steuernummer-Bescheid / USt-IdNr",        "anm_4"  },
         { "Impressum",                               "betr_2" },
+        { "Copyright Hinweis",                        "betr_3" },
+        { "Lizenzhinweis Einfach",                    "betr_3" },
         { "Dienstleistungskatalog / Preisliste",     "betr_1" },
         { "Corporate Identity Manual",               "betr_2" },
         { "Muster-Arbeitsvertrag",                   "sonst_1"},
