@@ -5,7 +5,8 @@ using UnityEngine.UIElements;
 public class RechnungController : BelegScreenController
 {
     protected override string BelegTyp      => "Rechnung";
-    protected override string NummernPrefix => "RG-NR";
+    protected override string NummernPrefix =>
+        PlayerPrefs.GetString("settings_rechnr_praefix", "RG-NR");
 
     // Verhindert doppelte Kassenbucheinträge innerhalb einer Session
     private bool _insKassenbuchGebucht = false;
