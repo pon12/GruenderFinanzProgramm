@@ -77,30 +77,8 @@
                                 <ui:Button text="Mitwirkende" name="btn-open-mitwirkende" class="btn-grey" style="flex: 1; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:VisualElement name="card-hilfe" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-top: 16px;">
-                            <ui:VisualElement name="row-titel-hilfe" style="flex-direction: row; align-items: center; margin-bottom: 16px;">
-                                <ui:VisualElement name="dot-hilfe" style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
-                                <ui:Label text="Hilfe" name="label-titel-hilfe" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
-                                <ui:VisualElement name="spacer-titel-hilfe" style="flex-grow: 1;"/>
-                                <ui:VisualElement name="btn-help-hilfe" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                            </ui:VisualElement>
-                            <ui:VisualElement name="row-tutorial-button" style="flex-direction: row; align-items: center;">
-                                <ui:Button text="Tutorial starten" name="btn-start-tutorial" class="btn-grey" style="flex-grow: 1; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>                            
-                            </ui:VisualElement>
-                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="col-right" style="flex: 1; flex-direction: column;">
-                        <ui:VisualElement name="card-pdf" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
-                            <ui:VisualElement name="row-titel-pdf" style="flex-direction: row; align-items: center; margin-bottom: 20px;">
-                                <ui:VisualElement name="dot-pdf" style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(100, 149, 237); margin-right: 10px; flex-shrink: 0;"/>
-                                <ui:Label text="PDF Export und Layout" name="label-titel-pdf" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
-                                <ui:VisualElement name="spacer-titel-pdf" style="flex-grow: 1;"/>
-                                <ui:VisualElement name="btn-help-pdf" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
-                            </ui:VisualElement>
-                            <ui:Toggle name="toggle-logo" label="Logo auf der Rechnung anzeigen" style="font-size: 16px; margin-bottom: 12px;"/>
-                            <ui:Toggle name="toggle-seitenzahl" label="Seitenzahl im Fußbereich" style="font-size: 16px; margin-bottom: 12px;"/>
-                            <ui:Toggle name="toggle-exportpfad" label="Letzten Exportpfad merken" style="font-size: 16px;"/>
-                        </ui:VisualElement>
                         <ui:VisualElement name="card-steuersaetze" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-bottom: 16px;">
                             <ui:VisualElement name="row-titel-steuersaetze" style="flex-direction: row; align-items: center; margin-bottom: 20px;">
                                 <ui:VisualElement name="dot-steuersaetze" style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(255, 165, 60); margin-right: 10px; flex-shrink: 0;"/>
@@ -129,8 +107,8 @@
                             </ui:VisualElement>
                             <ui:Label text="Anzeigemodus" name="label-anzeigemodus-titel" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 10px;"/>
                             <ui:VisualElement name="row-anzeigemodus-buttons" style="flex-direction: row; margin-bottom: 16px;">
-                                <ui:Button text="Hell" name="btn-light-mode" class="btn-modus" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(183, 183, 183); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 44px; font-size: 16px;"/>
-                                <ui:Button text="Dunkel" name="btn-dark-mode" class="btn-modus" style="flex: 1; background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 44px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                                <ui:Button text="Hell" name="btn-light-mode" class="btn-modus" style="flex: 1; margin-right: 8px; background-color: rgb(50, 50, 50); color: rgb(255, 255, 255); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 44px; font-size: 16px;"/>
+                                <ui:Button text="Dunkel" name="btn-dark-mode" class="btn-modus" style="flex: 1; background-color: rgb(128, 207, 149); color: rgb(255, 255, 255); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 44px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                             </ui:VisualElement>
                             <ui:VisualElement name="row-toggle-begleiter" style="flex-direction: row; align-items: center; margin-top: 4px;">
                                 <ui:Toggle name="toggle-begleiter" label="Begleiter / Assistent aktiv" style="font-size: 16px; flex-grow: 1;"/>
@@ -155,6 +133,17 @@
                                     <ui:Label text="Dieser Vorgang kann nicht rückgängig gemacht werden" name="label-lokalprofil-loeschen-hinweis" style="font-size: 12px; color: rgb(160, 160, 160);"/>
                                 </ui:VisualElement>
                                 <ui:Button text="Löschen" name="btn-delete-profile" style="background-color: rgb(180, 40, 40); color: rgb(255, 255, 255); border-width: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; padding-top: 8px; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; font-size: 14px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="card-hilfe" style="background-color: rgb(44, 44, 44); border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px; padding: 24px; margin-top: 16px;">
+                            <ui:VisualElement name="row-titel-hilfe" style="flex-direction: row; align-items: center; margin-bottom: 16px;">
+                                <ui:VisualElement name="dot-hilfe" style="width: 14px; height: 14px; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; background-color: rgb(128, 207, 149); margin-right: 10px; flex-shrink: 0;"/>
+                                <ui:Label text="Hilfe" name="label-titel-hilfe" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 20px; color: rgb(255, 255, 255);"/>
+                                <ui:VisualElement name="spacer-titel-hilfe" style="flex-grow: 1;"/>
+                                <ui:VisualElement name="btn-help-hilfe" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement name="row-tutorial-button" style="flex-direction: row; align-items: center;">
+                                <ui:Button text="Tutorial starten" name="btn-start-tutorial" class="btn-grey" style="flex-grow: 1; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; height: 40px; font-size: 14px;"/>                            
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
