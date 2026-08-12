@@ -442,7 +442,7 @@ public class DocumentDashboard : MonoBehaviour
     {
         bool geaendert = false;
 
-        foreach (var kategorie in kategorien.Where(k => k.istFest))
+        foreach (var kategorie in kategorien)
         {
             foreach (string pflichtTitel in kategorie.pflichtDocs)
             {
@@ -971,13 +971,22 @@ public class DocumentDashboard : MonoBehaviour
 
                     var feldInput = new TextField { value = aktuellerWert };
                     feldInput.name = $"struktur-feld-{def.key}";
-                    feldInput.tooltip = def.placeholder;
                     feldGroup.Add(feldInput);
 
                     editStrukturFelderBox.Add(feldGroup);
                     aktiveStrukturFelder.Add(feldInput);
 
                     feldInput.userData = def.key;
+
+                    // FIX: Hinweistext war bisher nur als natives .tooltip
+                    // gesetzt - das erfordert Hovern und rendert im Build
+                    // ohnehin oft nicht zuverlässig (gleiches Problem wie
+                    // beim Kalender-Tooltip). Jetzt echte Platzhalter-
+                    // Simulation: grauer Hinweistext direkt im leeren Feld,
+                    // verschwindet beim Fokussieren, kommt beim Verlassen
+                    // zurück falls das Feld leer bleibt.
+                    if (string.IsNullOrEmpty(aktuellerWert))
+                        SetzeFeldPlatzhalter(feldInput, def.placeholder);
                 }
 
                 if (doc.istPflichtdokument && aktiveStrukturFelder.Count > 0)
@@ -1005,6 +1014,37 @@ public class DocumentDashboard : MonoBehaviour
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
     }
 
+    // Echte Platzhalter-Simulation für die Struktur-Felder (gleiches Muster
+    // wie SetupPlaceholderSimulation im Kassenbuch) - UI Toolkit TextFields
+    // haben in dieser Unity-Version kein natives Platzhalter-Verhalten.
+    private void SetzeFeldPlatzhalter(TextField field, string placeholder)
+    {
+        if (field == null || string.IsNullOrEmpty(placeholder)) return;
+
+        var platzhalterFarbe = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+
+        field.SetValueWithoutNotify(placeholder);
+        field.style.color = platzhalterFarbe;
+
+        field.RegisterCallback<FocusInEvent>(_ =>
+        {
+            if (field.value == placeholder)
+            {
+                field.SetValueWithoutNotify("");
+                field.style.color = new StyleColor(StyleKeyword.Null);
+            }
+        });
+
+        field.RegisterCallback<FocusOutEvent>(_ =>
+        {
+            if (string.IsNullOrEmpty(field.value))
+            {
+                field.SetValueWithoutNotify(placeholder);
+                field.style.color = platzhalterFarbe;
+            }
+        });
+    }
+
     private void SaveEditedDocumentEntry()
     {
         if (activeDocForEditing == null) return;
@@ -1029,16 +1069,27 @@ public class DocumentDashboard : MonoBehaviour
             {
                 if (docInList.strukturFelder == null) docInList.strukturFelder = new List<StrukturFeldWert>();
 
+                var definitionen = felderProPflichtDoc.ContainsKey(docInList.title)
+                    ? felderProPflichtDoc[docInList.title]
+                    : new List<FeldDefinition>();
+
                 foreach (var feldInput in aktiveStrukturFelder)
                 {
                     string key = feldInput.userData as string;
                     if (key == null) continue;
 
+                    // Falls das Feld noch den grauen Platzhaltertext zeigt
+                    // (nie angeklickt oder wieder leer verlassen), zählt das
+                    // als "nichts eingegeben" - sonst würde der Hinweistext
+                    // selbst als Wert gespeichert werden.
+                    string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
+                    string wert = (platzhalter != null && feldInput.value == platzhalter) ? "" : feldInput.value;
+
                     var bestehenderEintrag = docInList.strukturFelder.FirstOrDefault(f => f.key == key);
                     if (bestehenderEintrag != null)
-                        bestehenderEintrag.wert = feldInput.value;
+                        bestehenderEintrag.wert = wert;
                     else
-                        docInList.strukturFelder.Add(new StrukturFeldWert { key = key, wert = feldInput.value });
+                        docInList.strukturFelder.Add(new StrukturFeldWert { key = key, wert = wert });
                 }
             }
             else

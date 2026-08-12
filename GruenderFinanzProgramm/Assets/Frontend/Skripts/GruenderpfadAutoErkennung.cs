@@ -81,7 +81,8 @@ public static class GruenderpfadAutoErkennung
     }
 
     // Zusätzliche Schritte, die sich direkt aus echten App-Daten ableiten
-    // lassen (nicht nur Dokumente): Kassenbuch-Einträge, Kunden in der KDB.
+    // lassen (nicht nur Dokumente): Kassenbuch-Einträge, Kunden in der KDB,
+    // Firmendaten, Finanzkennzahlen.
     public static HashSet<string> AusAppDaten(DataBase db)
     {
         var ergebnis = new HashSet<string>();
@@ -89,13 +90,36 @@ public static class GruenderpfadAutoErkennung
 
         try
         {
-            bool hatKassenbuchEintrag =
-                (db.getAllEinkommenEntries()?.Count ?? 0) > 0 ||
-                (db.getAllAusgabenEntries()?.Count ?? 0) > 0;
-            if (hatKassenbuchEintrag) ergebnis.Add("fin_2"); // Buchhaltung eingerichtet
+            bool hatEinkommen = (db.getAllEinkommenEntries()?.Count ?? 0) > 0;
+            bool hatAusgaben  = (db.getAllAusgabenEntries()?.Count ?? 0) > 0;
+
+            if (hatEinkommen || hatAusgaben) ergebnis.Add("fin_2"); // Buchhaltung eingerichtet
+
+            // Jahresabschluss vorbereiten: braucht mehr als nur EINEN
+            // Buchungstyp - beide Seiten (Einnahmen UND Ausgaben) müssen
+            // gebucht sein, damit überhaupt ein sinnvoller Abschluss
+            // möglich ist.
+            if (hatEinkommen && hatAusgaben) ergebnis.Add("betr_4");
 
             bool hatKunde = (db.getAllCustomers()?.Count ?? 0) > 0;
             if (hatKunde) ergebnis.Add("betr_1"); // Erste Kunden akquiriert
+
+            // Rechtsform wählen: das freie Textfeld "Rechtsform" in den
+            // Unternehmensstammdaten ist ausgefüllt.
+            var gespeichert = DocumentDashboard.GetSavedDocuments();
+            var stammdaten = gespeichert?.savedDocs?.FirstOrDefault(d => d.title == "Unternehmensstammdaten");
+            string rechtsform = stammdaten?.strukturFelder?.FirstOrDefault(f => f.key == "rechtsform")?.wert;
+            if (!string.IsNullOrWhiteSpace(rechtsform)) ergebnis.Add("vorb_4");
+
+            // Finanzierung klären & Startkapital verwalten: nutzen dieselben
+            // Kennzahlen wie die Finanzplanung-Erfolge (siehe FinanzKennzahlenService).
+            var k = FinanzKennzahlenService.Berechne(db);
+
+            bool hatFinanzierungsquelle = k.Geldeinlagen > 0 || k.Kredite > 0 || k.Darlehen > 0 || k.Sacheinlagen > 0;
+            if (hatFinanzierungsquelle) ergebnis.Add("vorb_5"); // Finanzierung klären
+
+            bool kapitalbedarfGedeckt = k.Kapitalbedarf > 0 && k.GesamtKapital >= k.Kapitalbedarf;
+            if (kapitalbedarfGedeckt) ergebnis.Add("fin_4"); // Startkapital verwalten
         }
         catch { /* defensiv - lieber nix automatisch abhaken als crashen */ }
 

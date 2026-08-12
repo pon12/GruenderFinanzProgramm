@@ -151,8 +151,23 @@ public static class DokumentPdfGenerator
 
                     PdfPTable unterschriftTable = new PdfPTable(2);
                     unterschriftTable.WidthPercentage = 100f;
-                    unterschriftTable.AddCell(new PdfPCell(new Phrase("__________________________\n" + unterschriftLinks, textFont)) { Border = Rectangle.NO_BORDER });
-                    unterschriftTable.AddCell(new PdfPCell(new Phrase("__________________________\n" + unterschriftRechts, textFont)) { Border = Rectangle.NO_BORDER });
+                    // FIX: eingebettetes "\n" in einer einzelnen Phrase wird
+                    // von iTextSharp nicht zuverlässig als echter
+                    // Zeilenumbruch gerendert - stattdessen landete alles
+                    // in einer Zeile zusammengequetscht. Jetzt mit
+                    // Chunk.NEWLINE, dem dafür vorgesehenen Weg.
+                    var linksParagraph = new Paragraph();
+                    linksParagraph.Add(new Chunk("__________________________", textFont));
+                    linksParagraph.Add(Chunk.NEWLINE);
+                    linksParagraph.Add(new Chunk(unterschriftLinks, textFont));
+
+                    var rechtsParagraph = new Paragraph();
+                    rechtsParagraph.Add(new Chunk("__________________________", textFont));
+                    rechtsParagraph.Add(Chunk.NEWLINE);
+                    rechtsParagraph.Add(new Chunk(unterschriftRechts, textFont));
+
+                    unterschriftTable.AddCell(new PdfPCell(linksParagraph) { Border = Rectangle.NO_BORDER });
+                    unterschriftTable.AddCell(new PdfPCell(rechtsParagraph) { Border = Rectangle.NO_BORDER });
                     doc.Add(unterschriftTable);
                 }
 
@@ -893,6 +908,33 @@ public static class DokumentPdfGenerator
     }
 
     // ─────────────────────────────────────────
+    // UNTERNEHMENSSTAMMDATEN
+    // ─────────────────────────────────────────
+    public static string ErstelleUnternehmensstammdaten(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string firmenname = Feld(f, "firma");
+        string rechtsform = Feld(f, "rechtsform");
+        string branche = Feld(f, "branche");
+        string standort = Feld(f, "standort");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, "Diese Übersicht fasst die im System Ventoriq hinterlegten Stammdaten des Unternehmens zusammen."),
+            (true,  "Unternehmensdaten"),
+            (false, "Firmenname: " + N(firmenname)),
+            (false, "Rechtsform: " + N(rechtsform)),
+            (false, "Branche: " + N(branche)),
+            (false, "Standort: " + N(standort)),
+        };
+
+        string pfad = PfadFuer("Unternehmensstammdaten");
+        bool ok = ErstellePdf(pfad, "Unternehmensstammdaten", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
     // ZENTRALER EINSTIEGSPUNKT
     // Wird vom Export-Screen aufgerufen - liefert null zurück, wenn für
     // diesen Dokument-Titel noch kein spezieller PDF-Generator existiert
@@ -904,6 +946,7 @@ public static class DokumentPdfGenerator
 
         switch (doc.title)
         {
+            case "Unternehmensstammdaten": return ErstelleUnternehmensstammdaten(doc);
             case "Gründungsurkunde":       return ErstelleGruendungsurkunde(doc);
             case "Handelsregisterauszug":  return ErstelleHandelsregisterauszug(doc);
             case "Gesellschaftsvertrag":   return ErstelleGesellschaftsvertrag(doc);
