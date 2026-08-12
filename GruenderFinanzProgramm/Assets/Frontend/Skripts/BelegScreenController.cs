@@ -70,8 +70,8 @@ public abstract class BelegScreenController : MonoBehaviour
     protected string _ausgewaehlterKunde = "";
     protected int _ausgewaehlterKundeId = 0;
     protected string _ausgewaehlterKundeAdresse = "";
-    private bool _istBearbeitung = false;
-    private int _bearbeiteId = -1;
+    protected bool _istBearbeitung = false;
+    protected int _bearbeiteId = -1;
     private Button _umwandelnButton;
     private Label _rabattWertBezeichnungLabel;
     private bool _buttonsRegistriert = false;
@@ -377,8 +377,25 @@ public abstract class BelegScreenController : MonoBehaviour
 
         if (_rabattTypDropdown != null)
         {
-            _rabattTypDropdown.choices = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
-            _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
+            var rabattOptionen = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
+
+            _rabattTypDropdown.schedule.Execute(() =>
+            {
+                _rabattTypDropdown.choices = rabattOptionen;
+                if (string.IsNullOrEmpty(_rabattTypDropdown.value) ||
+                    !rabattOptionen.Contains(_rabattTypDropdown.value))
+                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
+            }).ExecuteLater(50);
+
+            _rabattTypDropdown.schedule.Execute(() =>
+            {
+                if (_rabattTypDropdown.choices == null || _rabattTypDropdown.choices.Count == 0)
+                {
+                    _rabattTypDropdown.choices = rabattOptionen;
+                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
+                }
+            }).ExecuteLater(200);
+
             _rabattTypDropdown.RegisterValueChangedCallback(evt =>
             {
                 BerechneSummen();
