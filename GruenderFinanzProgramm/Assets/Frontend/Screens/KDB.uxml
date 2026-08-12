@@ -6,6 +6,7 @@
     <Style src="project://database/Assets/Frontend/Stylesheets/KDB/KDB.uss?fileID=7433441132597879392&amp;guid=98b3c1d8ab360a04a8ada2c47179d6c5&amp;type=3#KDB"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/buttons.uss?fileID=7433441132597879392&amp;guid=976b577918780d5498328a47b1d3f61c&amp;type=3#buttons"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
+    <Style src="project://database/Assets/Frontend/Stylesheets/Einstellungen%20USS.uss?fileID=7433441132597879392&amp;guid=c4a9726888d324748923be9caf3a73ab&amp;type=3#Einstellungen USS"/>
     <ui:VisualElement name="root" focusable="false" class="root fullscreen-bg grid-container" style="flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; align-self: flex-start; top: 1px; left: -1px; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" class="main grid-item" style="flex-grow: 1; align-self: stretch; position: relative; align-items: stretch; padding-left: 430px;">
             <ui:VisualElement name="row-kopfzeile" style="flex-direction: row; align-items: center; margin-top: 8px; margin-bottom: 8px;">
@@ -14,18 +15,18 @@
             </ui:VisualElement>
             <ui:ScrollView name="kunden-container" style="flex-grow: 1; height: 943px;">
                 <ui:VisualElement name="card-Lokaler-Nutzer" style="flex-grow: 1; left: 0; right: auto; top: 10px; position: relative; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; background-color: rgb(44, 44, 44); width: 100%; height: 237px; margin-bottom: 10px; background-image: url(&quot;project://database/Assets/Frontend/Bilder/Benutzer-Bild-wei%C3%9F.png?fileID=2800000&amp;guid=54542a0114f7b054ab4603199027cd42&amp;type=3#Benutzer-Bild-weiß&quot;); background-size: 100px 100px; background-position-x: left 50px; background-position-y: bottom 30px; padding-left: 2px; white-space: normal;">
-                    <ui:VisualElement name="row-lokaler-nutzer-kopf" style="flex-grow: 1; flex-direction: row;">
-                        <ui:Button text="Lokaler Nutzer" name="btn-lokaler-nutzer-label" enable-rich-text="true" style="border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; width: auto; height: 48px; background-color: rgba(0, 0, 0, 0); color: rgb(128, 207, 149); font-size: 20px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; margin-left: 10px; margin-top: 20px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:Label text="Max Mustermann" name="label-lokaler-nutzer-name" style="width: auto; height: auto; margin-left: 33px; font-size: 40px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); -unity-text-align: middle-left;"/>
-                        <ui:Label text="Mustert GmbH" name="label-lokaler-nutzer-firma" style="width: auto; height: auto; margin-left: 90px; font-size: 24px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); padding-top: 20px; -unity-text-align: middle-left;"/>
-                        <ui:Button text="Ändern" enable-rich-text="true" name="btn-edit-local" class="btn-primary" style="height: 44px; width: 181px; position: absolute; top: 48px; left: 1258px; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px;"/>
-                        <ui:VisualElement name="spacer-lokaler-nutzer" picking-mode="Ignore" style="flex-grow: 1;"/>
-                        <ui:VisualElement name="btn-help-lokaler-nutzer" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-right: 16px; margin-top: 16px; align-self: flex-start; top: -8px; left: -15px;"/>
+                    <ui:VisualElement name="row-lokaler-nutzer-kopf" style="flex-grow: 1; flex-direction: row; align-items: center; padding-right: 20px;">
+                        <ui:Button text="Lokaler Nutzer" name="btn-lokaler-nutzer-label" enable-rich-text="true" style="border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; width: auto; height: 48px; background-color: rgba(0, 0, 0, 0); color: rgb(128, 207, 149); font-size: 20px; -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; margin-left: 10px; margin-top: 20px; flex-shrink: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+                        <ui:Label text="Max Mustermann" name="label-lokaler-nutzer-name" style="width: auto; height: auto; margin-left: 20px; font-size: 40px; -unity-font-style: bold; flex-shrink: 0; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); -unity-text-align: middle-left;"/>
+                        <ui:Label text="Mustert GmbH" name="label-lokaler-nutzer-firma" style="width: auto; height: auto; margin-left: 24px; font-size: 24px; -unity-font-style: bold; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); -unity-text-align: middle-left;"/>
+                        <ui:VisualElement name="spacer-lokaler-nutzer" picking-mode="Ignore" style="flex-grow: 1; min-width: 16px;"/>
+                        <ui:Button text="Ändern" enable-rich-text="true" name="btn-edit-local" class="btn-primary" style="height: 44px; width: 150px; flex-shrink: 0; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px;"/>
+                        <ui:VisualElement name="btn-help-lokaler-nutzer" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 12px;"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="row-lokaler-nutzer-kontakt" style="flex-grow: 1; flex-direction: row; padding-left: 80px;">
-                        <ui:Label text="Mustertstr. 8 12345 Musterstadt" name="label-lokaler-nutzer-adresse" style="width: auto; height: auto; margin-left: 160px; font-size: 24px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); -unity-text-align: upper-left;"/>
-                        <ui:Label text="muster@email.de" name="label-lokaler-nutzer-email" style="width: auto; height: auto; margin-left: 50px; font-size: 24px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229);"/>
-                        <ui:Label text="0162-12345" name="label-lokaler-nutzer-telefon" style="width: auto; height: auto; margin-left: 90px; font-size: 24px; -unity-font-style: bold; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229);"/>
+                    <ui:VisualElement name="row-lokaler-nutzer-kontakt" style="flex-grow: 1; flex-direction: row; align-items: center; padding-left: 170px; padding-right: 20px;">
+                        <ui:Label text="Mustertstr. 8 12345 Musterstadt" name="label-lokaler-nutzer-adresse" style="width: auto; height: auto; font-size: 24px; -unity-font-style: bold; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229); -unity-text-align: middle-left;"/>
+                        <ui:Label text="muster@email.de" name="label-lokaler-nutzer-email" style="width: auto; height: auto; margin-left: 40px; font-size: 24px; -unity-font-style: bold; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229);"/>
+                        <ui:Label text="0162-12345" name="label-lokaler-nutzer-telefon" style="width: auto; height: auto; margin-left: 40px; font-size: 24px; -unity-font-style: bold; flex-shrink: 0; -unity-font-definition: url(&quot;project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=bd89cb14730400b4bbcff7e0926565fc&amp;type=3#Poppins-Bold&quot;); color: rgb(229, 229, 229);"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="card-Zwischenbar" style="flex-grow: 1; left: 0; right: auto; top: 10px; position: relative; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; background-color: rgb(44, 44, 44); width: 100%; height: auto; margin-bottom: 10px; align-items: center; flex-direction: row; justify-content: space-between;">
@@ -37,101 +38,113 @@
                 <ui:VisualElement name="kunden-liste-holder" style="flex-grow: 1;"/>
             </ui:ScrollView>
         </ui:VisualElement>
-        <ui:VisualElement name="PopUpKundeerstellen" picking-mode="Position" style="flex-grow: 1; position: absolute; height: 100%; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; display: none;">
-            <ui:VisualElement name="Pop-up" style="flex-grow: 1; width: 901px; height: 926px; align-self: center; background-color: rgb(44, 44, 44); align-items: stretch; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px;">
-                <ui:VisualElement name="Header" style="flex-grow: 1; height: auto; border-top-width: 10px;">
-                    <ui:Label text="Neuen Kunden / Kontakt anlegen" name="label-popup-create-titel" style="font-size: 36px; color: rgb(255, 255, 255); -unity-text-align: upper-center; margin-top: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+        <ui:VisualElement name="PopUpKundeerstellen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
+            <ui:VisualElement name="Pop-up" style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 720px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:VisualElement name="Header" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
+                    <ui:Label text="Neuen Kunden / Kontakt anlegen" name="label-popup-create-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
+                    <ui:Button name="create-btn-close" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement name="Middle" style="flex-grow: 1; border-left-width: 20px; border-right-width: 20px; height: 800px;">
-                    <ui:VisualElement name="row-create-name" style="flex-grow: 1; flex-direction: row;">
-                        <ui:VisualElement name="feld-gruppe-create-vorname" style="flex-grow: 1; flex-direction: column;">
-                            <ui:Label text="Vorname" name="label-feld-create-vorname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="create-vorname" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                <ui:VisualElement name="Middle" style="flex-direction: column;">
+                    <ui:VisualElement name="row-create-name" style="flex-direction: row; margin-bottom: 14px;">
+                        <ui:VisualElement name="feld-gruppe-create-vorname" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="Vorname" name="label-feld-create-vorname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="create-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="feld-gruppe-create-nachname" style="flex-grow: 1;">
-                            <ui:Label text="Nachname" name="label-feld-create-nachname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="create-nachname" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-create-firma" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Firmenbezeichnung" name="label-feld-create-firma" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="create-firma" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-create-strasse" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Straße &amp; Hausnummer" name="label-feld-create-strasse" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="create-strasse" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="row-create-plz-ort" style="flex-grow: 1; flex-direction: row;">
-                        <ui:VisualElement name="feld-gruppe-create-plz" style="flex-grow: 1; flex-direction: column;">
-                            <ui:Label text="PLZ" name="label-feld-create-plz" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="create-plz" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement name="feld-gruppe-create-ort" style="flex-grow: 1;">
-                            <ui:Label text="Ort" name="label-feld-create-ort" style="font-size: 24px; color: rgb(255, 255, 255);"/>
-                            <ui:TextField label="" placeholder-text="" name="create-ort" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                        <ui:VisualElement name="feld-gruppe-create-nachname" style="flex: 1;">
+                            <ui:Label text="Nachname" name="label-feld-create-nachname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="create-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-create-email" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="E-Mail-Adresse" name="label-feld-create-email" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="create-email" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                    <ui:VisualElement name="feld-gruppe-create-firma" style="margin-bottom: 14px;">
+                        <ui:Label text="Firmenbezeichnung" name="label-feld-create-firma" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField label="" placeholder-text="" name="create-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-create-telefon" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Telefonnummer" name="label-feld-create-telefon" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="create-telefon" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                    <ui:VisualElement name="feld-gruppe-create-strasse" style="margin-bottom: 14px;">
+                        <ui:Label text="Straße &amp; Hausnummer" name="label-feld-create-strasse" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField label="" placeholder-text="" name="create-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="row-create-plz-ort" style="flex-direction: row; margin-bottom: 14px;">
+                        <ui:VisualElement name="feld-gruppe-create-plz" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="PLZ" name="label-feld-create-plz" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="create-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="feld-gruppe-create-ort" style="flex: 2;">
+                            <ui:Label text="Ort" name="label-feld-create-ort" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="create-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="row-create-email-telefon" style="flex-direction: row; margin-bottom: 28px;">
+                        <ui:VisualElement name="feld-gruppe-create-email" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="E-Mail-Adresse" name="label-feld-create-email" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="create-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="feld-gruppe-create-telefon" style="flex: 1;">
+                            <ui:Label text="Telefonnummer" name="label-feld-create-telefon" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:VisualElement name="telefon-wrapper-create" style="flex-direction: row;">
+                                <ui:DropdownField name="create-vorwahl" class="dark-input" style="width: 100px; height: 40px; flex-shrink: 0; margin-right: 8px;"/>
+                                <ui:TextField label="" placeholder-text="" name="create-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="Footer" style="flex-grow: 1; height: 30px; flex-direction: row; justify-content: space-between; border-left-width: 20px; border-right-width: 20px;">
-                    <ui:Button text="Abbrechen" name="create-btn-abbrechen" class="btn-danger-pop-up"/>
-                    <ui:Button text="Kunden speichern" name="create-btn-speichern" class="btn-primary-pop-up"/>
+                <ui:VisualElement name="Footer" style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button text="Abbrechen" name="create-btn-abbrechen" class="btn-red" style="margin-right: 12px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
+                    <ui:Button text="Kunden speichern" name="create-btn-speichern" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="PopUpKundenbearbeiten" picking-mode="Position" style="flex-grow: 1; position: absolute; height: 100%; width: 100%; display: none; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
-            <ui:VisualElement name="container-popup-edit" style="flex-grow: 1; width: 901px; height: 926px; align-self: center; background-color: rgb(44, 44, 44); align-items: stretch; border-left-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-top-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px;">
-                <ui:VisualElement name="row-popup-edit-header" style="flex-grow: 1; height: auto; border-top-width: 10px;">
-                    <ui:Label text="Kunden bearbeiten" name="label-popup-edit-titel" style="font-size: 36px; color: rgb(255, 255, 255); -unity-text-align: upper-center; margin-top: 0; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
+        <ui:VisualElement name="PopUpKundenbearbeiten" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
+            <ui:VisualElement name="container-popup-edit" style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 720px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:VisualElement name="row-popup-edit-header" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
+                    <ui:Label text="Kunden bearbeiten" name="label-popup-edit-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
+                    <ui:Button name="edit-btn-close" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement name="container-popup-edit-middle" style="flex-grow: 1; border-left-width: 20px; border-right-width: 20px; height: 800px;">
-                    <ui:VisualElement name="row-edit-name" style="flex-grow: 1; flex-direction: row;">
-                        <ui:VisualElement name="feld-gruppe-edit-vorname" style="flex-grow: 1; flex-direction: column;">
-                            <ui:Label text="Vorname" name="label-feld-edit-vorname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-vorname" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                <ui:VisualElement name="container-popup-edit-middle" style="flex-direction: column;">
+                    <ui:VisualElement name="row-edit-name" style="flex-direction: row; margin-bottom: 14px;">
+                        <ui:VisualElement name="feld-gruppe-edit-vorname" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="Vorname" name="label-feld-edit-vorname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="edit-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
-                        <ui:VisualElement name="feld-gruppe-edit-nachname" style="flex-grow: 1;">
-                            <ui:Label text="Nachname" name="label-feld-edit-nachname" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-nachname" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-edit-firma" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Firmenbezeichnung" name="label-feld-edit-firma" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-firma" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-edit-strasse" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Straße &amp; Hausnummer" name="label-feld-edit-strasse" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-strasse" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="row-edit-plz-ort" style="flex-grow: 1; flex-direction: row;">
-                        <ui:VisualElement name="feld-gruppe-edit-plz" style="flex-grow: 1; flex-direction: column;">
-                            <ui:Label text="PLZ" name="label-feld-edit-plz" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-plz" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement name="feld-gruppe-edit-ort" style="flex-grow: 1;">
-                            <ui:Label text="Ort" name="label-feld-edit-ort" style="font-size: 24px; color: rgb(255, 255, 255);"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-ort" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                        <ui:VisualElement name="feld-gruppe-edit-nachname" style="flex: 1;">
+                            <ui:Label text="Nachname" name="label-feld-edit-nachname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="edit-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-edit-email" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="E-Mail-Adresse" name="label-feld-edit-email" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-email" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                    <ui:VisualElement name="feld-gruppe-edit-firma" style="margin-bottom: 14px;">
+                        <ui:Label text="Firmenbezeichnung" name="label-feld-edit-firma" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField label="" placeholder-text="" name="edit-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="feld-gruppe-edit-telefon" style="flex-grow: 1; flex-direction: column;">
-                        <ui:Label text="Telefonnummer" name="label-feld-edit-telefon" style="font-size: 24px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;);"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-telefon" class="textfield-styled" style="border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px;"/>
+                    <ui:VisualElement name="feld-gruppe-edit-strasse" style="margin-bottom: 14px;">
+                        <ui:Label text="Straße &amp; Hausnummer" name="label-feld-edit-strasse" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                        <ui:TextField label="" placeholder-text="" name="edit-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="row-edit-plz-ort" style="flex-direction: row; margin-bottom: 14px;">
+                        <ui:VisualElement name="feld-gruppe-edit-plz" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="PLZ" name="label-feld-edit-plz" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="edit-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="feld-gruppe-edit-ort" style="flex: 2;">
+                            <ui:Label text="Ort" name="label-feld-edit-ort" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="edit-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="row-edit-email-telefon" style="flex-direction: row; margin-bottom: 28px;">
+                        <ui:VisualElement name="feld-gruppe-edit-email" style="flex: 1; margin-right: 8px;">
+                            <ui:Label text="E-Mail-Adresse" name="label-feld-edit-email" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:TextField label="" placeholder-text="" name="edit-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="feld-gruppe-edit-telefon" style="flex: 1;">
+                            <ui:Label text="Telefonnummer" name="label-feld-edit-telefon" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
+                            <ui:VisualElement name="telefon-wrapper-edit" style="flex-direction: row;">
+                                <ui:DropdownField name="edit-vorwahl" class="dark-input" style="width: 100px; height: 40px; flex-shrink: 0; margin-right: 8px;"/>
+                                <ui:TextField label="" placeholder-text="" name="edit-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="row-popup-edit-footer" style="flex-grow: 1; height: 30px; flex-direction: row; justify-content: space-between; border-left-width: 20px; border-right-width: 20px;">
-                    <ui:Button text="Abbrechen" name="edit-btn-abbrechen" class="btn-danger-pop-up"/>
-                    <ui:Button text="Speichern" name="edit-btn-speichern" class="btn-primary-pop-up"/>
+                <ui:VisualElement name="row-popup-edit-footer" style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button text="Abbrechen" name="edit-btn-abbrechen" class="btn-red" style="margin-right: 12px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
+                    <ui:Button text="Speichern" name="edit-btn-speichern" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

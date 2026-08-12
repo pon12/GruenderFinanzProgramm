@@ -13,10 +13,10 @@ public class KundendatenbankController : MonoBehaviour
     [SerializeField] private VisualTreeAsset kundenZeileTemplate;
 
     private VisualElement root;
-    private ScrollView    kundenContainer;
+    private ScrollView kundenContainer;
     private VisualElement kundenListeHolder;
-    private Button        btnKundeHinzufuegen;
-    private Label         lblCounter;
+    private Button btnKundeHinzufuegen;
+    private Label lblCounter;
 
     [Header("Lokaler Nutzer")]
     private Button btnEditLocal;
@@ -28,35 +28,47 @@ public class KundendatenbankController : MonoBehaviour
     // Inputs Erstellen-Popup
     private TextField inputCreateVorname, inputCreateNachname, inputCreateFirma;
     private TextField inputCreateStrasse, inputCreatePlz, inputCreateOrt;
-    private TextField inputCreateEmail,   inputCreateTelefon;
-    private Button    btnCreateSpeichern, btnCreateAbbrechen;
+    private TextField inputCreateEmail, inputCreateTelefon;
+    private DropdownField dropdownCreateVorwahl;
+    private Button btnCreateSpeichern, btnCreateAbbrechen, btnCreateClose;
 
     // Inputs Bearbeiten-Popup
     private TextField inputEditVorname, inputEditNachname, inputEditFirma;
-    private TextField inputEditStrasse, inputEditPlz,     inputEditOrt;
-    private TextField inputEditEmail,   inputEditTelefon;
-    private Button    btnEditSpeichern, btnEditAbbrechen;
+    private TextField inputEditStrasse, inputEditPlz, inputEditOrt;
+    private TextField inputEditEmail, inputEditTelefon;
+    private DropdownField dropdownEditVorwahl;
+    private Button btnEditSpeichern, btnEditAbbrechen, btnEditClose;
+
+    // Verfügbare Ländervorwahlen für das Telefon-Dropdown, Standard ist Deutschland.
+    private static readonly List<string> Vorwahlen = new List<string> { "+49", "+43", "+41", "+33", "+1" };
 
     private List<KundeData> kundenListe = new List<KundeData>();
-    private KundeData       aktuellBearbeiteterKunde;
+    private KundeData aktuellBearbeiteterKunde;
 
     void OnEnable()
     {
         uiDocument = GetComponent<UIDocument>();
-        root       = uiDocument.rootVisualElement;
+        root = uiDocument.rootVisualElement;
 
-        kundenContainer     = root.Q<ScrollView>("kunden-container");
-        kundenListeHolder   = root.Q<VisualElement>("kunden-liste-holder");
+        kundenContainer = root.Q<ScrollView>("kunden-container");
+        kundenListeHolder = root.Q<VisualElement>("kunden-liste-holder");
         btnKundeHinzufuegen = root.Q<Button>("btn-add-coustomer");
-        lblCounter          = root.Q<Label>("lbl-counter");
-        btnEditLocal        = root.Q<Button>("btn-edit-local");
+        lblCounter = root.Q<Label>("lbl-counter");
+        btnEditLocal = root.Q<Button>("btn-edit-local");
 
-        popupErstellen  = root.Q<VisualElement>("PopUpKundeerstellen");
+        popupErstellen = root.Q<VisualElement>("PopUpKundeerstellen");
         popupBearbeiten = root.Q<VisualElement>("PopUpKundenbearbeiten");
 
         AssignPopupElements();
 
-        SetElementVisible(popupErstellen,  false);
+        InitialisiereVorwahlDropdown(dropdownCreateVorwahl);
+        InitialisiereVorwahlDropdown(dropdownEditVorwahl);
+        NurZiffern(inputCreatePlz, 5);
+        NurZiffern(inputEditPlz, 5);
+        NurZiffern(inputCreateTelefon, 15);
+        NurZiffern(inputEditTelefon, 15);
+
+        SetElementVisible(popupErstellen, false);
         SetElementVisible(popupBearbeiten, false);
 
         RegisterEvents();
@@ -78,10 +90,10 @@ public class KundendatenbankController : MonoBehaviour
     // ============================================================
     private void LadeLokalenNutzer()
     {
-        var lblName    = root.Q<Label>("label-lokaler-nutzer-name");
-        var lblFirma   = root.Q<Label>("label-lokaler-nutzer-firma");
+        var lblName = root.Q<Label>("label-lokaler-nutzer-name");
+        var lblFirma = root.Q<Label>("label-lokaler-nutzer-firma");
         var lblAdresse = root.Q<Label>("label-lokaler-nutzer-adresse");
-        var lblEmail   = root.Q<Label>("label-lokaler-nutzer-email");
+        var lblEmail = root.Q<Label>("label-lokaler-nutzer-email");
         var lblTelefon = root.Q<Label>("label-lokaler-nutzer-telefon");
 
         try
@@ -156,31 +168,86 @@ public class KundendatenbankController : MonoBehaviour
     {
         if (popupErstellen != null)
         {
-            inputCreateVorname  = popupErstellen.Q<TextField>("create-vorname");
+            inputCreateVorname = popupErstellen.Q<TextField>("create-vorname");
             inputCreateNachname = popupErstellen.Q<TextField>("create-nachname");
-            inputCreateFirma    = popupErstellen.Q<TextField>("create-firma");
-            inputCreateStrasse  = popupErstellen.Q<TextField>("create-strasse");
-            inputCreatePlz      = popupErstellen.Q<TextField>("create-plz");
-            inputCreateOrt      = popupErstellen.Q<TextField>("create-ort");
-            inputCreateEmail    = popupErstellen.Q<TextField>("create-email");
-            inputCreateTelefon  = popupErstellen.Q<TextField>("create-telefon");
-            btnCreateSpeichern  = popupErstellen.Q<Button>("create-btn-speichern");
-            btnCreateAbbrechen  = popupErstellen.Q<Button>("create-btn-abbrechen");
+            inputCreateFirma = popupErstellen.Q<TextField>("create-firma");
+            inputCreateStrasse = popupErstellen.Q<TextField>("create-strasse");
+            inputCreatePlz = popupErstellen.Q<TextField>("create-plz");
+            inputCreateOrt = popupErstellen.Q<TextField>("create-ort");
+            inputCreateEmail = popupErstellen.Q<TextField>("create-email");
+            inputCreateTelefon = popupErstellen.Q<TextField>("create-telefon");
+            dropdownCreateVorwahl = popupErstellen.Q<DropdownField>("create-vorwahl");
+            btnCreateSpeichern = popupErstellen.Q<Button>("create-btn-speichern");
+            btnCreateAbbrechen = popupErstellen.Q<Button>("create-btn-abbrechen");
+            btnCreateClose = popupErstellen.Q<Button>("create-btn-close");
         }
 
         if (popupBearbeiten != null)
         {
-            inputEditVorname  = popupBearbeiten.Q<TextField>("edit-vorname");
+            inputEditVorname = popupBearbeiten.Q<TextField>("edit-vorname");
             inputEditNachname = popupBearbeiten.Q<TextField>("edit-nachname");
-            inputEditFirma    = popupBearbeiten.Q<TextField>("edit-firma");
-            inputEditStrasse  = popupBearbeiten.Q<TextField>("edit-strasse");
-            inputEditPlz      = popupBearbeiten.Q<TextField>("edit-plz");
-            inputEditOrt      = popupBearbeiten.Q<TextField>("edit-ort");
-            inputEditEmail    = popupBearbeiten.Q<TextField>("edit-email");
-            inputEditTelefon  = popupBearbeiten.Q<TextField>("edit-telefon");
-            btnEditSpeichern  = popupBearbeiten.Q<Button>("edit-btn-speichern");
-            btnEditAbbrechen  = popupBearbeiten.Q<Button>("edit-btn-abbrechen");
+            inputEditFirma = popupBearbeiten.Q<TextField>("edit-firma");
+            inputEditStrasse = popupBearbeiten.Q<TextField>("edit-strasse");
+            inputEditPlz = popupBearbeiten.Q<TextField>("edit-plz");
+            inputEditOrt = popupBearbeiten.Q<TextField>("edit-ort");
+            inputEditEmail = popupBearbeiten.Q<TextField>("edit-email");
+            inputEditTelefon = popupBearbeiten.Q<TextField>("edit-telefon");
+            dropdownEditVorwahl = popupBearbeiten.Q<DropdownField>("edit-vorwahl");
+            btnEditSpeichern = popupBearbeiten.Q<Button>("edit-btn-speichern");
+            btnEditAbbrechen = popupBearbeiten.Q<Button>("edit-btn-abbrechen");
+            btnEditClose = popupBearbeiten.Q<Button>("edit-btn-close");
         }
+    }
+
+    // Beschränkt ein Textfeld auf Ziffern - z. B. für PLZ und Telefonnummer.
+    private static void NurZiffern(TextField feld, int maxLength = -1)
+    {
+        if (feld == null) return;
+        feld.RegisterValueChangedCallback(evt =>
+        {
+            string gefiltert = new string(evt.newValue.Where(char.IsDigit).ToArray());
+            if (maxLength > 0 && gefiltert.Length > maxLength)
+                gefiltert = gefiltert.Substring(0, maxLength);
+            if (gefiltert != evt.newValue)
+                feld.SetValueWithoutNotify(gefiltert);
+        });
+    }
+
+    private void InitialisiereVorwahlDropdown(DropdownField dropdown)
+    {
+        if (dropdown == null) return;
+        dropdown.choices = new List<string>(Vorwahlen);
+        dropdown.SetValueWithoutNotify("+49");
+    }
+
+    // Trennt eine gespeicherte Telefonnummer wieder in Vorwahl und Rest auf,
+    // damit das Bearbeiten-Popup beide Felder korrekt vorbefüllt.
+    private void SetzeTelefonFelder(DropdownField vorwahlDropdown, TextField telefonFeld, string kompletteNummer)
+    {
+        if (vorwahlDropdown == null || telefonFeld == null) return;
+
+        string passendeVorwahl = "+49";
+        string rest = kompletteNummer ?? "";
+
+        foreach (var v in Vorwahlen)
+        {
+            if (rest.StartsWith(v))
+            {
+                passendeVorwahl = v;
+                rest = rest.Substring(v.Length).TrimStart();
+                break;
+            }
+        }
+
+        vorwahlDropdown.SetValueWithoutNotify(passendeVorwahl);
+        telefonFeld.SetValueWithoutNotify(rest);
+    }
+
+    private static string ZusammengesetzteTelefonnummer(DropdownField vorwahlDropdown, TextField telefonFeld)
+    {
+        string vorwahl = vorwahlDropdown != null ? vorwahlDropdown.value : "+49";
+        string ziffern = telefonFeld != null ? telefonFeld.value : "";
+        return string.IsNullOrEmpty(ziffern) ? "" : vorwahl + " " + ziffern;
     }
 
     // ============================================================
@@ -194,11 +261,15 @@ public class KundendatenbankController : MonoBehaviour
 
         if (btnCreateAbbrechen != null)
             btnCreateAbbrechen.clicked += () => SetElementVisible(popupErstellen, false);
+        if (btnCreateClose != null)
+            btnCreateClose.clicked += () => SetElementVisible(popupErstellen, false);
         if (btnCreateSpeichern != null)
             btnCreateSpeichern.clicked += SpeichereNeuenKunden;
 
         if (btnEditAbbrechen != null)
             btnEditAbbrechen.clicked += () => SetElementVisible(popupBearbeiten, false);
+        if (btnEditClose != null)
+            btnEditClose.clicked += () => SetElementVisible(popupBearbeiten, false);
         if (btnEditSpeichern != null)
             btnEditSpeichern.clicked += SpeichereBearbeitetenKunden;
 
@@ -219,7 +290,7 @@ public class KundendatenbankController : MonoBehaviour
     private void SetElementVisible(VisualElement element, bool visible)
     {
         if (element == null) return;
-        element.style.display  = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         element.style.position = visible ? Position.Absolute : Position.Relative;
     }
 
@@ -242,22 +313,22 @@ public class KundendatenbankController : MonoBehaviour
                 {
                     foreach (var bKunde in backendKunden)
                     {
-                        var kData       = new KundeData();
+                        var kData = new KundeData();
                         kData.backendObjekt = bKunde;
-                        kData.id        = bKunde.id.ToString();
+                        kData.id = bKunde.id.ToString();
 
-                        string vollerName  = bKunde.name ?? "";
-                        string[] teile     = vollerName.Split(' ');
+                        string vollerName = bKunde.name ?? "";
+                        string[] teile = vollerName.Split(' ');
                         if (teile.Length > 0) kData.vorname = teile[0];
                         if (teile.Length > 1)
                             kData.nachname = string.Join(" ", teile, 1, teile.Length - 1);
 
-                        kData.firma   = "Kunde";
-                        kData.strasse = bKunde.street      ?? "";
-                        kData.plz     = bKunde.postalCode  ?? "";
-                        kData.ort     = bKunde.city        ?? "";
-                        kData.email   = bKunde.email       ?? "";
-                        kData.telefon = bKunde.phone       ?? "";
+                        kData.firma = "Kunde";
+                        kData.strasse = bKunde.street ?? "";
+                        kData.plz = bKunde.postalCode ?? "";
+                        kData.ort = bKunde.city ?? "";
+                        kData.email = bKunde.email ?? "";
+                        kData.telefon = bKunde.phone ?? "";
 
                         kundenListe.Add(kData);
                     }
@@ -280,8 +351,8 @@ public class KundendatenbankController : MonoBehaviour
     {
         if (kundenListe.Count == 0)
         {
-            kundenListe.Add(new KundeData { id = "1", vorname = "Max",   nachname = "Mustermann", firma = "Mustert GmbH",  strasse = "Musterstr. 8",  plz = "12345", ort = "Musterstadt", email = "muster@email.de",      telefon = "0162-12345" });
-            kundenListe.Add(new KundeData { id = "2", vorname = "Erika", nachname = "Musterfrau", firma = "Fraunhofer AG", strasse = "Technikweg 4",   plz = "54321", ort = "Techcity",    email = "erika@fraunhofer.de",  telefon = "0175-98765" });
+            kundenListe.Add(new KundeData { id = "1", vorname = "Max", nachname = "Mustermann", firma = "Mustert GmbH", strasse = "Musterstr. 8", plz = "12345", ort = "Musterstadt", email = "muster@email.de", telefon = "+49 016212345" });
+            kundenListe.Add(new KundeData { id = "2", vorname = "Erika", nachname = "Musterfrau", firma = "Fraunhofer AG", strasse = "Technikweg 4", plz = "54321", ort = "Techcity", email = "erika@fraunhofer.de", telefon = "+49 017598765" });
         }
     }
 
@@ -303,22 +374,22 @@ public class KundendatenbankController : MonoBehaviour
         {
             var neueKarte = kundenZeileTemplate.Instantiate();
 
-            var nameLabel    = neueKarte.Q<Label>("lbl-name");
-            var firmaLabel   = neueKarte.Q<Label>("lbl-firma");
-            var emailLabel   = neueKarte.Q<Label>("lbl-email");
+            var nameLabel = neueKarte.Q<Label>("lbl-name");
+            var firmaLabel = neueKarte.Q<Label>("lbl-firma");
+            var emailLabel = neueKarte.Q<Label>("lbl-email");
             var telefonLabel = neueKarte.Q<Label>("lbl-number");
             var adresseLabel = neueKarte.Q<Label>("lbl-adress");
-            var btnAendern   = neueKarte.Q<Button>("btn-edit");
-            var btnLoeschen  = neueKarte.Q<Button>("btn-delete");
+            var btnAendern = neueKarte.Q<Button>("btn-edit");
+            var btnLoeschen = neueKarte.Q<Button>("btn-delete");
 
-            if (nameLabel    != null) nameLabel.text    = $"{kunde.vorname} {kunde.nachname}".Trim();
-            if (firmaLabel   != null) firmaLabel.text   = kunde.firma;
-            if (emailLabel   != null) emailLabel.text   = kunde.email;
+            if (nameLabel != null) nameLabel.text = $"{kunde.vorname} {kunde.nachname}".Trim();
+            if (firmaLabel != null) firmaLabel.text = kunde.firma;
+            if (emailLabel != null) emailLabel.text = kunde.email;
             if (telefonLabel != null) telefonLabel.text = kunde.telefon;
             if (adresseLabel != null)
                 adresseLabel.text = $"{kunde.strasse}, {kunde.plz} {kunde.ort}".Trim();
 
-            if (btnAendern  != null) btnAendern.clicked  += () => OeffneBearbeitenPopup(kunde);
+            if (btnAendern != null) btnAendern.clicked += () => OeffneBearbeitenPopup(kunde);
             if (btnLoeschen != null) btnLoeschen.clicked += () => LoescheKunde(kunde);
 
             // Help-Icon in der Karte registrieren (Template-Icon)
@@ -343,15 +414,15 @@ public class KundendatenbankController : MonoBehaviour
     {
         var uiKunde = new KundeData
         {
-            id      = Guid.NewGuid().ToString(),
-            vorname = inputCreateVorname  != null ? inputCreateVorname.value  : "",
-            nachname= inputCreateNachname != null ? inputCreateNachname.value : "",
-            firma   = inputCreateFirma    != null ? inputCreateFirma.value    : "",
-            strasse = inputCreateStrasse  != null ? inputCreateStrasse.value  : "",
-            plz     = inputCreatePlz      != null ? inputCreatePlz.value      : "",
-            ort     = inputCreateOrt      != null ? inputCreateOrt.value      : "",
-            email   = inputCreateEmail    != null ? inputCreateEmail.value    : "",
-            telefon = inputCreateTelefon  != null ? inputCreateTelefon.value  : ""
+            id = Guid.NewGuid().ToString(),
+            vorname = inputCreateVorname != null ? inputCreateVorname.value : "",
+            nachname = inputCreateNachname != null ? inputCreateNachname.value : "",
+            firma = inputCreateFirma != null ? inputCreateFirma.value : "",
+            strasse = inputCreateStrasse != null ? inputCreateStrasse.value : "",
+            plz = inputCreatePlz != null ? inputCreatePlz.value : "",
+            ort = inputCreateOrt != null ? inputCreateOrt.value : "",
+            email = inputCreateEmail != null ? inputCreateEmail.value : "",
+            telefon = ZusammengesetzteTelefonnummer(dropdownCreateVorwahl, inputCreateTelefon)
         };
 
         bool inDB = false;
@@ -362,12 +433,12 @@ public class KundendatenbankController : MonoBehaviour
             {
                 var bKunde = new Customer
                 {
-                    name        = $"{uiKunde.vorname} {uiKunde.nachname}".Trim(),
-                    street      = uiKunde.strasse,
-                    postalCode  = uiKunde.plz,
-                    city        = uiKunde.ort,
-                    email       = uiKunde.email,
-                    phone       = uiKunde.telefon,
+                    name = $"{uiKunde.vorname} {uiKunde.nachname}".Trim(),
+                    street = uiKunde.strasse,
+                    postalCode = uiKunde.plz,
+                    city = uiKunde.ort,
+                    email = uiKunde.email,
+                    phone = uiKunde.telefon,
                     lastUpdated = DateTime.Now
                 };
                 db.createCustomer(bKunde);
@@ -382,21 +453,21 @@ public class KundendatenbankController : MonoBehaviour
         ClearCreateInputs();
 
         if (inDB) LadeKundenAusDatenbank();
-        else      RefreshKundenListe();
+        else RefreshKundenListe();
     }
 
     private void OeffneBearbeitenPopup(KundeData kunde)
     {
         aktuellBearbeiteterKunde = kunde;
 
-        if (inputEditVorname  != null) inputEditVorname.value  = kunde.vorname;
+        if (inputEditVorname != null) inputEditVorname.value = kunde.vorname;
         if (inputEditNachname != null) inputEditNachname.value = kunde.nachname;
-        if (inputEditFirma    != null) inputEditFirma.value    = kunde.firma;
-        if (inputEditStrasse  != null) inputEditStrasse.value  = kunde.strasse;
-        if (inputEditPlz      != null) inputEditPlz.value      = kunde.plz;
-        if (inputEditOrt      != null) inputEditOrt.value      = kunde.ort;
-        if (inputEditEmail    != null) inputEditEmail.value    = kunde.email;
-        if (inputEditTelefon  != null) inputEditTelefon.value  = kunde.telefon;
+        if (inputEditFirma != null) inputEditFirma.value = kunde.firma;
+        if (inputEditStrasse != null) inputEditStrasse.value = kunde.strasse;
+        if (inputEditPlz != null) inputEditPlz.value = kunde.plz;
+        if (inputEditOrt != null) inputEditOrt.value = kunde.ort;
+        if (inputEditEmail != null) inputEditEmail.value = kunde.email;
+        SetzeTelefonFelder(dropdownEditVorwahl, inputEditTelefon, kunde.telefon);
 
         SetElementVisible(popupBearbeiten, true);
     }
@@ -409,14 +480,14 @@ public class KundendatenbankController : MonoBehaviour
             return;
         }
 
-        aktuellBearbeiteterKunde.vorname  = inputEditVorname  != null ? inputEditVorname.value  : aktuellBearbeiteterKunde.vorname;
+        aktuellBearbeiteterKunde.vorname = inputEditVorname != null ? inputEditVorname.value : aktuellBearbeiteterKunde.vorname;
         aktuellBearbeiteterKunde.nachname = inputEditNachname != null ? inputEditNachname.value : aktuellBearbeiteterKunde.nachname;
-        aktuellBearbeiteterKunde.firma    = inputEditFirma    != null ? inputEditFirma.value    : aktuellBearbeiteterKunde.firma;
-        aktuellBearbeiteterKunde.strasse  = inputEditStrasse  != null ? inputEditStrasse.value  : aktuellBearbeiteterKunde.strasse;
-        aktuellBearbeiteterKunde.plz      = inputEditPlz      != null ? inputEditPlz.value      : aktuellBearbeiteterKunde.plz;
-        aktuellBearbeiteterKunde.ort      = inputEditOrt      != null ? inputEditOrt.value      : aktuellBearbeiteterKunde.ort;
-        aktuellBearbeiteterKunde.email    = inputEditEmail    != null ? inputEditEmail.value    : aktuellBearbeiteterKunde.email;
-        aktuellBearbeiteterKunde.telefon  = inputEditTelefon  != null ? inputEditTelefon.value  : aktuellBearbeiteterKunde.telefon;
+        aktuellBearbeiteterKunde.firma = inputEditFirma != null ? inputEditFirma.value : aktuellBearbeiteterKunde.firma;
+        aktuellBearbeiteterKunde.strasse = inputEditStrasse != null ? inputEditStrasse.value : aktuellBearbeiteterKunde.strasse;
+        aktuellBearbeiteterKunde.plz = inputEditPlz != null ? inputEditPlz.value : aktuellBearbeiteterKunde.plz;
+        aktuellBearbeiteterKunde.ort = inputEditOrt != null ? inputEditOrt.value : aktuellBearbeiteterKunde.ort;
+        aktuellBearbeiteterKunde.email = inputEditEmail != null ? inputEditEmail.value : aktuellBearbeiteterKunde.email;
+        aktuellBearbeiteterKunde.telefon = ZusammengesetzteTelefonnummer(dropdownEditVorwahl, inputEditTelefon);
 
         bool inDB = false;
         try
@@ -424,13 +495,13 @@ public class KundendatenbankController : MonoBehaviour
             var db = UserDatabaseAccess.getCurrentUserDatabase();
             if (db != null && aktuellBearbeiteterKunde.backendObjekt != null)
             {
-                var bKunde       = aktuellBearbeiteterKunde.backendObjekt;
-                bKunde.name      = $"{aktuellBearbeiteterKunde.vorname} {aktuellBearbeiteterKunde.nachname}".Trim();
-                bKunde.street    = aktuellBearbeiteterKunde.strasse;
-                bKunde.postalCode= aktuellBearbeiteterKunde.plz;
-                bKunde.city      = aktuellBearbeiteterKunde.ort;
-                bKunde.email     = aktuellBearbeiteterKunde.email;
-                bKunde.phone     = aktuellBearbeiteterKunde.telefon;
+                var bKunde = aktuellBearbeiteterKunde.backendObjekt;
+                bKunde.name = $"{aktuellBearbeiteterKunde.vorname} {aktuellBearbeiteterKunde.nachname}".Trim();
+                bKunde.street = aktuellBearbeiteterKunde.strasse;
+                bKunde.postalCode = aktuellBearbeiteterKunde.plz;
+                bKunde.city = aktuellBearbeiteterKunde.ort;
+                bKunde.email = aktuellBearbeiteterKunde.email;
+                bKunde.phone = aktuellBearbeiteterKunde.telefon;
                 bKunde.lastUpdated = DateTime.Now;
                 db.updateCustomer(bKunde);
                 inDB = true;
@@ -441,7 +512,7 @@ public class KundendatenbankController : MonoBehaviour
         SetElementVisible(popupBearbeiten, false);
 
         if (inDB) LadeKundenAusDatenbank();
-        else      RefreshKundenListe();
+        else RefreshKundenListe();
     }
 
     private void LoescheKunde(KundeData kunde)
@@ -461,7 +532,7 @@ public class KundendatenbankController : MonoBehaviour
         kundenListe.Remove(kunde);
 
         if (inDB) LadeKundenAusDatenbank();
-        else      RefreshKundenListe();
+        else RefreshKundenListe();
     }
 
     // ============================================================
@@ -470,26 +541,28 @@ public class KundendatenbankController : MonoBehaviour
 
     private void ClearCreateInputs()
     {
-        if (inputCreateVorname  != null) inputCreateVorname.value  = "";
+        if (inputCreateVorname != null) inputCreateVorname.value = "";
         if (inputCreateNachname != null) inputCreateNachname.value = "";
-        if (inputCreateFirma    != null) inputCreateFirma.value    = "";
-        if (inputCreateStrasse  != null) inputCreateStrasse.value  = "";
-        if (inputCreatePlz      != null) inputCreatePlz.value      = "";
-        if (inputCreateOrt      != null) inputCreateOrt.value      = "";
-        if (inputCreateEmail    != null) inputCreateEmail.value    = "";
-        if (inputCreateTelefon  != null) inputCreateTelefon.value  = "";
+        if (inputCreateFirma != null) inputCreateFirma.value = "";
+        if (inputCreateStrasse != null) inputCreateStrasse.value = "";
+        if (inputCreatePlz != null) inputCreatePlz.value = "";
+        if (inputCreateOrt != null) inputCreateOrt.value = "";
+        if (inputCreateEmail != null) inputCreateEmail.value = "";
+        if (inputCreateTelefon != null) inputCreateTelefon.value = "";
+        if (dropdownCreateVorwahl != null) dropdownCreateVorwahl.SetValueWithoutNotify("+49");
     }
 
     private void ClearEditInputs()
     {
-        if (inputEditVorname  != null) inputEditVorname.value  = "";
+        if (inputEditVorname != null) inputEditVorname.value = "";
         if (inputEditNachname != null) inputEditNachname.value = "";
-        if (inputEditFirma    != null) inputEditFirma.value    = "";
-        if (inputEditStrasse  != null) inputEditStrasse.value  = "";
-        if (inputEditPlz      != null) inputEditPlz.value      = "";
-        if (inputEditOrt      != null) inputEditOrt.value      = "";
-        if (inputEditEmail    != null) inputEditEmail.value    = "";
-        if (inputEditTelefon  != null) inputEditTelefon.value  = "";
+        if (inputEditFirma != null) inputEditFirma.value = "";
+        if (inputEditStrasse != null) inputEditStrasse.value = "";
+        if (inputEditPlz != null) inputEditPlz.value = "";
+        if (inputEditOrt != null) inputEditOrt.value = "";
+        if (inputEditEmail != null) inputEditEmail.value = "";
+        if (inputEditTelefon != null) inputEditTelefon.value = "";
+        if (dropdownEditVorwahl != null) dropdownEditVorwahl.SetValueWithoutNotify("+49");
     }
 }
 
