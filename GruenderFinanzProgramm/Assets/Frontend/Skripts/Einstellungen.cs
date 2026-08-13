@@ -192,6 +192,15 @@ public class EinstellungenController : MonoBehaviour
 
     private Company _currentCompany = null;
 
+    private VisualElement _popupRestoreBackup;
+    private DropdownField _dropdownRestoreBackup;
+    private Label _labelKeinBackup;
+    private Button _btnCloseRestoreBackup;
+    private Button _btnCancelRestoreBackup;
+    private Button _btnConfirmRestoreBackup;
+
+    private List<string> _verfuegbareBackupPfade = new List<string>();
+
     private readonly List<string> _rechtsformOptions = new List<string>
     {
         "GmbH", "KG", "AG", "OHG", "GbR",
@@ -379,6 +388,13 @@ public class EinstellungenController : MonoBehaviour
         _labelNewPasskeyPlain = _root.Q<Label>("label-new-passkey-plain");
         _btnClosePasskeyPopup = _root.Q<Button>("btn-close-passkey-popup");
 
+        _popupRestoreBackup = _root.Q<VisualElement>("popup-restore-backup");
+        _dropdownRestoreBackup = _root.Q<DropdownField>("dropdown-restore-backup");
+        _labelKeinBackup = _root.Q<Label>("label-kein-backup");
+        _btnCloseRestoreBackup = _root.Q<Button>("btn-close-restore-backup");
+        _btnCancelRestoreBackup = _root.Q<Button>("btn-cancel-restore-backup");
+        _btnConfirmRestoreBackup = _root.Q<Button>("btn-confirm-restore-backup");
+
         _popupGespeichert = _root.Q<VisualElement>("popup-gespeichert");
         _labelGespeichertText = _root.Q<Label>("label-gespeichert-text");
         _btnCloseGespeichert = _root.Q<Button>("btn-close-gespeichert");
@@ -553,51 +569,59 @@ public class EinstellungenController : MonoBehaviour
             };
 
         if (_btnRestoreBackup != null)
-            _btnRestoreBackup.clicked += () =>
+            _btnRestoreBackup.clicked += OeffneRestoreBackupPopup;
+
+        if (_btnCloseRestoreBackup != null) _btnCloseRestoreBackup.clicked += () => HidePopup(_popupRestoreBackup);
+        if (_btnCancelRestoreBackup != null) _btnCancelRestoreBackup.clicked += () => HidePopup(_popupRestoreBackup);
+
+        if (_btnConfirmRestoreBackup != null)
+            _btnConfirmRestoreBackup.clicked += () =>
             {
-                bool erfolgreich = BackupService.RestoreLatestBackup();
+                int index = _dropdownRestoreBackup?.index ?? -1;
+                if (index < 0 || index >= _verfuegbareBackupPfade.Count)
+                {
+                    Debug.LogWarning("[Einstellungen] Kein Backup zum Wiederherstellen ausgewählt.");
+                    return;
+                }
+
+                string gewaehlterPfad = _verfuegbareBackupPfade[index];
+
+                // Sicherheits-Backup der aktuellen Daten, bevor überschrieben wird
+                string sicherheitsBackup = BackupService.CreateSafetyBackup();
+                if (sicherheitsBackup == null)
+                    Debug.LogWarning("[Einstellungen] Sicherheits-Backup konnte nicht erstellt werden - Wiederherstellung wird trotzdem fortgesetzt.");
+
+                bool erfolgreich = BackupService.RestoreBackup(gewaehlterPfad);
+
                 var label = _root.Q<Label>("label-zurueckgesetzt-text");
                 if (label != null)
                 {
                     label.text = erfolgreich
-                        ? "Neuestes Backup wurde geladen - bitte Ventoriq neu starten"
-                        : "Kein Backup zum Laden gefunden";
+                        ? "Ausgewähltes Backup wurde geladen - bitte Ventoriq neu starten"
+                        : "Backup konnte nicht geladen werden";
                 }
+
+                HidePopup(_popupRestoreBackup);
                 ShowPopup(_popupZurueckgesetzt);
             };
-
-        if (_btnCloseGespeichert != null)
-            _btnCloseGespeichert.clicked += () =>
-            {
-                var label = _root.Q<Label>("label-gespeichert-text");
-                if (label != null) label.text = "Einstellungen wurden gespeichert";
-            };
-
-        if (_btnCloseZurueckgesetzt != null)
-            _btnCloseZurueckgesetzt.clicked += () =>
-            {
-                var label = _root.Q<Label>("label-zurueckgesetzt-text");
-                if (label != null) label.text = "Einstellungen wurden zurückgesetzt";
-            };
-
-        // TUTORIAL: ruft den (neu ergänzten) TutorialManager-Singleton auf.
-        // Falls im aktuellen Szenen-Setup kein TutorialManager existiert,
-        // passiert bewusst NICHT einfach nichts - es gibt eine klare
-        // Debug-Warnung, damit das nicht als "Button tut nix" durchgeht.
-        if (_btnStartTutorial != null)
-            _btnStartTutorial.clicked += () =>
-            {
-                if (TutorialManager.Instance != null)
-                {
-                    TutorialManager.Instance.TutorialAuswahlOeffnen();
-                }
-                else
-                {
-                    Debug.LogWarning("[Einstellungen] Kein TutorialManager in der Szene gefunden - " +
-                        "das Tutorial-System ist aktuell nicht eingerichtet (siehe Chat-Hinweis).");
-                }
-            };
-    }
+                // TUTORIAL: ruft den (neu ergänzten) TutorialManager-Singleton auf.
+                // Falls im aktuellen Szenen-Setup kein TutorialManager existiert,
+                // passiert bewusst NICHT einfach nichts - es gibt eine klare
+                // Debug-Warnung, damit das nicht als "Button tut nix" durchgeht.
+                if (_btnStartTutorial != null)
+                    _btnStartTutorial.clicked += () =>
+                    {
+                        if (TutorialManager.Instance != null)
+                        {
+                            TutorialManager.Instance.TutorialAuswahlOeffnen();
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[Einstellungen] Kein TutorialManager in der Szene gefunden - " +
+                                "das Tutorial-System ist aktuell nicht eingerichtet (siehe Chat-Hinweis).");
+                        }
+                    };
+            }
 
     // ═══════════════════════════════════════════════════════════
     // POPUP-HILFSMETHODEN
@@ -1133,6 +1157,39 @@ public class EinstellungenController : MonoBehaviour
     private void SaveField(string key, TextField field)
     {
         if (field != null) PlayerPrefs.SetString(_pref(key), field.value);
+    }
+    // ═══════════════════════════════════════════════════════════
+    // Backupmethoden
+    // ═══════════════════════════════════════════════════════════
+    private void OeffneRestoreBackupPopup()
+    {
+        _verfuegbareBackupPfade = BackupService.GetAvailableBackups();
+
+        if (_verfuegbareBackupPfade == null || _verfuegbareBackupPfade.Count == 0)
+        {
+            if (_labelKeinBackup != null)
+            {
+                _labelKeinBackup.style.display = DisplayStyle.Flex;
+                _labelKeinBackup.text = "Es wurden keine Backups gefunden.";
+            }
+            if (_dropdownRestoreBackup != null) _dropdownRestoreBackup.style.display = DisplayStyle.None;
+            if (_btnConfirmRestoreBackup != null) _btnConfirmRestoreBackup.SetEnabled(false);
+        }
+        else
+        {
+            if (_labelKeinBackup != null) _labelKeinBackup.style.display = DisplayStyle.None;
+            if (_dropdownRestoreBackup != null)
+            {
+                _dropdownRestoreBackup.style.display = DisplayStyle.Flex;
+                _dropdownRestoreBackup.choices = _verfuegbareBackupPfade
+                    .Select(BackupService.FormatBackupDisplayName)
+                    .ToList();
+                _dropdownRestoreBackup.index = 0; // neuestes Backup vorausgewählt
+            }
+            if (_btnConfirmRestoreBackup != null) _btnConfirmRestoreBackup.SetEnabled(true);
+        }
+
+        ShowPopup(_popupRestoreBackup);
     }
 
     // ═══════════════════════════════════════════════════════════
