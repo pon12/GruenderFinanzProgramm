@@ -30,6 +30,9 @@ public class ExportScreenController : MonoBehaviour
         public int    pdfId;
         public string datum;       // Anzeige, z.B. "05.08.2026"
         public DateTime datumSort; // für die Sortierung
+        // Nur bei JSON-Dokumenten gesetzt - für den strukturierten
+        // PDF-Export (siehe DokumentPdfGenerator).
+        public DocumentDashboard.DocumentData quelleDokument;
     }
 
     // Sortierung (gleiches Muster wie Buchhaltung Screen Controller)
@@ -198,7 +201,8 @@ public class ExportScreenController : MonoBehaviour
                     isPDF       = false,
                     pdfId       = -1,
                     datum       = datumAnzeige,
-                    datumSort   = datumSort
+                    datumSort   = datumSort,
+                    quelleDokument = doc
                 });
             }
 
@@ -327,9 +331,19 @@ public class ExportScreenController : MonoBehaviour
                     return;
                 }
             }
+            else if (eintrag.quelleDokument != null &&
+                     DokumentPdfGenerator.ErstellePdfFuerDokument(eintrag.quelleDokument) is string generiertPfad &&
+                     generiertPfad != null)
+            {
+                // Strukturiertes Dokument mit echtem Vorlagentext (siehe
+                // DokumentPdfGenerator) - erst im internen Ordner erzeugt,
+                // jetzt auf den gewünschten Zielpfad (Desktop) kopieren.
+                File.Copy(generiertPfad, zielPfad, true);
+            }
             else
             {
-                // JSON-Dokument als PDF mit korrekten Zeilenumbruechen
+                // Fallback für Dokumente ohne eigenen Generator: JSON-Dokument
+                // als einfache PDF mit korrekten Zeilenumbruechen
                 ErstellePDF(zielPfad, eintrag);
             }
 

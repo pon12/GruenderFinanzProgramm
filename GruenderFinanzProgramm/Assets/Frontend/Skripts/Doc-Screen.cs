@@ -90,10 +90,10 @@ public class DocumentDashboard : MonoBehaviour
 
     private readonly List<KategorieDefinition> kategorien = new List<KategorieDefinition>
     {
-        new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde / Gesellschaftsvertrag", "Handelsregisterauszug", "Gewerbeanmeldung", "Gesellschafterliste" } },
-        new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung" } },
+        new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Gesellschaftsvertrag", "Handelsregisterauszug", "Fragebogen zur Steuerlichen Erfassung", "Gewerbeanmeldung", "Anmeldung Berufsgenossenschaft", "Organigramm", "Gesellschafterliste" } },
+        new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung", "Mahnverfahren", "Ratenzahlungsbestimmungen" } },
         new KategorieDefinition { name = "Finanzen",               istFest = false, pflichtDocs = new List<string> { "Eröffnungsbilanz" } },
-        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum" } },
+        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum", "Copyright Hinweis", "Lizenzhinweis Einfach" } },
         new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
         new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
         new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur" } },
@@ -117,15 +117,64 @@ public class DocumentDashboard : MonoBehaviour
         },
             ["Gründungsurkunde"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "datum",        label = "Gründungsdatum", placeholder = "TT.MM.JJJJ" },
-            new FeldDefinition { key = "notar",        label = "Notar",          placeholder = "Name des Notars" },
-            new FeldDefinition { key = "aktenzeichen", label = "Aktenzeichen",   placeholder = "z.B. UR-Nr. 123/2026" },
+            new FeldDefinition { key = "gruendernamen",    label = "Gründernamen",    placeholder = "Vollständige Namen aller Beteiligten eintragen" },
+            new FeldDefinition { key = "gruendungsdatum",  label = "Gründungsdatum",  placeholder = "Tag des offiziellen Starts auswählen (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "gruendungsvision", label = "Gründungsvision", placeholder = "Hauptziel deines Startups in 1-2 Sätzen" },
+            new FeldDefinition { key = "zusatztext",       label = "Zusatztext",      placeholder = "Optionaler Satz über den Unterschriften" },
         },
             ["Handelsregisterauszug"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "hrNummer",      label = "HR-Nummer",   placeholder = "z.B. HRB 12345" },
-            new FeldDefinition { key = "amtsgericht",   label = "Amtsgericht", placeholder = "z.B. Amtsgericht Berlin" },
-            new FeldDefinition { key = "eintragsdatum", label = "Eintragsdatum", placeholder = "TT.MM.JJJJ" },
+            new FeldDefinition { key = "registergericht",   label = "Registergericht",     placeholder = "Zuständiges Amtsgericht (z.B. Chemnitz)" },
+            new FeldDefinition { key = "registernummer",    label = "Registernummer",      placeholder = "Offizielle Nummer (z.B. HRB 12345)" },
+            new FeldDefinition { key = "tagDerEintragung",  label = "Tag der Eintragung",  placeholder = "Datum der offiziellen Registrierung (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "stammkapital",      label = "Stammkapital",        placeholder = "Höhe des gezeichneten Kapitals in Euro" },
+            new FeldDefinition { key = "geschaeftsfuehrung",label = "Geschäftsführung",    placeholder = "Namen der vertretungsberechtigten Personen" },
+        },
+            ["Gesellschaftsvertrag"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "gesellschafter",        label = "Gesellschafter",        placeholder = "Namen und Anschriften aller Partner angeben" },
+            new FeldDefinition { key = "stammkapital",          label = "Stammkapital",           placeholder = "Gesamtsumme der Einlagen in Euro" },
+            new FeldDefinition { key = "gewinnverteilung",      label = "Gewinnverteilung",       placeholder = "Regelung zur Aufteilung (z.B. nach Anteilen)" },
+            new FeldDefinition { key = "geschaeftsfuehrung",    label = "Geschäftsführung",       placeholder = "Namen der zur Leitung befugten Personen" },
+            new FeldDefinition { key = "schlussbestimmungen",   label = "Schlussbestimmungen",    placeholder = "Optionale Klauseln oder Sonderregelungen" },
+        },
+            ["Fragebogen zur Steuerlichen Erfassung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "finanzamt",          label = "Zuständiges Finanzamt",        placeholder = "Name deines Finanzamts am Unternehmenssitz" },
+            new FeldDefinition { key = "beginnTaetigkeit",   label = "Beginn der Tätigkeit",         placeholder = "Datum der ersten Betriebseinnahme oder -ausgabe (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "umsatzJahr1",        label = "Geschätzter Umsatz (Jahr 1)",  placeholder = "Dein voraussichtlicher Bruttoumsatz für das erste Jahr" },
+            new FeldDefinition { key = "gewinnJahr1",        label = "Geschätzter Gewinn (Jahr 1)",  placeholder = "Dein voraussichtlicher Reingewinn nach Abzug aller Kosten" },
+            new FeldDefinition { key = "kleinunternehmer",   label = "Kleinunternehmer-Regelung",    placeholder = "Ja/Nein (Umsatz < 22.000 € im ersten Jahr)" },
+        },
+            ["Gewerbeanmeldung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "behoerde",         label = "Zuständige Behörde",   placeholder = "Name des örtlichen Gewerbeamts (z.B. Stadt Mittweida)" },
+            new FeldDefinition { key = "beginnTaetigkeit", label = "Beginn der Tätigkeit", placeholder = "Datum des tatsächlichen Starts (auch rückwirkend möglich)" },
+            new FeldDefinition { key = "anzahlMitarbeiter",label = "Zahl der Mitarbeiter", placeholder = "Anzahl der Angestellten zum Start (ohne Inhaber)" },
+            new FeldDefinition { key = "nebenerwerb",      label = "Nebenerwerb",          placeholder = "„Ja“, wenn du noch hauptberuflich angestellt bist" },
+            new FeldDefinition { key = "anmeldungsgrund",  label = "Anmeldungsgrund",      placeholder = "z.B. Neugründung oder Übernahme" },
+        },
+            ["Anmeldung Berufsgenossenschaft"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "zustaendigeBg",   label = "Zuständige BG",         placeholder = "Name der Berufsgenossenschaft (z.B. VBG oder BG ETEM)" },
+            new FeldDefinition { key = "tagDerEroeffnung",label = "Tag der Eröffnung",     placeholder = "Datum, an dem der Betrieb tatsächlich startete" },
+            new FeldDefinition { key = "anzahlVersicherte",label = "Zahl der Versicherten", placeholder = "Anzahl der Gründer und Mitarbeiter im Unternehmen" },
+            new FeldDefinition { key = "artTaetigkeit",   label = "Art der Tätigkeit",     placeholder = "Detaillierte Beschreibung der ausgeübten Arbeiten" },
+            new FeldDefinition { key = "lohnsumme",       label = "Lohnsumme (geschätzt)", placeholder = "Voraussichtliche Entgelte im ersten Jahr (optional)" },
+        },
+            ["Organigramm"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "ceo",          label = "Geschäftsführung (CEO)",         placeholder = "Name der Person für Vision und Strategie" },
+            new FeldDefinition { key = "po",           label = "Produktmanagement (PO)",         placeholder = "Name des Verantwortlichen für die Roadmap" },
+            new FeldDefinition { key = "cto",          label = "Technische Leitung (CTO)",       placeholder = "Name des Leiters für IT und Entwicklung" },
+            new FeldDefinition { key = "marketing",    label = "Marketing & Vertrieb",           placeholder = "Name der Person für Kunden und Außenwirkung" },
+            new FeldDefinition { key = "cfo",          label = "Finanzen (CFO)",                 placeholder = "Name des Verantwortlichen für Buchhaltung" },
+            new FeldDefinition { key = "creative",     label = "Design (Creative Director)",     placeholder = "Name der Person für UI/UX und Markenidentität" },
+            new FeldDefinition { key = "pm",           label = "Projektorganisation (PM)",       placeholder = "Name der Person für Zeitplan und Dokumentation" },
+            new FeldDefinition { key = "qa",           label = "Qualitätssicherung (QA)",        placeholder = "Name des Verantwortlichen für Tests und Abnahme" },
+            new FeldDefinition { key = "mitarbeiter",  label = "Mitarbeiter",                    placeholder = "Liste an normalen Mitarbeitern, Komma getrennt" },
+            new FeldDefinition { key = "azubi",        label = "Azubi",                          placeholder = "Liste an Azubis, Komma getrennt" },
+            new FeldDefinition { key = "praktikant",   label = "Praktikant",                     placeholder = "Liste an Praktikanten, Komma getrennt" },
         },
             ["Kontodaten (IBAN/BIC)"] = new List<FeldDefinition>
         {
@@ -136,9 +185,86 @@ public class DocumentDashboard : MonoBehaviour
         },
             ["Zahlungsbedingungen"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "zahlungsziel", label = "Zahlungsziel (Tage)", placeholder = "z.B. 14" },
-            new FeldDefinition { key = "skonto",       label = "Skonto (%)",          placeholder = "z.B. 2" },
-            new FeldDefinition { key = "mahnstufe",    label = "Mahnstufe",           placeholder = "z.B. 1. Mahnung nach 7 Tagen" },
+            new FeldDefinition { key = "zahlungsfrist",   label = "Zahlungsfrist",     placeholder = "Anzahl der Tage bis zur Fälligkeit (z.B. 14)" },
+            new FeldDefinition { key = "skontoSatz",      label = "Skonto-Satz",       placeholder = "Rabatt bei Sofortzahlung in % (optional)" },
+            new FeldDefinition { key = "skontoZeitraum",  label = "Skonto-Zeitraum",   placeholder = "Zeitraum für Skonto-Abzug in Tagen" },
+            new FeldDefinition { key = "verzugszins",     label = "Verzugszins",       placeholder = "Prozentsatz über Basiszinssatz bei Verzug" },
+            new FeldDefinition { key = "zusatzhinweise",  label = "Zusatzhinweise",    placeholder = "Optionale Klauseln (z.B. Eigentumsvorbehalt)" },
+        },
+            ["AGB"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "leistungsbereich",     label = "Leistungsbereich",       placeholder = "Genaue Art der Software/Dienste (z.B. SaaS-Lösungen)" },
+            new FeldDefinition { key = "widerrufsfrist",       label = "Widerrufsfrist",         placeholder = "Anzahl der Tage für das Widerrufsrecht (Standard: 14)" },
+            new FeldDefinition { key = "zahlungsziel",         label = "Zahlungsziel",           placeholder = "Tage bis zur Fälligkeit" },
+            new FeldDefinition { key = "verzugszinssatz",      label = "Verzugszinssatz",        placeholder = "Prozentsatz bei Zahlungsverzug" },
+            new FeldDefinition { key = "mahngebuehr",          label = "Mahngebühr",             placeholder = "Pauschalbetrag pro Mahnstufe in EUR (z.B. 5,00 €)" },
+            new FeldDefinition { key = "abnahmefrist",         label = "Abnahmefrist",           placeholder = "Tage zur Prüfung durch den Kunden" },
+            new FeldDefinition { key = "lizenzmodell",         label = "Lizenzmodell",           placeholder = "„Einfach“ (Nutzung) oder „Erweitert“ (Editierung)" },
+            new FeldDefinition { key = "schadensersatzfaktor", label = "Schadensersatzfaktor",   placeholder = "Faktor bei Copyright-Verstoß" },
+            new FeldDefinition { key = "ndaDauer",             label = "NDA-Dauer",              placeholder = "Jahre der Geheimhaltung nach Projektende (z.B. 3)" },
+            new FeldDefinition { key = "gerichtsstand",        label = "Gerichtsstand",          placeholder = "Ort des zuständigen Gerichts (z.B. Mittweida)" },
+        },
+            ["Disclaimer"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geltungsbereich",        label = "Geltungsbereich",         placeholder = "Name der Software oder Website (z.B. Ventoriq-Plattform)" },
+            new FeldDefinition { key = "inhaltlichePruefung",    label = "Inhaltliche Prüfung",     placeholder = "Turnus der Aktualisierung (z.B. „regelmäßig“, „anlassbezogen“)" },
+            new FeldDefinition { key = "externeVerweise",        label = "Externe Verweise",        placeholder = "Erlaubnis oder Ausschluss der Haftung für Links zu Dritten" },
+            new FeldDefinition { key = "urheberrechtshinweis",   label = "Urheberrechtshinweis",    placeholder = "Besonderheiten zu genutzten Medien oder Programmcode" },
+        },
+            ["Barzahlung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "gueltigkeitsbereich", label = "Gültigkeitsbereich", placeholder = "Wofür wird dieser Vordruck genutzt? (z.B. „Bürokasse“, „Projekt XY“)" },
+            new FeldDefinition { key = "zusatzhinweis",       label = "Zusatzhinweis",      placeholder = "Interner Vermerk oder Anweisung (z.B. „Nur für Kleinbeträge bis 250 €“)" },
+            new FeldDefinition { key = "ausfuehrung",         label = "Ausführung",         placeholder = "Einfache Ausführung / Zweifache Ausführung" },
+        },
+            ["Überweisung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "kontoinhaber",   label = "Kontoinhaber",              placeholder = "Name des Empfängers (Standard: Firmenname)" },
+            new FeldDefinition { key = "kreditinstitut", label = "Kreditinstitut",            placeholder = "Name deiner Bank oder Sparkasse" },
+            new FeldDefinition { key = "iban",           label = "IBAN",                      placeholder = "Deine 22-stellige IBAN (beginnend mit DE)" },
+            new FeldDefinition { key = "bic",            label = "BIC / SWIFT",               placeholder = "Der 8- oder 11-stellige Code deiner Bank" },
+            new FeldDefinition { key = "verwendungszweck", label = "Standard-Verwendungszweck", placeholder = "z.B. die im Angebot/Rechnung hinterlegte Nummer wie AN-0003" },
+        },
+            ["SEPA-Basislastschrift-Mandat"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "glaeubigerId",  label = "Gläubiger-Identifikationsnummer", placeholder = "Deine individuelle Kennung für das Lastschriftverfahren" },
+            new FeldDefinition { key = "artZahlung",    label = "Art der Zahlung",                 placeholder = "Einmalige Zahlung / Wiederkehrende Zahlung" },
+            new FeldDefinition { key = "zusatzangaben", label = "Zusatzangaben",                   placeholder = "Optionale Hinweise zum Einzugsrhythmus" },
+        },
+            ["Widerrufsbelehrung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "widerrufsfrist",   label = "Widerrufsfrist",       placeholder = "Gesetzlich z.B. 14 Tage. Nur die Zahl eintragen" },
+            new FeldDefinition { key = "wertersatzklausel",label = "Wertersatz-Klausel",   placeholder = "Pflicht zur Zahlung bereits erbrachter Leistungen (Ja/Nein)" },
+            new FeldDefinition { key = "kontakt",          label = "Kontakt für Widerruf", placeholder = "E-Mail-Adresse oder Postanschrift deiner Firma" },
+            new FeldDefinition { key = "vorzeitigesErloeschen", label = "Vorzeitiges Erlöschen", placeholder = "Hinweis auf Erlöschen bei vollständiger Ausführung (Ja/Nein)" },
+        },
+            ["Mahnverfahren"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "zahlungsziel",       label = "Zahlungsziel (Standard)",  placeholder = "Tage bis zur Fälligkeit (nur Zahl)" },
+            new FeldDefinition { key = "verzugszinssatz",    label = "Verzugszinssatz",           placeholder = "Zinssatz p.a. bei Überschreitung (Vorgabe: 10 %)" },
+            new FeldDefinition { key = "bearbeitungspauschale", label = "Bearbeitungspauschale",  placeholder = "Gebühr pro Mahnstufe ab Stufe 2 (z.B. 5,00 €)" },
+            new FeldDefinition { key = "intervallMahnstufen",label = "Intervall der Mahnstufen",  placeholder = "Zeitraum zwischen den Schritten in Tagen (nur Zahl)" },
+            new FeldDefinition { key = "zusatzhinweis",      label = "Zusatzhinweis",             placeholder = "Optionaler Text (z.B. „Wir setzen auf faire Partnerschaft“)" },
+        },
+            ["Ratenzahlungsbestimmungen"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "mindestauftragswert", label = "Mindestauftragswert",  placeholder = "Ab welcher Summe bietest du Raten an? (z.B. 1.000 €)" },
+            new FeldDefinition { key = "maxLaufzeit",          label = "Max. Laufzeit",        placeholder = "Maximale Anzahl an Monatsraten (z.B. 12 Monate)" },
+            new FeldDefinition { key = "bearbeitungsgebuehr",  label = "Bearbeitungsgebühr",   placeholder = "Einmalige Gebühr oder „0,00 €“" },
+            new FeldDefinition { key = "zusatzhinweis",        label = "Zusatzhinweis",        placeholder = "Optionaler Text (z.B. „Bonitätsprüfung vorbehalten“)" },
+        },
+            ["Copyright Hinweis"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "schutzumfang",          label = "Schutzumfang",           placeholder = "Beschreibung der geschützten Werke (z.B. „Programmcode, Designs und UI-Konzepte“)" },
+            new FeldDefinition { key = "referenzklausel",       label = "Referenzklausel",        placeholder = "Recht zur Nutzung als Referenz aktiv bewerben? (Ja/Nein)" },
+            new FeldDefinition { key = "schadensersatzfaktor",  label = "Schadensersatzfaktor",   placeholder = "Faktor bei Verstößen (Vorgabe: 3-fache Höhe)" },
+            new FeldDefinition { key = "zusatzangabe",          label = "Zusatzangabe",           placeholder = "Optionale Einschränkungen (z.B. „Anonymisierte Referenz auf Wunsch möglich“)" },
+        },
+            ["Lizenzhinweis Einfach"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "zusatzangabe",              label = "Zusatzangabe",                  placeholder = "Beschreibung der erweiterten Rechte (z.B. „Inklusive Recht zur Bearbeitung und Dekompilierung des Quellcodes“)" },
+            new FeldDefinition { key = "kontakt",                   label = "Kontakt",                       placeholder = "E-Mail oder Ansprechpartner für Rückfragen (z.B. support@deinefirma.de)" },
+            new FeldDefinition { key = "preisErweiterteNutzung",    label = "Preis für erweiterte Nutzung",  placeholder = "Betrag in Euro" },
         },
         };
 
@@ -316,7 +442,7 @@ public class DocumentDashboard : MonoBehaviour
     {
         bool geaendert = false;
 
-        foreach (var kategorie in kategorien.Where(k => k.istFest))
+        foreach (var kategorie in kategorien)
         {
             foreach (string pflichtTitel in kategorie.pflichtDocs)
             {
@@ -789,7 +915,14 @@ public class DocumentDashboard : MonoBehaviour
         if (editDocNameInput != null)
         {
             editDocNameInput.value = doc.title;
-            editDocNameInput.schedule.Execute(() => editDocNameInput.Focus()).ExecuteLater(50);
+            editDocNameInput.SetEnabled(!doc.istPflichtdokument);
+
+            // Bei Pflichtdokumenten macht Fokus auf das (jetzt gesperrte)
+            // Titelfeld keinen Sinn - stattdessen gleich das erste
+            // Struktur-Feld fokussieren, wenn vorhanden. Bei freien
+            // Dokumenten bleibt das Titelfeld wie gehabt fokussiert.
+            if (!doc.istPflichtdokument)
+                editDocNameInput.schedule.Execute(() => editDocNameInput.Focus()).ExecuteLater(50);
         }
 
         bool zeigeStrukturFelder = doc.istPflichtdokument && felderProPflichtDoc.ContainsKey(doc.title);
@@ -838,13 +971,28 @@ public class DocumentDashboard : MonoBehaviour
 
                     var feldInput = new TextField { value = aktuellerWert };
                     feldInput.name = $"struktur-feld-{def.key}";
-                    feldInput.tooltip = def.placeholder;
                     feldGroup.Add(feldInput);
 
                     editStrukturFelderBox.Add(feldGroup);
                     aktiveStrukturFelder.Add(feldInput);
 
                     feldInput.userData = def.key;
+
+                    // FIX: Hinweistext war bisher nur als natives .tooltip
+                    // gesetzt - das erfordert Hovern und rendert im Build
+                    // ohnehin oft nicht zuverlässig (gleiches Problem wie
+                    // beim Kalender-Tooltip). Jetzt echte Platzhalter-
+                    // Simulation: grauer Hinweistext direkt im leeren Feld,
+                    // verschwindet beim Fokussieren, kommt beim Verlassen
+                    // zurück falls das Feld leer bleibt.
+                    if (string.IsNullOrEmpty(aktuellerWert))
+                        SetzeFeldPlatzhalter(feldInput, def.placeholder);
+                }
+
+                if (doc.istPflichtdokument && aktiveStrukturFelder.Count > 0)
+                {
+                    var erstesFeld = aktiveStrukturFelder[0];
+                    erstesFeld.schedule.Execute(() => erstesFeld.Focus()).ExecuteLater(50);
                 }
             }
         }
@@ -866,6 +1014,37 @@ public class DocumentDashboard : MonoBehaviour
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
     }
 
+    // Echte Platzhalter-Simulation für die Struktur-Felder (gleiches Muster
+    // wie SetupPlaceholderSimulation im Kassenbuch) - UI Toolkit TextFields
+    // haben in dieser Unity-Version kein natives Platzhalter-Verhalten.
+    private void SetzeFeldPlatzhalter(TextField field, string placeholder)
+    {
+        if (field == null || string.IsNullOrEmpty(placeholder)) return;
+
+        var platzhalterFarbe = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+
+        field.SetValueWithoutNotify(placeholder);
+        field.style.color = platzhalterFarbe;
+
+        field.RegisterCallback<FocusInEvent>(_ =>
+        {
+            if (field.value == placeholder)
+            {
+                field.SetValueWithoutNotify("");
+                field.style.color = new StyleColor(StyleKeyword.Null);
+            }
+        });
+
+        field.RegisterCallback<FocusOutEvent>(_ =>
+        {
+            if (string.IsNullOrEmpty(field.value))
+            {
+                field.SetValueWithoutNotify(placeholder);
+                field.style.color = platzhalterFarbe;
+            }
+        });
+    }
+
     private void SaveEditedDocumentEntry()
     {
         if (activeDocForEditing == null) return;
@@ -877,7 +1056,12 @@ public class DocumentDashboard : MonoBehaviour
         DocumentData docInList = speicherDaten.savedDocs.Find(d => d.id == activeDocForEditing.id);
         if (docInList != null)
         {
-            docInList.title = updatedTitle;
+            // Sicherheitsnetz: Titel von Pflichtdokumenten wird NIE
+            // überschrieben, egal was im (eigentlich gesperrten) Feld
+            // steht - alle Felder/Erfolge/Gründerpfad-Automatik hängen am
+            // exakten Titel-String.
+            if (!docInList.istPflichtdokument)
+                docInList.title = updatedTitle;
 
             bool hatStrukturFelder = docInList.istPflichtdokument && felderProPflichtDoc.ContainsKey(docInList.title);
 
@@ -885,16 +1069,27 @@ public class DocumentDashboard : MonoBehaviour
             {
                 if (docInList.strukturFelder == null) docInList.strukturFelder = new List<StrukturFeldWert>();
 
+                var definitionen = felderProPflichtDoc.ContainsKey(docInList.title)
+                    ? felderProPflichtDoc[docInList.title]
+                    : new List<FeldDefinition>();
+
                 foreach (var feldInput in aktiveStrukturFelder)
                 {
                     string key = feldInput.userData as string;
                     if (key == null) continue;
 
+                    // Falls das Feld noch den grauen Platzhaltertext zeigt
+                    // (nie angeklickt oder wieder leer verlassen), zählt das
+                    // als "nichts eingegeben" - sonst würde der Hinweistext
+                    // selbst als Wert gespeichert werden.
+                    string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
+                    string wert = (platzhalter != null && feldInput.value == platzhalter) ? "" : feldInput.value;
+
                     var bestehenderEintrag = docInList.strukturFelder.FirstOrDefault(f => f.key == key);
                     if (bestehenderEintrag != null)
-                        bestehenderEintrag.wert = feldInput.value;
+                        bestehenderEintrag.wert = wert;
                     else
-                        docInList.strukturFelder.Add(new StrukturFeldWert { key = key, wert = feldInput.value });
+                        docInList.strukturFelder.Add(new StrukturFeldWert { key = key, wert = wert });
                 }
             }
             else

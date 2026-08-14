@@ -96,7 +96,22 @@ public class AngebotController : BelegScreenController
                 bookingDate = ""
             };
 
-            int offerId = db.createOffer(offer);
+            int offerId;
+
+            if (_istBearbeitung && _bearbeiteId > 0)
+            {
+                offer.id = _bearbeiteId;
+                offerId = _bearbeiteId;
+                db.updateOffer(offer);
+
+                var alteItems = db.getItemsByOffer(offerId) ?? new List<OfferItem>();
+                foreach (var altesItem in alteItems)
+                    db.deleteOfferItem(altesItem.id);
+            }
+            else
+            {
+                offerId = db.createOffer(offer);
+            }
 
             BelegTransferData.Clear();
 
