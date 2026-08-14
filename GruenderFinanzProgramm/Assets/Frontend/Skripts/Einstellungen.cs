@@ -604,24 +604,24 @@ public class EinstellungenController : MonoBehaviour
                 HidePopup(_popupRestoreBackup);
                 ShowPopup(_popupZurueckgesetzt);
             };
-                // TUTORIAL: ruft den (neu ergänzten) TutorialManager-Singleton auf.
-                // Falls im aktuellen Szenen-Setup kein TutorialManager existiert,
-                // passiert bewusst NICHT einfach nichts - es gibt eine klare
-                // Debug-Warnung, damit das nicht als "Button tut nix" durchgeht.
-                if (_btnStartTutorial != null)
-                    _btnStartTutorial.clicked += () =>
-                    {
-                        if (TutorialManager.Instance != null)
-                        {
-                            TutorialManager.Instance.TutorialAuswahlOeffnen();
-                        }
-                        else
-                        {
-                            Debug.LogWarning("[Einstellungen] Kein TutorialManager in der Szene gefunden - " +
-                                "das Tutorial-System ist aktuell nicht eingerichtet (siehe Chat-Hinweis).");
-                        }
-                    };
-            }
+        // TUTORIAL: ruft den (neu ergänzten) TutorialManager-Singleton auf.
+        // Falls im aktuellen Szenen-Setup kein TutorialManager existiert,
+        // passiert bewusst NICHT einfach nichts - es gibt eine klare
+        // Debug-Warnung, damit das nicht als "Button tut nix" durchgeht.
+        if (_btnStartTutorial != null)
+            _btnStartTutorial.clicked += () =>
+            {
+                if (TutorialManager.Instance != null)
+                {
+                    TutorialManager.Instance.TutorialAuswahlOeffnen();
+                }
+                else
+                {
+                    Debug.LogWarning("[Einstellungen] Kein TutorialManager in der Szene gefunden - " +
+                        "das Tutorial-System ist aktuell nicht eingerichtet (siehe Chat-Hinweis).");
+                }
+            };
+    }
 
     // ═══════════════════════════════════════════════════════════
     // POPUP-HILFSMETHODEN
@@ -1123,14 +1123,48 @@ public class EinstellungenController : MonoBehaviour
         string key2 = _inputSuperkey2?.value?.Trim() ?? "";
 
         if (string.IsNullOrEmpty(key1) || string.IsNullOrEmpty(key2))
-        { Debug.LogWarning("[Einstellungen] Super-Passkey fehlt."); return; }
+        {
+            Debug.LogWarning("[Einstellungen] Recovery-Key fehlt.");
+            return;
+        }
 
         if (key1 != key2)
-        { Debug.LogWarning("[Einstellungen] Super-Passkeys stimmen nicht \u00fcberein."); return; }
+        {
+            Debug.LogWarning("[Einstellungen] Recovery-Keys stimmen nicht überein.");
+            return;
+        }
 
-        if (mainLogoutController != null) mainLogoutController.logout();
+        PassKeyRecord currentUser = null;
+
+        if (StateManager.Instance != null && StateManager.Instance.isLoggedIn())
+        {
+            currentUser = StateManager.Instance.getCurrentUser();
+        }
+
+        if (currentUser == null)
+        {
+            Debug.LogError("[Einstellungen] Lokalprofil löschen abgebrochen: Kein aktiver Nutzer gefunden.");
+            return;
+        }
+
+        bool deleted = authService.deleteLocalProfileWithRecoveryKey(key1, currentUser);
+
+        if (!deleted)
+        {
+            Debug.LogError("[Einstellungen] Lokalprofil konnte nicht vollständig gelöscht werden.");
+            return;
+        }
+
+        HidePopup(_dialogOverlay);
+
+        if (StateManager.Instance != null && StateManager.Instance.isLoggedIn())
+        {
+            StateManager.Instance.logout();
+        }
+
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
+
         SceneManager.LoadScene(0);
     }
 
