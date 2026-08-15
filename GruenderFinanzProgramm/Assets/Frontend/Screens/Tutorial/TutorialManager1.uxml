@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/TutorialManager.uss?fileID=7433441132597879392&amp;guid=8a7fe86fb8542e848b8b68cca5a4a18f&amp;type=3#TutorialManager"/>
+    <ui:VisualElement name="TutorialOverlay" class="tutorial-overlay">
+        <ui:VisualElement name="StartDialog" class="dialog">
+            <ui:Label text="Tutorial" class="dialog-headline"/>
+            <ui:Label text="Möchtest du eine Einführung erhalten?" class="dialog-text"/>
+            <ui:Button name="LangButton" text="Ausführlich" class="btn btn-primary"/>
+            <ui:Button name="KurzButton" text="Kurz" class="btn btn-primary"/>
+            <ui:Button name="KeinTutorialButton" text="Überspringen" class="btn btn-ghost"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="TutorialPanel" class="tutorial-panel">
+            <ui:VisualElement name="TutorialBild" class="tutorial-bild"/>
+            <ui:VisualElement class="nav-row">
+                <ui:Button name="ZurueckButton" text="Zurück" class="btn btn-ghost"/>
+                <ui:Button name="WeiterButton" text="Weiter" class="btn btn-primary"/>
+            </ui:VisualElement>
+            <ui:Button name="BeendenButton" text="✕" class="btn-beenden"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

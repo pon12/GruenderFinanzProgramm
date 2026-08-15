@@ -1,0 +1,159 @@
+/* ── Ventoriq Tutorial – USS ────────────────────────────────────────── */
+
+/* Versteckt ein Element komplett (kein Layout-Platz) */
+.hidden {
+    display: none;
+}
+
+/* Overlay – liegt über dem gesamten Screen */
+.tutorial-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.72);
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── StartDialog ─────────────────────────────────────────────────────── */
+
+.dialog {
+    background-color: rgb(28, 33, 38);
+    border-radius: 12px;
+    padding: 36px;
+    width: 420px;
+    align-items: center;
+    border-width: 1px;
+    border-color: rgb(50, 57, 65);
+}
+
+.dialog-headline {
+    color: rgb(128, 207, 149);
+    font-size: 20px;
+    -unity-font-style: bold;
+    margin-bottom: 10px;
+    -unity-text-align: middle-center;
+}
+
+.dialog-text {
+    color: rgb(190, 195, 200);
+    font-size: 14px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    margin-bottom: 28px;
+}
+
+.dialog-buttons {
+    width: 100%;
+    align-items: stretch;
+}
+
+/* ── TutorialPanel ───────────────────────────────────────────────────── */
+
+.tutorial-panel {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    right: 32px;
+    bottom: 32px;
+    background-color: rgb(22, 27, 32);
+    border-radius: 12px;
+    padding: 24px;
+    align-items: center;
+    border-width: 1px;
+    border-color: rgb(50, 57, 65);
+}
+
+/* Screenshot */
+.tutorial-bild {
+    flex-grow: 1;
+    width: 100%;
+    margin-bottom: 16px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-color: rgb(15, 18, 22);
+    border-radius: 8px;
+}
+
+/* Navigationszeile */
+.nav-row {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+.btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    margin-top: 10px;
+    font-size: 14px;
+    border-width: 0;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+/* Primär – grüner Akzent */
+.btn-primary {
+    background-color: rgb(128, 207, 149);
+    color: rgb(18, 22, 26);
+    -unity-font-style: bold;
+}
+
+.btn-primary:hover {
+    background-color: rgb(148, 220, 167);
+}
+
+.btn-primary:active {
+    background-color: rgb(108, 187, 130);
+}
+
+/* Disabled-Zustand (z.B. Zurück auf erstem Bild) */
+.btn-primary:disabled,
+.btn-ghost:disabled {
+    opacity: 0.35;
+}
+
+/* Ghost – Outline-Stil */
+.btn-ghost {
+    background-color: transparent;
+    color: rgb(128, 207, 149);
+    border-width: 1px;
+    border-color: rgb(128, 207, 149);
+}
+
+.btn-ghost:hover {
+    background-color: rgba(128, 207, 149, 0.1);
+}
+
+.btn-ghost:active {
+    background-color: rgba(128, 207, 149, 0.2);
+}
+
+/* Beenden-Button oben rechts (✕) */
+.btn-beenden {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: rgb(50, 57, 65);
+    color: rgb(190, 195, 200);
+    font-size: 15px;
+    border-width: 0;
+    padding: 0;
+    cursor: pointer;
+    -unity-text-align: middle-center;
+}
+
+.btn-beenden:hover {
+    background-color: rgb(70, 77, 85);
+}
+
+.btn-beenden:active {
+    background-color: rgb(90, 97, 105);
+}

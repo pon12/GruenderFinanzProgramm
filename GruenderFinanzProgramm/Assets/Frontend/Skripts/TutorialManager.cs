@@ -1,123 +1,191 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class TutorialManager : MonoBehaviour
 {
-    // Singleton, damit UIToolkit-Screens (z.B. Einstellungen.cs) das
-    // Tutorial per Code auslösen können, ohne eine Inspector-Referenz zu
-    // brauchen (Einstellungen nutzt UIToolkit-Buttons, keine uGUI-Buttons,
-    // die man hier im Inspector verdrahten könnte).
     public static TutorialManager Instance { get; private set; }
 
-    private const string ErsterStartSchluessel =
-        "TutorialStartDialogAngezeigt";
+    // Key wird pro Nutzer geprefixed, damit jeder neue Nutzer
+    // den StartDialog einmal sieht.
+    private const string SchluesselSuffix = "_TutorialAngezeigt";
 
     [Header("Tutorial-Bilder")]
     [SerializeField] private Sprite[] tutorialBilderLang;
     [SerializeField] private Sprite[] tutorialBilderKurz;
 
-    [Header("UI-Referenzen")]
-    [SerializeField] private GameObject startDialog;
-    [SerializeField] private GameObject tutorialPanel;
-    [SerializeField] private Image tutorialBildAnzeige;
+    [Header("UI Document")]
+    [SerializeField] private UIDocument uiDocument;
 
-    [Header("Tutorial-Auswahl")]
-    [SerializeField] private Button langButton;
-    [SerializeField] private Button kurzButton;
-    [SerializeField] private Button keinTutorialButton;
+    private VisualElement overlay;
+    private VisualElement startDialog;
+    private VisualElement tutorialPanel;
+    private VisualElement tutorialBild;
 
-    [Header("Navigation")]
-    [SerializeField] private Button weiterButton;
-    [SerializeField] private Button zurueckButton;
-
-    [Header("Tutorial-Button in den Einstellungen")]
-    [SerializeField] private Button tutorialDirektButton;
+    private Button langButton;
+    private Button kurzButton;
+    private Button keinTutorialButton;
+    private Button weiterButton;
+    private Button zurueckButton;
+    private Button beendenButton;
 
     private Sprite[] aktiveTutorialBilder;
     private int aktuellerIndex;
 
+    // ── Lifecycle ──────────────────────────────────────────────────────────
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private VisualElement GetRoot()
+{
+    if (uiDocument == null)
+        uiDocument = GetComponent<UIDocument>();
+    return uiDocument?.rootVisualElement;
+}
+
+private void HoleElemente()
+{
+    var root = GetRoot();
+    if (root == null) return;
+
+    overlay            = root.Q<VisualElement>("TutorialOverlay");
+    startDialog        = root.Q<VisualElement>("StartDialog");
+    tutorialPanel      = root.Q<VisualElement>("TutorialPanel");
+    tutorialBild       = root.Q<VisualElement>("TutorialBild");
+    langButton         = root.Q<Button>("LangButton");
+    kurzButton         = root.Q<Button>("KurzButton");
+    keinTutorialButton = root.Q<Button>("KeinTutorialButton");
+    weiterButton       = root.Q<Button>("WeiterButton");
+    zurueckButton      = root.Q<Button>("ZurueckButton");
+    beendenButton      = root.Q<Button>("BeendenButton");
+}
+
     private void Start()
     {
-        Instance = this;
-        tutorialPanel.SetActive(false);
+        if (uiDocument == null)
+            uiDocument = GetComponent<UIDocument>();
 
-        // Nur beim ersten Start automatisch anzeigen.
-        bool auswahlBereitsAngezeigt =
-            PlayerPrefs.GetInt(ErsterStartSchluessel, 0) == 1;
-
-        startDialog.SetActive(!auswahlBereitsAngezeigt);
-
-        if (!auswahlBereitsAngezeigt)
+        if (uiDocument == null)
         {
-            PlayerPrefs.SetInt(ErsterStartSchluessel, 1);
-            PlayerPrefs.Save();
+            Debug.LogError("[TutorialManager] Kein UIDocument zugewiesen.");
+            return;
         }
 
-        langButton.onClick.AddListener(LangesTutorialStarten);
-        kurzButton.onClick.AddListener(KurzesTutorialStarten);
-        keinTutorialButton.onClick.AddListener(AuswahlSchliessen);
+        var root = uiDocument.rootVisualElement;
 
-        weiterButton.onClick.AddListener(NaechstesBild);
-        zurueckButton.onClick.AddListener(VorherigesBild);
+        overlay            = root.Q<VisualElement>("TutorialOverlay");
+        startDialog        = root.Q<VisualElement>("StartDialog");
+        tutorialPanel      = root.Q<VisualElement>("TutorialPanel");
+        tutorialBild       = root.Q<VisualElement>("TutorialBild");
+        langButton         = root.Q<Button>("LangButton");
+        kurzButton         = root.Q<Button>("KurzButton");
+        keinTutorialButton = root.Q<Button>("KeinTutorialButton");
+        weiterButton       = root.Q<Button>("WeiterButton");
+        zurueckButton      = root.Q<Button>("ZurueckButton");
+        beendenButton      = root.Q<Button>("BeendenButton");
 
-        if (tutorialDirektButton != null)
+        // Alles erstmal komplett ausblenden – kein Block, keine Abdunklung.
+        SetzeVisible(overlay, false);
+        SetzeVisible(startDialog, false);
+        SetzeVisible(tutorialPanel, false);
+
+        langButton.clicked         += LangesTutorialStarten;
+        kurzButton.clicked         += KurzesTutorialStarten;
+        keinTutorialButton.clicked += AuswahlSchliessen;
+        weiterButton.clicked       += NaechstesBild;
+        zurueckButton.clicked      += VorherigesBild;
+        beendenButton.clicked      += TutorialSchliessen;
+    }
+
+    private void OnDestroy()
+    {
+        if (langButton         != null) langButton.clicked         -= LangesTutorialStarten;
+        if (kurzButton         != null) kurzButton.clicked         -= KurzesTutorialStarten;
+        if (keinTutorialButton != null) keinTutorialButton.clicked -= AuswahlSchliessen;
+        if (weiterButton       != null) weiterButton.clicked       -= NaechstesBild;
+        if (zurueckButton      != null) zurueckButton.clicked      -= VorherigesBild;
+        if (beendenButton      != null) beendenButton.clicked      -= TutorialSchliessen;
+    }
+
+    // ── Public API ─────────────────────────────────────────────────────────
+
+    /// Beim Login aufrufen: TutorialManager.Instance.PruefeErstenStart(nutzername);
+    /// Zeigt den StartDialog nur wenn dieser Nutzer ihn noch nie gesehen hat.
+    public void PruefeErstenStart(string nutzername)
+    {
+        string schluessel = nutzername + SchluesselSuffix;
+        bool bereitsAngezeigt = PlayerPrefs.GetInt(schluessel, 0) == 1;
+
+        if (!bereitsAngezeigt)
         {
-            // Zeigt zuerst die Auswahl, statt direkt das Tutorial zu starten.
-            tutorialDirektButton.onClick.AddListener(
-                TutorialAuswahlOeffnen
-            );
+            PlayerPrefs.SetInt(schluessel, 1);
+            PlayerPrefs.Save();
+            HoleElemente();
+            TutorialAuswahlOeffnen();
         }
     }
 
-    /// Wird vom Tutorial-Button in den Einstellungen aufgerufen.
+    /// Aus Einstellungen.cs aufrufen:
+    /// TutorialManager.Instance.TutorialAuswahlOeffnen();
     public void TutorialAuswahlOeffnen()
     {
-        tutorialPanel.SetActive(false);
-        startDialog.SetActive(true);
+        HoleElemente();
+        SetzeVisible(tutorialPanel, false);
+        SetzeVisible(startDialog, true);
+        SetzeVisible(overlay, true);
     }
 
-    private void LangesTutorialStarten()
-    {
-        TutorialOeffnen(tutorialBilderLang);
-    }
+    // ── Private ────────────────────────────────────────────────────────────
 
-    private void KurzesTutorialStarten()
-    {
-        TutorialOeffnen(tutorialBilderKurz);
-    }
+    private void LangesTutorialStarten()  => TutorialOeffnen(tutorialBilderLang);
+    private void KurzesTutorialStarten()  => TutorialOeffnen(tutorialBilderKurz);
 
     private void TutorialOeffnen(Sprite[] bilder)
     {
         if (bilder == null || bilder.Length == 0)
         {
-            Debug.LogWarning(
-                "Für diese Tutorial-Variante wurden keine Bilder eingetragen."
-            );
+            Debug.LogWarning("[TutorialManager] Keine Bilder eingetragen.");
             return;
         }
 
         aktiveTutorialBilder = bilder;
         aktuellerIndex = 0;
 
-        startDialog.SetActive(false);
-        tutorialPanel.SetActive(true);
+        SetzeVisible(startDialog, false);
+        SetzeVisible(tutorialPanel, true);
+        SetzeVisible(overlay, true);
 
         BildAktualisieren();
     }
 
     private void AuswahlSchliessen()
     {
-        startDialog.SetActive(false);
-        tutorialPanel.SetActive(false);
+        SetzeVisible(startDialog, false);
+        SetzeVisible(tutorialPanel, false);
+        SetzeVisible(overlay, false);
+    }
+
+    private void TutorialSchliessen()
+    {
+        SetzeVisible(tutorialPanel, false);
+        SetzeVisible(overlay, false);
+        aktiveTutorialBilder = null;
+        aktuellerIndex = 0;
     }
 
     private void NaechstesBild()
     {
-        if (aktiveTutorialBilder == null ||
-            aktiveTutorialBilder.Length == 0)
-        {
+        if (aktiveTutorialBilder == null || aktiveTutorialBilder.Length == 0)
             return;
-        }
 
         if (aktuellerIndex < aktiveTutorialBilder.Length - 1)
         {
@@ -132,11 +200,8 @@ public class TutorialManager : MonoBehaviour
 
     private void VorherigesBild()
     {
-        if (aktiveTutorialBilder == null ||
-            aktiveTutorialBilder.Length == 0)
-        {
+        if (aktiveTutorialBilder == null || aktiveTutorialBilder.Length == 0)
             return;
-        }
 
         if (aktuellerIndex > 0)
         {
@@ -147,59 +212,25 @@ public class TutorialManager : MonoBehaviour
 
     private void BildAktualisieren()
     {
-        if (aktiveTutorialBilder == null ||
-            aktiveTutorialBilder.Length == 0)
-        {
-            return;
-        }
+        tutorialBild.style.backgroundImage =
+            new StyleBackground(aktiveTutorialBilder[aktuellerIndex]);
 
-        tutorialBildAnzeige.sprite =
-            aktiveTutorialBilder[aktuellerIndex];
+        zurueckButton.SetEnabled(aktuellerIndex > 0);
 
-        zurueckButton.interactable = aktuellerIndex > 0;
-
-        Text weiterText =
-            weiterButton.GetComponentInChildren<Text>();
-
-        if (weiterText != null)
-        {
-            bool istLetztesBild =
-                aktuellerIndex == aktiveTutorialBilder.Length - 1;
-
-            weiterText.text = istLetztesBild ? "Fertig" : "Weiter";
-        }
+        bool istLetztes = aktuellerIndex == aktiveTutorialBilder.Length - 1;
+        weiterButton.text = istLetztes ? "Fertig" : "Weiter ›";
     }
 
-    private void TutorialSchliessen()
+    private static void SetzeVisible(VisualElement element, bool sichtbar)
     {
-        tutorialPanel.SetActive(false);
-        aktiveTutorialBilder = null;
-        aktuellerIndex = 0;
-    }
-
-    private void OnDestroy()
-    {
-        langButton.onClick.RemoveListener(LangesTutorialStarten);
-        kurzButton.onClick.RemoveListener(KurzesTutorialStarten);
-        keinTutorialButton.onClick.RemoveListener(AuswahlSchliessen);
-
-        weiterButton.onClick.RemoveListener(NaechstesBild);
-        zurueckButton.onClick.RemoveListener(VorherigesBild);
-
-        if (tutorialDirektButton != null)
-        {
-            tutorialDirektButton.onClick.RemoveListener(
-                TutorialAuswahlOeffnen
-            );
-        }
+        element.style.display = sichtbar ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     [ContextMenu("Ersten Start zurücksetzen")]
     private void ErstenStartZuruecksetzen()
     {
-        PlayerPrefs.DeleteKey(ErsterStartSchluessel);
+        PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
-
-        Debug.Log("Der Tutorial-Erststart wurde zurückgesetzt.");
+        Debug.Log("[TutorialManager] Alle Tutorial-Keys zurückgesetzt.");
     }
 }
