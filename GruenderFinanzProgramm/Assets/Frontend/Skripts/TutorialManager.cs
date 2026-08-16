@@ -1,196 +1,164 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// ── Datenstuktur für einen Tutorial-Schritt ──────────────────────────────────
+[System.Serializable]
+public class TutorialSchritt
+{
+    [TextArea(2, 5)]
+    [Tooltip("Erklärungstext der dem Nutzer angezeigt wird.")]
+    public string Erklaerung;
+
+    [Tooltip("name=\"...\" des Elements im UXML das hervorgehoben werden soll. " +
+             "Leer lassen für allgemeine Beschreibung ohne Highlight.")]
+    public string ElementName;
+
+    [Tooltip("Wird dieser Schritt auch in der Kurzversion angezeigt?")]
+    public bool inKurzversion;
+}
+
+// ── TutorialManager ──────────────────────────────────────────────────────────
 public class TutorialManager : MonoBehaviour
 {
     public static TutorialManager Instance { get; private set; }
 
-    // Key wird pro Nutzer geprefixed, damit jeder neue Nutzer
-    // den StartDialog einmal sieht.
     private const string SchluesselSuffix = "_TutorialAngezeigt";
-
-    [Header("Tutorial-Bilder")]
-    [SerializeField] private Sprite[] tutorialBilderLang;
-    [SerializeField] private Sprite[] tutorialBilderKurz;
 
     [Header("UI Document")]
     [SerializeField] private UIDocument uiDocument;
 
+    [Header("Tutorial-Schritte (Reihenfolge = Anzeigereihenfolge)")]
+    [SerializeField] private List<TutorialSchritt> alleSchritte = new();
+
+    // ── UI-Elemente ──────────────────────────────────────────────────────────
     private VisualElement overlay;
-    private VisualElement startDialog;
-    private VisualElement tutorialPanel;
-    private VisualElement tutorialBild;
+    private VisualElement startDialogWrapper;
+    private VisualElement tutorialModus;
+    private VisualElement highlightRahmen;
+    private Label         erklaerungsText;
+    private Label         schrittAnzeige;
+    private Button        zurueckButton;
+    private Button        weiterButton;
+    private Button        beendenButton;
+    private Button        langButton;
+    private Button        kurzButton;
+    private Button        keinTutorialButton;
 
-    private Button langButton;
-    private Button kurzButton;
-    private Button keinTutorialButton;
-    private Button weiterButton;
-    private Button zurueckButton;
-    private Button beendenButton;
+    // Lambda-Referenzen für sauberes Unsubscribe
+    private System.Action _onLang;
+    private System.Action _onKurz;
 
-    private Sprite[] aktiveTutorialBilder;
-    private int aktuellerIndex;
+    private List<TutorialSchritt> aktiveSchritte = new();
+    private int aktuellerIndex = 0;
 
-    // ── Lifecycle ──────────────────────────────────────────────────────────
+    // ── Lifecycle ────────────────────────────────────────────────────────────
 
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
-    private VisualElement GetRoot()
-{
-    if (uiDocument == null)
-        uiDocument = GetComponent<UIDocument>();
-    return uiDocument?.rootVisualElement;
-}
-
-private void HoleElemente()
-{
-    var root = GetRoot();
-    if (root == null) return;
-
-    overlay            = root.Q<VisualElement>("TutorialOverlay");
-    startDialog        = root.Q<VisualElement>("StartDialog");
-    tutorialPanel      = root.Q<VisualElement>("TutorialPanel");
-    tutorialBild       = root.Q<VisualElement>("TutorialBild");
-    langButton         = root.Q<Button>("LangButton");
-    kurzButton         = root.Q<Button>("KurzButton");
-    keinTutorialButton = root.Q<Button>("KeinTutorialButton");
-    weiterButton       = root.Q<Button>("WeiterButton");
-    zurueckButton      = root.Q<Button>("ZurueckButton");
-    beendenButton      = root.Q<Button>("BeendenButton");
-}
 
     private void Start()
     {
         if (uiDocument == null)
             uiDocument = GetComponent<UIDocument>();
 
-        if (uiDocument == null)
-        {
-            Debug.LogError("[TutorialManager] Kein UIDocument zugewiesen.");
-            return;
-        }
+        HoleElemente();
 
-        var root = uiDocument.rootVisualElement;
+        SetzeVisible(overlay,            false);
+        SetzeVisible(startDialogWrapper, false);
+        SetzeVisible(tutorialModus,      false);
+    }
 
-        overlay            = root.Q<VisualElement>("TutorialOverlay");
-        startDialog        = root.Q<VisualElement>("StartDialog");
-        tutorialPanel      = root.Q<VisualElement>("TutorialPanel");
-        tutorialBild       = root.Q<VisualElement>("TutorialBild");
-        langButton         = root.Q<Button>("LangButton");
-        kurzButton         = root.Q<Button>("KurzButton");
-        keinTutorialButton = root.Q<Button>("KeinTutorialButton");
-        weiterButton       = root.Q<Button>("WeiterButton");
-        zurueckButton      = root.Q<Button>("ZurueckButton");
-        beendenButton      = root.Q<Button>("BeendenButton");
+    private void HoleElemente()
+    {
+        var root = uiDocument?.rootVisualElement;
+        if (root == null) return;
 
-        // Alles erstmal komplett ausblenden – kein Block, keine Abdunklung.
-        SetzeVisible(overlay, false);
-        SetzeVisible(startDialog, false);
-        SetzeVisible(tutorialPanel, false);
+        overlay             = root.Q<VisualElement>("TutorialOverlay");
+        startDialogWrapper  = root.Q<VisualElement>("StartDialogWrapper");
+        tutorialModus       = root.Q<VisualElement>("TutorialModus");
+        highlightRahmen     = root.Q<VisualElement>("HighlightRahmen");
+        erklaerungsText     = root.Q<Label>("ErklaerungsText");
+        schrittAnzeige      = root.Q<Label>("SchrittAnzeige");
+        zurueckButton       = root.Q<Button>("ZurueckButton");
+        weiterButton        = root.Q<Button>("WeiterButton");
+        beendenButton       = root.Q<Button>("BeendenButton");
+        langButton          = root.Q<Button>("LangButton");
+        kurzButton          = root.Q<Button>("KurzButton");
+        keinTutorialButton  = root.Q<Button>("KeinTutorialButton");
 
-        langButton.clicked         += LangesTutorialStarten;
-        kurzButton.clicked         += KurzesTutorialStarten;
+        _onLang = () => TutorialStarten(lang: true);
+        _onKurz = () => TutorialStarten(lang: false);
+
+        langButton.clicked         += _onLang;
+        kurzButton.clicked         += _onKurz;
         keinTutorialButton.clicked += AuswahlSchliessen;
-        weiterButton.clicked       += NaechstesBild;
-        zurueckButton.clicked      += VorherigesBild;
+        weiterButton.clicked       += NaechsterSchritt;
+        zurueckButton.clicked      += VorherigerSchritt;
         beendenButton.clicked      += TutorialSchliessen;
     }
 
-    private void OnDestroy()
-    {
-        if (langButton         != null) langButton.clicked         -= LangesTutorialStarten;
-        if (kurzButton         != null) kurzButton.clicked         -= KurzesTutorialStarten;
-        if (keinTutorialButton != null) keinTutorialButton.clicked -= AuswahlSchliessen;
-        if (weiterButton       != null) weiterButton.clicked       -= NaechstesBild;
-        if (zurueckButton      != null) zurueckButton.clicked      -= VorherigesBild;
-        if (beendenButton      != null) beendenButton.clicked      -= TutorialSchliessen;
-    }
+    // ── Public API ───────────────────────────────────────────────────────────
 
-    // ── Public API ─────────────────────────────────────────────────────────
-
-    /// Beim Login aufrufen: TutorialManager.Instance.PruefeErstenStart(nutzername);
-    /// Zeigt den StartDialog nur wenn dieser Nutzer ihn noch nie gesehen hat.
+    /// In LoginScreenController nach erfolgreichem Login aufrufen:
+    /// TutorialManager.Instance.PruefeErstenStart(nutzername);
     public void PruefeErstenStart(string nutzername)
     {
         string schluessel = nutzername + SchluesselSuffix;
-        bool bereitsAngezeigt = PlayerPrefs.GetInt(schluessel, 0) == 1;
+        if (PlayerPrefs.GetInt(schluessel, 0) == 1) return;
 
-        if (!bereitsAngezeigt)
-        {
-            PlayerPrefs.SetInt(schluessel, 1);
-            PlayerPrefs.Save();
-            HoleElemente();
-            TutorialAuswahlOeffnen();
-        }
+        PlayerPrefs.SetInt(schluessel, 1);
+        PlayerPrefs.Save();
+        TutorialAuswahlOeffnen();
     }
 
-    /// Aus Einstellungen.cs aufrufen:
+    /// In Einstellungen.cs aufrufen:
     /// TutorialManager.Instance.TutorialAuswahlOeffnen();
     public void TutorialAuswahlOeffnen()
     {
         HoleElemente();
-        SetzeVisible(tutorialPanel, false);
-        SetzeVisible(startDialog, true);
-        SetzeVisible(overlay, true);
+        SetzeVisible(tutorialModus,      false);
+        SetzeVisible(startDialogWrapper, true);
+        SetzeVisible(overlay,            true);
     }
 
-    // ── Private ────────────────────────────────────────────────────────────
+    // ── Private ──────────────────────────────────────────────────────────────
 
-    private void LangesTutorialStarten()  => TutorialOeffnen(tutorialBilderLang);
-    private void KurzesTutorialStarten()  => TutorialOeffnen(tutorialBilderKurz);
-
-    private void TutorialOeffnen(Sprite[] bilder)
+    private void TutorialStarten(bool lang)
     {
-        if (bilder == null || bilder.Length == 0)
+        aktiveSchritte = lang
+            ? new List<TutorialSchritt>(alleSchritte)
+            : alleSchritte.FindAll(s => s.inKurzversion);
+
+        if (aktiveSchritte.Count == 0)
         {
-            Debug.LogWarning("[TutorialManager] Keine Bilder eingetragen.");
+            Debug.LogWarning("[TutorialManager] Keine Schritte für diese Variante.");
+            AuswahlSchliessen();
             return;
         }
 
-        aktiveTutorialBilder = bilder;
         aktuellerIndex = 0;
-
-        SetzeVisible(startDialog, false);
-        SetzeVisible(tutorialPanel, true);
-        SetzeVisible(overlay, true);
-
-        BildAktualisieren();
+        SetzeVisible(startDialogWrapper, false);
+        SetzeVisible(tutorialModus,      true);
+        SchrittAnzeigen();
     }
 
     private void AuswahlSchliessen()
     {
-        SetzeVisible(startDialog, false);
-        SetzeVisible(tutorialPanel, false);
-        SetzeVisible(overlay, false);
+        SetzeVisible(startDialogWrapper, false);
+        SetzeVisible(overlay,            false);
     }
 
-    private void TutorialSchliessen()
+    private void NaechsterSchritt()
     {
-        SetzeVisible(tutorialPanel, false);
-        SetzeVisible(overlay, false);
-        aktiveTutorialBilder = null;
-        aktuellerIndex = 0;
-    }
-
-    private void NaechstesBild()
-    {
-        if (aktiveTutorialBilder == null || aktiveTutorialBilder.Length == 0)
-            return;
-
-        if (aktuellerIndex < aktiveTutorialBilder.Length - 1)
+        if (aktuellerIndex < aktiveSchritte.Count - 1)
         {
             aktuellerIndex++;
-            BildAktualisieren();
+            SchrittAnzeigen();
         }
         else
         {
@@ -198,32 +166,227 @@ private void HoleElemente()
         }
     }
 
-    private void VorherigesBild()
+    private void VorherigerSchritt()
     {
-        if (aktiveTutorialBilder == null || aktiveTutorialBilder.Length == 0)
-            return;
-
         if (aktuellerIndex > 0)
         {
             aktuellerIndex--;
-            BildAktualisieren();
+            SchrittAnzeigen();
         }
     }
 
-    private void BildAktualisieren()
+    private void SchrittAnzeigen()
     {
-        tutorialBild.style.backgroundImage =
-            new StyleBackground(aktiveTutorialBilder[aktuellerIndex]);
+        var schritt = aktiveSchritte[aktuellerIndex];
 
+        erklaerungsText.text = schritt.Erklaerung;
+        schrittAnzeige.text  = $"{aktuellerIndex + 1} / {aktiveSchritte.Count}";
         zurueckButton.SetEnabled(aktuellerIndex > 0);
+        weiterButton.text = aktuellerIndex == aktiveSchritte.Count - 1
+            ? "Fertig"
+            : "Weiter ›";
 
-        bool istLetztes = aktuellerIndex == aktiveTutorialBilder.Length - 1;
-        weiterButton.text = istLetztes ? "Fertig" : "Weiter ›";
+        bool hatHighlight = !string.IsNullOrEmpty(schritt.ElementName);
+        SetzeVisible(highlightRahmen, hatHighlight);
+
+        if (hatHighlight)
+        {
+            // Einen Frame warten damit das Layout des Ziel-Screens berechnet ist
+            highlightRahmen.schedule.Execute(() =>
+                HighlightPositionieren(schritt.ElementName));
+        }
     }
 
-    private static void SetzeVisible(VisualElement element, bool sichtbar)
+    private void HighlightPositionieren(string elementName)
     {
-        element.style.display = sichtbar ? DisplayStyle.Flex : DisplayStyle.None;
+        var rect = HoleElementPosition(elementName);
+
+        if (rect == null)
+        {
+            SetzeVisible(highlightRahmen, false);
+            Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
+            return;
+        }
+
+        const float Padding = 8f;
+        var r = rect.Value;
+
+        highlightRahmen.style.left   = r.x - Padding;
+        highlightRahmen.style.top    = r.y - Padding;
+        highlightRahmen.style.width  = r.width  + Padding * 2;
+        highlightRahmen.style.height = r.height + Padding * 2;
+    }
+
+    /// Durchsucht alle aktiven UIDocuments in der Scene nach dem Element.
+    private Rect? HoleElementPosition(string elementName)
+    {
+        var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+        foreach (var doc in alleDocuments)
+        {
+            if (doc == uiDocument) continue;
+            var root = doc.rootVisualElement;
+            if (root == null) continue;
+
+            var element = root.Q<VisualElement>(elementName);
+            if (element == null) continue;
+            if (element.resolvedStyle.display == DisplayStyle.None) continue;
+
+            return element.worldBound;
+        }
+        return null;
+    }
+
+    private void TutorialSchliessen()
+    {
+        SetzeVisible(tutorialModus, false);
+        SetzeVisible(overlay,       false);
+        aktuellerIndex = 0;
+        aktiveSchritte.Clear();
+    }
+
+    private static void SetzeVisible(VisualElement el, bool sichtbar)
+    {
+        if (el == null) return;
+        el.style.display = sichtbar ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    private void OnDestroy()
+    {
+        if (langButton         != null && _onLang != null) langButton.clicked         -= _onLang;
+        if (kurzButton         != null && _onKurz != null) kurzButton.clicked         -= _onKurz;
+        if (keinTutorialButton != null) keinTutorialButton.clicked -= AuswahlSchliessen;
+        if (weiterButton       != null) weiterButton.clicked       -= NaechsterSchritt;
+        if (zurueckButton      != null) zurueckButton.clicked      -= VorherigerSchritt;
+        if (beendenButton      != null) beendenButton.clicked      -= TutorialSchliessen;
+    }
+
+    // ── Inspector-Helfer ─────────────────────────────────────────────────────
+
+    /// Rechtsklick auf die Komponente → "Standardschritte befüllen"
+    /// Trägt alle Schritte mit Platzhaltertext vor – einfach Texte anpassen.
+    [ContextMenu("Standardschritte befüllen")]
+    private void StandardschritteBefllen()
+    {
+        alleSchritte = new List<TutorialSchritt>
+        {
+            // ── Login ──────────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Willkommen bei Ventoriq! Diese kurze Einführung zeigt dir die wichtigsten Funktionen der App.",
+                ElementName   = "",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Mit diesem Button erstellst du ein neues Konto und richtest dein Profil ein.",
+                ElementName   = "KontoErstellen",
+                inKurzversion = true
+            },
+
+            // ── Registrierung ──────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen Dokumenten verwendet.",
+                ElementName   = "Profileingabe",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Akzeptiere hier die AGB und Datenschutzrichtlinie um fortzufahren.",
+                ElementName   = "Toggle",
+                inKurzversion = false
+            },
+            new() {
+                Erklaerung    = "Klicke hier um deinen verschlüsselten Passkey zu entschlüsseln und zu sehen. Notiere ihn sicher!",
+                ElementName   = "btnEntschluesseln",
+                inKurzversion = true
+            },
+
+            // ── Fortschritt ────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Hier siehst du deine zuletzt erreichten Meilensteine auf dem Weg zur Gründung.",
+                ElementName   = "panel-letzte-erfolge",
+                inKurzversion = true
+            },
+
+            // ── Angebot ────────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote zu erstellen.",
+                ElementName   = "",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Hier wählst du den Kunden aus dem Ihr das Angebot erstellt oder trägst einen neuen ein.",
+                ElementName   = "card-partner",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Hier pflegst du Angebotsnummer, Datum, Status und Währung.",
+                ElementName   = "card-grunddaten",
+                inKurzversion = false
+            },
+            new() {
+                Erklaerung    = "Hier kannst du Dateien und Dokumente direkt an das Angebot anhängen.",
+                ElementName   = "card-anhaenge",
+                inKurzversion = false
+            },
+            new() {
+                Erklaerung    = "Trage hier alle Artikel und Leistungen mit Menge und Preis ein.",
+                ElementName   = "card-positionen",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.",
+                ElementName   = "card-details",
+                inKurzversion = false
+            },
+
+            // ── Kundendatenbank ────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten erscheint.",
+                ElementName   = "card-Lokaler-Nutzer",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Mit diesem Button legst du einen neuen Kunden in deiner Datenbank an.",
+                ElementName   = "btn-add-coustomer",
+                inKurzversion = true
+            },
+
+            // ── Finanzen ───────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Hier siehst du deine Rentabilitätskennzahlen – Umsatz, Kosten und Gewinn im Überblick.",
+                ElementName   = "panel-rentabilitaet",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Dieser Bereich zeigt deine Liquidität zum Geschäftsbeginn – was du zum Start benötigst.",
+                ElementName   = "panel-liquiditaet",
+                inKurzversion = false
+            },
+            new() {
+                Erklaerung    = "Die Liquiditätsplanung gibt dir einen Überblick über Ein- und Ausgaben über die Zeit.",
+                ElementName   = "panel-liquiditaetsplanung",
+                inKurzversion = false
+            },
+
+            // ── Dokumente ──────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Wähle hier eine Vorlage für dein neues Dokument: Standard-Text, Diagramm oder Checkliste.",
+                ElementName   = "Template-Grid",
+                inKurzversion = true
+            },
+
+            // ── Einstellungen ──────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Hier findest du den Tutorial-Button – du kannst diese Einführung jederzeit erneut starten.",
+                ElementName   = "card-hilfe",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Das war die Einführung! Du kannst jetzt loslegen. Viel Erfolg bei deiner Gründung!",
+                ElementName   = "",
+                inKurzversion = true
+            },
+        };
+
+        Debug.Log($"[TutorialManager] {alleSchritte.Count} Standardschritte eingetragen.");
     }
 
     [ContextMenu("Ersten Start zurücksetzen")]

@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="TutorialOverlay" class="tutorial-overlay">
+
+        <!-- ── StartDialog ─────────────────────────────────────────────── -->
+        <ui:VisualElement name="StartDialogWrapper" class="start-dialog-wrapper">
+            <ui:VisualElement name="StartDialog" class="dialog">
+                <ui:Label text="Tutorial" class="dialog-headline" />
+                <ui:Label text="Möchtest du eine Einführung in die App erhalten?" class="dialog-text" />
+                <ui:Button name="LangButton"        text="Ausführliche Einführung" class="btn btn-primary" />
+                <ui:Button name="KurzButton"        text="Kurze Übersicht"         class="btn btn-primary" />
+                <ui:Button name="KeinTutorialButton" text="Überspringen"           class="btn btn-ghost"   />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ── Tutorial-Modus ──────────────────────────────────────────── -->
+        <ui:VisualElement name="TutorialModus" class="tutorial-modus">
+
+            <!-- Highlight-Ring – wird per Script absolut positioniert -->
+            <ui:VisualElement name="HighlightRahmen" class="highlight-rahmen" />
+
+            <!-- Erklärungsbox unten zentriert -->
+            <ui:VisualElement name="ErklaerungsBox" class="erklaerung-box">
+                <ui:Label name="ErklaerungsText" class="erklaerung-text" />
+                <ui:VisualElement class="nav-row">
+                    <ui:Button name="ZurueckButton" text="‹ Zurück"  class="btn btn-ghost"   />
+                    <ui:Label  name="SchrittAnzeige" text="1 / 1"    class="schritt-anzeige" />
+                    <ui:Button name="WeiterButton"   text="Weiter ›" class="btn btn-primary"  />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Beenden oben rechts -->
+            <ui:Button name="BeendenButton" text="✕ Beenden" class="btn-beenden" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
