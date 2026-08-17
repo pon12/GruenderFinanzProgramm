@@ -7,7 +7,7 @@
                 <ui:Label text="Möchtest du eine Einführung in die App erhalten?" class="dialog-text"/>
                 <ui:Button name="LangButton" text="Ausführliche Einführung" class="btn btn-primary"/>
                 <ui:Button name="KurzButton" text="Kurze Übersicht" class="btn btn-primary"/>
-                <ui:Button name="KeinTutorialButton" text="Überspringen" class="btn btn-ghost"/>
+                <ui:Button name="KeinTutorialButton" text="Schließen" class="btn btn-ghost"/>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="TutorialModus" class="tutorial-modus">

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 // ── Datenstuktur für einen Tutorial-Schritt ──────────────────────────────────
 [System.Serializable]
@@ -16,6 +18,18 @@ public class TutorialSchritt
 
     [Tooltip("Wird dieser Schritt auch in der Kurzversion angezeigt?")]
     public bool inKurzversion;
+
+    [Tooltip("Scene die geladen wird. Leer = aktuelle Scene behalten.")]
+    public string SceneName;
+
+    [Tooltip("Welches GameObject soll in 3-Start-Screens aktiviert werden? Leer = nichts umschalten.")]
+    public string GameObjectName;
+
+    [Tooltip("Falls ein VisualElement-Popup im UI Document eingeblendet werden muss.")]
+    public string PopupElementName;
+
+    [Tooltip("Falls nach unten gescrollt werden soll: Der Name des ScrollView-Elements im UXML.")]
+    public string ScrollViewToBottomName;
 }
 
 // ── TutorialManager ──────────────────────────────────────────────────────────
@@ -25,11 +39,21 @@ public class TutorialManager : MonoBehaviour
 
     private const string SchluesselSuffix = "_TutorialAngezeigt";
 
+    public bool IsTutorialAktiv => tutorialModus != null && tutorialModus.style.display == DisplayStyle.Flex;
+
+    private bool zeigeLoginNachTutorial = false;
+
     [Header("UI Document")]
     [SerializeField] private UIDocument uiDocument;
 
     [Header("Tutorial-Schritte (Reihenfolge = Anzeigereihenfolge)")]
     [SerializeField] private List<TutorialSchritt> alleSchritte = new();
+
+    [Header("Start Screens (Falls in derselben Szene)")]
+    [SerializeField] private GameObject startScreenObj;
+    [SerializeField] private GameObject loginScreenObj;
+    [SerializeField] private GameObject registrationScreenObj;
+    [SerializeField] private GameObject settingsScreenObj;
 
     // ── UI-Elemente ──────────────────────────────────────────────────────────
     private VisualElement overlay;
@@ -120,7 +144,6 @@ public class TutorialManager : MonoBehaviour
     /// TutorialManager.Instance.TutorialAuswahlOeffnen();
     public void TutorialAuswahlOeffnen()
     {
-        HoleElemente();
         SetzeVisible(tutorialModus,      false);
         SetzeVisible(startDialogWrapper, true);
         SetzeVisible(overlay,            true);
@@ -130,6 +153,7 @@ public class TutorialManager : MonoBehaviour
 
     private void TutorialStarten(bool lang)
     {
+
         aktiveSchritte = lang
             ? new List<TutorialSchritt>(alleSchritte)
             : alleSchritte.FindAll(s => s.inKurzversion);
@@ -144,7 +168,9 @@ public class TutorialManager : MonoBehaviour
         aktuellerIndex = 0;
         SetzeVisible(startDialogWrapper, false);
         SetzeVisible(tutorialModus,      true);
-        SchrittAnzeigen();
+        StartCoroutine(LadeSceneUndZeigeSchritt());
+
+        
     }
 
     private void AuswahlSchliessen()
@@ -158,7 +184,7 @@ public class TutorialManager : MonoBehaviour
         if (aktuellerIndex < aktiveSchritte.Count - 1)
         {
             aktuellerIndex++;
-            SchrittAnzeigen();
+            StartCoroutine(LadeSceneUndZeigeSchritt());
         }
         else
         {
@@ -166,36 +192,110 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    private void VorherigerSchritt()
+    private IEnumerator LadeSceneUndZeigeSchritt()
+{
+    var schritt      = aktiveSchritte[aktuellerIndex];
+    string zielScene = schritt.SceneName;
+    string aktScene  = SceneManager.GetActiveScene().name;
+
+    SetzeButtonsAktiv(false);
+    SchliesseAllePopups();
+
+    if (!string.IsNullOrEmpty(zielScene) && zielScene != aktScene)
     {
-        if (aktuellerIndex > 0)
+        yield return SceneManager.LoadSceneAsync(zielScene);
+        yield return null;
+        yield return null;
+    }
+
+    if (!string.IsNullOrEmpty(schritt.GameObjectName))
+    {
+        var mainMenu = Object.FindFirstObjectByType<MainMenuManager>();
+        if (mainMenu != null) mainMenu.StopAllCoroutines();
+
+        GameObject zielObj = null;
+        if (startScreenObj != null && startScreenObj.name == schritt.GameObjectName) zielObj = startScreenObj;
+        else if (loginScreenObj != null && loginScreenObj.name == schritt.GameObjectName) zielObj = loginScreenObj;
+        else if (registrationScreenObj != null && registrationScreenObj.name == schritt.GameObjectName) zielObj = registrationScreenObj;
+
+        if (zielObj == null) zielObj = FindInaktivesGameObject(schritt.GameObjectName);
+
+        if (zielObj != null)
         {
-            aktuellerIndex--;
-            SchrittAnzeigen();
+            if (startScreenObj != null) startScreenObj.SetActive(false);
+            if (loginScreenObj != null) loginScreenObj.SetActive(false);
+            if (registrationScreenObj != null) registrationScreenObj.SetActive(false);
+
+            zielObj.SetActive(true);
+            yield return null;
         }
     }
+
+    if (!string.IsNullOrEmpty(schritt.PopupElementName))
+    {
+        ZeigePopupVisualElement(schritt.PopupElementName);
+        yield return null;
+    }
+
+    SchrittAnzeigen();
+
+    if (!string.IsNullOrEmpty(schritt.ScrollViewToBottomName))
+    {
+        // Highlight während Scroll verstecken
+        SetzeVisible(highlightRahmen, false);
+
+        yield return StartCoroutine(ScrollSmoothToBottom(schritt.ScrollViewToBottomName));
+
+        // Highlight erst NACH dem Scroll einblenden
+        if (!string.IsNullOrEmpty(schritt.ElementName))
+        {
+            SetzeVisible(highlightRahmen, true);
+            HighlightPositionieren(schritt.ElementName);
+        }
+    }
+
+    SetzeButtonsAktiv(true);
+}
+
+private void SetzeButtonsAktiv(bool aktiv)
+{
+    weiterButton?.SetEnabled(aktiv);
+    zurueckButton?.SetEnabled(aktiv && aktuellerIndex > 0);
+    beendenButton?.SetEnabled(aktiv);
+}
+
+    private void VorherigerSchritt()
+{
+    if (aktuellerIndex > 0)
+    {
+        aktuellerIndex--;
+        StartCoroutine(LadeSceneUndZeigeSchritt()); // <- Ruft nun ebenfalls den Screen-Wechsel auf
+    }
+}
 
     private void SchrittAnzeigen()
+{
+    var schritt = aktiveSchritte[aktuellerIndex];
+
+    erklaerungsText.text = schritt.Erklaerung;
+    schrittAnzeige.text  = $"{aktuellerIndex + 1} / {aktiveSchritte.Count}";
+    zurueckButton.SetEnabled(aktuellerIndex > 0);
+    weiterButton.text = aktuellerIndex == aktiveSchritte.Count - 1
+        ? "Fertig"
+        : "Weiter ›";
+
+    bool hatHighlight = !string.IsNullOrEmpty(schritt.ElementName);
+    bool hatScroll    = !string.IsNullOrEmpty(schritt.ScrollViewToBottomName);
+
+    // Highlight nur sofort setzen wenn kein Scroll folgt
+    SetzeVisible(highlightRahmen, hatHighlight && !hatScroll);
+
+    if (hatHighlight && !hatScroll)
     {
-        var schritt = aktiveSchritte[aktuellerIndex];
-
-        erklaerungsText.text = schritt.Erklaerung;
-        schrittAnzeige.text  = $"{aktuellerIndex + 1} / {aktiveSchritte.Count}";
-        zurueckButton.SetEnabled(aktuellerIndex > 0);
-        weiterButton.text = aktuellerIndex == aktiveSchritte.Count - 1
-            ? "Fertig"
-            : "Weiter ›";
-
-        bool hatHighlight = !string.IsNullOrEmpty(schritt.ElementName);
-        SetzeVisible(highlightRahmen, hatHighlight);
-
-        if (hatHighlight)
-        {
-            // Einen Frame warten damit das Layout des Ziel-Screens berechnet ist
-            highlightRahmen.schedule.Execute(() =>
-                HighlightPositionieren(schritt.ElementName));
-        }
+        highlightRahmen.schedule.Execute(() =>
+            HighlightPositionieren(schritt.ElementName));
     }
+}
 
     private void HighlightPositionieren(string elementName)
     {
@@ -238,10 +338,42 @@ public class TutorialManager : MonoBehaviour
 
     private void TutorialSchliessen()
     {
+        // 1. Tutorial-UI und Popups ausblenden
+        SchliesseAllePopups();
         SetzeVisible(tutorialModus, false);
         SetzeVisible(overlay,       false);
+
+        // 2. Tutorial-Status zurücksetzen
         aktuellerIndex = 0;
         aktiveSchritte.Clear();
+
+        // 3. Ziel-Screen basierend auf dem Modus laden/anzeigen
+        if (zeigeLoginNachTutorial)
+        {
+            // Erststart-Fall: Zum Login-Screen im MainMenuManager wechseln
+            zeigeLoginNachTutorial = false; // Zurücksetzen für spätere Durchläufe
+
+            var mainMenu = Object.FindFirstObjectByType<MainMenuManager>();
+            if (mainMenu != null)
+            {
+                mainMenu.ShowLogin();
+            }
+            else
+            {
+                // Falls MainMenuManager in einer anderen Szene liegt
+                UnityEngine.SceneManagement.SceneManager.LoadScene("3-Start-Screens"); // Name deiner Hauptmenü-Szene
+            }
+        }
+        else
+        {
+            // Manueller Durchlauf (z.B. aus den Einstellungen gestartet): Zurück zu den Einstellungen
+            string einstellungenSzeneName = "Einstellungen";
+
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != einstellungenSzeneName)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(einstellungenSzeneName);
+            }
+        }
     }
 
     private static void SetzeVisible(VisualElement el, bool sichtbar)
@@ -273,11 +405,13 @@ public class TutorialManager : MonoBehaviour
             new() {
                 Erklaerung    = "Willkommen bei Ventoriq! Diese kurze Einführung zeigt dir die wichtigsten Funktionen der App.",
                 ElementName   = "",
+                GameObjectName= "startScreenObj",
                 inKurzversion = true
             },
             new() {
                 Erklaerung    = "Mit diesem Button erstellst du ein neues Konto und richtest dein Profil ein.",
                 ElementName   = "KontoErstellen",
+                GameObjectName= "loginScreenObj",
                 inKurzversion = true
             },
 
@@ -285,16 +419,19 @@ public class TutorialManager : MonoBehaviour
             new() {
                 Erklaerung    = "Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen Dokumenten verwendet.",
                 ElementName   = "Profileingabe",
+                GameObjectName= "registrationScreenObj",
                 inKurzversion = true
             },
             new() {
                 Erklaerung    = "Akzeptiere hier die AGB und Datenschutzrichtlinie um fortzufahren.",
                 ElementName   = "Toggle",
+                GameObjectName= "registrationScreenObj",
                 inKurzversion = false
             },
             new() {
                 Erklaerung    = "Klicke hier um deinen verschlüsselten Passkey zu entschlüsseln und zu sehen. Notiere ihn sicher!",
                 ElementName   = "btnEntschluesseln",
+                GameObjectName= "registrationScreenObj",
                 inKurzversion = true
             },
 
@@ -377,6 +514,7 @@ public class TutorialManager : MonoBehaviour
             new() {
                 Erklaerung    = "Hier findest du den Tutorial-Button – du kannst diese Einführung jederzeit erneut starten.",
                 ElementName   = "card-hilfe",
+                ScrollViewToBottomName  = "settings-scroll",
                 inKurzversion = true
             },
             new() {
@@ -395,5 +533,198 @@ public class TutorialManager : MonoBehaviour
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
         Debug.Log("[TutorialManager] Alle Tutorial-Keys zurückgesetzt.");
+    }
+
+    private GameObject FindInaktivesGameObject(string objName)
+{
+    // 1. Zuerst aktiv suchen
+    var obj = GameObject.Find(objName);
+    if (obj != null) return obj;
+
+    // 2. Durchsuche alle geladenen Szenen inklusive Root-Objekte
+    for (int i = 0; i < SceneManager.sceneCount; i++)
+    {
+        var scene = SceneManager.GetSceneAt(i);
+        if (!scene.isLoaded) continue;
+
+        var rootObjects = scene.GetRootGameObjects();
+        foreach (var root in rootObjects)
+        {
+            var target = FindChildRecursive(root.transform, objName);
+            if (target != null) return target;
+        }
+    }
+
+    return null;
+}
+
+private GameObject FindChildRecursive(Transform parent, string name)
+{
+    if (parent.name == name) return parent.gameObject;
+
+    foreach (Transform child in parent)
+    {
+        var result = FindChildRecursive(child, name);
+        if (result != null) return result;
+    }
+    return null;
+}
+
+private void ZeigePopupVisualElement(string popupName)
+{
+    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+    foreach (var doc in alleDocuments)
+    {
+        var root = doc.rootVisualElement;
+        if (root == null) continue;
+
+        var popupEl = root.Q<VisualElement>(popupName);
+        if (popupEl != null)
+        {
+            popupEl.style.display = DisplayStyle.Flex;
+            return;
+        }
+    }
+    Debug.LogWarning($"[TutorialManager] UI Element Popup '{popupName}' wurde nicht gefunden.");
+}
+
+private void SchliesseAllePopups()
+{
+    // 1. Alle UI-Toolkit Popups durchgehen und ausblenden
+    foreach (var schritt in alleSchritte)
+    {
+        if (!string.IsNullOrEmpty(schritt.PopupElementName))
+        {
+            VersteckePopupVisualElement(schritt.PopupElementName);
+        }
+    }
+
+    // 2. Alle GameObject-basierten Popups / Zusatz-Screens ausblenden,
+    // außer wenn sie einer der 3 Haupt-Screens sind (die werden separat verwaltet)
+    foreach (var schritt in alleSchritte)
+    {
+        if (!string.IsNullOrEmpty(schritt.GameObjectName))
+        {
+            // Hauptscreens überspringen, da diese in Step 3 gezielt geschaltet werden
+            if ((startScreenObj != null && schritt.GameObjectName == startScreenObj.name) ||
+                (loginScreenObj != null && schritt.GameObjectName == loginScreenObj.name) ||
+                (registrationScreenObj != null && schritt.GameObjectName == registrationScreenObj.name))
+            {
+                continue;
+            }
+
+            var go = FindInaktivesGameObject(schritt.GameObjectName);
+            if (go != null)
+            {
+                go.SetActive(false);
+            }
+        }
+    }
+}
+
+private void VersteckePopupVisualElement(string popupName)
+{
+    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+    foreach (var doc in alleDocuments)
+    {
+        var root = doc.rootVisualElement;
+        if (root == null) continue;
+
+        var popupEl = root.Q<VisualElement>(popupName);
+        if (popupEl != null)
+        {
+            popupEl.style.display = DisplayStyle.None;
+        }
+    }
+}
+
+private IEnumerator ScrollSmoothToBottom(string scrollViewName, float dauer = 0.8f)
+{
+    ScrollView scrollView = null;
+
+    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+    foreach (var doc in alleDocuments)
+    {
+        if (doc == uiDocument) continue;
+        var root = doc.rootVisualElement;
+        if (root == null) continue;
+        scrollView = root.Q<ScrollView>(scrollViewName);
+        if (scrollView != null) break;
+    }
+
+    if (scrollView == null)
+    {
+        Debug.LogWarning($"[TutorialManager] ScrollView '{scrollViewName}' nicht gefunden.");
+        yield break;
+    }
+
+    // Erst zum letzten Element springen damit UI Toolkit den Scroll-Bereich berechnet
+    if (scrollView.contentContainer.childCount > 0)
+        scrollView.ScrollTo(scrollView.contentContainer[scrollView.contentContainer.childCount - 1]);
+
+    // Mehrere Frames warten bis highValue stabil ist
+    for (int i = 0; i < 10; i++)
+        yield return null;
+
+    float maxScroll = scrollView.verticalScroller.highValue;
+
+    if (maxScroll <= 0)
+    {
+        Debug.LogWarning("[TutorialManager] ScrollView hat keine scrollbare Höhe.");
+        yield break;
+    }
+
+    // Zurück nach oben springen und dann smooth animieren
+    scrollView.scrollOffset = new Vector2(0, 0);
+    yield return null;
+
+    float startY           = 0f;
+    float verstricheneZeit = 0f;
+
+    while (verstricheneZeit < dauer)
+    {
+        verstricheneZeit += Time.deltaTime;
+        float t = Mathf.SmoothStep(0f, 1f, verstricheneZeit / dauer);
+        scrollView.scrollOffset = new Vector2(0, Mathf.Lerp(startY, maxScroll, t));
+        yield return null;
+    }
+
+    scrollView.scrollOffset = new Vector2(0, maxScroll);
+
+    yield return null;
+    if (!string.IsNullOrEmpty(aktiveSchritte[aktuellerIndex].ElementName))
+        HighlightPositionieren(aktiveSchritte[aktuellerIndex].ElementName);
+}
+
+// ── Public API ───────────────────────────────────────────────────────────
+
+/// <summary>
+/// Prüft beim allerersten App-Start, ob das Tutorial gezeigt werden soll.
+/// </summary>
+public void PruefeErstenAppStart()
+    {
+        const string Key = "ErsterAppStart_TutorialAngezeigt";
+
+        // Falls die App schon einmal gestartet wurde, abbrechen
+        if (PlayerPrefs.GetInt(Key, 0) == 1) return;
+
+        // Als gestartet markieren und speichern
+        PlayerPrefs.SetInt(Key, 1);
+        PlayerPrefs.Save();
+
+        // Merken: Beim allerersten Start soll danach der Login-Screen kommen!
+        zeigeLoginNachTutorial = true;
+
+        // Tutorial starten
+        TutorialAuswahlOeffnen(); 
+    }
+
+// Hilfsmethode zum Testen im Unity Inspector
+[ContextMenu("Ersten Start zurücksetzen")]
+    public void ResetErsterStart()
+    {
+        PlayerPrefs.DeleteKey("ErsterAppStart_TutorialAngezeigt");
+        PlayerPrefs.Save();
+        Debug.Log("[TutorialManager] Erster App-Start zurückgesetzt!");
     }
 }

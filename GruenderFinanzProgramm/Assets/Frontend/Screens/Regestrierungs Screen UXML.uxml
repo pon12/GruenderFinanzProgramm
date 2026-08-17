@@ -32,7 +32,7 @@
             <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay">
+    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: flex;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
                 <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
@@ -53,7 +53,7 @@
             <ui:Button text="Zur Anmeldung" name="btnZurAnmeldung" class="btn-submit"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="PopUpAGB" class="popup-overlay">
+    <ui:VisualElement name="PopUpAGB" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-agb" class="popup-doc-card">
             <ui:VisualElement name="row-popup-agb-header" class="popup-doc-header">
                 <ui:Label text="AGB" name="label-popup-agb-titel" class="popup-doc-title"/>

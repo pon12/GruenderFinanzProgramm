@@ -737,55 +737,167 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c46759be7f87b04fb81850f6e445df3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
-  tutorialBilderLang:
-  - {fileID: 6663841525623665819, guid: 8ae3a484f6c4f3741a832a078403aee4, type: 3}
-  - {fileID: 9055085296163755439, guid: 020d57d7cf5310f49835ee7affdd95be, type: 3}
-  - {fileID: 5020296527248882466, guid: 8a4a8dd564fc7004ab3f31ae11c5ab44, type: 3}
-  - {fileID: 5555921646746413605, guid: 21dbae96ee414274cb9feda422b782e7, type: 3}
-  - {fileID: -3147591041614878760, guid: c6e0a50b2c5fbd24eaac0a99f2fa02f9, type: 3}
-  - {fileID: 4575064947617878892, guid: aa53c117eaed44845b045bbb475af14f, type: 3}
-  - {fileID: 3587141560910765710, guid: 576c99083411d54419d2a4a31e42b8e8, type: 3}
-  - {fileID: 4399963456049192973, guid: fcda8ec7172416448a8691a0deff2079, type: 3}
-  - {fileID: -3040758998549487544, guid: acd9e53a30c34ca41879b818b5d650b7, type: 3}
-  - {fileID: -2757950986198270302, guid: 4e4234b6885dd2e4fbdc819ea2ea4459, type: 3}
-  - {fileID: -820307451781987897, guid: b0037ce9252eeef4fb1a6f114f6f50e2, type: 3}
-  - {fileID: 5960268561470262041, guid: a174abe4b290fb148963e7a4575333c7, type: 3}
-  - {fileID: -3688312498151331057, guid: a6f25a26fd656984baf6a58a9f6d12fa, type: 3}
-  - {fileID: -1292543632387437021, guid: b434188bacba74f4792a436bfc457bb2, type: 3}
-  - {fileID: 9159216262894501291, guid: dfd9e81d8b85da842bd315dcdfe7f1ad, type: 3}
-  - {fileID: 4004839048080936420, guid: 1a094543fed3b694fb28023695a13cf4, type: 3}
-  - {fileID: 4527853958532716004, guid: b54568f688656e74dbc189d5cb8a25ba, type: 3}
-  - {fileID: -3601537091696776800, guid: c4e2b4999fb45924dbce49dfb9227e31, type: 3}
-  - {fileID: -5848357686027312877, guid: 5cae94a78e3d67c43ad07dfdc8abad94, type: 3}
-  - {fileID: 662399242581751783, guid: fcdc1cfc648c2694eb7d3f20648649b7, type: 3}
-  - {fileID: -3231487701974093657, guid: 1c40914a8a7a2014bbc4cfdc3c7af51a, type: 3}
-  - {fileID: -8853639211807423181, guid: 62d83b1b96c0b5b45a59a2d6dc9d3503, type: 3}
-  - {fileID: 4898771595770596616, guid: 2b50d72f88093f5479914359084c8c11, type: 3}
-  tutorialBilderKurz:
-  - {fileID: 6663841525623665819, guid: 8ae3a484f6c4f3741a832a078403aee4, type: 3}
-  - {fileID: 9055085296163755439, guid: 020d57d7cf5310f49835ee7affdd95be, type: 3}
-  - {fileID: 5020296527248882466, guid: 8a4a8dd564fc7004ab3f31ae11c5ab44, type: 3}
-  - {fileID: 5555921646746413605, guid: 21dbae96ee414274cb9feda422b782e7, type: 3}
-  - {fileID: -3147591041614878760, guid: c6e0a50b2c5fbd24eaac0a99f2fa02f9, type: 3}
-  - {fileID: 4575064947617878892, guid: aa53c117eaed44845b045bbb475af14f, type: 3}
-  - {fileID: 3587141560910765710, guid: 576c99083411d54419d2a4a31e42b8e8, type: 3}
-  - {fileID: 4399963456049192973, guid: fcda8ec7172416448a8691a0deff2079, type: 3}
-  - {fileID: -3040758998549487544, guid: acd9e53a30c34ca41879b818b5d650b7, type: 3}
-  - {fileID: -2757950986198270302, guid: 4e4234b6885dd2e4fbdc819ea2ea4459, type: 3}
-  - {fileID: -820307451781987897, guid: b0037ce9252eeef4fb1a6f114f6f50e2, type: 3}
-  - {fileID: 5960268561470262041, guid: a174abe4b290fb148963e7a4575333c7, type: 3}
-  - {fileID: -3688312498151331057, guid: a6f25a26fd656984baf6a58a9f6d12fa, type: 3}
-  - {fileID: -1292543632387437021, guid: b434188bacba74f4792a436bfc457bb2, type: 3}
-  - {fileID: 9159216262894501291, guid: dfd9e81d8b85da842bd315dcdfe7f1ad, type: 3}
-  - {fileID: 4004839048080936420, guid: 1a094543fed3b694fb28023695a13cf4, type: 3}
-  - {fileID: 4527853958532716004, guid: b54568f688656e74dbc189d5cb8a25ba, type: 3}
-  - {fileID: -3601537091696776800, guid: c4e2b4999fb45924dbce49dfb9227e31, type: 3}
-  - {fileID: -5848357686027312877, guid: 5cae94a78e3d67c43ad07dfdc8abad94, type: 3}
-  - {fileID: 662399242581751783, guid: fcdc1cfc648c2694eb7d3f20648649b7, type: 3}
-  - {fileID: -3231487701974093657, guid: 1c40914a8a7a2014bbc4cfdc3c7af51a, type: 3}
-  - {fileID: -8853639211807423181, guid: 62d83b1b96c0b5b45a59a2d6dc9d3503, type: 3}
-  - {fileID: 4898771595770596616, guid: 2b50d72f88093f5479914359084c8c11, type: 3}
   uiDocument: {fileID: 1363661634}
+  alleSchritte:
+  - Erklaerung: "Willkommen bei Ventoriq! Diese kurze Einf\xFChrung zeigt dir die
+      wichtigsten Funktionen der App."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: 3-Start-Screens
+    GameObjectName: Start Screen
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Mit diesem Button erstellst du ein neues Konto und richtest dein
+      Profil ein.
+    ElementName: KontoErstellen
+    inKurzversion: 1
+    SceneName: 3-Start-Screens
+    GameObjectName: Login Screen
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen
+      Dokumenten verwendet.
+    ElementName: Profileingabe
+    inKurzversion: 1
+    SceneName: 3-Start-Screens
+    GameObjectName: Regestrierung Screen
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Akzeptiere hier die AGB und Datenschutzrichtlinie um fortzufahren.
+    ElementName: Toggle
+    inKurzversion: 0
+    SceneName: 3-Start-Screens
+    GameObjectName: Regestrierung Screen
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Klicke hier um deinen verschl\xFCsselten Passkey zu entschl\xFCsseln
+      und zu sehen. Notiere ihn sicher!"
+    ElementName: btnEntschluesseln
+    inKurzversion: 1
+    SceneName: 3-Start-Screens
+    GameObjectName: Regestrierung Screen
+    PopupElementName: popuppasskey
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier siehst du deine zuletzt erreichten Meilensteine auf dem Weg
+      zur Gr\xFCndung."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote
+      zu erstellen.
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier w\xE4hlst du den Kunden aus dem Ihr das Angebot erstellt oder
+      tr\xE4gst einen neuen ein."
+    ElementName: card-partner
+    inKurzversion: 1
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier pflegst du Angebotsnummer, Datum, Status und W\xE4hrung."
+    ElementName: card-grunddaten
+    inKurzversion: 0
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier kannst du Dateien und Dokumente direkt an das Angebot anh\xE4ngen."
+    ElementName: card-anhaenge
+    inKurzversion: 0
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Trage hier alle Artikel und Leistungen mit Menge und Preis ein.
+    ElementName: card-positionen
+    inKurzversion: 1
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.
+    ElementName: card-details
+    inKurzversion: 0
+    SceneName: Angebot
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten
+      erscheint.
+    ElementName: card-Lokaler-Nutzer
+    inKurzversion: 1
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: Mit diesem Button legst du einen neuen Kunden in deiner Datenbank
+      an.
+    ElementName: btn-add-coustomer
+    inKurzversion: 1
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier siehst du deine Rentabilit\xE4tskennzahlen \u2013 Umsatz, Kosten
+      und Gewinn im \xDCberblick."
+    ElementName: panel-rentabilitaet
+    inKurzversion: 1
+    SceneName: Finanzen1
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Dieser Bereich zeigt deine Liquidit\xE4t zum Gesch\xE4ftsbeginn
+      \u2013 was du zum Start ben\xF6tigst."
+    ElementName: panel-liquiditaet
+    inKurzversion: 0
+    SceneName: Finanzen1
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "Die Liquidit\xE4tsplanung gibt dir einen \xDCberblick \xFCber Ein-
+      und Ausgaben \xFCber die Zeit."
+    ElementName: panel-liquiditaetsplanung
+    inKurzversion: 0
+    SceneName: Finanzen1
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  - Erklaerung: "W\xE4hle hier eine Vorlage f\xFCr dein neues Dokument: Standard-Text,
+      Diagramm oder Checkliste."
+    ElementName: Template-Grid
+    inKurzversion: 1
+    SceneName: Dokument-Screen
+    GameObjectName: 
+    PopupElementName: Popup-Overlay
+    ScrollViewToBottomName: 
+  - Erklaerung: "Hier findest du den Tutorial-Button \u2013 du kannst diese Einf\xFChrung
+      jederzeit erneut starten."
+    ElementName: card-hilfe
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: settings-scroll
+  - Erklaerung: "Das war die Einf\xFChrung! Du kannst jetzt loslegen. Viel Erfolg
+      bei deiner Gr\xFCndung!"
+    ElementName: 
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewToBottomName: 
+  startScreenObj: {fileID: 457497950}
+  loginScreenObj: {fileID: 1136899310}
+  registrationScreenObj: {fileID: 1318028743}
+  settingsScreenObj: {fileID: 0}
 --- !u!114 &1363661634
 MonoBehaviour:
   m_ObjectHideFlags: 0
