@@ -28,8 +28,8 @@ public class TutorialSchritt
     [Tooltip("Falls ein VisualElement-Popup im UI Document eingeblendet werden muss.")]
     public string PopupElementName;
 
-    [Tooltip("Falls nach unten gescrollt werden soll: Der Name des ScrollView-Elements im UXML.")]
-    public string ScrollViewToBottomName;
+    [Tooltip("Der Name der ScrollView im UXML, falls gescrollt werden muss.")]
+    public string ScrollViewName;
 }
 
 // ── TutorialManager ──────────────────────────────────────────────────────────
@@ -205,7 +205,6 @@ public class TutorialManager : MonoBehaviour
     {
         yield return SceneManager.LoadSceneAsync(zielScene);
         yield return null;
-        yield return null;
     }
 
     if (!string.IsNullOrEmpty(schritt.GameObjectName))
@@ -239,22 +238,111 @@ public class TutorialManager : MonoBehaviour
 
     SchrittAnzeigen();
 
-    if (!string.IsNullOrEmpty(schritt.ScrollViewToBottomName))
+    // Warten, bis das UI Toolkit die Elemente gezeichnet hat
+    yield return null;
+    yield return null;
+
+    // Scrollen und Highlighten ausführen
+    ZeigeElementMitScroll(schritt.ScrollViewName, schritt.ElementName);
+
+    SetzeButtonsAktiv(true);
+}
+
+private void FokussiereUndHighlighteElement(string elementName)
+{
+    if (string.IsNullOrEmpty(elementName))
     {
-        // Highlight während Scroll verstecken
         SetzeVisible(highlightRahmen, false);
+        return;
+    }
 
-        yield return StartCoroutine(ScrollSmoothToBottom(schritt.ScrollViewToBottomName));
+    // Suchen nach dem Element und dessen übergeordneter ScrollView
+    VisualElement targetElement = null;
+    ScrollView parentScrollView = null;
 
-        // Highlight erst NACH dem Scroll einblenden
-        if (!string.IsNullOrEmpty(schritt.ElementName))
+    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+    foreach (var doc in alleDocuments)
+    {
+        if (doc == uiDocument) continue; // Eigenes Overlay-UI ausklammern
+        var root = doc.rootVisualElement;
+        if (root == null) continue;
+
+        var found = root.Q<VisualElement>(elementName);
+        if (found != null && found.resolvedStyle.display != DisplayStyle.None)
         {
-            SetzeVisible(highlightRahmen, true);
-            HighlightPositionieren(schritt.ElementName);
+            targetElement = found;
+            // Prüfen, ob das Element in einer ScrollView liegt
+            parentScrollView = targetElement.GetFirstAncestorOfType<ScrollView>();
+            break;
         }
     }
 
-    SetzeButtonsAktiv(true);
+    if (targetElement == null)
+    {
+        SetzeVisible(highlightRahmen, false);
+        Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
+        return;
+    }
+
+    // Falls das Element in einer ScrollView liegt, automatisch dorthin scrollen!
+    if (parentScrollView != null)
+    {
+        parentScrollView.ScrollTo(targetElement);
+    }
+
+    // Highlight-Rahmen aktivieren und nach dem Layout-Update auf das Element ausrichten
+    SetzeVisible(highlightRahmen, true);
+    highlightRahmen.schedule.Execute(() =>
+    {
+        HighlightPositionieren(elementName);
+    }).ExecuteLater(10); // 10ms Verzögerung sorgt für exakte Ausrichtung nach dem Scroll-Vorgang
+}
+
+private void ZeigeElementMitScroll(string scrollViewName, string elementName)
+{
+    if (string.IsNullOrEmpty(elementName))
+    {
+        SetzeVisible(highlightRahmen, false);
+        return;
+    }
+
+    VisualElement targetElement = null;
+    ScrollView scrollView = null;
+
+    // Suche in allen UI Documents nach den Elementen
+    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+    foreach (var doc in alleDocuments)
+    {
+        if (doc == uiDocument) continue;
+        var root = doc.rootVisualElement;
+        if (root == null) continue;
+
+        if (targetElement == null)
+            targetElement = root.Q<VisualElement>(elementName);
+
+        if (!string.IsNullOrEmpty(scrollViewName) && scrollView == null)
+            scrollView = root.Q<ScrollView>(scrollViewName);
+    }
+
+    if (targetElement == null)
+    {
+        SetzeVisible(highlightRahmen, false);
+        Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
+        return;
+    }
+
+    // Falls eine ScrollView angegeben ist, direkt zum Ziel-Element springen
+    if (scrollView != null)
+    {
+        scrollView.ScrollTo(targetElement);
+    }
+
+    // Rahmen einblenden und nach dem Scroll-Vorgang positionieren
+    SetzeVisible(highlightRahmen, true);
+    highlightRahmen.schedule.Execute(() =>
+    {
+        HighlightPositionieren(elementName);
+    }).ExecuteLater(50); // 50ms Verzögerung stellt sicher, dass die Position nach dem Scrollen stimmt
 }
 
 private void SetzeButtonsAktiv(bool aktiv)
@@ -284,17 +372,8 @@ private void SetzeButtonsAktiv(bool aktiv)
         ? "Fertig"
         : "Weiter ›";
 
-    bool hatHighlight = !string.IsNullOrEmpty(schritt.ElementName);
-    bool hatScroll    = !string.IsNullOrEmpty(schritt.ScrollViewToBottomName);
-
-    // Highlight nur sofort setzen wenn kein Scroll folgt
-    SetzeVisible(highlightRahmen, hatHighlight && !hatScroll);
-
-    if (hatHighlight && !hatScroll)
-    {
-        highlightRahmen.schedule.Execute(() =>
-            HighlightPositionieren(schritt.ElementName));
-    }
+    // Highlight-Rahmen vorerst ausblenden, bis fokussiert/gescrollt wurde
+    SetzeVisible(highlightRahmen, false);
 }
 
     private void HighlightPositionieren(string elementName)
@@ -401,7 +480,7 @@ private void SetzeButtonsAktiv(bool aktiv)
     {
         alleSchritte = new List<TutorialSchritt>
         {
-            // ── Login ──────────────────────────────────────────────────────
+            /* ── Login ──────────────────────────────────────────────────────
             new() {
                 Erklaerung    = "Willkommen bei Ventoriq! Diese kurze Einführung zeigt dir die wichtigsten Funktionen der App.",
                 ElementName   = "",
@@ -414,8 +493,9 @@ private void SetzeButtonsAktiv(bool aktiv)
                 GameObjectName= "loginScreenObj",
                 inKurzversion = true
             },
+            */
 
-            // ── Registrierung ──────────────────────────────────────────────
+            /* ── Registrierung ──────────────────────────────────────────────
             new() {
                 Erklaerung    = "Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen Dokumenten verwendet.",
                 ElementName   = "Profileingabe",
@@ -434,11 +514,104 @@ private void SetzeButtonsAktiv(bool aktiv)
                 GameObjectName= "registrationScreenObj",
                 inKurzversion = true
             },
+            */
+
+            // ── Dashboard ──────────────────────────────────────────────────
+
+            new()
+            {
+                Erklaerung    = "Willkommen auf ihrer zentralen Steuerzentrale!",
+                ElementName   = "",
+                SceneName     = "Dashboard",
+                inKurzversion = true
+            },
+
+            new()
+            {
+                Erklaerung    = "Hier sehen sie all ihre wichtigen Geschäftszahlen auf einen Blick – von der Anzahl ihrer Kunden bis hin zum aktuellen Kontostand. Über die direkten Buttons können sie ohne Umwege sofort neue Kunden anlegen, Angebote schreiben oder Rechnungen erstellen",
+                ElementName   = "stats-grid",
+                SceneName     = "Dashboard",
+                inKurzversion = true
+            },
+
+            new()
+            {
+                Erklaerung    = "In diesem Bereich wird ihre finanzielle Entwicklung des gesamten Jahres übersichtlich als Diagramm aufbereitet. Auf der linken Seite sehen sie die Beträge, während die Achse unten ihre Umsätze von Januar bis Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr Geschäft besonders gut läuft.",
+                ElementName   = "kassenbuch-statistik-panel",
+                SceneName     = "Dashboard",
+                inKurzversion = true
+            },
+
+            new()
+            {
+                Erklaerung    = "Mit dem Fristenkalender verpassen die garantiert keine wichtigen Termine oder steuerlichen Abgabefristen mehr. Navigieren sie einfach durch die Monate und Jahre, um ihre Fälligkeiten bequem im Voraus zu planen. Ein Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an.",
+                ElementName   = "kalender-panel",
+                SceneName     = "Dashboard",
+                inKurzversion = true
+            },
+
+            // ── Settings ────────────────────────────────────────────────────
+            
+            new() {
+                Erklaerung    = "Auf der linken Seite können Sie wichtigen Daten für Sie und Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen.",
+                ElementName   = "col-left",
+                ScrollViewName  = "settings-scroll",
+                SceneName     = "Einstellungen",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Auf der rechten Seite finden sie die Steuersätze ...",
+                ElementName   = "card-steuersaetze",
+                ScrollViewName  = "settings-scroll",
+                SceneName     = "Einstellungen",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "... den Anzeigemodus und Ihren Persönlichen Begleiter, welchen sie ein und ausschalten können ...",
+                ElementName   = "card-layout",
+                ScrollViewName  = "settings-scroll",
+                SceneName     = "Einstellungen",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "... und die Sicherheitseinstellungen, wo sie Ihren aktuellen Passkey zurücksetzen können.",
+                ElementName   = "card-sicherheit",
+                ScrollViewName  = "settings-scroll",
+                SceneName     = "Einstellungen",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Ganz unten finden Sie den Tutorial-Button – Sie können diese Einführung jederzeit erneut starten.",
+                ElementName   = "card-hilfe",
+                ScrollViewName  = "settings-scroll",
+                SceneName     = "Einstellungen",
+                inKurzversion = true
+            },
+            
+            // ── Dokumente ──────────────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Hier sehen sie all ihre Dokumente auf einen Blick.",
+                ElementName   = "Main-Scroll-View",
+                SceneName     = "Dokument-Screen",
+                inKurzversion = true
+            },
+            new() {
+                Erklaerung    = "Mit diesen zwei Buttons können Dukemente hinzugefügt oder gelöscht werden.",
+                ElementName   = "row-alle-loeschen",
+                SceneName     = "Dokument-Screen",
+                inKurzversion = true
+            },
 
             // ── Fortschritt ────────────────────────────────────────────────
             new() {
-                Erklaerung    = "Hier siehst du deine zuletzt erreichten Meilensteine auf dem Weg zur Gründung.",
+                Erklaerung    = "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg zur Gründung.",
                 ElementName   = "panel-letzte-erfolge",
+                SceneName     = "Fortschritt",
                 inKurzversion = true
             },
 
@@ -507,19 +680,6 @@ private void SetzeButtonsAktiv(bool aktiv)
             new() {
                 Erklaerung    = "Wähle hier eine Vorlage für dein neues Dokument: Standard-Text, Diagramm oder Checkliste.",
                 ElementName   = "Template-Grid",
-                inKurzversion = true
-            },
-
-            // ── Einstellungen ──────────────────────────────────────────────
-            new() {
-                Erklaerung    = "Hier findest du den Tutorial-Button – du kannst diese Einführung jederzeit erneut starten.",
-                ElementName   = "card-hilfe",
-                ScrollViewToBottomName  = "settings-scroll",
-                inKurzversion = true
-            },
-            new() {
-                Erklaerung    = "Das war die Einführung! Du kannst jetzt loslegen. Viel Erfolg bei deiner Gründung!",
-                ElementName   = "",
                 inKurzversion = true
             },
         };
@@ -636,64 +796,6 @@ private void VersteckePopupVisualElement(string popupName)
             popupEl.style.display = DisplayStyle.None;
         }
     }
-}
-
-private IEnumerator ScrollSmoothToBottom(string scrollViewName, float dauer = 0.8f)
-{
-    ScrollView scrollView = null;
-
-    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-    foreach (var doc in alleDocuments)
-    {
-        if (doc == uiDocument) continue;
-        var root = doc.rootVisualElement;
-        if (root == null) continue;
-        scrollView = root.Q<ScrollView>(scrollViewName);
-        if (scrollView != null) break;
-    }
-
-    if (scrollView == null)
-    {
-        Debug.LogWarning($"[TutorialManager] ScrollView '{scrollViewName}' nicht gefunden.");
-        yield break;
-    }
-
-    // Erst zum letzten Element springen damit UI Toolkit den Scroll-Bereich berechnet
-    if (scrollView.contentContainer.childCount > 0)
-        scrollView.ScrollTo(scrollView.contentContainer[scrollView.contentContainer.childCount - 1]);
-
-    // Mehrere Frames warten bis highValue stabil ist
-    for (int i = 0; i < 10; i++)
-        yield return null;
-
-    float maxScroll = scrollView.verticalScroller.highValue;
-
-    if (maxScroll <= 0)
-    {
-        Debug.LogWarning("[TutorialManager] ScrollView hat keine scrollbare Höhe.");
-        yield break;
-    }
-
-    // Zurück nach oben springen und dann smooth animieren
-    scrollView.scrollOffset = new Vector2(0, 0);
-    yield return null;
-
-    float startY           = 0f;
-    float verstricheneZeit = 0f;
-
-    while (verstricheneZeit < dauer)
-    {
-        verstricheneZeit += Time.deltaTime;
-        float t = Mathf.SmoothStep(0f, 1f, verstricheneZeit / dauer);
-        scrollView.scrollOffset = new Vector2(0, Mathf.Lerp(startY, maxScroll, t));
-        yield return null;
-    }
-
-    scrollView.scrollOffset = new Vector2(0, maxScroll);
-
-    yield return null;
-    if (!string.IsNullOrEmpty(aktiveSchritte[aktuellerIndex].ElementName))
-        HighlightPositionieren(aktiveSchritte[aktuellerIndex].ElementName);
 }
 
 // ── Public API ───────────────────────────────────────────────────────────

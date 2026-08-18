@@ -739,161 +739,169 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
   uiDocument: {fileID: 1363661634}
   alleSchritte:
-  - Erklaerung: "Willkommen bei Ventoriq! Diese kurze Einf\xFChrung zeigt dir die
-      wichtigsten Funktionen der App."
+  - Erklaerung: Willkommen auf ihrer zentralen Steuerzentrale!
     ElementName: 
     inKurzversion: 1
-    SceneName: 3-Start-Screens
-    GameObjectName: Start Screen
+    SceneName: Dashboard
+    GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Mit diesem Button erstellst du ein neues Konto und richtest dein
-      Profil ein.
-    ElementName: KontoErstellen
+    ScrollViewName: 
+  - Erklaerung: "Hier sehen sie all ihre wichtigen Gesch\xE4ftszahlen auf einen Blick
+      \u2013 von der Anzahl ihrer Kunden bis hin zum aktuellen Kontostand. \xDCber
+      die direkten Buttons k\xF6nnen sie ohne Umwege sofort neue Kunden anlegen,
+      Angebote schreiben oder Rechnungen erstellen"
+    ElementName: stats-grid
     inKurzversion: 1
-    SceneName: 3-Start-Screens
-    GameObjectName: Login Screen
+    SceneName: Dashboard
+    GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen
-      Dokumenten verwendet.
-    ElementName: Profileingabe
+    ScrollViewName: 
+  - Erklaerung: "In diesem Bereich wird ihre finanzielle Entwicklung des gesamten
+      Jahres \xFCbersichtlich als Diagramm aufbereitet. Auf der linken Seite sehen
+      sie die Betr\xE4ge, w\xE4hrend die Achse unten ihre Ums\xE4tze von Januar bis
+      Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr
+      Gesch\xE4ft besonders gut l\xE4uft."
+    ElementName: kassenbuch-statistik-panel
     inKurzversion: 1
-    SceneName: 3-Start-Screens
-    GameObjectName: Regestrierung Screen
+    SceneName: Dashboard
+    GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Akzeptiere hier die AGB und Datenschutzrichtlinie um fortzufahren.
-    ElementName: Toggle
-    inKurzversion: 0
-    SceneName: 3-Start-Screens
-    GameObjectName: Regestrierung Screen
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Klicke hier um deinen verschl\xFCsselten Passkey zu entschl\xFCsseln
-      und zu sehen. Notiere ihn sicher!"
-    ElementName: btnEntschluesseln
+    ScrollViewName: 
+  - Erklaerung: "Mit dem Fristenkalender verpassen die garantiert keine wichtigen
+      Termine oder steuerlichen Abgabefristen mehr. Navigieren sie einfach durch
+      die Monate und Jahre, um ihre F\xE4lligkeiten bequem im Voraus zu planen. Ein
+      Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an."
+    ElementName: kalender-panel
     inKurzversion: 1
-    SceneName: 3-Start-Screens
-    GameObjectName: Regestrierung Screen
-    PopupElementName: popuppasskey
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier siehst du deine zuletzt erreichten Meilensteine auf dem Weg
-      zur Gr\xFCndung."
-    ElementName: 
+    SceneName: Dashboard
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Auf der linken Seite k\xF6nnen Sie wichtigen Daten f\xFCr Sie und
+      Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen."
+    ElementName: col-left
     inKurzversion: 1
-    SceneName: Fortschritt
+    SceneName: Einstellungen
     GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote
-      zu erstellen.
-    ElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Auf der rechten Seite sind Steuers\xE4tze und Design-Einstellungen
+      zu finden. Sie k\xF6nnen ebenfalls ihren aktuellen Passkey zur\xFCcksetzen
+      oder ihr Konto l\xF6schen"
+    ElementName: col-right
     inKurzversion: 1
-    SceneName: Angebot
+    SceneName: Einstellungen
     GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier w\xE4hlst du den Kunden aus dem Ihr das Angebot erstellt oder
-      tr\xE4gst einen neuen ein."
-    ElementName: card-partner
-    inKurzversion: 1
-    SceneName: Angebot
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier pflegst du Angebotsnummer, Datum, Status und W\xE4hrung."
-    ElementName: card-grunddaten
-    inKurzversion: 0
-    SceneName: Angebot
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier kannst du Dateien und Dokumente direkt an das Angebot anh\xE4ngen."
-    ElementName: card-anhaenge
-    inKurzversion: 0
-    SceneName: Angebot
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Trage hier alle Artikel und Leistungen mit Menge und Preis ein.
-    ElementName: card-positionen
-    inKurzversion: 1
-    SceneName: Angebot
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.
-    ElementName: card-details
-    inKurzversion: 0
-    SceneName: Angebot
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten
-      erscheint.
-    ElementName: card-Lokaler-Nutzer
-    inKurzversion: 1
-    SceneName: KundenDB
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: Mit diesem Button legst du einen neuen Kunden in deiner Datenbank
-      an.
-    ElementName: btn-add-coustomer
-    inKurzversion: 1
-    SceneName: KundenDB
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier siehst du deine Rentabilit\xE4tskennzahlen \u2013 Umsatz, Kosten
-      und Gewinn im \xDCberblick."
-    ElementName: panel-rentabilitaet
-    inKurzversion: 1
-    SceneName: Finanzen1
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Dieser Bereich zeigt deine Liquidit\xE4t zum Gesch\xE4ftsbeginn
-      \u2013 was du zum Start ben\xF6tigst."
-    ElementName: panel-liquiditaet
-    inKurzversion: 0
-    SceneName: Finanzen1
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "Die Liquidit\xE4tsplanung gibt dir einen \xDCberblick \xFCber Ein-
-      und Ausgaben \xFCber die Zeit."
-    ElementName: panel-liquiditaetsplanung
-    inKurzversion: 0
-    SceneName: Finanzen1
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewToBottomName: 
-  - Erklaerung: "W\xE4hle hier eine Vorlage f\xFCr dein neues Dokument: Standard-Text,
-      Diagramm oder Checkliste."
-    ElementName: Template-Grid
-    inKurzversion: 1
-    SceneName: Dokument-Screen
-    GameObjectName: 
-    PopupElementName: Popup-Overlay
-    ScrollViewToBottomName: 
-  - Erklaerung: "Hier findest du den Tutorial-Button \u2013 du kannst diese Einf\xFChrung
-      jederzeit erneut starten."
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Ganz unten finden Sie den Tutorial-Button \u2013 Sie k\xF6nnen diese
+      Einf\xFChrung jederzeit erneut starten."
     ElementName: card-hilfe
     inKurzversion: 1
     SceneName: Einstellungen
     GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: settings-scroll
-  - Erklaerung: "Das war die Einf\xFChrung! Du kannst jetzt loslegen. Viel Erfolg
-      bei deiner Gr\xFCndung!"
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg
+      zur Gr\xFCndung."
+    ElementName: panel-letzte-erfolge
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote
+      zu erstellen.
     ElementName: 
     inKurzversion: 1
     SceneName: 
     GameObjectName: 
     PopupElementName: 
-    ScrollViewToBottomName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier w\xE4hlst du den Kunden aus dem Ihr das Angebot erstellt oder
+      tr\xE4gst einen neuen ein."
+    ElementName: card-partner
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier pflegst du Angebotsnummer, Datum, Status und W\xE4hrung."
+    ElementName: card-grunddaten
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier kannst du Dateien und Dokumente direkt an das Angebot anh\xE4ngen."
+    ElementName: card-anhaenge
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Trage hier alle Artikel und Leistungen mit Menge und Preis ein.
+    ElementName: card-positionen
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.
+    ElementName: card-details
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten
+      erscheint.
+    ElementName: card-Lokaler-Nutzer
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Mit diesem Button legst du einen neuen Kunden in deiner Datenbank
+      an.
+    ElementName: btn-add-coustomer
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du deine Rentabilit\xE4tskennzahlen \u2013 Umsatz, Kosten
+      und Gewinn im \xDCberblick."
+    ElementName: panel-rentabilitaet
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Bereich zeigt deine Liquidit\xE4t zum Gesch\xE4ftsbeginn
+      \u2013 was du zum Start ben\xF6tigst."
+    ElementName: panel-liquiditaet
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Die Liquidit\xE4tsplanung gibt dir einen \xDCberblick \xFCber Ein-
+      und Ausgaben \xFCber die Zeit."
+    ElementName: panel-liquiditaetsplanung
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "W\xE4hle hier eine Vorlage f\xFCr dein neues Dokument: Standard-Text,
+      Diagramm oder Checkliste."
+    ElementName: Template-Grid
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
   startScreenObj: {fileID: 457497950}
   loginScreenObj: {fileID: 1136899310}
   registrationScreenObj: {fileID: 1318028743}
