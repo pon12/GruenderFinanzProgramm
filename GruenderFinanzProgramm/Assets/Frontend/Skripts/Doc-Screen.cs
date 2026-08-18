@@ -93,11 +93,11 @@ public class DocumentDashboard : MonoBehaviour
         new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Gesellschaftsvertrag", "Handelsregisterauszug", "Fragebogen zur Steuerlichen Erfassung", "Gewerbeanmeldung", "Anmeldung Berufsgenossenschaft", "Organigramm", "Gesellschafterliste" } },
         new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung", "Mahnverfahren", "Ratenzahlungsbestimmungen" } },
         new KategorieDefinition { name = "Finanzen",               istFest = false, pflichtDocs = new List<string> { "Eröffnungsbilanz" } },
-        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum", "Copyright Hinweis", "Lizenzhinweis Einfach" } },
-        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
-        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
-        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur" } },
-        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum", "Copyright Hinweis", "Lizenzhinweis Einfach", "Lizenzhinweis Erweitert", "Vertraulichkeitserklärung" } },
+        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag", "Vorlage Kündigung", "Stellenbeschreibung", "Urlaubsantrag", "Unternehmensrichtlinien", "Social Media Strategie" } },
+        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse", "SWOT-Analyse", "Zielgruppenanalyse" } },
+        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur", "Fördermittelübersicht", "Darlehensübersicht", "Versicherungsübersicht", "Kundenzufriedenheitsumfrage", "Vollmachtvorlage", "Gutschriftvorlage" } },
+        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string> { "Besprechungsprotokoll" } },
     };
 
     // ============================================================
@@ -265,6 +265,208 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "zusatzangabe",              label = "Zusatzangabe",                  placeholder = "Beschreibung der erweiterten Rechte (z.B. „Inklusive Recht zur Bearbeitung und Dekompilierung des Quellcodes“)" },
             new FeldDefinition { key = "kontakt",                   label = "Kontakt",                       placeholder = "E-Mail oder Ansprechpartner für Rückfragen (z.B. support@deinefirma.de)" },
             new FeldDefinition { key = "preisErweiterteNutzung",    label = "Preis für erweiterte Nutzung",  placeholder = "Betrag in Euro" },
+        },
+            ["Lizenzhinweis Erweitert"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geltungsbereich",         label = "Geltungsbereich",                placeholder = "Für welche Leistungen gilt dies? (Standard: „Alle erbrachten Werke & Leistungen“)" },
+            new FeldDefinition { key = "bedingungRechteuebergang", label = "Bedingung für Rechteübergang",   placeholder = "Wann gehen die Rechte über? (z.B. „Vollständige Zahlung der Vergütung“)" },
+            new FeldDefinition { key = "nutzungsumfang",          label = "Nutzungsumfang",                 placeholder = "Was darf der Kunde tun? (z.B. „Jegliche gewerbliche Nutzung, Vervielfältigung & Bearbeitung“)" },
+            new FeldDefinition { key = "raeumlicheReichweite",    label = "Räumliche Reichweite",           placeholder = "Wo darf das Werk genutzt werden? (z.B. „Weltweit / Unbeschränkt“)" },
+            new FeldDefinition { key = "zeitlicheReichweite",     label = "Zeitliche Reichweite",           placeholder = "Wie lange gilt das Recht? (Standard: „Zeitlich unbeschränkt / Unbefristet“)" },
+            new FeldDefinition { key = "zusatzvereinbarung",      label = "Zusatzvereinbarung",             placeholder = "Besondere Hinweise (z.B. „Inklusive Recht zur Unterlizensierung“)" },
+        },
+            ["Datenschutzerklärung (DSGVO)"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",         label = "Versionsstand",         placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "verantwortlicheStelle", label = "Verantwortliche Stelle", placeholder = "Name der Person/Abteilung (Standard: Geschäftsführung)" },
+            new FeldDefinition { key = "kontaktDatenschutz",    label = "Kontakt Datenschutz",    placeholder = "E-Mail für Rückfragen (z.B. datenschutz@firma.de)" },
+            new FeldDefinition { key = "zusatzangabe",          label = "Zusatzangabe",           placeholder = "Optional: Hinweis auf spezifische NDAs oder Projekt-Besonderheiten" },
+        },
+            ["Vertraulichkeitserklärung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",   label = "Versionsstand",     placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "dauerDerPflicht", label = "Dauer der Pflicht", placeholder = "Jahre nach Vertragsende (Standard: „unbefristet“ oder z.B. „3 Jahre“)" },
+            new FeldDefinition { key = "kontaktNda",      label = "Kontakt für NDAs",  placeholder = "E-Mail-Adresse für spezifische Geheimhaltungsanfragen" },
+            new FeldDefinition { key = "zusatzangabe",    label = "Zusatzangabe",      placeholder = "Optional: Hinweis auf ergänzende projektbezogene NDAs" },
+        },
+            ["Muster-Arbeitsvertrag"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "vertragsart",         label = "Vertragsart",         placeholder = "Welche Art es ist (Minijob, Senior Developer, CEO, ...)" },
+            new FeldDefinition { key = "stellenbezeichnung",  label = "Stellenbezeichnung",  placeholder = "z.B. „Junior Developer“ oder „UI-Designer“" },
+            new FeldDefinition { key = "vertragsbeginn",      label = "Vertragsbeginn",      placeholder = "Datum des ersten Arbeitstages (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "wochenstunden",       label = "Wochenstunden",       placeholder = "Anzahl der Stunden (z.B. „40 Stunden“)" },
+            new FeldDefinition { key = "bruttogehalt",        label = "Bruttogehalt",        placeholder = "Monatliches Entgelt in EUR" },
+            new FeldDefinition { key = "urlaubstage",         label = "Urlaubstage",         placeholder = "Jährlicher Anspruch (gesetzliches Minimum: 20 bei 5-Tage-Woche)" },
+            new FeldDefinition { key = "probezeit",           label = "Probezeit",           placeholder = "Dauer in Monaten (Standard: 6 Monate)" },
+        },
+            ["Vorlage Kündigung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "arbeitnehmer",       label = "Arbeitnehmer",       placeholder = "Name & Anschrift (aus KDB oder frei eintragen)" },
+            new FeldDefinition { key = "kuendigungsdatum",   label = "Kündigungsdatum",    placeholder = "Datum, an dem das Schreiben übergeben wird" },
+            new FeldDefinition { key = "kuendigungstermin",  label = "Kündigungstermin",   placeholder = "Datum, zu dem das Verhältnis endet (z.B. „30.09.2026“)" },
+            new FeldDefinition { key = "kuendigungsgrund",   label = "Kündigungsgrund",    placeholder = "Fristgerecht / Fristlos / optionaler Freitext" },
+            new FeldDefinition { key = "rueckgabeCheck",     label = "Rückgabe-Check",     placeholder = "Aufforderung zur Rückgabe von Firmeneigentum einblenden? (Ja/Nein)" },
+        },
+            ["Stellenbeschreibung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "stellentitel",        label = "Stellentitel",        placeholder = "Name der Position (z.B. „Backend-Developer“ oder „UI-Lead“)" },
+            new FeldDefinition { key = "abteilung",           label = "Abteilung",           placeholder = "Fachbereich (z.B. „Software-Engineering“ oder „Design“)" },
+            new FeldDefinition { key = "berichtetAn",         label = "Berichtet an",        placeholder = "Vorgesetzte Rolle (z.B. „CTO / Projektleitung“)" },
+            new FeldDefinition { key = "hauptaufgaben",       label = "Hauptaufgaben",       placeholder = "Kernaktivitäten (z.B. „Entwicklung der ERP-Logik“, „Datenmodelle pflegen“)" },
+            new FeldDefinition { key = "anforderungsprofil",  label = "Anforderungsprofil",  placeholder = "Erforderliche Skills (z.B. „C# Kenntnisse“, „Unity UI Toolkit“)" },
+            new FeldDefinition { key = "benefits",            label = "Benefits",            placeholder = "Was die Firma bietet (z.B. „Flexible Arbeitszeiten“, „Home Office“)" },
+            new FeldDefinition { key = "starttermin",         label = "Starttermin",         placeholder = "Datum oder „ab sofort“" },
+        },
+            ["Urlaubsantrag"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "kalenderjahr",       label = "Kalenderjahr",        placeholder = "Jahr, für das die Vorlage gedruckt wird (z.B. „2026“)" },
+            new FeldDefinition { key = "einreichungsfrist",  label = "Einreichungsfrist",   placeholder = "z.B. „Antrag bitte 2 Wochen vor Urlaubsantritt einreichen“" },
+            new FeldDefinition { key = "zusatzhinweis",      label = "Zusatzhinweis",       placeholder = "Optionale Anweisung (z.B. „Bitte in Blockschrift ausfüllen“)" },
+        },
+            ["Corporate Identity Manual"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",   label = "Versionsstand",         placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "markenkern",      label = "Markenkern",            placeholder = "Kurzbeschreibung der Vision (z.B. „Klarheit durch Design“)" },
+            new FeldDefinition { key = "primaerfarbe",    label = "Primärfarbe (HEX)",     placeholder = "Hauptfarbcode (z.B. Grün: #80CF95)" },
+            new FeldDefinition { key = "sekundaerfarbe",  label = "Sekundärfarbe (HEX)",   placeholder = "Akzentfarbcode (z.B. Grau: #646464)" },
+            new FeldDefinition { key = "hausschrift",     label = "Hausschrift",           placeholder = "Name der primären Schriftart (z.B. Poppins)" },
+            new FeldDefinition { key = "aufloesung",      label = "Auflösung",             placeholder = "Optimierte Auflösung bei digital erstellten Inhalten (z.B. 1080p)" },
+            new FeldDefinition { key = "layoutRaster",    label = "Layout-Raster",         placeholder = "Standard-Abstände (z.B. 8px / 16px / 24px)" },
+            new FeldDefinition { key = "zusatzangabe",    label = "Zusatzangabe",          placeholder = "Optional (z.B. „Nutzung von Kristall-Elementen erlaubt“)" },
+        },
+            ["Businessplan"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geschaeftsidee",     label = "Geschäftsidee",           placeholder = "Was ist der Kern Ihres Unternehmens? Welches Problem lösen Sie?" },
+            new FeldDefinition { key = "zielgruppeMarkt",    label = "Zielgruppe & Markt",      placeholder = "Wer sind Ihre Kunden und wie erreichen Sie diese?" },
+            new FeldDefinition { key = "angebotPreise",      label = "Angebot & Preise",        placeholder = "Was verkaufen Sie konkret und zu welchen Konditionen?" },
+            new FeldDefinition { key = "staerken",           label = "Stärken (SWOT)",          placeholder = "Warum sind Sie besser als der Wettbewerb?" },
+            new FeldDefinition { key = "risiken",            label = "Risiken (SWOT)",          placeholder = "Welche Gefahren gibt es und wie sichern Sie sich ab?" },
+            new FeldDefinition { key = "investitionsbedarf", label = "Investitionsbedarf",      placeholder = "Wie viel Startkapital wird benötigt (z.B. für Hardware, Miete)?" },
+            new FeldDefinition { key = "umsatzJ1",           label = "Umsatzprognose Jahr 1",   placeholder = "Geschätzter Rohgewinn Jahr 1" },
+            new FeldDefinition { key = "umsatzJ2",           label = "Umsatzprognose Jahr 2",   placeholder = "Geschätzter Rohgewinn Jahr 2" },
+            new FeldDefinition { key = "umsatzJ3",           label = "Umsatzprognose Jahr 3",   placeholder = "Geschätzter Rohgewinn Jahr 3" },
+            new FeldDefinition { key = "teamMeilensteine",   label = "Team & Meilensteine",     placeholder = "Wer setzt das Projekt um und was sind die nächsten Ziele?" },
+        },
+            ["Markt- & Wettbewerbsanalyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "marktbeschreibung",       label = "Marktbeschreibung",        placeholder = "In welcher Branche sind Sie tätig? Was sind die aktuellen Trends?" },
+            new FeldDefinition { key = "zielgruppensegmente",     label = "Zielgruppensegmente",      placeholder = "Wer sind Ihre Kernkunden? (z.B. „Software-Startups“)" },
+            new FeldDefinition { key = "direkteWettbewerber",     label = "Direkte Wettbewerber",     placeholder = "Welche Firmen bieten ein identisches Produkt an?" },
+            new FeldDefinition { key = "indirekteWettbewerber",   label = "Indirekte Wettbewerber",   placeholder = "Welche alternativen Lösungen nutzen Kunden aktuell (z.B. Excel)?" },
+            new FeldDefinition { key = "wettbewerbsvorteile",     label = "Wettbewerbsvorteile",      placeholder = "Was ist Ihr Alleinstellungsmerkmal (USP) (z.B. „Guided UI“)?" },
+            new FeldDefinition { key = "marktpotenzial",          label = "Marktpotenzial",           placeholder = "Wie schätzen Sie das Wachstum in den nächsten 3 Jahren ein?" },
+        },
+            ["SWOT-Analyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Was sind Ihre Wettbewerbsvorteile? (z.B. „Hocheffiziente Architektur“)" },
+            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Wo liegen interne Defizite? (z.B. „Begrenzte Personalressourcen“)" },
+            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Welche Markttrends können Sie nutzen? (z.B. „Wachsender Digitalisierungsbedarf“)" },
+            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Welche Gefahren drohen von außen? (z.B. „Markteintritt großer Wettbewerber“)" },
+            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Welche Kernmaßnahmen leiten Sie aus dieser Analyse ab?" },
+        },
+            ["Zielgruppenanalyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "kernZielgruppe",         label = "Kern-Zielgruppe",         placeholder = "Wer ist der ideale Kunde? (z.B. „Einzelgründer im IT-Sektor“)" },
+            new FeldDefinition { key = "demografischeMerkmale",  label = "Demografische Merkmale",  placeholder = "Alter, Region, Branche oder Unternehmensgröße" },
+            new FeldDefinition { key = "psychografischeMerkmale",label = "Psychografische Merkmale",placeholder = "Welche Werte und Interessen hat die Zielgruppe?" },
+            new FeldDefinition { key = "painPoints",             label = "Probleme & Pain Points",  placeholder = "Vor welchen Herausforderungen stehen die Kunden aktuell?" },
+            new FeldDefinition { key = "kaufmotivation",         label = "Kaufmotivation",          placeholder = "Warum entscheidet sich der Kunde für Ihr Produkt?" },
+            new FeldDefinition { key = "kommunikationswege",     label = "Kommunikationswege",      placeholder = "Über welche Kanäle erreichen Sie diese Personen?" },
+        },
+            ["Fördermittelübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "planungszeitraum",   label = "Planungszeitraum",      placeholder = "Zeitraum oder Phase (z.B. „Gründungsphase 2026/27“)" },
+            new FeldDefinition { key = "zuschussProgramm1",  label = "Zuschuss-Programm 1",   placeholder = "Name des ersten Zuschusses (z.B. „EXIST-Gründerstipendium“)" },
+            new FeldDefinition { key = "zuschussProgramm2",  label = "Zuschuss-Programm 2",   placeholder = "Weiteres Programm (z.B. „Gründungszuschuss BfA“)" },
+            new FeldDefinition { key = "kreditProgramm1",    label = "Kredit-Programm 1",     placeholder = "Name des Darlehens (z.B. „KfW Startgeld“)" },
+            new FeldDefinition { key = "kreditProgramm2",    label = "Kredit-Programm 2",     placeholder = "Weiteres Darlehen (z.B. „ERP-Gründerkredit“)" },
+            new FeldDefinition { key = "sonstigeMittel",     label = "Sonstige Mittel",       placeholder = "Wettbewerbe oder Sponsoring (z.B. „Businessplan-Wettbewerb Sachsen“)" },
+            new FeldDefinition { key = "strategischeNotizen",label = "Strategische Notizen",  placeholder = "Freitext für Fristen oder nächste Schritte" },
+        },
+            ["Darlehensübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "berichtsstand",         label = "Berichtsstand",         placeholder = "Datum der Erfassung (z.B. „3. Quartal 2026“)" },
+            new FeldDefinition { key = "darlehensbezeichnung",  label = "Darlehensbezeichnung",  placeholder = "Name des Kredits (z.B. „KfW Startgeld“)" },
+            new FeldDefinition { key = "kreditgeber",           label = "Kreditgeber",           placeholder = "Name der Bank oder des Investors" },
+            new FeldDefinition { key = "darlehenssumme",        label = "Darlehenssumme",        placeholder = "Gesamter Nominalbetrag in EUR" },
+            new FeldDefinition { key = "zinssatz",              label = "Zinssatz (%)",          placeholder = "Jährlicher Zinssatz (z.B. „3,0 %“)" },
+            new FeldDefinition { key = "laufzeit",              label = "Laufzeit (Jahre)",      placeholder = "Dauer der Rückzahlung (z.B. „3 Jahre“)" },
+            new FeldDefinition { key = "monatlicheRate",        label = "Monatliche Rate",       placeholder = "Betrag für Zins und Tilgung in EUR" },
+            new FeldDefinition { key = "verwendungszweck",      label = "Verwendungszweck",      placeholder = "Wofür wurde das Geld genutzt? (z.B. „Büroausstattung“)" },
+        },
+            ["Versicherungsübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "berichtsstand",        label = "Berichtsstand",        placeholder = "Datum der Erfassung (z.B. „August 2026“)" },
+            new FeldDefinition { key = "versicherungstyp",     label = "Versicherungstyp",     placeholder = "Art der Absicherung (z.B. „IT-Haftpflicht“ oder „Rechtsschutz“)" },
+            new FeldDefinition { key = "versicherer",          label = "Versicherer",          placeholder = "Name der Versicherungsgesellschaft" },
+            new FeldDefinition { key = "versicherungsnummer",  label = "Versicherungsnummer",  placeholder = "Eindeutige Kennung der Police" },
+            new FeldDefinition { key = "beitrag",              label = "Beitrag (EUR)",        placeholder = "Monatliche oder jährliche Prämie" },
+            new FeldDefinition { key = "zahlungsrhythmus",     label = "Zahlungsrhythmus",     placeholder = "monatlich / vierteljährlich / jährlich" },
+            new FeldDefinition { key = "zusatznotiz",          label = "Zusatznotiz",          placeholder = "Optionale Infos (z.B. „inkl. Cyber-Risk-Abdeckung“)" },
+        },
+            ["Kundenzufriedenheitsumfrage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "befragungszeitraum", label = "Befragungszeitraum", placeholder = "Zeitraum oder Projektname (z.B. „Projekt XY – Q3 2026“)" },
+            new FeldDefinition { key = "einleitungstext",    label = "Einleitungstext",     placeholder = "Persönliche Ansprache (z.B. „Helfen Sie uns, besser zu werden“)" },
+            new FeldDefinition { key = "leistungsfokus",     label = "Leistungsfokus",      placeholder = "Was wurde bewertet? (z.B. „Software-Implementierung“)" },
+            new FeldDefinition { key = "frage1",             label = "Frage 1",             placeholder = "Erste Qualitätsabfrage (z.B. „Wie zufrieden sind Sie mit der Usability?“)" },
+            new FeldDefinition { key = "frage2",             label = "Frage 2",             placeholder = "Zweite Qualitätsabfrage (z.B. „Wie klar war die Kommunikation?“)" },
+            new FeldDefinition { key = "frage3",             label = "Frage 3",             placeholder = "Dritte Qualitätsabfrage (z.B. „Entspricht das Ergebnis Ihren Erwartungen?“)" },
+            new FeldDefinition { key = "schlusswort",        label = "Schlusswort",         placeholder = "Dankesformel an den Kunden" },
+        },
+            ["Vollmachtvorlage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "betreff", label = "Betreff (optional)", placeholder = "Kurztitel für die Kopfzeile (z.B. „Postvollmacht“)" },
+        },
+            ["Gesellschafterliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "erstellungsdatum",  label = "Erstellungsdatum",       placeholder = "Datum der aktuellen Liste (Stichtag, TT.MM.JJJJ)" },
+            new FeldDefinition { key = "gesellschafter1",   label = "Gesellschafter 1",       placeholder = "Name, Vorname, Geburtsdatum, Wohnort" },
+            new FeldDefinition { key = "anteil1",           label = "Anteil 1 (Betrag)",      placeholder = "Nennbetrag des Anteils in EUR (z.B. „12.500 €“)" },
+            new FeldDefinition { key = "gesellschafter2",   label = "Gesellschafter 2",       placeholder = "Name, Vorname, Geburtsdatum, Wohnort" },
+            new FeldDefinition { key = "anteil2",           label = "Anteil 2 (Betrag)",      placeholder = "Nennbetrag des Anteils in EUR" },
+            new FeldDefinition { key = "stammkapitalGesamt",label = "Stammkapital Gesamt",    placeholder = "Summe aller Anteile in EUR" },
+            new FeldDefinition { key = "zusatzangaben",     label = "Zusatzangaben",          placeholder = "z.B. „Laufende Nummern der Anteile 1 bis X“" },
+        },
+            ["Gutschriftvorlage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "tabellenzeilen", label = "Tabellenzeilen", placeholder = "Anzahl der Leerzeilen für Positionen (z.B. „5“)" },
+            new FeldDefinition { key = "zusatzhinweis",  label = "Zusatzhinweis",  placeholder = "Optionaler Text (z.B. „Bitte Grund der Gutschrift angeben“)" },
+        },
+            ["Besprechungsprotokoll"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "themenFokus",         label = "Themen-Fokus",           placeholder = "Projekttitel oder Bereich (z.B. „Projekt XY – Meilenstein 1“)" },
+            new FeldDefinition { key = "anzahlAufgabenzeilen",label = "Anzahl Aufgabenzeilen",  placeholder = "Auswahl: „Standard (8 Zeilen)“" },
+            new FeldDefinition { key = "zusatzhinweis",       label = "Zusatzhinweis",          placeholder = "Optionaler Text (z.B. „Bitte zur Dokumentation in die Cloud hochladen“)" },
+        },
+            ["Inventarliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "tabellenzeilen",  label = "Tabellenzeilen",   placeholder = "Anzahl der Leerzeilen (z.B. „15“ oder „Ganze Seite“)" },
+            new FeldDefinition { key = "inventurBereich", label = "Inventur-Bereich", placeholder = "Optionaler Fokus (z.B. „IT-Hardware“ oder „Büroausstattung“)" },
+        },
+            ["Unternehmensrichtlinien"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",        label = "Versionsstand",           placeholder = "Datum oder Nummer (z.B. „v1.0 – Stand August 2026“)" },
+            new FeldDefinition { key = "vision",               label = "Vision",                  placeholder = "Was ist die Unternehmensvision in einem kurzen Text" },
+            new FeldDefinition { key = "unternehmenskultur",   label = "Unternehmenskultur",      placeholder = "Kurzbeschreibung der Werte (z.B. „Transparenz & Eigenverantwortung“)" },
+            new FeldDefinition { key = "reaktionszeit",        label = "Reaktionszeit (Std.)",    placeholder = "Zeitfenster für interne Rückmeldungen (Standard: „24 Stunden“)" },
+            new FeldDefinition { key = "technologieStack",     label = "Technologie-Stack",       placeholder = "Genutzte Tools (z.B. „Unity, GitHub, SQLite, Ventoriq“)" },
+            new FeldDefinition { key = "designStack",          label = "Design-Stack",            placeholder = "Genutzte Tools und Details (z.B. „Unity, GitHub, SQLite, Ventoriq, 1080p“)" },
+            new FeldDefinition { key = "uxStack",              label = "UX-Stack",                placeholder = "Details zum Ablauf und zur Sicherstellung der Qualitätssicherung" },
+            new FeldDefinition { key = "datenschutzabschnitt", label = "Datenschutzabschnitt",    placeholder = "Kurzbeschreibung wie der Datenschutz aussieht" },
+            new FeldDefinition { key = "datensicherheitabschnitt", label = "Datensicherheitsabschnitt", placeholder = "Kurzbeschreibung wie es zum Thema Datensicherheit steht" },
+            new FeldDefinition { key = "zusatzangaben",        label = "Zusatzangaben",           placeholder = "Optionale spezifische Regeln (z.B. „Home-Office-Vorgaben“)" },
+        },
+            ["Social Media Strategie"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "primaereKanaele",   label = "Primäre Kanäle",     placeholder = "Auswahl der Plattformen (z.B. „LinkedIn & Discord“)" },
+            new FeldDefinition { key = "kernbotschaft",     label = "Kernbotschaft",      placeholder = "Die Hauptaussage (z.B. „Gründen ohne kognitive Last“)" },
+            new FeldDefinition { key = "postFrequenz",      label = "Post-Frequenz",      placeholder = "Wie oft wird gepostet? (z.B. „3x wöchentlich“)" },
+            new FeldDefinition { key = "zielgruppe",        label = "Zielgruppe",         placeholder = "Definition (z.B. „Software-Gründer & Startups“)" },
+            new FeldDefinition { key = "zusatzangabe",      label = "Zusatzangabe",       placeholder = "Besondere Kampagnen (z.B. „Release-Countdown zum 01.07.“)" },
+            new FeldDefinition { key = "productInsights",  label = "Product Insights",   placeholder = "Contentschwerpunkt - Inhalt für Produkte" },
+            new FeldDefinition { key = "techTransparenz",  label = "Tech Transparenz",   placeholder = "Contentschwerpunkt - Inhalt für Technik & Transparenz" },
+            new FeldDefinition { key = "startupEducation", label = "Startup Education",  placeholder = "Contentschwerpunkt - Inhalt für Weiteres" },
         },
         };
 
@@ -592,7 +794,18 @@ public class DocumentDashboard : MonoBehaviour
 
     private void SpawnAllCardsAtStart()
     {
-        if (gridContainer == null || categoryCardTemplate == null) return;
+        if (gridContainer == null)
+        {
+            Debug.LogError("[Dokumente] gridContainer ist leer - UXML-Struktur oder UIDocument-Zuweisung prüfen.");
+            return;
+        }
+        if (categoryCardTemplate == null)
+        {
+            Debug.LogError("[Dokumente] categoryCardTemplate ist im Inspector nicht zugewiesen - " +
+                "dadurch werden keine Kategorie-Karten angezeigt. Bitte am DocumentDashboard-" +
+                "GameObject die CategoryCard.uxml-Datei ins Feld 'Category Card Template' ziehen.");
+            return;
+        }
         gridContainer.Clear();
 
         foreach (var kategorie in kategorien)

@@ -27,6 +27,19 @@ public static class DokumentPdfGenerator
     // ─────────────────────────────────────────
 
     // Holt den Wert eines Struktur-Felds anhand des Keys, oder "" falls nicht gesetzt.
+    // Liest eine Zeilenanzahl aus einem Freitext-Feld wie "5" oder
+    // "Standard (8 Zeilen)" - nimmt die erste gefundene Zahl, sonst den
+    // übergebenen Standardwert. Nach oben gedeckelt, damit ein Tippfehler
+    // (z.B. "500") nicht eine unbrauchbar lange PDF erzeugt.
+    public static int LeseZeilenAnzahl(string wert, int standard, int max)
+    {
+        if (string.IsNullOrWhiteSpace(wert)) return standard;
+        var treffer = System.Text.RegularExpressions.Regex.Match(wert, @"\d+");
+        if (!treffer.Success) return standard;
+        if (!int.TryParse(treffer.Value, out int zahl) || zahl <= 0) return standard;
+        return Math.Min(zahl, max);
+    }
+
     public static string Feld(List<DocumentDashboard.StrukturFeldWert> felder, string key)
     {
         if (felder == null) return "";
@@ -169,6 +182,212 @@ public static class DokumentPdfGenerator
                     unterschriftTable.AddCell(new PdfPCell(linksParagraph) { Border = Rectangle.NO_BORDER });
                     unterschriftTable.AddCell(new PdfPCell(rechtsParagraph) { Border = Rectangle.NO_BORDER });
                     doc.Add(unterschriftTable);
+                }
+
+                doc.Close();
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[DokumentPdfGenerator] Fehler beim Erstellen von \"" + titel + "\": " + e.Message);
+            return false;
+        }
+    }
+
+    // Variante von ErstellePdf für Dokumente mit ZWEI Unterschriftenzeilen
+    // untereinander (z.B. Arbeitsvertrag: Arbeitgeber + Arbeitnehmer),
+    // statt der üblichen einen Zeile mit zwei Spalten nebeneinander.
+    public static bool ErstellePdfMitDoppelSignatur(string dateipfad, string titel,
+        List<(bool istUeberschrift, string text)> bloecke,
+        string signatur1Links, string signatur1Rechts,
+        string signatur2Links, string signatur2Rechts)
+    {
+        try
+        {
+            string ordner = Path.GetDirectoryName(dateipfad);
+            if (!string.IsNullOrEmpty(ordner)) Directory.CreateDirectory(ordner);
+
+            var firma = HoleFirmendaten();
+
+            Document doc = new Document(PageSize.A4, 50, 50, 60, 75);
+            using (FileStream fs = new FileStream(dateipfad, FileMode.Create))
+            {
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent(firma.Name, firma.Anschrift, false);
+
+                doc.AddAuthor("Ventoriq");
+                doc.AddTitle(titel);
+                doc.Open();
+
+                var titelFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 17);
+                var ueberschriftFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+                var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+                var grauFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
+
+                doc.Add(new Paragraph(titel, titelFont));
+                doc.Add(new Paragraph(firma.Name + (string.IsNullOrEmpty(firma.Rechtsform) ? "" : " " + firma.Rechtsform), grauFont));
+                doc.Add(new Paragraph("Erstellt am: " + DateTime.Now.ToString("dd.MM.yyyy"), grauFont));
+                doc.Add(new Paragraph(" "));
+
+                foreach (var (istUeberschrift, text) in bloecke)
+                {
+                    if (string.IsNullOrWhiteSpace(text)) { doc.Add(new Paragraph(" ")); continue; }
+                    var p = new Paragraph(text, istUeberschrift ? ueberschriftFont : textFont);
+                    p.SpacingAfter = istUeberschrift ? 6f : 10f;
+                    doc.Add(p);
+                }
+
+                doc.Add(new Paragraph(" "));
+                doc.Add(new Paragraph(" "));
+
+                void FuegeSignaturzeileHinzu(string links, string rechts)
+                {
+                    var linksP = new Paragraph();
+                    linksP.Add(new Chunk("__________________________", textFont));
+                    linksP.Add(Chunk.NEWLINE);
+                    linksP.Add(new Chunk(links, textFont));
+
+                    var rechtsP = new Paragraph();
+                    rechtsP.Add(new Chunk("__________________________", textFont));
+                    rechtsP.Add(Chunk.NEWLINE);
+                    rechtsP.Add(new Chunk(rechts, textFont));
+
+                    var tabelle = new PdfPTable(2);
+                    tabelle.WidthPercentage = 100f;
+                    tabelle.AddCell(new PdfPCell(linksP) { Border = Rectangle.NO_BORDER, PaddingBottom = 16f });
+                    tabelle.AddCell(new PdfPCell(rechtsP) { Border = Rectangle.NO_BORDER, PaddingBottom = 16f });
+                    doc.Add(tabelle);
+                }
+
+                FuegeSignaturzeileHinzu(signatur1Links, signatur1Rechts);
+                FuegeSignaturzeileHinzu(signatur2Links, signatur2Rechts);
+
+                doc.Close();
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[DokumentPdfGenerator] Fehler beim Erstellen von \"" + titel + "\": " + e.Message);
+            return false;
+        }
+    }
+
+    // ─────────────────────────────────────────
+    // ERWEITERTER RENDERER MIT TABELLEN-UNTERSTÜTZUNG
+    // Für Vorlagen wie Fördermittelübersicht, Darlehensübersicht,
+    // Versicherungsübersicht, die echte Tabellen statt nur Fließtext
+    // brauchen. Der einfache ErstellePdf-Weg (nur Text/Überschriften)
+    // bleibt für alle anderen Dokumente unverändert bestehen.
+    // ─────────────────────────────────────────
+    public class PdfBlock
+    {
+        public enum ArtTyp { Ueberschrift, Text, Tabelle }
+        public ArtTyp Art;
+        public string Text;
+        public string[] TabellenSpalten;
+        public List<string[]> TabellenZeilen;
+
+        public static PdfBlock Ueberschrift(string text) => new PdfBlock { Art = ArtTyp.Ueberschrift, Text = text };
+        public static PdfBlock Absatz(string text) => new PdfBlock { Art = ArtTyp.Text, Text = text };
+        public static PdfBlock Tabelle(string[] spalten, List<string[]> zeilen) =>
+            new PdfBlock { Art = ArtTyp.Tabelle, TabellenSpalten = spalten, TabellenZeilen = zeilen };
+    }
+
+    public static bool ErstellePdfErweitert(string dateipfad, string titel, List<PdfBlock> bloecke,
+        bool mitUnterschrift = true, string unterschriftLinks = "(Ort, Datum)", string unterschriftRechts = "(Unterschrift)")
+    {
+        try
+        {
+            string ordner = Path.GetDirectoryName(dateipfad);
+            if (!string.IsNullOrEmpty(ordner)) Directory.CreateDirectory(ordner);
+
+            var firma = HoleFirmendaten();
+
+            Document doc = new Document(PageSize.A4, 45, 45, 60, 75);
+            using (FileStream fs = new FileStream(dateipfad, FileMode.Create))
+            {
+                PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+                writer.PageEvent = new PdfFooterEvent(firma.Name, firma.Anschrift, false);
+
+                doc.AddAuthor("Ventoriq");
+                doc.AddTitle(titel);
+                doc.Open();
+
+                var titelFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 17);
+                var ueberschriftFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+                var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11);
+                var grauFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, new iTextSharp.text.Color(128, 128, 128));
+                var tabellenKopfFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9, iTextSharp.text.Color.WHITE);
+                var tabellenTextFont = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                var kopfFarbe = new iTextSharp.text.Color(60, 60, 60);
+
+                doc.Add(new Paragraph(titel, titelFont));
+                doc.Add(new Paragraph(firma.Name + (string.IsNullOrEmpty(firma.Rechtsform) ? "" : " " + firma.Rechtsform), grauFont));
+                doc.Add(new Paragraph("Erstellt am: " + DateTime.Now.ToString("dd.MM.yyyy"), grauFont));
+                doc.Add(new Paragraph(" "));
+
+                foreach (var block in bloecke)
+                {
+                    switch (block.Art)
+                    {
+                        case PdfBlock.ArtTyp.Ueberschrift:
+                            var u = new Paragraph(block.Text, ueberschriftFont);
+                            u.SpacingAfter = 6f;
+                            doc.Add(u);
+                            break;
+
+                        case PdfBlock.ArtTyp.Text:
+                            if (string.IsNullOrWhiteSpace(block.Text)) { doc.Add(new Paragraph(" ")); break; }
+                            var p = new Paragraph(block.Text, textFont);
+                            p.SpacingAfter = 10f;
+                            doc.Add(p);
+                            break;
+
+                        case PdfBlock.ArtTyp.Tabelle:
+                            var tabelle = new PdfPTable(block.TabellenSpalten.Length) { WidthPercentage = 100f };
+                            foreach (var spalte in block.TabellenSpalten)
+                            {
+                                var kopfZelle = new PdfPCell(new Phrase(spalte, tabellenKopfFont))
+                                {
+                                    BackgroundColor = kopfFarbe,
+                                    Padding = 5f,
+                                    HorizontalAlignment = Element.ALIGN_LEFT
+                                };
+                                tabelle.AddCell(kopfZelle);
+                            }
+                            foreach (var zeile in block.TabellenZeilen)
+                            {
+                                foreach (var wert in zeile)
+                                {
+                                    var zelle = new PdfPCell(new Phrase(wert ?? "", tabellenTextFont)) { Padding = 5f };
+                                    tabelle.AddCell(zelle);
+                                }
+                            }
+                            doc.Add(tabelle);
+                            doc.Add(new Paragraph(" "));
+                            break;
+                    }
+                }
+
+                if (mitUnterschrift)
+                {
+                    doc.Add(new Paragraph(" "));
+                    var linksP = new Paragraph();
+                    linksP.Add(new Chunk("__________________________", textFont));
+                    linksP.Add(Chunk.NEWLINE);
+                    linksP.Add(new Chunk(unterschriftLinks, textFont));
+
+                    var rechtsP = new Paragraph();
+                    rechtsP.Add(new Chunk("__________________________", textFont));
+                    rechtsP.Add(Chunk.NEWLINE);
+                    rechtsP.Add(new Chunk(unterschriftRechts, textFont));
+
+                    var signaturTabelle = new PdfPTable(2) { WidthPercentage = 100f };
+                    signaturTabelle.AddCell(new PdfPCell(linksP) { Border = Rectangle.NO_BORDER });
+                    signaturTabelle.AddCell(new PdfPCell(rechtsP) { Border = Rectangle.NO_BORDER });
+                    doc.Add(signaturTabelle);
                 }
 
                 doc.Close();
@@ -570,6 +789,7 @@ public static class DokumentPdfGenerator
         var f = doc.strukturFelder;
         var firma = HoleFirmendaten();
         string geltungsbereich = Feld(f, "geltungsbereich");
+        string inhaltlichePruefung = Feld(f, "inhaltlichePruefung");
         string externeVerweise = Feld(f, "externeVerweise");
         string urheberrechtshinweis = Feld(f, "urheberrechtshinweis");
         string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
@@ -578,6 +798,7 @@ public static class DokumentPdfGenerator
         {
             (true,  "§ 1 Haftung für Inhalte"),
             (false, $"Die Inhalte der Software/Dienste von {firma.Name} im Bereich " + N(geltungsbereich) + " wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Wir behalten uns vor, Inhalte ohne gesonderte Ankündigung zu verändern oder zu löschen."),
+            (false, "Inhaltliche Prüfung: " + N(inhaltlichePruefung) + "."),
             (true,  "§ 2 Haftung für Links"),
             (false, "Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. " + N(externeVerweise)),
             (true,  "§ 3 Urheberrecht"),
@@ -603,28 +824,42 @@ public static class DokumentPdfGenerator
         var firma = HoleFirmendaten();
         string gueltigkeitsbereich = Feld(f, "gueltigkeitsbereich");
         string zusatzhinweis = Feld(f, "zusatzhinweis");
+        string ausfuehrung = Feld(f, "ausfuehrung");
+        bool zweifach = !string.IsNullOrWhiteSpace(ausfuehrung) && ausfuehrung.Trim().ToLower().Contains("zwei");
 
-        var bloecke = new List<(bool, string)>
+        List<(bool, string)> BaueQuittungsblock(string kennzeichnung)
         {
-            (true,  "Barzahlung & Quittung"),
-            (false, "Aussteller: " + firma.Name + " " + firma.Rechtsform +
-                    (string.IsNullOrEmpty(firma.Anschrift) ? "" : ", " + firma.Anschrift) +
-                    (string.IsNullOrEmpty(firma.SteuerNr) ? "" : " \u2013 Steuer-Nr.: " + firma.SteuerNr)),
-            (true,  "Organisatorische Angaben"),
-            (false, "Gültigkeitsbereich: " + (string.IsNullOrEmpty(gueltigkeitsbereich) ? "[nicht angegeben]" : gueltigkeitsbereich)),
-            (false, "Zusatzhinweis: " + (string.IsNullOrEmpty(zusatzhinweis) ? "\u2013" : zusatzhinweis)),
-            (false, " "),
-            (false, "Zahlung von: ________________________________________________"),
-            (false, "(Name / Anschrift des Zahlers)"),
-            (false, " "),
-            (false, "Bruttobetrag (in Zahlen): € ____________________"),
-            (false, "Betrag in Worten: ___________________________________________"),
-            (false, "Verwendungszweck / Leistung: ________________________________"),
-            (false, "Steuerliche Aufschlüsselung: [ ] 19% MwSt. | [ ] 7% MwSt. | [ ] ____ % MwSt."),
-            (false, "MwSt.-Betrag: ________________ EUR      Nettobetrag: ________________ EUR"),
-            (true,  "Rechtlicher Hinweis"),
-            (false, "Dieser Vordruck wurde maschinell mit dem System Ventoriq erstellt. Er dient als offizieller Nachweis über den Erhalt eines Barbetrags."),
-        };
+            var block = new List<(bool, string)>
+            {
+                (true,  "Barzahlung & Quittung" + (string.IsNullOrEmpty(kennzeichnung) ? "" : " (" + kennzeichnung + ")")),
+                (false, "Aussteller: " + firma.Name + " " + firma.Rechtsform +
+                        (string.IsNullOrEmpty(firma.Anschrift) ? "" : ", " + firma.Anschrift) +
+                        (string.IsNullOrEmpty(firma.SteuerNr) ? "" : " \u2013 Steuer-Nr.: " + firma.SteuerNr)),
+                (true,  "Organisatorische Angaben"),
+                (false, "Gültigkeitsbereich: " + (string.IsNullOrEmpty(gueltigkeitsbereich) ? "[nicht angegeben]" : gueltigkeitsbereich)),
+                (false, "Zusatzhinweis: " + (string.IsNullOrEmpty(zusatzhinweis) ? "\u2013" : zusatzhinweis)),
+                (false, " "),
+                (false, "Zahlung von: ________________________________________________"),
+                (false, "(Name / Anschrift des Zahlers)"),
+                (false, " "),
+                (false, "Bruttobetrag (in Zahlen): € ____________________"),
+                (false, "Betrag in Worten: ___________________________________________"),
+                (false, "Verwendungszweck / Leistung: ________________________________"),
+                (false, "Steuerliche Aufschlüsselung: [ ] 19% MwSt. | [ ] 7% MwSt. | [ ] ____ % MwSt."),
+                (false, "MwSt.-Betrag: ________________ EUR      Nettobetrag: ________________ EUR"),
+                (true,  "Rechtlicher Hinweis"),
+                (false, "Dieser Vordruck wurde maschinell mit dem System Ventoriq erstellt. Er dient als offizieller Nachweis über den Erhalt eines Barbetrags."),
+            };
+            return block;
+        }
+
+        var bloecke = BaueQuittungsblock(zweifach ? "Original" : "");
+        if (zweifach)
+        {
+            bloecke.Add((false, " "));
+            bloecke.Add((false, "─────────────────────────────────────────"));
+            bloecke.AddRange(BaueQuittungsblock("Kopie"));
+        }
 
         string pfad = PfadFuer("Barzahlung");
         bool ok = ErstellePdf(pfad, "Barzahlung", bloecke, true, "Ort, Datum", "(Handzeichen / Stempel des Empfängers)");
@@ -755,8 +990,12 @@ public static class DokumentPdfGenerator
         string zahlungsziel = Feld(f, "zahlungsziel");
         string verzugszinssatz = Feld(f, "verzugszinssatz");
         string bearbeitungspauschale = Feld(f, "bearbeitungspauschale");
+        string intervallMahnstufen = Feld(f, "intervallMahnstufen");
         string zusatzhinweis = Feld(f, "zusatzhinweis");
         string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+        string intervallText = string.IsNullOrWhiteSpace(intervallMahnstufen)
+            ? "Sollte ein Zahlungseingang ausbleiben, folgen wir in der Regel diesem Prozess:"
+            : "Sollte ein Zahlungseingang ausbleiben, folgen wir in der Regel diesem Prozess (Intervall zwischen den Stufen: " + intervallMahnstufen + " Tage):";
 
         var bloecke = new List<(bool, string)>
         {
@@ -768,7 +1007,7 @@ public static class DokumentPdfGenerator
             (false, "(2) Das Recht zur Geltendmachung eines darüber hinausgehenden Schadens bleibt hiervon unberührt."),
             (false, "(3) Ab der zweiten Mahnstufe wird eine Bearbeitungspauschale von " + N(bearbeitungspauschale) + " EUR erhoben."),
             (true,  "§ 3 Ablauf des Mahnverfahrens"),
-            (false, "Sollte ein Zahlungseingang ausbleiben, folgen wir in der Regel diesem Prozess:"),
+            (false, intervallText),
             (false, "1. Zahlungserinnerung: Ein freundlicher Hinweis auf den offenen Posten (kurz nach Fristablauf)."),
             (false, "2. 1. Mahnung: Formelle Aufforderung zur Zahlung unter Setzung einer Nachfrist."),
             (false, "3. 2. Mahnung: Letzte außergerichtliche Aufforderung inkl. Mahngebühren."),
@@ -935,6 +1174,1007 @@ public static class DokumentPdfGenerator
     }
 
     // ─────────────────────────────────────────
+    // LIZENZHINWEIS ERWEITERT
+    // ─────────────────────────────────────────
+    public static string ErstelleLizenzhinweisErweitert(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string geltungsbereich = Feld(f, "geltungsbereich");
+        string bedingung = Feld(f, "bedingungRechteuebergang");
+        string nutzungsumfang = Feld(f, "nutzungsumfang");
+        string raeumlich = Feld(f, "raeumlicheReichweite");
+        string zeitlich = Feld(f, "zeitlicheReichweite");
+        string zusatzvereinbarung = Feld(f, "zusatzvereinbarung");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Grundsatz der Lizenzierung"),
+            (false, $"Dieser Lizenzhinweis regelt die Einräumung von Nutzungsrechten für alle Leistungen, Entwürfe und Werke der {firma.Name}. Er ist integraler Bestandteil der vertraglichen Beziehung und gilt für: " + N(geltungsbereich) + "."),
+            (true,  "2. Unbeschränktes Nutzungsrecht"),
+            (false, "Dem Auftraggeber wird ein unbeschränktes Nutzungsrecht eingeräumt. Dies umfasst ausdrücklich:"),
+            (false, "Art der Nutzung: " + N(nutzungsumfang)),
+            (false, "Räumliche Reichweite: " + N(raeumlich)),
+            (false, "Zeitliche Reichweite: " + N(zeitlich)),
+            (true,  "3. Rechteübergang und Bedingungen"),
+            (false, "Die Übertragung der genannten Rechte erfolgt unter der aufschiebenden Bedingung der: " + N(bedingung) + ". Bis zur Erfüllung dieser Bedingung verbleiben sämtliche Rechte sowie das Eigentum an Zwischenergebnissen beim Urheber."),
+            (true,  "4. Bearbeitungs- und Weitergaberechte"),
+            (false, "Der Lizenznehmer ist berechtigt, die Leistungen nach eigenem Ermessen zu verändern, zu erweitern oder mit anderen Werken zu verbinden. Die Weitergabe der Rechte an Dritte sowie die Erteilung von Unterlizenzen ist " + N(zusatzvereinbarung) + "."),
+            (true,  "5. Urheberrecht"),
+            (false, $"Das unveräußerliche Urheberrecht verbleibt bei der {firma.Name}. Der Urheber behält sich das Recht vor, die erbrachten Leistungen zum Zwecke der Eigenwerbung (Referenzen) zu nutzen, sofern nichts anderes schriftlich vereinbart wurde."),
+            (false, $"Rechtlicher Hinweis: Dieses Dokument dient der Information über die standardmäßig geltenden Lizenzbestimmungen unserer AGB. Es ist Bestandteil der kaufmännischen Unterlagen von {firma.Name} und auch ohne handschriftliche Unterschrift rechtsgültig."),
+        };
+
+        string pfad = PfadFuer("Lizenzhinweis_Erweitert");
+        bool ok = ErstellePdf(pfad, "Lizenzhinweis Erweitert", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // DATENSCHUTZERKLÄRUNG
+    // ─────────────────────────────────────────
+    public static string ErstelleDatenschutzerklaerung(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string versionsstand = Feld(f, "versionsstand");
+        string verantwortlicheStelle = Feld(f, "verantwortlicheStelle");
+        string kontaktDatenschutz = Feld(f, "kontaktDatenschutz");
+        string zusatzangabe = Feld(f, "zusatzangabe");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>();
+        if (!string.IsNullOrWhiteSpace(versionsstand)) bloecke.Add((false, versionsstand));
+
+        bloecke.AddRange(new List<(bool, string)>
+        {
+            (true,  "§ 1 Grundsatz der Vertraulichkeit"),
+            (false, $"(1) Gemäß § 5.1 unserer AGB werden alle Informationen und Unterlagen, die im Rahmen der Zusammenarbeit zwischen der {firma.Name} und dem Kunden bekannt werden oder entstehen, streng vertraulich behandelt."),
+            (false, "(2) Dies gilt insbesondere für kundenspezifische Daten, Software-Architekturen, Geschäftsgeheimnisse und Kalkulationen, die während der gemeinsamen Tätigkeit ausgetauscht werden."),
+            (true,  "§ 2 Lokale Datenverarbeitung (Systemstandard)"),
+            (false, "(1) Der Kunde wird darüber informiert, dass zur Abwicklung von Angeboten und Rechnungen das System Ventoriq eingesetzt wird."),
+            (false, "(2) Datensparsamkeit: Personenbezogene Daten werden ausschließlich lokal in einer verschlüsselten SQLite-Instanz auf unseren Endgeräten gespeichert."),
+            (false, "(3) Es findet keine Übermittlung dieser Daten in eine Cloud oder an externe Server statt, sofern dies nicht ausdrücklich für die Projektdurchführung (z. B. Hosting-Setup) schriftlich vereinbart wurde."),
+            (true,  "§ 3 Zweck der Datenerfassung"),
+            (false, "Die Erfassung und Verarbeitung von Kundendaten (Name, Anschrift, Bankdaten, Projektdetails) erfolgt ausschließlich zum Zweck der: Erstellung von rechtskonformen Angeboten und Rechnungen; Dokumentation der erbrachten Dienstleistungen im Kassenbuch; Pflege der gemeinsamen Geschäftsbeziehung in der Kundendatenbank (KDB)."),
+            (true,  "§ 4 Sicherheit & Löschung"),
+            (false, "(1) Zum Schutz der Daten werden moderne Verschlüsselungsverfahren (SHA-256 Hashing für Zugänge) eingesetzt."),
+            (false, "(2) Nach Abschluss der Tätigkeit und Ablauf der gesetzlichen Aufbewahrungsfristen werden alle projektspezifischen Daten auf Verlangen des Kunden gelöscht, sofern dem keine gesetzlichen Pflichten entgegenstehen."),
+            (true,  "§ 5 Verantwortlichkeit & Kontakt"),
+            (false, "Verantwortlich für die Einhaltung dieser Bestimmungen ist: " + N(verantwortlicheStelle) + "."),
+            (false, "Bei Fragen wenden Sie sich bitte an: " + N(kontaktDatenschutz) + "."),
+        });
+
+        if (!string.IsNullOrWhiteSpace(zusatzangabe)) bloecke.Add((false, "Zusatzhinweis: " + zusatzangabe));
+
+        bloecke.Add((false, "Rechtlicher Hinweis: Dieses Dokument wurde mit dem System Ventoriq erstellt und ist als Bestandteil des Angebots oder der Rechnung auch ohne handschriftliche Unterschrift rechtsgültig."));
+
+        string pfad = PfadFuer("Datenschutzerklaerung");
+        bool ok = ErstellePdf(pfad, "Datenschutzerklärung", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // VERTRAULICHKEITSERKLÄRUNG
+    // ─────────────────────────────────────────
+    public static string ErstelleVertraulichkeitserklaerung(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string versionsstand = Feld(f, "versionsstand");
+        string dauerDerPflicht = Feld(f, "dauerDerPflicht");
+        string kontaktNda = Feld(f, "kontaktNda");
+        string zusatzangabe = Feld(f, "zusatzangabe");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "§ 1 Grundsatz der Verschwiegenheit"),
+            (false, "(1) Vertrauen ist die Basis jeder Softwareentwicklung. Gemäß unserer Allgemeinen Geschäftsbedingungen verpflichten wir uns, alle Informationen und Unterlagen, die im Rahmen der Zusammenarbeit bekannt werden, streng vertraulich zu behandeln."),
+            (false, "(2) Dies gilt für alle Geschäftsgeheimnisse, technischen Konzepte, Quellcodes und wirtschaftlichen Daten, die nicht ausdrücklich zur Weitergabe an Dritte bestimmt sind."),
+            (true,  "§ 2 Schutz kundenspezifischer Daten (Ventoriq-Standard)"),
+            (false, "(1) Zur Bearbeitung Ihres Projekts nutzen wir das System Ventoriq. Alle projektbezogenen Daten werden ausschließlich lokal in einer verschlüsselten Umgebung gespeichert."),
+            (false, "(2) Es findet keine Übertragung Ihrer sensiblen Daten in eine Cloud statt. Damit stellen wir sicher, dass Ihre Informationen vor unbefugtem Zugriff durch externe Plattformbetreiber geschützt sind."),
+            (true,  "§ 3 Umfang der Geheimhaltung"),
+            (false, "Die Geheimhaltungspflicht umfasst: sämtliche im Rahmen von Beratungsgesprächen erlangten Kenntnisse; alle zur Verfügung gestellten Unterlagen (analog und digital); Ergebnisse von Zwischenphasen und Prototypen."),
+            (true,  "§ 4 Dauer der Verpflichtung"),
+            (false, "Die Pflicht zur Vertraulichkeit beginnt mit dem ersten Kontakt und bleibt auch nach Beendigung der aktiven Zusammenarbeit für einen Zeitraum von " + N(dauerDerPflicht) + " bestehen."),
+            (true,  "§ 5 Ausnahmen"),
+            (false, "Die Vertraulichkeit gilt nicht für Informationen, die nachweislich bereits öffentlich bekannt sind, ohne Zutun einer Vertragspartei öffentlich bekannt werden oder aufgrund gesetzlicher Vorschriften (z. B. gegenüber dem Finanzamt) offengelegt werden müssen."),
+            (true,  "§ 6 Kontakt & Zusatzvereinbarungen"),
+            (false, "Sollten für Ihr Projekt weiterführende, individuelle Geheimhaltungsvereinbarungen (NDAs) erforderlich sein, wenden Sie sich bitte an: " + N(kontaktNda) + "."),
+        };
+
+        if (!string.IsNullOrWhiteSpace(versionsstand)) bloecke.Insert(0, (false, versionsstand));
+        if (!string.IsNullOrWhiteSpace(zusatzangabe)) bloecke.Add((false, "Zusatz: " + zusatzangabe));
+
+        bloecke.Add((false, $"Rechtlicher Hinweis: Dieses Dokument dient der Information über unsere Standards zur Geheimhaltung. Es ist Bestandteil der kaufmännischen Unterlagen von {firma.Name} und auch ohne handschriftliche Unterschrift rechtsgültig."));
+
+        string pfad = PfadFuer("Vertraulichkeitserklaerung");
+        bool ok = ErstellePdf(pfad, "Vertraulichkeitserklärung", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // MUSTER-ARBEITSVERTRAG
+    // ─────────────────────────────────────────
+    public static string ErstelleArbeitsvertrag(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string vertragsart = Feld(f, "vertragsart");
+        string stellenbezeichnung = Feld(f, "stellenbezeichnung");
+        string vertragsbeginn = Feld(f, "vertragsbeginn");
+        string wochenstunden = Feld(f, "wochenstunden");
+        string bruttogehalt = Feld(f, "bruttogehalt");
+        string urlaubstage = Feld(f, "urlaubstage");
+        string probezeit = Feld(f, "probezeit");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+        string titel = string.IsNullOrEmpty(vertragsart) ? "Arbeitsvertrag" : vertragsart + "-Vertrag";
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, $"Zwischen der {firma.Name} (nachfolgend „Arbeitgeber“) und der/dem unten genannten Person (nachfolgend „Arbeitnehmer“) wird folgender Vertrag geschlossen."),
+            (true,  "§ 1 Beginn & Tätigkeit"),
+            (false, "(1) Der Arbeitnehmer wird ab dem " + N(vertragsbeginn) + " als " + N(stellenbezeichnung) + " eingestellt."),
+            (false, "(2) Der Aufgabenbereich umfasst die Unterstützung in den betrieblichen Prozessen sowie spezifische Fachaufgaben gemäß den Weisungen der Geschäftsführung."),
+            (true,  "§ 2 Probezeit"),
+            (false, "Die ersten " + N(probezeit) + " Monate des Arbeitsverhältnisses gelten als Probezeit. Während dieser Zeit kann das Arbeitsverhältnis von beiden Seiten mit einer Frist von zwei Wochen gekündigt werden."),
+            (true,  "§ 3 Vergütung & Arbeitszeit"),
+            (false, "(1) Das monatliche Bruttogehalt beträgt " + N(bruttogehalt) + " EUR."),
+            (false, "(2) Die regelmäßige wöchentliche Arbeitszeit beträgt " + N(wochenstunden) + " Stunden."),
+            (true,  "§ 4 Urlaub"),
+            (false, "Der Arbeitnehmer hat Anspruch auf einen bezahlten Erholungsurlaub von " + N(urlaubstage) + " Arbeitstagen pro Kalenderjahr."),
+            (true,  "§ 5 Verschwiegenheit & Urheberrechte"),
+            (false, "(1) Der Arbeitnehmer verpflichtet sich, über alle betrieblichen Belange und Geschäftsgeheimnisse Stillschweigen zu bewahren (gemäß der allgemeinen Vertraulichkeitserklärung von Ventoriq)."),
+            (false, "(2) Alle im Rahmen der Tätigkeit erstellten Arbeitsergebnisse (insb. Software-Code, Designs, Konzepte) stehen urheberrechtlich dem Arbeitgeber zu."),
+            (true,  "§ 6 Schlussbestimmungen"),
+            (false, "Änderungen dieses Vertrages bedürfen der Schriftform. Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit des restlichen Vertrages unberührt."),
+        };
+
+        string pfad = PfadFuer("Arbeitsvertrag");
+
+        // Sonderfall: zwei Unterschriftenzeilen (Arbeitgeber + Arbeitnehmer)
+        // statt der üblichen einen - deshalb hier direkt ohne den
+        // Standard-Signaturblock von ErstellePdf gerendert.
+        bool ok = ErstellePdfMitDoppelSignatur(pfad, titel, bloecke,
+            "(Ort, Datum)", "(Unterschrift Arbeitgeber)",
+            "(Ort, Datum)", "(Unterschrift Arbeitnehmer)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // VORLAGE KÜNDIGUNG
+    // ─────────────────────────────────────────
+    public static string ErstelleKuendigung(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string arbeitnehmer = Feld(f, "arbeitnehmer");
+        string kuendigungsdatum = Feld(f, "kuendigungsdatum");
+        string kuendigungstermin = Feld(f, "kuendigungstermin");
+        string kuendigungsgrund = Feld(f, "kuendigungsgrund");
+        string rueckgabeCheck = Feld(f, "rueckgabeCheck");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+        bool zeigeRueckgabe(string wert) => string.IsNullOrEmpty(wert) || !wert.Trim().ToLower().Contains("nein");
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, "An: " + (string.IsNullOrEmpty(arbeitnehmer) ? "[nicht angegeben]" : arbeitnehmer)),
+            (false, " "),
+            (false, "Sehr geehrte(r) Frau/Herr,"),
+            (false, "hiermit kündigen wir das mit Ihnen bestehende Arbeitsverhältnis vom " + N(kuendigungsdatum) + " ordentlich und fristgerecht zum " + N(kuendigungstermin) + "."),
+            (true,  "§ 1 Beendigungsgrund & Fristen"),
+            (false, "Die Kündigung erfolgt " + N(kuendigungsgrund) + " unter Einhaltung der vertraglich vereinbarten Kündigungsfrist. Hilfsweise kündigen wir zum nächstmöglichen Termin."),
+            (true,  "§ 2 Freistellung & Resturlaub"),
+            (false, "Wir behalten uns vor, Sie bis zur Beendigung des Arbeitsverhältnisses unter Fortzahlung der Bezüge unwiderruflich von der Arbeit freizustellen. Etwaige noch bestehende Urlaubsansprüche sowie Guthaben auf dem Arbeitszeitkonto werden mit der Zeit der Freistellung verrechnet."),
+        };
+
+        if (zeigeRueckgabe(rueckgabeCheck))
+        {
+            bloecke.Add((true, "§ 3 Rückgabe von Firmeneigentum"));
+            bloecke.Add((false, "Bitte übergeben Sie spätestens an Ihrem letzten Arbeitstag alle Ihnen überlassenen Arbeitsmittel. Dies umfasst insbesondere: Hardware (Laptop, Smartphone, Token); Zugangsdaten und Passkeys zu internen Systemen (gemäß Vertraulichkeitserklärung); Projektunterlagen und Datenträger."));
+        }
+
+        bloecke.Add((true, "§ 4 Arbeitszeugnis"));
+        bloecke.Add((false, "Ein qualifiziertes Arbeitszeugnis wird Ihnen zeitnah erstellt und nach der Beendigung des Arbeitsverhältnisses zugesandt."));
+        bloecke.Add((false, "Wir danken Ihnen für die bisherige Zusammenarbeit und wünschen Ihnen für Ihren weiteren Berufs- und Lebensweg alles Gute."));
+
+        string pfad = PfadFuer("Kuendigung");
+        bool ok = ErstellePdf(pfad, "Kündigung", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // STELLENBESCHREIBUNG
+    // ─────────────────────────────────────────
+    public static string ErstelleStellenbeschreibung(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string stellentitel = Feld(f, "stellentitel");
+        string abteilung = Feld(f, "abteilung");
+        string berichtetAn = Feld(f, "berichtetAn");
+        string hauptaufgaben = Feld(f, "hauptaufgaben");
+        string anforderungsprofil = Feld(f, "anforderungsprofil");
+        string benefits = Feld(f, "benefits");
+        string starttermin = Feld(f, "starttermin");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Allgemeine Informationen"),
+            (false, "Position: " + N(stellentitel)),
+            (false, "Abteilung: " + N(abteilung)),
+            (false, "Hierarchische Einordnung: Berichtet direkt an " + N(berichtetAn)),
+            (false, "Geplanter Beginn: " + N(starttermin)),
+            (true,  "2. Zweck der Stelle"),
+            (false, $"Die Position trägt maßgeblich dazu bei, die Vision von {firma.Name} umzusetzen."),
+            (true,  "3. Ihre Hauptaufgaben"),
+            (false, N(hauptaufgaben)),
+            (true,  "4. Ihr Profil & Qualifikationen"),
+            (false, N(anforderungsprofil)),
+            (true,  "5. Besondere Rahmenbedingungen"),
+            (false, "(1) IP-Schutz: Der Stelleninhaber ist zur strikten Geheimhaltung von Quellcodes und Geschäftsgeheimnissen verpflichtet."),
+            (false, "(2) Methodik: Wir arbeiten nach agilen Prinzipien mit wöchentlichen Statuskontrollen und klaren Meilensteinen."),
+            (true,  "6. Was wir bieten"),
+            (false, N(benefits)),
+        };
+
+        string pfad = PfadFuer("Stellenbeschreibung");
+        bool ok = ErstellePdf(pfad, "Stellenbeschreibung", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // URLAUBSANTRAG
+    // ─────────────────────────────────────────
+    public static string ErstelleUrlaubsantrag(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string kalenderjahr = Feld(f, "kalenderjahr");
+        string einreichungsfrist = Feld(f, "einreichungsfrist");
+        string zusatzhinweis = Feld(f, "zusatzhinweis");
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "Persönliche Angaben des Mitarbeiters"),
+            (false, "Name, Vorname: ________________________________________________"),
+            (false, "Abteilung / Projekt: ___________________________________________"),
+            (true,  "Zeitraum und Dauer" + (string.IsNullOrEmpty(kalenderjahr) ? "" : " (" + kalenderjahr + ")")),
+            (false, "Hiermit beantrage ich Urlaub für den Zeitraum vom ____________ bis einschließlich ____________."),
+            (false, "Dies entspricht einer Anzahl von ________________ Arbeitstagen."),
+            (false, "Art des Urlaubs / Abwesenheit: [ ] Erholungsurlaub  [ ] Sonderurlaub  [ ] Zeitausgleich (Überstunden)"),
+            (false, "Vertretungsregelung: Meine laufenden Aufgaben werden während meiner Abwesenheit übernommen von: ________________________________"),
+        };
+
+        var hinweise = new List<string>();
+        if (!string.IsNullOrWhiteSpace(einreichungsfrist)) hinweise.Add(einreichungsfrist);
+        if (!string.IsNullOrWhiteSpace(zusatzhinweis)) hinweise.Add(zusatzhinweis);
+        if (hinweise.Count > 0)
+        {
+            bloecke.Add((true, "Hinweise des Arbeitgebers"));
+            bloecke.Add((false, string.Join(" ", hinweise)));
+        }
+
+        bloecke.Add((true, "Bearbeitungsvermerk (durch die Geschäftsführung auszufüllen)"));
+        bloecke.Add((false, "[ ] Der Urlaubsantrag wird genehmigt.   [ ] Der Urlaubsantrag wird abgelehnt."));
+        bloecke.Add((false, "Begründung: ________________________________________________"));
+
+        string pfad = PfadFuer("Urlaubsantrag");
+        bool ok = ErstellePdf(pfad, "Urlaubsantrag", bloecke, true, "(Ort, Datum)", "(Unterschrift Mitarbeiter)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // CORPORATE IDENTITY MANUAL (Corporate Design Leitfaden)
+    // ─────────────────────────────────────────
+    public static string ErstelleCorporateIdentityManual(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string versionsstand = Feld(f, "versionsstand");
+        string markenkern = Feld(f, "markenkern");
+        string primaerfarbe = Feld(f, "primaerfarbe");
+        string sekundaerfarbe = Feld(f, "sekundaerfarbe");
+        string hausschrift = Feld(f, "hausschrift");
+        string aufloesung = Feld(f, "aufloesung");
+        string layoutRaster = Feld(f, "layoutRaster");
+        string zusatzangabe = Feld(f, "zusatzangabe");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "§ 1 Markenidentität & Vision"),
+            (false, "Unser Erscheinungsbild spiegelt unsere Professionalität und unseren technologischen Anspruch wider."),
+            (false, "Markenkern: " + N(markenkern)),
+            (false, "Ziel ist eine konsistente Wahrnehmung über alle digitalen und analogen Berührungspunkte hinweg."),
+            (true,  "§ 2 Farbsystem"),
+            (false, "Die Farbpalette ist verbindlich für alle Dokumente, Benutzeroberflächen und Marketingmaterialien anzuwenden."),
+            (false, "Primärfarbe: " + N(primaerfarbe) + " (Einsatz für Interaktion und Highlights)."),
+            (false, "Sekundärfarbe: " + N(sekundaerfarbe) + " (Einsatz für Hintergründe und Strukturen)."),
+            (true,  "§ 3 Typografie"),
+            (false, "Zur Sicherstellung der Lesbarkeit und Modernität wird ausschließlich folgende Typografie verwendet:"),
+            (false, "Schriftart: " + N(hausschrift)),
+            (false, "Hierarchie: Überschriften (H1) werden in Bold gesetzt, Fließtexte in Regular. Hilfetexte und Labels erscheinen in Italic."),
+            (true,  "§ 4 Layout & Raster"),
+            (false, "(1) Alle digitalen Anwendungen sind auf einen Desktop-Standard von " + N(aufloesung) + " optimiert."),
+            (false, "(2) Abstände und Weißräume folgen konsequent dem " + N(layoutRaster) + "-System, um visuelle Ruhe und Stabilität zu gewährleisten."),
+            (true,  "§ 5 Logo-Verwendung & Gestaltungselemente"),
+            (false, "(1) Das Logo ist stets auf ausreichendem Kontrast zu platzieren."),
+        };
+
+        if (!string.IsNullOrWhiteSpace(versionsstand)) bloecke.Insert(0, (false, versionsstand));
+        if (!string.IsNullOrWhiteSpace(zusatzangabe)) bloecke.Add((false, "(2) Zusatzrichtlinien: " + zusatzangabe));
+
+        bloecke.Add((false, "(3) Ergänzende grafische Elemente (wie z. B. geometrische Formen) dürfen nur dezent und unterstützend eingesetzt werden."));
+        bloecke.Add((false, $"Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt. Es ist die verbindliche Arbeitsgrundlage für alle gestalterischen Tätigkeiten von {firma.Name}."));
+
+        string pfad = PfadFuer("Corporate_Identity_Manual");
+        bool ok = ErstellePdf(pfad, "Corporate Identity Manual", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // UNTERNEHMENSRICHTLINIEN
+    // ─────────────────────────────────────────
+    public static string ErstelleUnternehmensrichtlinien(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string versionsstand = Feld(f, "versionsstand");
+        string vision = Feld(f, "vision");
+        string unternehmenskultur = Feld(f, "unternehmenskultur");
+        string reaktionszeit = Feld(f, "reaktionszeit");
+        string technologieStack = Feld(f, "technologieStack");
+        string designStack = Feld(f, "designStack");
+        string uxStack = Feld(f, "uxStack");
+        string datenschutzabschnitt = Feld(f, "datenschutzabschnitt");
+        string datensicherheitabschnitt = Feld(f, "datensicherheitabschnitt");
+        string zusatzangaben = Feld(f, "zusatzangaben");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "§ 1 Vision & Unternehmenskultur"),
+            (false, "(1) " + N(vision) + "."),
+            (false, "(2) Unsere Werte: " + N(unternehmenskultur) + ". Wir arbeiten eigenverantwortlich, lösungsorientiert und proaktiv."),
+            (true,  "§ 2 Kommunikation & Zusammenarbeit"),
+            (false, "(1) Holschuld: Informationen werden aktiv im Team geteilt. Wir warten nicht, bis wir angesprochen werden."),
+            (false, "(2) Reaktionsregel: Interne Anfragen (z. B. via Discord oder E-Mail) sind innerhalb von maximal " + N(reaktionszeit) + " Stunden zu beantworten. Ein kurzes Feedback („Gesehen, kümmere mich“) ist ausreichend."),
+            (false, "(3) Ergebnisfokus: Jeder Arbeitsschritt muss ein lauffähiges Ergebnis liefern. Der Grundsatz „Integration schlägt Feature-Entwicklung“ ist bindend."),
+            (true,  "§ 3 Technologische Standards"),
+            (false, "(1) Zur Projektabwicklung und Verwaltung nutzen wir verbindlich: " + N(technologieStack) + "."),
+            (false, "(2) Architektur & Design: " + N(designStack) + "."),
+            (false, "(3) Qualitätssicherung: " + N(uxStack) + "."),
+            (true,  "§ 4 Datenschutz & Sicherheit"),
+            (false, "(1) Datenschutz: " + N(datenschutzabschnitt) + "."),
+            (false, "(2) Datensicherheit: " + N(datensicherheitabschnitt) + "."),
+        };
+
+        if (!string.IsNullOrWhiteSpace(versionsstand)) bloecke.Insert(0, (false, versionsstand));
+
+        if (!string.IsNullOrWhiteSpace(zusatzangaben))
+        {
+            bloecke.Add((true, "§ 5 Besondere Bestimmungen"));
+            bloecke.Add((false, zusatzangaben));
+        }
+
+        bloecke.Add((false, $"Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt. Es bildet die verbindliche Arbeitsgrundlage für alle Mitarbeiter und Partner der {firma.Name}."));
+
+        string pfad = PfadFuer("Unternehmensrichtlinien");
+        bool ok = ErstellePdf(pfad, "Unternehmensrichtlinien", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // SOCIAL MEDIA STRATEGIE
+    // ─────────────────────────────────────────
+    public static string ErstelleSocialMediaStrategie(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string kernbotschaft = Feld(f, "kernbotschaft");
+        string zielgruppe = Feld(f, "zielgruppe");
+        string primaereKanaele = Feld(f, "primaereKanaele");
+        string productInsights = Feld(f, "productInsights");
+        string techTransparenz = Feld(f, "techTransparenz");
+        string startupEducation = Feld(f, "startupEducation");
+        string postFrequenz = Feld(f, "postFrequenz");
+        string zusatzangabe = Feld(f, "zusatzangabe");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "§ 1 Vision & Markenkern"),
+            (false, $"Die Präsenz in sozialen Netzwerken spiegelt die Vision von {firma.Name}."),
+            (false, "Kernbotschaft: " + N(kernbotschaft)),
+            (true,  "§ 2 Zielgruppe & Kanäle"),
+            (false, "Wir konzentrieren unsere Ressourcen auf Kanäle mit maximaler Relevanz für unsere Zielgruppe: " + N(zielgruppe) + "."),
+            (false, "Gewählte Plattformen: " + N(primaereKanaele)),
+            (true,  "§ 3 Content-Säulen"),
+            (false, "Unsere Inhalte folgen drei thematischen Schwerpunkten:"),
+            (false, "1. Product-Insights: " + N(productInsights)),
+            (false, "2. Tech-Transparency: " + N(techTransparenz)),
+            (false, "3. Startup-Education: " + N(startupEducation)),
+            (true,  "§ 4 Visual Styleguide"),
+            (false, "Alle Postings müssen dem etablierten Designsystem folgen (siehe Corporate Identity Manual)."),
+            (true,  "§ 5 Redaktionsplan & Frequenz"),
+            (false, "Um eine kontinuierliche Sichtbarkeit zu gewährleisten, halten wir folgende Frequenz ein: " + N(postFrequenz) + "."),
+        };
+
+        if (!string.IsNullOrWhiteSpace(zusatzangabe)) bloecke.Add((false, "Aktueller Fokus: " + zusatzangabe));
+
+        string pfad = PfadFuer("Social_Media_Strategie");
+        bool ok = ErstellePdf(pfad, "Social Media Strategie", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // BUSINESSPLAN
+    // ─────────────────────────────────────────
+    public static string ErstelleBusinessplan(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string geschaeftsidee = Feld(f, "geschaeftsidee");
+        string zielgruppeMarkt = Feld(f, "zielgruppeMarkt");
+        string angebotPreise = Feld(f, "angebotPreise");
+        string staerken = Feld(f, "staerken");
+        string risiken = Feld(f, "risiken");
+        string investitionsbedarf = Feld(f, "investitionsbedarf");
+        string umsatzJ1 = Feld(f, "umsatzJ1");
+        string umsatzJ2 = Feld(f, "umsatzJ2");
+        string umsatzJ3 = Feld(f, "umsatzJ3");
+        string teamMeilensteine = Feld(f, "teamMeilensteine");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Zusammenfassung (Executive Summary)"),
+            (false, "Das Vorhaben umfasst im Kern: " + N(geschaeftsidee) + "."),
+            (false, "Unser Ziel ist es, eine nachhaltige Marktposition durch Qualität und Kundennutzen zu erreichen."),
+            (true,  "2. Markt- und Zielgruppenanalyse"),
+            (false, "Wir richten uns primär an: " + N(zielgruppeMarkt) + ". Der Markt wurde analysiert und bietet aufgrund aktueller Trends ein erhebliches Potenzial für unser Leistungsangebot."),
+            (true,  "3. Leistungsangebot und Monetarisierung"),
+            (false, "Unser Produkt-/Dienstleistungsportfolio besteht aus: " + N(angebotPreise) + ". Die Preisgestaltung orientiert sich an einem marktüblichen Standard bei gleichzeitigem Fokus auf hohe Effizienz."),
+            (true,  "4. Strategische Analyse (SWOT)"),
+            (false, "Wettbewerbsvorteile: " + N(staerken)),
+            (false, "Risikomanagement: " + N(risiken)),
+            (false, "Genaue SWOT-Analyse liegt bei (siehe Dokument „SWOT-Analyse“)."),
+            (true,  "5. Finanzplanung und Kapitalbedarf"),
+            (false, "Für die Umsetzung der Strategie wurde folgender Finanzrahmen kalkuliert:"),
+            (false, "Einmaliger Kapitalbedarf: " + N(investitionsbedarf) + " EUR."),
+            (false, "Ertragsplanung (geschätzt): Jahr 1: " + N(umsatzJ1) + " EUR, Jahr 2: " + N(umsatzJ2) + " EUR, Jahr 3: " + N(umsatzJ3) + " EUR."),
+            (true,  "6. Organisation und Fahrplan"),
+            (false, "Die operative Umsetzung erfolgt durch: " + N(teamMeilensteine) + "."),
+            (false, "Wir planen die Erreichung der Gewinnschwelle (Break-Even) zeitnah nach dem Markteintritt."),
+        };
+
+        string pfad = PfadFuer("Businessplan");
+        bool ok = ErstellePdf(pfad, "Businessplan", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // MARKT- & WETTBEWERBSANALYSE
+    // ─────────────────────────────────────────
+    public static string ErstelleMarktWettbewerbsanalyse(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string marktbeschreibung = Feld(f, "marktbeschreibung");
+        string zielgruppensegmente = Feld(f, "zielgruppensegmente");
+        string direkteWettbewerber = Feld(f, "direkteWettbewerber");
+        string indirekteWettbewerber = Feld(f, "indirekteWettbewerber");
+        string wettbewerbsvorteile = Feld(f, "wettbewerbsvorteile");
+        string marktpotenzial = Feld(f, "marktpotenzial");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Marktumfeld und Branchentrends"),
+            (false, "Die aktuelle Marktsituation lässt sich wie folgt zusammenfassen: " + N(marktbeschreibung) + "."),
+            (true,  "2. Zielgruppenanalyse"),
+            (false, "Unser Angebot richtet sich primär an: " + N(zielgruppensegmente) + "."),
+            (true,  "3. Wettbewerbsbetrachtung"),
+            (false, "Im Rahmen der Analyse wurden folgende Marktteilnehmer identifiziert:"),
+            (false, "Direkte Konkurrenz: " + N(direkteWettbewerber)),
+            (false, "Indirekte Konkurrenz / Alternativen: " + N(indirekteWettbewerber)),
+            (true,  "4. Eigene Marktpositionierung (USP)"),
+            (false, "Gegenüber dem Wettbewerb grenzen wir uns durch folgende Vorteile ab: " + N(wettbewerbsvorteile)),
+            (true,  "5. Prognose und Chancen"),
+            (false, "Basierend auf der aktuellen Entwicklung sehen wir folgendes Potenzial: " + N(marktpotenzial) + ". Ziel ist es, durch kontinuierliche Expansion und technologische Reife einen festen Marktanteil zu sichern."),
+        };
+
+        string pfad = PfadFuer("Markt_Wettbewerbsanalyse");
+        bool ok = ErstellePdf(pfad, "Markt- & Wettbewerbsanalyse", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // SWOT-ANALYSE
+    // ─────────────────────────────────────────
+    public static string ErstelleSwotAnalyse(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string interneStaerken = Feld(f, "interneStaerken");
+        string interneSchwaechen = Feld(f, "interneSchwaechen");
+        string externeChancen = Feld(f, "externeChancen");
+        string externeRisiken = Feld(f, "externeRisiken");
+        string strategischesFazit = Feld(f, "strategischesFazit");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Interne Analyse: Stärken & Schwächen"),
+            (false, "Stärken (Strengths): " + N(interneStaerken)),
+            (false, "Schwächen (Weaknesses): " + N(interneSchwaechen)),
+            (true,  "2. Externe Analyse: Chancen & Risiken"),
+            (false, "Chancen (Opportunities): " + N(externeChancen)),
+            (false, "Risiken (Threats): " + N(externeRisiken)),
+            (true,  "3. Strategische Ableitung (Maßnahmenplan)"),
+            (false, "Basierend auf der Gegenüberstellung der internen und externen Faktoren ergibt sich folgendes Fazit: " + N(strategischesFazit) + " Ziel ist es, die identifizierten Stärken gezielt einzusetzen, um Chancen zu nutzen, während gleichzeitig Maßnahmen zur Minimierung der Risiken und Schwächen ergriffen werden."),
+        };
+
+        string pfad = PfadFuer("SWOT_Analyse");
+        bool ok = ErstellePdf(pfad, "SWOT-Analyse", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // ZIELGRUPPENANALYSE
+    // ─────────────────────────────────────────
+    public static string ErstelleZielgruppenanalyse(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string kernZielgruppe = Feld(f, "kernZielgruppe");
+        string demografischeMerkmale = Feld(f, "demografischeMerkmale");
+        string psychografischeMerkmale = Feld(f, "psychografischeMerkmale");
+        string painPoints = Feld(f, "painPoints");
+        string kaufmotivation = Feld(f, "kaufmotivation");
+        string kommunikationswege = Feld(f, "kommunikationswege");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "1. Definition der Primär-Zielgruppe"),
+            (false, "Unsere Hauptzielgruppe lässt sich wie folgt charakterisieren: " + N(kernZielgruppe) + ". Diese Gruppe bildet das Fundament für unsere Marktaktivitäten."),
+            (true,  "2. Merkmale der Zielgruppe"),
+            (false, "Demografie: " + N(demografischeMerkmale)),
+            (false, "Psychografie: " + N(psychografischeMerkmale)),
+            (true,  "3. Bedürfnisse und Schmerzpunkte (Pain Points)"),
+            (false, "Die Zielgruppe sieht sich derzeit mit folgenden Problemen konfrontiert: " + N(painPoints) + "."),
+            (true,  "4. Kaufmotivation und Kundennutzen"),
+            (false, "Der entscheidende Grund für die Inanspruchnahme unserer Leistungen ist: " + N(kaufmotivation) + "."),
+            (true,  "5. Erreichbarkeit (Kanäle)"),
+            (false, "Um die Zielgruppe effektiv anzusprechen, nutzen wir primär folgende Kanäle: " + N(kommunikationswege) + "."),
+        };
+
+        string pfad = PfadFuer("Zielgruppenanalyse");
+        bool ok = ErstellePdf(pfad, "Zielgruppenanalyse", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // FÖRDERMITTELÜBERSICHT
+    // ─────────────────────────────────────────
+    public static string ErstelleFoerdermittelUebersicht(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string planungszeitraum = Feld(f, "planungszeitraum");
+        string zuschuss1 = Feld(f, "zuschussProgramm1");
+        string zuschuss2 = Feld(f, "zuschussProgramm2");
+        string kredit1 = Feld(f, "kreditProgramm1");
+        string kredit2 = Feld(f, "kreditProgramm2");
+        string sonstigeMittel = Feld(f, "sonstigeMittel");
+        string strategischeNotizen = Feld(f, "strategischeNotizen");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Planungszeitraum: " + N(planungszeitraum)),
+            PdfBlock.Ueberschrift("1. Staatliche Zuschüsse & nicht rückzahlbare Mittel"),
+            PdfBlock.Absatz("Diese Mittel belasten die Liquidität nicht durch Rückzahlungen und sind vorrangig zu prüfen."),
+            PdfBlock.Tabelle(
+                new[] { "Status", "Förderprogramm / Quelle", "Erwarteter Betrag", "Deadline" },
+                new List<string[]>
+                {
+                    new[] { "[ ]", N(zuschuss1), "___________ €", "________" },
+                    new[] { "[ ]", N(zuschuss2), "___________ €", "________" },
+                    new[] { "[ ]", "Regionale Innovationsgutscheine", "___________ €", "________" },
+                }),
+            PdfBlock.Ueberschrift("2. Förderdarlehen & Kredite"),
+            PdfBlock.Absatz("Zinsgünstige Darlehen zur Deckung des Investitionsbedarfs gemäß Businessplan."),
+            PdfBlock.Tabelle(
+                new[] { "Status", "Kreditprogramm / Institut", "Volumen", "Zins (gesch.)" },
+                new List<string[]>
+                {
+                    new[] { "[ ]", N(kredit1), "___________ €", "________ %" },
+                    new[] { "[ ]", N(kredit2), "___________ €", "________ %" },
+                    new[] { "[ ]", "Mikromezzaninfonds", "___________ €", "________ %" },
+                }),
+            PdfBlock.Ueberschrift("3. Wettbewerbe & Alternative Finanzierung"),
+            PdfBlock.Absatz("Zusätzliche Kapitalquellen durch Preisgelder oder Sponsoring."),
+            PdfBlock.Tabelle(
+                new[] { "Status", "Quelle / Wettbewerb", "Kapital", "Status" },
+                new List<string[]>
+                {
+                    new[] { "[ ]", N(sonstigeMittel), "___________ €", "________" },
+                    new[] { "[ ]", "Business Angel / Private Investoren", "___________ €", "________" },
+                }),
+            PdfBlock.Ueberschrift("4. Strategische Notizen & Nächste Schritte"),
+            PdfBlock.Absatz(N(strategischeNotizen)),
+        };
+
+        string pfad = PfadFuer("Foerdermittelübersicht");
+        bool ok = ErstellePdfErweitert(pfad, "Fördermittelübersicht", bloecke, true, "(Ort, Datum)", "(Unterschrift Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // DARLEHENSÜBERSICHT
+    // ─────────────────────────────────────────
+    public static string ErstelleDarlehensUebersicht(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string berichtsstand = Feld(f, "berichtsstand");
+        string bezeichnung = Feld(f, "darlehensbezeichnung");
+        string kreditgeber = Feld(f, "kreditgeber");
+        string verwendungszweck = Feld(f, "verwendungszweck");
+        string summe = Feld(f, "darlehenssumme");
+        string zinssatz = Feld(f, "zinssatz");
+        string laufzeit = Feld(f, "laufzeit");
+        string rate = Feld(f, "monatlicheRate");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Berichtsstand: " + N(berichtsstand)),
+            PdfBlock.Ueberschrift("§ 1 Strategische Übersicht"),
+            PdfBlock.Absatz($"Diese Übersicht dient zur Überwachung der langfristigen Finanzierungsstruktur der {firma.Name}. Sie ist die Grundlage für die monatliche Liquiditätsplanung und die Vorbereitung von Jahresabschlüssen."),
+            PdfBlock.Ueberschrift("§ 2 Aktive Darlehen und Kredite"),
+            PdfBlock.Tabelle(
+                new[] { "Parameter", "Details zum Darlehen" },
+                new List<string[]>
+                {
+                    new[] { "Bezeichnung", N(bezeichnung) },
+                    new[] { "Kreditgeber", N(kreditgeber) },
+                    new[] { "Verwendungszweck", N(verwendungszweck) },
+                    new[] { "Nominalbetrag", N(summe) + " EUR" },
+                    new[] { "Konditionen", N(zinssatz) + " Zinsen / " + N(laufzeit) + " Laufzeit" },
+                    new[] { "Annuität", N(rate) + " EUR pro Monat" },
+                }),
+            PdfBlock.Ueberschrift("§ 3 Zahlungsplan & Liquiditätsrelevanz"),
+            PdfBlock.Absatz("(1) Die monatlichen Belastungen aus Zins und Tilgung sind fest im Kassenbuch zu hinterlegen, um die Real-Liquidität abzubilden."),
+            PdfBlock.Absatz("(2) Besondere Hinweise: Die Rückzahlung erfolgt gemäß dem vereinbarten Tilgungsplan. Etwaige Sondertilgungen sind separat zu dokumentieren."),
+            PdfBlock.Ueberschrift("§ 4 Bestätigung der Vollständigkeit"),
+            PdfBlock.Absatz("Hiermit wird bestätigt, dass alle zum Berichtszeitpunkt relevanten Darlehensverträge in dieser Übersicht erfasst wurden."),
+        };
+
+        string pfad = PfadFuer("Darlehensübersicht");
+        bool ok = ErstellePdfErweitert(pfad, "Darlehensübersicht", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // VERSICHERUNGSÜBERSICHT
+    // ─────────────────────────────────────────
+    public static string ErstelleVersicherungsUebersicht(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string berichtsstand = Feld(f, "berichtsstand");
+        string typ = Feld(f, "versicherungstyp");
+        string versicherer = Feld(f, "versicherer");
+        string nr = Feld(f, "versicherungsnummer");
+        string beitrag = Feld(f, "beitrag");
+        string rhythmus = Feld(f, "zahlungsrhythmus");
+        string zusatznotiz = Feld(f, "zusatznotiz");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+        string beitragRhythmus = (string.IsNullOrEmpty(beitrag) ? "___" : beitrag) + " € / " + (string.IsNullOrEmpty(rhythmus) ? "___" : rhythmus);
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Berichtsstand: " + N(berichtsstand)),
+            PdfBlock.Ueberschrift("§ 1 Betriebliche Kernabsicherungen"),
+            PdfBlock.Absatz($"Folgende Policen sind zur Sicherung des laufenden Geschäftsbetriebs der {firma.Name} aktiv:"),
+            // Erste Zeile mit den erfassten Daten befüllt, zwei weitere
+            // Zeilen leer für zusätzliche Policen (die Spezifikation zeigt
+            // eine 3-Zeilen-Tabelle, das Feldset deckt aber nur EINE Police ab).
+            PdfBlock.Tabelle(
+                new[] { "Sparte", "Versicherer", "Police-Nr.", "Beitrag / Rhythmus" },
+                new List<string[]>
+                {
+                    new[] { N(typ), N(versicherer), N(nr), beitragRhythmus },
+                    new[] { "", "", "", "" },
+                    new[] { "", "", "", "" },
+                }),
+            PdfBlock.Ueberschrift("§ 2 Notizen & Besondere Leistungen"),
+            PdfBlock.Absatz("Wichtige Details: " + N(zusatznotiz)),
+            PdfBlock.Absatz("Fristen: Alle Verträge sind monatlich auf Unter- oder Überversicherung zu prüfen, insbesondere bei Wachstum des Mitarbeiterstamms oder des Inventars."),
+            PdfBlock.Ueberschrift("§ 3 Ergänzende Informationen"),
+            PdfBlock.Absatz("(1) Im Falle eines Schadens ist der Versicherer unverzüglich zu benachrichtigen."),
+            PdfBlock.Absatz("(2) Diese Übersicht dient als Kurzinformation für die Geschäftsführung und die Buchhaltung zur Liquiditätsplanung."),
+            PdfBlock.Absatz($"Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt. Es unterstützt den Gründer bei der kaufmännischen Sorgfaltspflicht und der Risikokontrolle."),
+        };
+
+        string pfad = PfadFuer("Versicherungsübersicht");
+        bool ok = ErstellePdfErweitert(pfad, "Versicherungsübersicht", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // KUNDENZUFRIEDENHEITSUMFRAGE
+    // ─────────────────────────────────────────
+    public static string ErstelleKundenzufriedenheitsumfrage(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string befragungszeitraum = Feld(f, "befragungszeitraum");
+        string einleitungstext = Feld(f, "einleitungstext");
+        string leistungsfokus = Feld(f, "leistungsfokus");
+        string frage1 = Feld(f, "frage1");
+        string frage2 = Feld(f, "frage2");
+        string frage3 = Feld(f, "frage3");
+        string schlusswort = Feld(f, "schlusswort");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<PdfBlock>();
+        if (!string.IsNullOrWhiteSpace(befragungszeitraum)) bloecke.Add(PdfBlock.Absatz(befragungszeitraum));
+
+        bloecke.AddRange(new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Sehr geehrte Kundin, sehr geehrter Kunde, " + N(einleitungstext)),
+            PdfBlock.Absatz("Bewertungsskala (Likert 5-Punkt): 1 = Trifft überhaupt nicht zu | 2 = Trifft eher nicht zu | 3 = Neutral | 4 = Trifft eher zu | 5 = Trifft voll zu."),
+            PdfBlock.Ueberschrift("Ihre Bewertung für: " + N(leistungsfokus)),
+            PdfBlock.Tabelle(
+                new[] { "Qualitätsmerkmal", "1", "2", "3", "4", "5" },
+                new List<string[]>
+                {
+                    new[] { N(frage1), "[ ]", "[ ]", "[ ]", "[ ]", "[ ]" },
+                    new[] { N(frage2), "[ ]", "[ ]", "[ ]", "[ ]", "[ ]" },
+                    new[] { N(frage3), "[ ]", "[ ]", "[ ]", "[ ]", "[ ]" },
+                }),
+            PdfBlock.Ueberschrift("Was können wir in Zukunft noch besser machen?"),
+            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Absatz("Vielen Dank für Ihre Zeit! " + N(schlusswort)),
+            PdfBlock.Absatz("Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt und dient der kontinuierlichen Qualitätssicherung gemäß ISO-nahen Standards."),
+        });
+
+        string pfad = PfadFuer("Kundenzufriedenheitsumfrage");
+        bool ok = ErstellePdfErweitert(pfad, "Kundenzufriedenheitsumfrage", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // VOLLMACHTVORLAGE
+    // ─────────────────────────────────────────
+    public static string ErstelleVollmachtvorlage(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string betreff = Feld(f, "betreff");
+
+        var bloecke = new List<(bool, string)>();
+        if (!string.IsNullOrWhiteSpace(betreff)) bloecke.Add((true, betreff));
+
+        bloecke.Add((true, "1. Vollmachtgeber"));
+        bloecke.Add((false, $"Die {firma.Name} bevollmächtigt hiermit die unten genannte Person zur Vertretung des Unternehmens im Rahmen der nachfolgend definierten Befugnisse."));
+        bloecke.Add((true, "2. Bevollmächtigte Person (Bitte in Druckbuchstaben ausfüllen)"));
+        bloecke.Add((false, "Name, Vorname: __________________________________________________________"));
+        bloecke.Add((false, "Anschrift: ________________________________________________________________"));
+        bloecke.Add((false, "Identifikation (z. B. Ausweis-Nr.): ___________________________________________"));
+        bloecke.Add((true, "3. Umfang und Zweck der Vollmacht"));
+        bloecke.Add((false, "Die oben genannte Person ist berechtigt, folgende Handlungen vorzunehmen:"));
+        bloecke.Add((false, "________________________________________________________________"));
+        bloecke.Add((false, "________________________________________________________________"));
+        bloecke.Add((true, "4. Geltungsdauer"));
+        bloecke.Add((false, "Diese Vollmacht ist gültig bis: _______________________________________________"));
+        bloecke.Add((true, "5. Rechtliche Hinweise"));
+        bloecke.Add((false, "Diese Vollmacht erlischt durch Widerruf oder mit Erreichung des oben genannten Zwecks. Der Bevollmächtigte ist verpflichtet, das Dokument nach Beendigung der Vertretung an den Vollmachtgeber zurückzugeben."));
+
+        string pfad = PfadFuer("Vollmachtvorlage");
+
+        // Sonderfall: zwei Unterschriftenzeilen (Geschäftsführung +
+        // Bevollmächtigter), wie beim Arbeitsvertrag.
+        bool ok = ErstellePdfMitDoppelSignatur(pfad, "Vollmacht", bloecke,
+            "(Ort, Datum)", "(Unterschrift Geschäftsführung)",
+            "", "(Unterschrift Bevollmächtigter)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // GESELLSCHAFTERLISTE
+    // ─────────────────────────────────────────
+    public static string ErstelleGesellschafterliste(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string erstellungsdatum = Feld(f, "erstellungsdatum");
+        string gesellschafter1 = Feld(f, "gesellschafter1");
+        string anteil1 = Feld(f, "anteil1");
+        string gesellschafter2 = Feld(f, "gesellschafter2");
+        string anteil2 = Feld(f, "anteil2");
+        string stammkapitalGesamt = Feld(f, "stammkapitalGesamt");
+        string zusatzangaben = Feld(f, "zusatzangaben");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Unternehmensbezeichnung: " + firma.Name + (string.IsNullOrEmpty(firma.Rechtsform) ? "" : " " + firma.Rechtsform)),
+            PdfBlock.Absatz("Stichtag: " + N(erstellungsdatum)),
+            PdfBlock.Ueberschrift("§ 1 Beteiligungsverhältnisse"),
+            PdfBlock.Absatz("Die Anteile am Stammkapital der Gesellschaft sind wie folgt verteilt:"),
+            PdfBlock.Tabelle(
+                new[] { "Gesellschafter (Name, Anschrift, Geburtsdatum)", "Nennbetrag des Geschäftsanteils" },
+                new List<string[]>
+                {
+                    new[] { N(gesellschafter1), N(anteil1) + " EUR" },
+                    new[] { N(gesellschafter2), N(anteil2) + " EUR" },
+                    new[] { "GESAMTSUMME STAMMKAPITAL", N(stammkapitalGesamt) + " EUR" },
+                }),
+        };
+
+        if (!string.IsNullOrWhiteSpace(zusatzangaben))
+        {
+            bloecke.Add(PdfBlock.Ueberschrift("§ 2 Besondere Bestimmungen & Nummern"));
+            bloecke.Add(PdfBlock.Absatz(zusatzangaben));
+        }
+
+        bloecke.Add(PdfBlock.Ueberschrift("§ 3 Versicherung der Geschäftsführung"));
+        bloecke.Add(PdfBlock.Absatz("Die Geschäftsführung versichert, dass die vorstehende Liste der Wahrheit entspricht und den aktuellen Stand der Beteiligungsverhältnisse zum oben genannten Stichtag wiedergibt. Jede Veränderung in den Personen der Gesellschafter oder des Umfangs ihrer Beteiligung ist unverzüglich beim Handelsregister einzureichen."));
+
+        string pfad = PfadFuer("Gesellschafterliste");
+        bool ok = ErstellePdfErweitert(pfad, "Gesellschafterliste", bloecke, true, "(Ort, Datum)", "(Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // GUTSCHRIFTVORLAGE
+    // ─────────────────────────────────────────
+    public static string ErstelleGutschriftvorlage(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string tabellenzeilen = Feld(f, "tabellenzeilen");
+        string zusatzhinweis = Feld(f, "zusatzhinweis");
+        int anzahlZeilen = LeseZeilenAnzahl(tabellenzeilen, 3, 20);
+
+        var positionsZeilen = new List<string[]>();
+        for (int i = 1; i <= anzahlZeilen; i++)
+            positionsZeilen.Add(new[] { i.ToString(), "", "€" });
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Empfänger (Bitte in Druckbuchstaben ausfüllen):"),
+            PdfBlock.Absatz("Name / Firma: ___________________________________________________________"),
+            PdfBlock.Absatz("Anschrift: _______________________________________________________________"),
+            PdfBlock.Absatz("Gutschrift-Nr.: ____________________     Datum: ____________________"),
+            PdfBlock.Absatz("Bezug auf Rechnung: ____________________     Kunden-Nr.: ____________________"),
+            PdfBlock.Ueberschrift("§ 1 Korrekturpositionen"),
+            PdfBlock.Absatz("Hiermit schreiben wir Ihnen für die folgenden Positionen den genannten Betrag gut:"),
+            PdfBlock.Tabelle(
+                new[] { "Pos.", "Beschreibung der Leistung / Ware", "Betrag (Netto)" },
+                positionsZeilen),
+            PdfBlock.Absatz("Gutschrift-Summe (Gesamt): ____________ €"),
+            PdfBlock.Ueberschrift("§ 2 Grund der Gutschrift / Notizen"),
+            PdfBlock.Absatz("[ ] Retoure   [ ] Preisnachlass   [ ] Falschlieferung   [ ] Sonstiges: " +
+                (string.IsNullOrWhiteSpace(zusatzhinweis) ? "" : zusatzhinweis)),
+            PdfBlock.Ueberschrift("§ 3 Steuerlicher Hinweis"),
+            PdfBlock.Absatz("Der oben genannte Betrag wird mit bestehenden Forderungen verrechnet oder auf das uns bekannte Konto erstattet. Die Umsatzsteuer ist entsprechend der ursprünglichen Rechnung zu korrigieren."),
+        };
+
+        string pfad = PfadFuer("Gutschriftvorlage");
+        bool ok = ErstellePdfErweitert(pfad, "Gutschrift", bloecke, true, "(Ort, Datum)", "(Unterschrift Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // INVENTARLISTE
+    // ─────────────────────────────────────────
+    public static string ErstelleInventarliste(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string inventurBereich = Feld(f, "inventurBereich");
+        string tabellenzeilen = Feld(f, "tabellenzeilen");
+        int anzahlZeilen = LeseZeilenAnzahl(tabellenzeilen, 10, 40);
+
+        var zeilen = new List<string[]>();
+        for (int i = 1; i <= anzahlZeilen; i++)
+            zeilen.Add(new[] { i.ToString(), "", "", "€", "" });
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Absatz("Fokus / Abteilung: " + (string.IsNullOrEmpty(inventurBereich) ? "Gesamtes Unternehmen" : inventurBereich)),
+            PdfBlock.Ueberschrift("§ 1 Erfassung der Wirtschaftsgüter"),
+            PdfBlock.Absatz("Bitte tragen Sie alle im Unternehmen befindlichen Gegenstände leserlich in die Tabelle ein."),
+            PdfBlock.Tabelle(
+                new[] { "Pos.", "Gegenstand (Bezeichnung / Modell)", "Seriennr. / Interne ID", "Wert (Netto)", "Standort / Nutzer" },
+                zeilen),
+            PdfBlock.Ueberschrift("§ 2 Besondere Anmerkungen / Zustand"),
+            PdfBlock.Absatz("(Hinweise zu Defekten, Leasing-Verträgen oder geplanten Neuanschaffungen)"),
+            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Ueberschrift("§ 3 Bestätigung der Vollständigkeit"),
+            PdfBlock.Absatz("Der Unterzeichnende bestätigt die Richtigkeit der oben aufgeführten Angaben zum Zeitpunkt der Aufnahme. Diese Liste dient als Grundlage für die buchhalterische Erfassung und die Versicherungswertermittlung."),
+        };
+
+        string pfad = PfadFuer("Inventarliste");
+        bool ok = ErstellePdfErweitert(pfad, "Inventarliste", bloecke, true, "(Ort, Datum)", "(Unterschrift)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // BESPRECHUNGSPROTOKOLL
+    // ─────────────────────────────────────────
+    public static string ErstelleBesprechungsprotokoll(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string themenFokus = Feld(f, "themenFokus");
+        string anzahlAufgabenzeilen = Feld(f, "anzahlAufgabenzeilen");
+        string zusatzhinweis = Feld(f, "zusatzhinweis");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+        int anzahlZeilen = LeseZeilenAnzahl(anzahlAufgabenzeilen, 8, 25);
+
+        var aufgabenZeilen = new List<string[]>();
+        for (int i = 1; i <= anzahlZeilen; i++)
+            aufgabenZeilen.Add(new[] { "", "", "", "" });
+
+        var bloecke = new List<PdfBlock>
+        {
+            PdfBlock.Ueberschrift("1. Rahmendaten"),
+            PdfBlock.Absatz("Projekt / Bereich: " + N(themenFokus)),
+            PdfBlock.Absatz("Datum: ____________________     Zeitraum: von __________ bis __________"),
+            PdfBlock.Absatz("Ort / Medium: ____________________ (z. B. Discord, Präsenz)"),
+            PdfBlock.Ueberschrift("2. Teilnehmer & Anwesenheit"),
+            PdfBlock.Absatz("Anwesend: ________________________________________________"),
+            PdfBlock.Absatz("Abwesend: ________________________________________________"),
+            PdfBlock.Ueberschrift("3. Tagesordnung & Kerninhalte (Agenda)"),
+            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Ueberschrift("4. Besprochene Inhalte & Entscheidungen"),
+            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Ueberschrift("5. Aufgabenverteilung & Deadlines"),
+            PdfBlock.Tabelle(
+                new[] { "Nr.", "Aufgabe / Tätigkeit", "Verantwortlich", "Deadline" },
+                aufgabenZeilen),
+            PdfBlock.Ueberschrift("6. Nächste Schritte / Nächstes Meeting"),
+            PdfBlock.Absatz("Datum: ____________________     Uhrzeit: ____________________"),
+            PdfBlock.Absatz("Themen: ________________________________________________"),
+        };
+
+        if (!string.IsNullOrWhiteSpace(zusatzhinweis)) bloecke.Add(PdfBlock.Absatz("Hinweis: " + zusatzhinweis));
+
+        string pfad = PfadFuer("Besprechungsprotokoll");
+        bool ok = ErstellePdfErweitert(pfad, "Besprechungsprotokoll", bloecke, true, "(Ort, Datum)", "(Protokollführung / PL)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // KONTODATEN (IBAN/BIC)
+    // ─────────────────────────────────────────
+    public static string ErstelleKontodaten(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string iban = Feld(f, "iban");
+        string bic = Feld(f, "bic");
+        string bank = Feld(f, "bank");
+        string kontoinhaber = Feld(f, "kontoinhaber");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, $"Übersicht der hinterlegten Geschäftskonto-Daten von {firma.Name}."),
+            (true,  "Bankverbindung"),
+            (false, "Kontoinhaber: " + (string.IsNullOrEmpty(kontoinhaber) ? firma.Name : kontoinhaber)),
+            (false, "Bank: " + N(bank)),
+            (false, "IBAN: " + N(iban)),
+            (false, "BIC: " + N(bic)),
+        };
+
+        string pfad = PfadFuer("Kontodaten");
+        bool ok = ErstellePdf(pfad, "Kontodaten (IBAN/BIC)", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
     // ZENTRALER EINSTIEGSPUNKT
     // Wird vom Export-Screen aufgerufen - liefert null zurück, wenn für
     // diesen Dokument-Titel noch kein spezieller PDF-Generator existiert
@@ -947,6 +2187,7 @@ public static class DokumentPdfGenerator
         switch (doc.title)
         {
             case "Unternehmensstammdaten": return ErstelleUnternehmensstammdaten(doc);
+            case "Kontodaten (IBAN/BIC)":  return ErstelleKontodaten(doc);
             case "Gründungsurkunde":       return ErstelleGruendungsurkunde(doc);
             case "Handelsregisterauszug":  return ErstelleHandelsregisterauszug(doc);
             case "Gesellschaftsvertrag":   return ErstelleGesellschaftsvertrag(doc);
@@ -965,6 +2206,29 @@ public static class DokumentPdfGenerator
             case "Ratenzahlungsbestimmungen": return ErstelleRatenzahlungsbestimmungen(doc);
             case "Copyright Hinweis":      return ErstelleCopyrightHinweis(doc);
             case "Lizenzhinweis Einfach":  return ErstelleLizenzhinweisEinfach(doc);
+            case "Lizenzhinweis Erweitert": return ErstelleLizenzhinweisErweitert(doc);
+            case "Datenschutzerklärung (DSGVO)": return ErstelleDatenschutzerklaerung(doc);
+            case "Vertraulichkeitserklärung": return ErstelleVertraulichkeitserklaerung(doc);
+            case "Muster-Arbeitsvertrag":   return ErstelleArbeitsvertrag(doc);
+            case "Vorlage Kündigung":       return ErstelleKuendigung(doc);
+            case "Stellenbeschreibung":     return ErstelleStellenbeschreibung(doc);
+            case "Urlaubsantrag":           return ErstelleUrlaubsantrag(doc);
+            case "Corporate Identity Manual": return ErstelleCorporateIdentityManual(doc);
+            case "Unternehmensrichtlinien": return ErstelleUnternehmensrichtlinien(doc);
+            case "Social Media Strategie":  return ErstelleSocialMediaStrategie(doc);
+            case "Businessplan":            return ErstelleBusinessplan(doc);
+            case "Markt- & Wettbewerbsanalyse": return ErstelleMarktWettbewerbsanalyse(doc);
+            case "SWOT-Analyse":            return ErstelleSwotAnalyse(doc);
+            case "Zielgruppenanalyse":      return ErstelleZielgruppenanalyse(doc);
+            case "Fördermittelübersicht":   return ErstelleFoerdermittelUebersicht(doc);
+            case "Darlehensübersicht":      return ErstelleDarlehensUebersicht(doc);
+            case "Versicherungsübersicht":  return ErstelleVersicherungsUebersicht(doc);
+            case "Kundenzufriedenheitsumfrage": return ErstelleKundenzufriedenheitsumfrage(doc);
+            case "Vollmachtvorlage":        return ErstelleVollmachtvorlage(doc);
+            case "Gesellschafterliste":     return ErstelleGesellschafterliste(doc);
+            case "Gutschriftvorlage":       return ErstelleGutschriftvorlage(doc);
+            case "Inventarliste":           return ErstelleInventarliste(doc);
+            case "Besprechungsprotokoll":   return ErstelleBesprechungsprotokoll(doc);
             default: return null;
         }
     }
