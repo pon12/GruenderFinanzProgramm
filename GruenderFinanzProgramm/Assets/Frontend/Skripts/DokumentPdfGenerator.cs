@@ -22,6 +22,10 @@ using UnityEngine;
 
 public static class DokumentPdfGenerator
 {
+    // Für "N2"-Formatierung mit deutschem Komma statt Punkt.
+    private static readonly System.Globalization.CultureInfo DeKultur =
+        System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
     // ─────────────────────────────────────────
     // HILFSFUNKTIONEN
     // ─────────────────────────────────────────
@@ -97,7 +101,13 @@ public static class DokumentPdfGenerator
         {
             var gespeichert = DocumentDashboard.GetSavedDocuments();
             var stammdaten = gespeichert?.savedDocs?.FirstOrDefault(d => d.title == "Unternehmensstammdaten");
-            string zweck = Feld(stammdaten?.strukturFelder, "zweck");
+            // FIX: suchte bisher nach einem Feld-Key "zweck" - das gibt es
+            // in den Unternehmensstammdaten (firma/rechtsform/branche/
+            // standort) gar nicht und existiert auch sonst nirgends im
+            // Projekt. Griff also immer ins Leere, egal was eingetragen
+            // wurde. "Branche" ist das einzige vorhandene Feld, das
+            // tatsächlich beschreibt, womit sich das Unternehmen befasst.
+            string zweck = Feld(stammdaten?.strukturFelder, "branche");
             return string.IsNullOrWhiteSpace(zweck) ? "[Unternehmenszweck noch nicht in den Stammdaten hinterlegt]" : zweck;
         }
         catch
@@ -152,7 +162,17 @@ public static class DokumentPdfGenerator
                         doc.Add(new Paragraph(" "));
                         continue;
                     }
-                    var p = new Paragraph(text, istUeberschrift ? ueberschriftFont : textFont);
+                    // Gleicher Zeilenumbruch-Fix wie im erweiterten Renderer:
+                    // eingebettetes "\n" zeilenweise mit Chunk.NEWLINE statt
+                    // als ein durchgehender String.
+                    var p = new Paragraph();
+                    var zeilen = text.Split('\n');
+                    var schrift = istUeberschrift ? ueberschriftFont : textFont;
+                    for (int zi = 0; zi < zeilen.Length; zi++)
+                    {
+                        p.Add(new Chunk(zeilen[zi], schrift));
+                        if (zi < zeilen.Length - 1) p.Add(Chunk.NEWLINE);
+                    }
                     p.SpacingAfter = istUeberschrift ? 6f : 10f;
                     doc.Add(p);
                 }
@@ -233,7 +253,14 @@ public static class DokumentPdfGenerator
                 foreach (var (istUeberschrift, text) in bloecke)
                 {
                     if (string.IsNullOrWhiteSpace(text)) { doc.Add(new Paragraph(" ")); continue; }
-                    var p = new Paragraph(text, istUeberschrift ? ueberschriftFont : textFont);
+                    var p = new Paragraph();
+                    var zeilen = text.Split('\n');
+                    var schrift = istUeberschrift ? ueberschriftFont : textFont;
+                    for (int zi = 0; zi < zeilen.Length; zi++)
+                    {
+                        p.Add(new Chunk(zeilen[zi], schrift));
+                        if (zi < zeilen.Length - 1) p.Add(Chunk.NEWLINE);
+                    }
                     p.SpacingAfter = istUeberschrift ? 6f : 10f;
                     doc.Add(p);
                 }
@@ -340,7 +367,19 @@ public static class DokumentPdfGenerator
 
                         case PdfBlock.ArtTyp.Text:
                             if (string.IsNullOrWhiteSpace(block.Text)) { doc.Add(new Paragraph(" ")); break; }
-                            var p = new Paragraph(block.Text, textFont);
+                            // FIX: mehrzeiliger Text (eingebettetes "\n")
+                            // wird von iTextSharp innerhalb einer einzelnen
+                            // Paragraph-Zeichenkette nicht zuverlässig als
+                            // Zeilenumbruch gerendert - deshalb zeilenweise
+                            // mit Chunk.NEWLINE aufgebaut statt als ein
+                            // durchgehender String.
+                            var p = new Paragraph();
+                            var textZeilen = block.Text.Split('\n');
+                            for (int zi = 0; zi < textZeilen.Length; zi++)
+                            {
+                                p.Add(new Chunk(textZeilen[zi], textFont));
+                                if (zi < textZeilen.Length - 1) p.Add(Chunk.NEWLINE);
+                            }
                             p.SpacingAfter = 10f;
                             doc.Add(p);
                             break;
@@ -721,9 +760,10 @@ public static class DokumentPdfGenerator
         if (!string.IsNullOrWhiteSpace(zusatzhinweise)) bloecke.Add((false, zusatzhinweise));
         bloecke.Add((false, $"Die gelieferte Ware bleibt bis zur vollständigen Bezahlung sämtlicher Forderungen Eigentum der {firma.Name} (Eigentumsvorbehalt)."));
         bloecke.Add((false, "Gültig ab dem Datum der Erstellung oder dem vertraglich vereinbarten Zeitpunkt."));
+        bloecke.Add((false, $"Rechtlicher Hinweis: Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt. Es ist Bestandteil der kaufmännischen Unterlagen von {firma.Name} und auch ohne handschriftliche Unterschrift rechtsgültig."));
 
         string pfad = PfadFuer("Zahlungsbedingungen");
-        bool ok = ErstellePdf(pfad, "Zahlungsbedingungen", bloecke, true, "(Ort, Datum)", "(Unterschrift Geschäftsführung)");
+        bool ok = ErstellePdf(pfad, "Zahlungsbedingungen", bloecke, false);
         return ok ? pfad : null;
     }
 
@@ -842,8 +882,8 @@ public static class DokumentPdfGenerator
                 (false, "Zahlung von: ________________________________________________"),
                 (false, "(Name / Anschrift des Zahlers)"),
                 (false, " "),
-                (false, "Bruttobetrag (in Zahlen): € ____________________"),
-                (false, "Betrag in Worten: ___________________________________________"),
+                (false, "Bruttobetrag: ____________________ €"),
+                (false, "Betrag in Worten: ___________________________________________ Euro"),
                 (false, "Verwendungszweck / Leistung: ________________________________"),
                 (false, "Steuerliche Aufschlüsselung: [ ] 19% MwSt. | [ ] 7% MwSt. | [ ] ____ % MwSt."),
                 (false, "MwSt.-Betrag: ________________ EUR      Nettobetrag: ________________ EUR"),
@@ -862,7 +902,7 @@ public static class DokumentPdfGenerator
         }
 
         string pfad = PfadFuer("Barzahlung");
-        bool ok = ErstellePdf(pfad, "Barzahlung", bloecke, true, "Ort, Datum", "(Handzeichen / Stempel des Empfängers)");
+        bool ok = ErstellePdf(pfad, "Barzahlung", bloecke, true, "Ort, Datum", "Unterschrift & Stempel des Empfängers");
         return ok ? pfad : null;
     }
 
@@ -919,10 +959,10 @@ public static class DokumentPdfGenerator
             (false, $"Ich ermächtige die {firma.Name}, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der {firma.Name} auf mein Konto gezogenen Lastschriften einzulösen."),
             (false, "Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen."),
             (true,  "Zahlungspflichtiger"),
-            (false, "Name: _______________"),
-            (false, "Anschrift: _______________"),
-            (false, "IBAN: _______________"),
-            (false, "BIC: _______________"),
+            (false, "Name: ________________________________________________________"),
+            (false, "Anschrift: ___________________________________________________"),
+            (false, "IBAN: ________________________________________________________"),
+            (false, "BIC: _________________________________________________________"),
             (true,  "Zahlungsmodalitäten"),
             (false, "Dieses Mandat gilt für: " + (string.IsNullOrEmpty(artZahlung) ? "[nicht angegeben]" : artZahlung) + "."),
         };
@@ -1143,6 +1183,188 @@ public static class DokumentPdfGenerator
 
         string pfad = PfadFuer("Lizenzhinweis_Einfach");
         bool ok = ErstellePdf(pfad, "Lizenzhinweis Einfach", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // ERÖFFNUNGSBILANZ
+    // ─────────────────────────────────────────
+    public static string ErstelleEroeffnungsbilanz(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string bilanzstichtag = Feld(f, "bilanzstichtag");
+        string anmerkungen = Feld(f, "anmerkungen");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        DataBase db = null;
+        try { db = UserDatabaseAccess.getCurrentUserDatabase(); } catch { }
+        var k = db != null ? FinanzKennzahlenService.Berechne(db) : default;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, "Bilanzstichtag: " + N(bilanzstichtag)),
+            (true,  "Aktiva"),
+            (false, "Anlagevermögen: " + k.SummeInvestition.ToString("N2", DeKultur) + " €"),
+            (false, "Umlaufvermögen: " + k.SummeUmlaufvermoegen.ToString("N2", DeKultur) + " €"),
+            (true,  "Passiva"),
+            (false, "Eigenkapital (Geldeinlagen + Sacheinlagen): " + (k.Geldeinlagen + k.Sacheinlagen).ToString("N2", DeKultur) + " €"),
+            (false, "Fremdkapital (Kredite + Darlehen): " + (k.Kredite + k.Darlehen).ToString("N2", DeKultur) + " €"),
+            (false, " "),
+            (false, "Werte automatisch aus dem Kassenbuch berechnet (siehe Finanzierung -> Kapitalbedarf)."),
+        };
+
+        if (!string.IsNullOrWhiteSpace(anmerkungen))
+        {
+            bloecke.Add((true, "Anmerkungen"));
+            bloecke.Add((false, anmerkungen));
+        }
+
+        string pfad = PfadFuer("Eroeffnungsbilanz");
+        bool ok = ErstellePdf(pfad, "Eröffnungsbilanz", bloecke, true, "(Ort, Datum)", "(Unterschrift Geschäftsführung)");
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // STEUERNUMMER-BESCHEID / USt-IdNr
+    // ─────────────────────────────────────────
+    public static string ErstelleSteuernummerBescheid(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string finanzamt = Feld(f, "finanzamt");
+        string steuernummer = Feld(f, "steuernummer");
+        string ustIdNr = Feld(f, "ustIdNr");
+        string ausstellungsdatum = Feld(f, "ausstellungsdatum");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, $"Diese Übersicht fasst die steuerliche Erfassung des Unternehmens {firma.Name} {firma.Rechtsform} zusammen."),
+            (true,  "Angaben laut Bescheid"),
+            (false, "Zuständiges Finanzamt: " + N(finanzamt)),
+            (false, "Steuernummer: " + N(steuernummer)),
+            (false, "USt-IdNr.: " + (string.IsNullOrEmpty(ustIdNr) ? "\u2013" : ustIdNr)),
+            (false, "Ausstellungsdatum: " + N(ausstellungsdatum)),
+        };
+
+        string pfad = PfadFuer("Steuernummer_Bescheid");
+        bool ok = ErstellePdf(pfad, "Steuernummer-Bescheid / USt-IdNr", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // IMPRESSUM
+    // ─────────────────────────────────────────
+    public static string ErstelleImpressum(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string vertretungsberechtigte = Feld(f, "vertretungsberechtigte");
+        string email = Feld(f, "email");
+        string telefon = Feld(f, "telefon");
+        string handelsregisternummer = Feld(f, "handelsregisternummer");
+        string zusatzangaben = Feld(f, "zusatzangaben");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "Angaben gemäß § 5 TMG"),
+            (false, firma.Name + " " + firma.Rechtsform),
+            (false, string.IsNullOrEmpty(firma.Anschrift) ? "[Anschrift nicht in den Einstellungen hinterlegt]" : firma.Anschrift),
+            (true,  "Vertreten durch"),
+            (false, N(vertretungsberechtigte)),
+            (true,  "Kontakt"),
+            (false, "E-Mail: " + N(email)),
+            (false, "Telefon: " + N(telefon)),
+        };
+
+        if (!string.IsNullOrWhiteSpace(handelsregisternummer))
+        {
+            bloecke.Add((true, "Registereintrag"));
+            bloecke.Add((false, "Handelsregisternummer: " + handelsregisternummer));
+        }
+
+        if (!string.IsNullOrEmpty(firma.UstIdNr))
+        {
+            bloecke.Add((true, "Umsatzsteuer-Identifikationsnummer"));
+            bloecke.Add((false, firma.UstIdNr));
+        }
+
+        if (!string.IsNullOrWhiteSpace(zusatzangaben))
+        {
+            bloecke.Add((true, "Zusatzangaben"));
+            bloecke.Add((false, zusatzangaben));
+        }
+
+        string pfad = PfadFuer("Impressum");
+        bool ok = ErstellePdf(pfad, "Impressum", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // DIENSTLEISTUNGSKATALOG / PREISLISTE
+    // ─────────────────────────────────────────
+    public static string ErstelleDienstleistungskatalog(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        var firma = HoleFirmendaten();
+        string leistungsuebersicht = Feld(f, "leistungsuebersicht");
+        string preismodell = Feld(f, "preismodell");
+        string zusatzangaben = Feld(f, "zusatzangaben");
+        string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
+
+        var bloecke = new List<(bool, string)>
+        {
+            (false, $"Diese Übersicht listet die Leistungen der {firma.Name} {firma.Rechtsform} sowie das zugrunde liegende Preismodell auf."),
+            (true,  "Leistungsübersicht"),
+            (false, N(leistungsuebersicht)),
+            (true,  "Preismodell"),
+            (false, N(preismodell)),
+        };
+
+        if (!string.IsNullOrWhiteSpace(zusatzangaben))
+        {
+            bloecke.Add((true, "Zusatzangaben"));
+            bloecke.Add((false, zusatzangaben));
+        }
+
+        string pfad = PfadFuer("Dienstleistungskatalog");
+        bool ok = ErstellePdf(pfad, "Dienstleistungskatalog / Preisliste", bloecke, false);
+        return ok ? pfad : null;
+    }
+
+    // ─────────────────────────────────────────
+    // GRÜNDUNGS-CHECKLISTE
+    // ─────────────────────────────────────────
+    public static string ErstelleGruendungsCheckliste(DocumentDashboard.DocumentData doc)
+    {
+        var f = doc.strukturFelder;
+        string notizen = Feld(f, "notizen");
+
+        string Haken(string key, string label)
+        {
+            bool erledigt = Feld(f, key) == "Ja";
+            return (erledigt ? "[x] " : "[ ] ") + label;
+        }
+
+        var bloecke = new List<(bool, string)>
+        {
+            (true,  "Gründungs-Checkliste"),
+            (false, Haken("geschaeftskontoEroeffnet", "Geschäftskonto eröffnet")),
+            (false, Haken("gewerbeAngemeldet", "Gewerbe angemeldet")),
+            (false, Haken("versicherungenAbgeschlossen", "Versicherungen abgeschlossen")),
+            (false, Haken("buchhaltungEingerichtet", "Buchhaltung eingerichtet")),
+            (false, Haken("websiteErstellt", "Website & Branding erstellt")),
+        };
+
+        if (!string.IsNullOrWhiteSpace(notizen))
+        {
+            bloecke.Add((true, "Notizen"));
+            bloecke.Add((false, notizen));
+        }
+
+        string pfad = PfadFuer("Gruendungs_Checkliste");
+        bool ok = ErstellePdf(pfad, "Gründungs-Checkliste", bloecke, false);
         return ok ? pfad : null;
     }
 
@@ -1935,7 +2157,7 @@ public static class DokumentPdfGenerator
                     new[] { N(frage3), "[ ]", "[ ]", "[ ]", "[ ]", "[ ]" },
                 }),
             PdfBlock.Ueberschrift("Was können wir in Zukunft noch besser machen?"),
-            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Absatz("________________________________________________________________\n________________________________________________________________\n________________________________________________________________"),
             PdfBlock.Absatz("Vielen Dank für Ihre Zeit! " + N(schlusswort)),
             PdfBlock.Absatz("Dieses Dokument wurde im Rahmen des Systems Ventoriq erstellt und dient der kontinuierlichen Qualitätssicherung gemäß ISO-nahen Standards."),
         });
@@ -1978,7 +2200,7 @@ public static class DokumentPdfGenerator
         // Bevollmächtigter), wie beim Arbeitsvertrag.
         bool ok = ErstellePdfMitDoppelSignatur(pfad, "Vollmacht", bloecke,
             "(Ort, Datum)", "(Unterschrift Geschäftsführung)",
-            "", "(Unterschrift Bevollmächtigter)");
+            "(Ort, Datum)", "(Unterschrift Bevollmächtigter)");
         return ok ? pfad : null;
     }
 
@@ -2079,7 +2301,7 @@ public static class DokumentPdfGenerator
 
         var zeilen = new List<string[]>();
         for (int i = 1; i <= anzahlZeilen; i++)
-            zeilen.Add(new[] { i.ToString(), "", "", "€", "" });
+            zeilen.Add(new[] { i.ToString(), "", "", "________ €", "" });
 
         var bloecke = new List<PdfBlock>
         {
@@ -2111,11 +2333,21 @@ public static class DokumentPdfGenerator
         string anzahlAufgabenzeilen = Feld(f, "anzahlAufgabenzeilen");
         string zusatzhinweis = Feld(f, "zusatzhinweis");
         string N(string wert) => string.IsNullOrEmpty(wert) ? "[nicht angegeben]" : wert;
-        int anzahlZeilen = LeseZeilenAnzahl(anzahlAufgabenzeilen, 8, 25);
+        int anzahlZeilen = LeseZeilenAnzahl(anzahlAufgabenzeilen, 10, 25);
 
         var aufgabenZeilen = new List<string[]>();
         for (int i = 1; i <= anzahlZeilen; i++)
             aufgabenZeilen.Add(new[] { "", "", "", "" });
+
+        // Mehrzeilige Freitext-Linien für Notizen (statt nur einer Zeile) -
+        // Abschnitte 3+4 brauchten deutlich mehr Platz zum Ausfüllen.
+        string LeereZeilen(int anzahl)
+        {
+            var zeilen = new List<string>();
+            for (int i = 0; i < anzahl; i++)
+                zeilen.Add("________________________________________________________________");
+            return string.Join("\n", zeilen);
+        }
 
         var bloecke = new List<PdfBlock>
         {
@@ -2127,9 +2359,9 @@ public static class DokumentPdfGenerator
             PdfBlock.Absatz("Anwesend: ________________________________________________"),
             PdfBlock.Absatz("Abwesend: ________________________________________________"),
             PdfBlock.Ueberschrift("3. Tagesordnung & Kerninhalte (Agenda)"),
-            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Absatz(LeereZeilen(5)),
             PdfBlock.Ueberschrift("4. Besprochene Inhalte & Entscheidungen"),
-            PdfBlock.Absatz("________________________________________________________________"),
+            PdfBlock.Absatz(LeereZeilen(6)),
             PdfBlock.Ueberschrift("5. Aufgabenverteilung & Deadlines"),
             PdfBlock.Tabelle(
                 new[] { "Nr.", "Aufgabe / Tätigkeit", "Verantwortlich", "Deadline" },
@@ -2187,6 +2419,11 @@ public static class DokumentPdfGenerator
         switch (doc.title)
         {
             case "Unternehmensstammdaten": return ErstelleUnternehmensstammdaten(doc);
+            case "Eröffnungsbilanz":       return ErstelleEroeffnungsbilanz(doc);
+            case "Steuernummer-Bescheid / USt-IdNr": return ErstelleSteuernummerBescheid(doc);
+            case "Impressum":              return ErstelleImpressum(doc);
+            case "Dienstleistungskatalog / Preisliste": return ErstelleDienstleistungskatalog(doc);
+            case "Gründungs-Checkliste":   return ErstelleGruendungsCheckliste(doc);
             case "Kontodaten (IBAN/BIC)":  return ErstelleKontodaten(doc);
             case "Gründungsurkunde":       return ErstelleGruendungsurkunde(doc);
             case "Handelsregisterauszug":  return ErstelleHandelsregisterauszug(doc);

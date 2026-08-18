@@ -41,6 +41,13 @@ public class DocumentDashboard : MonoBehaviour
     private VisualElement editPopupOverlay;
     private TextField editDocNameInput;
     private TextField editInhaltInput;
+    private TextField editStandardTitelInput, editStandardDatumInput;
+    private VisualElement feldGruppeInhalt, feldGruppeCheckliste, feldGruppeDiagramm;
+    private VisualElement editChecklisteBox, editDiagrammDatenBox, editDiagrammVorschau;
+    private Button btnChecklisteHinzufuegen, btnDiagrammHinzufuegen;
+    private EinfachesBalkendiagrammElement diagrammVorschauElement;
+    private List<ChecklistPunkt> aktiveChecklistPunkte = new List<ChecklistPunkt>();
+    private List<DiagrammPunkt> aktiveDiagrammPunkte = new List<DiagrammPunkt>();
     private Button editPopupSubmitButton;
     private Button editPopupCancelButton;
     private Button btnEditTypeStandard;
@@ -61,16 +68,21 @@ public class DocumentDashboard : MonoBehaviour
     private string selectedEditType = "Standard";
     private string activeCategoryForList = "";
     private DocumentData activeDocForEditing;
-    private List<TextField> aktiveStrukturFelder = new List<TextField>();
+    private List<VisualElement> aktiveStrukturFelder = new List<VisualElement>();
 
     // ============================================================
     // FELD-DEFINITION – ein einzelnes strukturiertes Eingabefeld
     // ============================================================
+    // Text = normales Eingabefeld, Dropdown = feste Auswahl, JaNein = Checkbox.
+    private enum FeldTyp { Text, Dropdown, JaNein }
+
     private class FeldDefinition
     {
         public string key;         // interner Schlüssel, z.B. "iban"
         public string label;       // Anzeigename, z.B. "IBAN"
         public string placeholder; // Platzhaltertext im Feld
+        public FeldTyp typ = FeldTyp.Text;
+        public string[] optionen;  // nur bei typ = Dropdown
     }
 
     // ============================================================
@@ -144,14 +156,14 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "beginnTaetigkeit",   label = "Beginn der Tätigkeit",         placeholder = "Datum der ersten Betriebseinnahme oder -ausgabe (TT.MM.JJJJ)" },
             new FeldDefinition { key = "umsatzJahr1",        label = "Geschätzter Umsatz (Jahr 1)",  placeholder = "Dein voraussichtlicher Bruttoumsatz für das erste Jahr" },
             new FeldDefinition { key = "gewinnJahr1",        label = "Geschätzter Gewinn (Jahr 1)",  placeholder = "Dein voraussichtlicher Reingewinn nach Abzug aller Kosten" },
-            new FeldDefinition { key = "kleinunternehmer",   label = "Kleinunternehmer-Regelung",    placeholder = "Ja/Nein (Umsatz < 22.000 € im ersten Jahr)" },
+            new FeldDefinition { key = "kleinunternehmer",   label = "Kleinunternehmer-Regelung (Umsatz < 22.000 € im ersten Jahr)", typ = FeldTyp.JaNein },
         },
             ["Gewerbeanmeldung"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "behoerde",         label = "Zuständige Behörde",   placeholder = "Name des örtlichen Gewerbeamts (z.B. Stadt Mittweida)" },
             new FeldDefinition { key = "beginnTaetigkeit", label = "Beginn der Tätigkeit", placeholder = "Datum des tatsächlichen Starts (auch rückwirkend möglich)" },
             new FeldDefinition { key = "anzahlMitarbeiter",label = "Zahl der Mitarbeiter", placeholder = "Anzahl der Angestellten zum Start (ohne Inhaber)" },
-            new FeldDefinition { key = "nebenerwerb",      label = "Nebenerwerb",          placeholder = "„Ja“, wenn du noch hauptberuflich angestellt bist" },
+            new FeldDefinition { key = "nebenerwerb",      label = "Nebenerwerb (hauptberuflich noch angestellt)", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "anmeldungsgrund",  label = "Anmeldungsgrund",      placeholder = "z.B. Neugründung oder Übernahme" },
         },
             ["Anmeldung Berufsgenossenschaft"] = new List<FeldDefinition>
@@ -215,7 +227,7 @@ public class DocumentDashboard : MonoBehaviour
         {
             new FeldDefinition { key = "gueltigkeitsbereich", label = "Gültigkeitsbereich", placeholder = "Wofür wird dieser Vordruck genutzt? (z.B. „Bürokasse“, „Projekt XY“)" },
             new FeldDefinition { key = "zusatzhinweis",       label = "Zusatzhinweis",      placeholder = "Interner Vermerk oder Anweisung (z.B. „Nur für Kleinbeträge bis 250 €“)" },
-            new FeldDefinition { key = "ausfuehrung",         label = "Ausführung",         placeholder = "Einfache Ausführung / Zweifache Ausführung" },
+            new FeldDefinition { key = "ausfuehrung",         label = "Ausführung",         typ = FeldTyp.Dropdown, optionen = new[] { "Einfache Ausführung", "Zweifache Ausführung" } },
         },
             ["Überweisung"] = new List<FeldDefinition>
         {
@@ -234,9 +246,9 @@ public class DocumentDashboard : MonoBehaviour
             ["Widerrufsbelehrung"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "widerrufsfrist",   label = "Widerrufsfrist",       placeholder = "Gesetzlich z.B. 14 Tage. Nur die Zahl eintragen" },
-            new FeldDefinition { key = "wertersatzklausel",label = "Wertersatz-Klausel",   placeholder = "Pflicht zur Zahlung bereits erbrachter Leistungen (Ja/Nein)" },
+            new FeldDefinition { key = "wertersatzklausel",label = "Wertersatz-Klausel: Pflicht zur Zahlung bereits erbrachter Leistungen", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "kontakt",          label = "Kontakt für Widerruf", placeholder = "E-Mail-Adresse oder Postanschrift deiner Firma" },
-            new FeldDefinition { key = "vorzeitigesErloeschen", label = "Vorzeitiges Erlöschen", placeholder = "Hinweis auf Erlöschen bei vollständiger Ausführung (Ja/Nein)" },
+            new FeldDefinition { key = "vorzeitigesErloeschen", label = "Vorzeitiges Erlöschen: Hinweis auf Erlöschen bei vollständiger Ausführung", typ = FeldTyp.JaNein },
         },
             ["Mahnverfahren"] = new List<FeldDefinition>
         {
@@ -256,7 +268,7 @@ public class DocumentDashboard : MonoBehaviour
             ["Copyright Hinweis"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "schutzumfang",          label = "Schutzumfang",           placeholder = "Beschreibung der geschützten Werke (z.B. „Programmcode, Designs und UI-Konzepte“)" },
-            new FeldDefinition { key = "referenzklausel",       label = "Referenzklausel",        placeholder = "Recht zur Nutzung als Referenz aktiv bewerben? (Ja/Nein)" },
+            new FeldDefinition { key = "referenzklausel",       label = "Referenzklausel: Recht zur Nutzung als Referenz aktiv bewerben?", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "schadensersatzfaktor",  label = "Schadensersatzfaktor",   placeholder = "Faktor bei Verstößen (Vorgabe: 3-fache Höhe)" },
             new FeldDefinition { key = "zusatzangabe",          label = "Zusatzangabe",           placeholder = "Optionale Einschränkungen (z.B. „Anonymisierte Referenz auf Wunsch möglich“)" },
         },
@@ -274,6 +286,41 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "raeumlicheReichweite",    label = "Räumliche Reichweite",           placeholder = "Wo darf das Werk genutzt werden? (z.B. „Weltweit / Unbeschränkt“)" },
             new FeldDefinition { key = "zeitlicheReichweite",     label = "Zeitliche Reichweite",           placeholder = "Wie lange gilt das Recht? (Standard: „Zeitlich unbeschränkt / Unbefristet“)" },
             new FeldDefinition { key = "zusatzvereinbarung",      label = "Zusatzvereinbarung",             placeholder = "Besondere Hinweise (z.B. „Inklusive Recht zur Unterlizensierung“)" },
+        },
+            ["Eröffnungsbilanz"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "bilanzstichtag", label = "Bilanzstichtag",  placeholder = "Datum der Bilanzaufstellung (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "anmerkungen",    label = "Anmerkungen",     placeholder = "Optionale Erläuterungen zu den Bilanzpositionen" },
+        },
+            ["Steuernummer-Bescheid / USt-IdNr"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "finanzamt",         label = "Zuständiges Finanzamt", placeholder = "Name des Finanzamts, das den Bescheid ausgestellt hat" },
+            new FeldDefinition { key = "steuernummer",      label = "Steuernummer",          placeholder = "z.B. 123/456/78910" },
+            new FeldDefinition { key = "ustIdNr",           label = "USt-IdNr.",             placeholder = "z.B. DE123456789 (optional)" },
+            new FeldDefinition { key = "ausstellungsdatum", label = "Ausstellungsdatum",     placeholder = "Datum des Bescheids (TT.MM.JJJJ)" },
+        },
+            ["Impressum"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "vertretungsberechtigte", label = "Vertretungsberechtigte Person", placeholder = "Name der laut § 5 TMG anzugebenden Person" },
+            new FeldDefinition { key = "email",                  label = "E-Mail",                        placeholder = "Kontakt-E-Mail für rechtliche Anfragen" },
+            new FeldDefinition { key = "telefon",                label = "Telefon",                       placeholder = "Erreichbare Telefonnummer" },
+            new FeldDefinition { key = "handelsregisternummer",  label = "Handelsregisternummer",         placeholder = "Optional, falls eingetragen" },
+            new FeldDefinition { key = "zusatzangaben",          label = "Zusatzangaben",                 placeholder = "z.B. Berufsbezeichnung, Aufsichtsbehörde" },
+        },
+            ["Dienstleistungskatalog / Preisliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "leistungsuebersicht", label = "Leistungsübersicht", placeholder = "Kurze Auflistung der angebotenen Leistungen" },
+            new FeldDefinition { key = "preismodell",         label = "Preismodell",        typ = FeldTyp.Dropdown, optionen = new[] { "Stundensatz", "Festpreis", "Pauschale", "Individuell" } },
+            new FeldDefinition { key = "zusatzangaben",       label = "Zusatzangaben",      placeholder = "z.B. Rabattstaffeln, Mindestbuchungsdauer" },
+        },
+            ["Gründungs-Checkliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geschaeftskontoEroeffnet",     label = "Geschäftskonto eröffnet",       typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "gewerbeAngemeldet",            label = "Gewerbe angemeldet",            typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "versicherungenAbgeschlossen",  label = "Versicherungen abgeschlossen",  typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "buchhaltungEingerichtet",      label = "Buchhaltung eingerichtet",      typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "websiteErstellt",              label = "Website & Branding erstellt",   typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "notizen",                      label = "Notizen",                       placeholder = "Offene Punkte oder nächste Schritte" },
         },
             ["Datenschutzerklärung (DSGVO)"] = new List<FeldDefinition>
         {
@@ -305,7 +352,7 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "kuendigungsdatum",   label = "Kündigungsdatum",    placeholder = "Datum, an dem das Schreiben übergeben wird" },
             new FeldDefinition { key = "kuendigungstermin",  label = "Kündigungstermin",   placeholder = "Datum, zu dem das Verhältnis endet (z.B. „30.09.2026“)" },
             new FeldDefinition { key = "kuendigungsgrund",   label = "Kündigungsgrund",    placeholder = "Fristgerecht / Fristlos / optionaler Freitext" },
-            new FeldDefinition { key = "rueckgabeCheck",     label = "Rückgabe-Check",     placeholder = "Aufforderung zur Rückgabe von Firmeneigentum einblenden? (Ja/Nein)" },
+            new FeldDefinition { key = "rueckgabeCheck",     label = "Aufforderung zur Rückgabe von Firmeneigentum einblenden", typ = FeldTyp.JaNein },
         },
             ["Stellenbeschreibung"] = new List<FeldDefinition>
         {
@@ -401,7 +448,7 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "versicherer",          label = "Versicherer",          placeholder = "Name der Versicherungsgesellschaft" },
             new FeldDefinition { key = "versicherungsnummer",  label = "Versicherungsnummer",  placeholder = "Eindeutige Kennung der Police" },
             new FeldDefinition { key = "beitrag",              label = "Beitrag (EUR)",        placeholder = "Monatliche oder jährliche Prämie" },
-            new FeldDefinition { key = "zahlungsrhythmus",     label = "Zahlungsrhythmus",     placeholder = "monatlich / vierteljährlich / jährlich" },
+            new FeldDefinition { key = "zahlungsrhythmus",     label = "Zahlungsrhythmus",     typ = FeldTyp.Dropdown, optionen = new[] { "monatlich", "vierteljährlich", "jährlich" } },
             new FeldDefinition { key = "zusatznotiz",          label = "Zusatznotiz",          placeholder = "Optionale Infos (z.B. „inkl. Cyber-Risk-Abdeckung“)" },
         },
             ["Kundenzufriedenheitsumfrage"] = new List<FeldDefinition>
@@ -515,10 +562,36 @@ public class DocumentDashboard : MonoBehaviour
         public bool istPflichtdokument;
         public string inhalt;
         public List<StrukturFeldWert> strukturFelder;
+        // Nur bei type == "Standard" bzw. "Checklist"/"Diagramm" befüllt.
+        public StandardDokumentDaten standardDaten;
+        public List<ChecklistPunkt> checkliste;
+        public List<DiagrammPunkt> diagrammDaten;
         // Zeitpunkt der letzten Änderung (yyyy-MM-dd) - für die Sortierung
         // im Export-Screen. Bei alten, bereits gespeicherten Dokumenten
         // leer, bis sie das nächste Mal bearbeitet werden.
         public string datum;
+    }
+
+    [System.Serializable]
+    public class ChecklistPunkt
+    {
+        public string text;
+        public bool erledigt;
+    }
+
+    [System.Serializable]
+    public class DiagrammPunkt
+    {
+        public string label;
+        public float wert;
+    }
+
+    [System.Serializable]
+    public class StandardDokumentDaten
+    {
+        public string titel;
+        public string datum;
+        public string inhalt;
     }
 
     [System.Serializable]
@@ -571,6 +644,47 @@ public class DocumentDashboard : MonoBehaviour
         editPopupOverlay = root.Q<VisualElement>("Edit-Popup-Overlay");
         editDocNameInput = root.Q<TextField>("Edit-Doc-Name-Input");
         editInhaltInput = root.Q<TextField>("Edit-Inhalt-Input");
+        editStandardTitelInput = root.Q<TextField>("Edit-Standard-Titel-Input");
+        editStandardDatumInput = root.Q<TextField>("Edit-Standard-Datum-Input");
+
+        // Platzhalter nur EINMAL registrieren - diese drei Felder sind
+        // wiederverwendet (anders als die Checklisten-/Diagramm-Zeilen,
+        // die bei jedem Öffnen frisch gebaut werden). Würde
+        // SetzeFeldPlatzhalter hier bei jedem Popup-Öffnen erneut
+        // aufgerufen, würden sich die FocusIn/FocusOut-Handler mit jedem
+        // Öffnen aufsummieren.
+        RegistrierePersistentenPlatzhalter(editStandardTitelInput, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+        RegistrierePersistentenPlatzhalter(editStandardDatumInput, "TT.MM.JJJJ");
+        RegistrierePersistentenPlatzhalter(editInhaltInput, "Haupttext des Dokuments...");
+        feldGruppeInhalt = root.Q<VisualElement>("feld-gruppe-inhalt");
+        feldGruppeCheckliste = root.Q<VisualElement>("feld-gruppe-checkliste");
+        feldGruppeDiagramm = root.Q<VisualElement>("feld-gruppe-diagramm");
+        editChecklisteBox = root.Q<VisualElement>("Edit-Checkliste-Box");
+        editDiagrammDatenBox = root.Q<VisualElement>("Edit-Diagramm-Daten-Box");
+        editDiagrammVorschau = root.Q<VisualElement>("Edit-Diagramm-Vorschau");
+        btnChecklisteHinzufuegen = root.Q<Button>("Btn-Checkliste-Hinzufuegen");
+        btnDiagrammHinzufuegen = root.Q<Button>("Btn-Diagramm-Hinzufuegen");
+
+        if (editDiagrammVorschau != null)
+        {
+            diagrammVorschauElement = new EinfachesBalkendiagrammElement();
+            diagrammVorschauElement.style.flexGrow = 1;
+            editDiagrammVorschau.Add(diagrammVorschauElement);
+        }
+
+        if (btnChecklisteHinzufuegen != null)
+            btnChecklisteHinzufuegen.clicked += () =>
+            {
+                aktiveChecklistPunkte.Add(new ChecklistPunkt { text = "", erledigt = false });
+                BaueChecklistenUI();
+            };
+
+        if (btnDiagrammHinzufuegen != null)
+            btnDiagrammHinzufuegen.clicked += () =>
+            {
+                aktiveDiagrammPunkte.Add(new DiagrammPunkt { label = "", wert = 0f });
+                BaueDiagrammUI();
+            };
         editPopupSubmitButton = root.Q<Button>("Btn-Edit-Submit");
         editPopupCancelButton = root.Q<Button>("Btn-Edit-Cancel");
         btnEditTypeStandard = root.Q<Button>("Btn-Edit-Type-Standard");
@@ -691,6 +805,19 @@ public class DocumentDashboard : MonoBehaviour
                 }
             }
         }
+
+        // Aufräumen: verwaiste Pflichtdokument-Einträge entfernen, deren
+        // (Kategorie, Titel)-Kombination zu KEINEM aktuellen Pflichtdokument
+        // mehr passt - z.B. Reste vom Split "Gründungsurkunde /
+        // Gesellschaftsvertrag" -> "Gründungsurkunde" + "Gesellschaftsvertrag".
+        // Deren Feldstruktur ist ohnehin veraltet/inkompatibel, ein
+        // Migrieren der alten Werte wäre nicht sauber möglich.
+        var gueltigeKombinationen = new HashSet<(string, string)>(
+            kategorien.SelectMany(k => k.pflichtDocs.Select(titel => (k.name, titel))));
+
+        int entfernt = speicherDaten.savedDocs.RemoveAll(d =>
+            d.istPflichtdokument && !gueltigeKombinationen.Contains((d.category, d.title)));
+        if (entfernt > 0) geaendert = true;
 
         if (geaendert) SaveDataLocally();
 
@@ -945,6 +1072,17 @@ public class DocumentDashboard : MonoBehaviour
             return $"{label}: {wert}";
         }
 
+        if (doc.type == "Checklist" && doc.checkliste != null && doc.checkliste.Count > 0)
+        {
+            int erledigt = doc.checkliste.Count(p => p.erledigt);
+            return $"{erledigt} von {doc.checkliste.Count} erledigt";
+        }
+
+        if (doc.type == "Diagramm" && doc.diagrammDaten != null && doc.diagrammDaten.Count > 0)
+        {
+            return $"{doc.diagrammDaten.Count} Werte im Diagramm";
+        }
+
         if (!string.IsNullOrEmpty(doc.inhalt))
         {
             string vorschau = doc.inhalt.Split('\n')[0];
@@ -1117,7 +1255,17 @@ public class DocumentDashboard : MonoBehaviour
     private void OpenEditPopup(DocumentData doc)
     {
         activeDocForEditing = doc;
-        selectedEditType = doc.type;
+        selectedEditType = string.IsNullOrEmpty(doc.type) ? "Standard" : doc.type;
+
+        // Checklisten-/Diagramm-Daten des Dokuments in die aktiven Listen
+        // laden (Kopie, damit ein Abbrechen nicht die gespeicherten Daten
+        // anfasst).
+        aktiveChecklistPunkte = doc.checkliste != null
+            ? doc.checkliste.Select(p => new ChecklistPunkt { text = p.text, erledigt = p.erledigt }).ToList()
+            : new List<ChecklistPunkt>();
+        aktiveDiagrammPunkte = doc.diagrammDaten != null
+            ? doc.diagrammDaten.Select(p => new DiagrammPunkt { label = p.label, wert = p.wert }).ToList()
+            : new List<DiagrammPunkt>();
 
         if (editPopupOverlay != null)
             editPopupOverlay.style.display = DisplayStyle.Flex;
@@ -1152,11 +1300,21 @@ public class DocumentDashboard : MonoBehaviour
         if (vorlagenLabelZeile != null)
             vorlagenLabelZeile.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
 
-        var inhaltGroup = editInhaltInput?.parent;
+        var inhaltGroup = editInhaltInput?.parent?.parent; // feld-gruppe-inhalt (äußere Gruppe)
         if (inhaltGroup != null)
             inhaltGroup.style.display = zeigeStrukturFelder ? DisplayStyle.None : DisplayStyle.Flex;
-        if (editInhaltInput != null)
-            editInhaltInput.value = doc.inhalt ?? "";
+
+        // Standard-Felder laden: bei neueren Dokumenten aus standardDaten,
+        // bei älteren (vor diesem Umbau gespeicherten) Dokumenten landet
+        // der komplette alte Freitext ersatzweise im Inhalt-Feld, damit
+        // nichts verloren geht.
+        string standardTitel = doc.standardDaten?.titel ?? "";
+        string standardDatum = doc.standardDaten?.datum ?? "";
+        string standardInhalt = doc.standardDaten?.inhalt ?? (doc.standardDaten == null ? (doc.inhalt ?? "") : "");
+
+        LadeFeldMitPlatzhalter(editStandardTitelInput, standardTitel, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+        LadeFeldMitPlatzhalter(editStandardDatumInput, standardDatum, "TT.MM.JJJJ");
+        LadeFeldMitPlatzhalter(editInhaltInput, standardInhalt, "Haupttext des Dokuments...");
 
         if (editStrukturFelderBox != null)
         {
@@ -1182,7 +1340,35 @@ public class DocumentDashboard : MonoBehaviour
                     feldLabel.AddToClassList("field-label");
                     feldGroup.Add(feldLabel);
 
-                    var feldInput = new TextField { value = aktuellerWert };
+                    VisualElement feldInput;
+
+                    switch (def.typ)
+                    {
+                        case FeldTyp.Dropdown:
+                        {
+                            var dropdown = new DropdownField();
+                            dropdown.choices = def.optionen?.ToList() ?? new List<string>();
+                            dropdown.value = !string.IsNullOrEmpty(aktuellerWert) && dropdown.choices.Contains(aktuellerWert)
+                                ? aktuellerWert
+                                : (dropdown.choices.Count > 0 ? dropdown.choices[0] : "");
+                            feldInput = dropdown;
+                            break;
+                        }
+                        case FeldTyp.JaNein:
+                        {
+                            var toggle = new Toggle { value = aktuellerWert == "Ja" };
+                            toggle.AddToClassList("field-checkbox");
+                            feldInput = toggle;
+                            break;
+                        }
+                        default:
+                        {
+                            var textField = new TextField { value = aktuellerWert };
+                            feldInput = textField;
+                            break;
+                        }
+                    }
+
                     feldInput.name = $"struktur-feld-{def.key}";
                     feldGroup.Add(feldInput);
 
@@ -1191,15 +1377,11 @@ public class DocumentDashboard : MonoBehaviour
 
                     feldInput.userData = def.key;
 
-                    // FIX: Hinweistext war bisher nur als natives .tooltip
-                    // gesetzt - das erfordert Hovern und rendert im Build
-                    // ohnehin oft nicht zuverlässig (gleiches Problem wie
-                    // beim Kalender-Tooltip). Jetzt echte Platzhalter-
-                    // Simulation: grauer Hinweistext direkt im leeren Feld,
-                    // verschwindet beim Fokussieren, kommt beim Verlassen
-                    // zurück falls das Feld leer bleibt.
-                    if (string.IsNullOrEmpty(aktuellerWert))
-                        SetzeFeldPlatzhalter(feldInput, def.placeholder);
+                    // Platzhalter-Simulation gibt's nur bei normalen
+                    // Textfeldern - Dropdown/Checkbox brauchen sowas nicht,
+                    // die haben ja schon eine sichtbare Auswahl.
+                    if (def.typ == FeldTyp.Text && feldInput is TextField tf && string.IsNullOrEmpty(aktuellerWert))
+                        SetzeFeldPlatzhalter(tf, def.placeholder);
                 }
 
                 if (doc.istPflichtdokument && aktiveStrukturFelder.Count > 0)
@@ -1211,6 +1393,9 @@ public class DocumentDashboard : MonoBehaviour
         }
 
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
+        AktualisiereTypSichtbarkeit();
+        BaueChecklistenUI();
+        BaueDiagrammUI();
     }
 
     private void CloseEditPopup()
@@ -1225,11 +1410,198 @@ public class DocumentDashboard : MonoBehaviour
     {
         selectedEditType = typeName;
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
+        AktualisiereTypSichtbarkeit();
+    }
+
+    // Blendet je nach gewähltem Dokumenttyp den richtigen Bereich ein
+    // (Freitext / Checkliste / Diagramm) - vorher gab's dafür GAR KEINE
+    // Umschaltung, alle drei Typen zeigten exakt dasselbe Textfeld.
+    private void AktualisiereTypSichtbarkeit()
+    {
+        // FIX: Pflichtdokumente nutzen ausschließlich die Struktur-Felder,
+        // niemals das Freitext-/Checklist-/Diagramm-System - unabhängig
+        // vom (bei Pflichtdokumenten immer auf "Standard" stehenden)
+        // type-Feld. Vorher wurde hier blind nach selectedEditType
+        // umgeschaltet, wodurch bei JEDEM Pflichtdokument zusätzlich das
+        // leere Freitextfeld neben den Struktur-Feldern auftauchte.
+        bool istStrukturDokument = activeDocForEditing != null
+            && activeDocForEditing.istPflichtdokument
+            && felderProPflichtDoc.ContainsKey(activeDocForEditing.title);
+
+        if (istStrukturDokument)
+        {
+            if (feldGruppeInhalt != null) feldGruppeInhalt.style.display = DisplayStyle.None;
+            if (feldGruppeCheckliste != null) feldGruppeCheckliste.style.display = DisplayStyle.None;
+            if (feldGruppeDiagramm != null) feldGruppeDiagramm.style.display = DisplayStyle.None;
+            return;
+        }
+
+        if (feldGruppeInhalt != null) feldGruppeInhalt.style.display = selectedEditType == "Standard" ? DisplayStyle.Flex : DisplayStyle.None;
+        if (feldGruppeCheckliste != null) feldGruppeCheckliste.style.display = selectedEditType == "Checklist" ? DisplayStyle.Flex : DisplayStyle.None;
+        if (feldGruppeDiagramm != null) feldGruppeDiagramm.style.display = selectedEditType == "Diagramm" ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (selectedEditType == "Checklist" && aktiveChecklistPunkte.Count == 0)
+        {
+            aktiveChecklistPunkte.Add(new ChecklistPunkt { text = "", erledigt = false });
+            BaueChecklistenUI();
+        }
+
+        if (selectedEditType == "Diagramm" && aktiveDiagrammPunkte.Count == 0)
+        {
+            aktiveDiagrammPunkte.Add(new DiagrammPunkt { label = "", wert = 0f });
+            BaueDiagrammUI();
+        }
+    }
+
+    // Baut die Checklisten-Zeilen (Checkbox + Text + Löschen) neu auf.
+    private void BaueChecklistenUI()
+    {
+        if (editChecklisteBox == null) return;
+        editChecklisteBox.Clear();
+
+        for (int i = 0; i < aktiveChecklistPunkte.Count; i++)
+        {
+            int index = i; // für die Closures unten
+            var punkt = aktiveChecklistPunkte[i];
+
+            var zeile = new VisualElement();
+            zeile.style.flexDirection = FlexDirection.Row;
+            zeile.style.alignItems = Align.Center;
+            zeile.style.marginBottom = 6;
+
+            var toggle = new Toggle { value = punkt.erledigt };
+            toggle.RegisterValueChangedCallback(evt => punkt.erledigt = evt.newValue);
+            zeile.Add(toggle);
+
+            var textFeld = new TextField { value = punkt.text };
+            textFeld.style.flexGrow = 1;
+            textFeld.style.marginLeft = 6;
+            textFeld.style.marginRight = 6;
+            if (string.IsNullOrEmpty(punkt.text)) SetzeFeldPlatzhalter(textFeld, "Was soll erledigt werden?");
+            textFeld.RegisterValueChangedCallback(evt => punkt.text = evt.newValue == "Was soll erledigt werden?" ? "" : evt.newValue);
+            zeile.Add(textFeld);
+
+            var loeschBtn = new Button(() =>
+            {
+                aktiveChecklistPunkte.RemoveAt(index);
+                BaueChecklistenUI();
+            }) { text = "✕" };
+            loeschBtn.style.width = 28;
+            zeile.Add(loeschBtn);
+
+            editChecklisteBox.Add(zeile);
+        }
+    }
+
+    // Baut die Diagramm-Datenzeilen (Label + Wert + Löschen) neu auf und
+    // aktualisiert die Live-Vorschau darunter.
+    private void BaueDiagrammUI()
+    {
+        if (editDiagrammDatenBox == null) return;
+        editDiagrammDatenBox.Clear();
+
+        for (int i = 0; i < aktiveDiagrammPunkte.Count; i++)
+        {
+            int index = i;
+            var punkt = aktiveDiagrammPunkte[i];
+
+            var zeile = new VisualElement();
+            zeile.style.flexDirection = FlexDirection.Row;
+            zeile.style.alignItems = Align.Center;
+            zeile.style.marginBottom = 6;
+
+            var labelFeld = new TextField { value = punkt.label };
+            labelFeld.style.flexGrow = 1;
+            labelFeld.style.marginRight = 6;
+            if (string.IsNullOrEmpty(punkt.label)) SetzeFeldPlatzhalter(labelFeld, "z.B. Januar, Produkt A, ...");
+            labelFeld.RegisterValueChangedCallback(evt => { punkt.label = evt.newValue == "z.B. Januar, Produkt A, ..." ? "" : evt.newValue; AktualisiereDiagrammVorschau(); });
+            zeile.Add(labelFeld);
+
+            var wertFeld = new TextField { value = punkt.wert.ToString("0.##") };
+            wertFeld.style.width = 80;
+            wertFeld.style.marginRight = 6;
+            if (punkt.wert == 0f && string.IsNullOrEmpty(punkt.label)) SetzeFeldPlatzhalter(wertFeld, "z.B. 100");
+            wertFeld.RegisterValueChangedCallback(evt =>
+            {
+                float.TryParse(evt.newValue.Replace(",", "."), System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out float wert);
+                punkt.wert = wert;
+                AktualisiereDiagrammVorschau();
+            });
+            zeile.Add(wertFeld);
+
+            var loeschBtn = new Button(() =>
+            {
+                aktiveDiagrammPunkte.RemoveAt(index);
+                BaueDiagrammUI();
+                AktualisiereDiagrammVorschau();
+            }) { text = "✕" };
+            loeschBtn.style.width = 28;
+            zeile.Add(loeschBtn);
+
+            editDiagrammDatenBox.Add(zeile);
+        }
+
+        AktualisiereDiagrammVorschau();
+    }
+
+    private void AktualisiereDiagrammVorschau()
+    {
+        if (diagrammVorschauElement == null) return;
+        var daten = new List<(string, float)>();
+        foreach (var p in aktiveDiagrammPunkte) daten.Add((p.label, p.wert));
+        diagrammVorschauElement.SetzeDaten(daten);
     }
 
     // Echte Platzhalter-Simulation für die Struktur-Felder (gleiches Muster
     // wie SetupPlaceholderSimulation im Kassenbuch) - UI Toolkit TextFields
     // haben in dieser Unity-Version kein natives Platzhalter-Verhalten.
+    // Für wiederverwendete (persistente) Felder wie die drei Standard-
+    // Felder: registriert die Platzhalter-Events nur EIN einziges Mal
+    // (im Gegensatz zu SetzeFeldPlatzhalter, das für frisch erzeugte
+    // Felder gedacht ist und bei jedem Aufruf neu registriert).
+    // Lädt einen Wert in ein persistentes Feld: echten Wert wenn vorhanden,
+    // sonst grauen Platzhalter (konsistent mit RegistrierePersistentenPlatzhalter).
+    private void LadeFeldMitPlatzhalter(TextField field, string wert, string placeholder)
+    {
+        if (field == null) return;
+        if (!string.IsNullOrEmpty(wert))
+        {
+            field.SetValueWithoutNotify(wert);
+            field.style.color = new StyleColor(StyleKeyword.Null);
+        }
+        else
+        {
+            field.SetValueWithoutNotify(placeholder);
+            field.style.color = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+        }
+    }
+
+    private void RegistrierePersistentenPlatzhalter(TextField field, string placeholder)
+    {
+        if (field == null) return;
+
+        var platzhalterFarbe = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+
+        field.RegisterCallback<FocusInEvent>(_ =>
+        {
+            if (field.value == placeholder)
+            {
+                field.SetValueWithoutNotify("");
+                field.style.color = new StyleColor(StyleKeyword.Null);
+            }
+        });
+
+        field.RegisterCallback<FocusOutEvent>(_ =>
+        {
+            if (string.IsNullOrEmpty(field.value))
+            {
+                field.SetValueWithoutNotify(placeholder);
+                field.style.color = platzhalterFarbe;
+            }
+        });
+    }
+
     private void SetzeFeldPlatzhalter(TextField field, string placeholder)
     {
         if (field == null || string.IsNullOrEmpty(placeholder)) return;
@@ -1291,12 +1663,31 @@ public class DocumentDashboard : MonoBehaviour
                     string key = feldInput.userData as string;
                     if (key == null) continue;
 
-                    // Falls das Feld noch den grauen Platzhaltertext zeigt
-                    // (nie angeklickt oder wieder leer verlassen), zählt das
-                    // als "nichts eingegeben" - sonst würde der Hinweistext
-                    // selbst als Wert gespeichert werden.
-                    string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
-                    string wert = (platzhalter != null && feldInput.value == platzhalter) ? "" : feldInput.value;
+                    // Wert je nach Steuerelement-Typ auslesen - TextField,
+                    // DropdownField und Toggle haben kein gemeinsames
+                    // ".value" auf VisualElement-Ebene.
+                    string wert;
+                    if (feldInput is Toggle toggleFeld)
+                    {
+                        wert = toggleFeld.value ? "Ja" : "Nein";
+                    }
+                    else if (feldInput is DropdownField dropdownFeld)
+                    {
+                        wert = dropdownFeld.value ?? "";
+                    }
+                    else if (feldInput is TextField textFeld)
+                    {
+                        // Falls das Feld noch den grauen Platzhaltertext
+                        // zeigt (nie angeklickt oder wieder leer verlassen),
+                        // zählt das als "nichts eingegeben" - sonst würde
+                        // der Hinweistext selbst als Wert gespeichert werden.
+                        string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
+                        wert = (platzhalter != null && textFeld.value == platzhalter) ? "" : textFeld.value;
+                    }
+                    else
+                    {
+                        wert = "";
+                    }
 
                     var bestehenderEintrag = docInList.strukturFelder.FirstOrDefault(f => f.key == key);
                     if (bestehenderEintrag != null)
@@ -1308,7 +1699,51 @@ public class DocumentDashboard : MonoBehaviour
             else
             {
                 docInList.type = selectedEditType;
-                docInList.inhalt = editInhaltInput != null ? editInhaltInput.value : "";
+
+                // Nur die zum gewählten Typ passenden Daten speichern -
+                // verhindert verwaiste alte Daten, falls jemand den Typ
+                // eines Dokuments nachträglich wechselt.
+                if (selectedEditType == "Checklist")
+                {
+                    docInList.checkliste = aktiveChecklistPunkte
+                        .Where(p => !string.IsNullOrWhiteSpace(p.text))
+                        .Select(p => new ChecklistPunkt { text = p.text, erledigt = p.erledigt })
+                        .ToList();
+                    docInList.diagrammDaten = null;
+                    docInList.inhalt = "";
+                }
+                else if (selectedEditType == "Diagramm")
+                {
+                    docInList.diagrammDaten = aktiveDiagrammPunkte
+                        .Where(p => !string.IsNullOrWhiteSpace(p.label))
+                        .Select(p => new DiagrammPunkt { label = p.label, wert = p.wert })
+                        .ToList();
+                    docInList.checkliste = null;
+                    docInList.inhalt = "";
+                }
+                else
+                {
+                    string HoleWert(TextField feld, string platzhalter) =>
+                        feld != null && feld.value != platzhalter ? feld.value.Trim() : "";
+
+                    string titel = HoleWert(editStandardTitelInput, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+                    string datum = HoleWert(editStandardDatumInput, "TT.MM.JJJJ");
+                    string inhalt = HoleWert(editInhaltInput, "Haupttext des Dokuments...");
+
+                    docInList.standardDaten = new StandardDokumentDaten { titel = titel, datum = datum, inhalt = inhalt };
+
+                    // Für Vorschau/Export weiterhin einen zusammengesetzten
+                    // Text ablegen (Rückwärtskompatibilität mit allem, was
+                    // bisher nur doc.inhalt kennt).
+                    var teile = new List<string>();
+                    if (!string.IsNullOrEmpty(titel)) teile.Add(titel);
+                    if (!string.IsNullOrEmpty(datum)) teile.Add("Datum: " + datum);
+                    if (!string.IsNullOrEmpty(inhalt)) teile.Add(inhalt);
+                    docInList.inhalt = string.Join("\n\n", teile);
+
+                    docInList.checkliste = null;
+                    docInList.diagrammDaten = null;
+                }
             }
         }
 
