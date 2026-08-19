@@ -749,7 +749,25 @@ public class DocumentDashboard : MonoBehaviour
         SpawnAllCardsAtStart();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(root);
+
+        // Von einem anderen Screen aus (z.B. Einstellungen -> "Bearbeiten"
+        // bei AGB/Disclaimer/Barzahlung/Überweisung) angefordert: direkt
+        // das Bearbeiten-Popup für ein bestimmtes Dokument öffnen, statt
+        // den Nutzer erst manuell die Karte suchen und anklicken zu lassen.
+        if (!string.IsNullOrEmpty(OeffneDokumentBeimStart))
+        {
+            string gesuchterTitel = OeffneDokumentBeimStart;
+            OeffneDokumentBeimStart = null;
+
+            var zielDoc = speicherDaten.savedDocs.FirstOrDefault(d => d.title == gesuchterTitel);
+            if (zielDoc != null) OpenEditPopup(zielDoc);
+        }
     }
+
+    // Von außen (z.B. EinstellungenController) setzbar: Titel des
+    // Dokuments, dessen Bearbeiten-Popup beim Laden dieses Screens
+    // automatisch geöffnet werden soll.
+    public static string OeffneDokumentBeimStart = null;
 
     // ─────────────────────────────────────────
     // PFLICHTDOKUMENTE SICHERSTELLEN
@@ -1903,7 +1921,32 @@ public class DocumentDashboard : MonoBehaviour
         var alle = GetSavedDocuments();
         var doc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Bezahlweise" && d.title == titel);
-        return doc?.inhalt ?? "";
+        if (doc == null) return "";
+
+        // FIX: Las bisher nur doc.inhalt - AGB/Disclaimer/Barzahlung/
+        // Überweisung sind aber längst strukturierte Dokumente (siehe
+        // felderProPflichtDoc), ihre Daten liegen in strukturFelder, nicht
+        // in .inhalt. .inhalt ist bei denen praktisch immer leer -
+        // die Vorschau in den Einstellungen zeigte deshalb nie etwas an,
+        // egal was im Dok-Pool eingetragen wurde.
+        if (!string.IsNullOrWhiteSpace(doc.inhalt)) return doc.inhalt;
+
+        if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
+        {
+            var ausgefuellte = doc.strukturFelder.Where(f => !string.IsNullOrWhiteSpace(f.wert)).ToList();
+            if (ausgefuellte.Count > 0)
+                return string.Join(" · ", ausgefuellte.Select(f => f.wert));
+        }
+
+        return "";
+    }
+
+    // Prüft, ob für ein Bezahlweise-Dokument überhaupt Daten hinterlegt
+    // sind (egal ob Freitext oder Struktur-Felder) - für den Status
+    // "hinterlegt"/"nicht hinterlegt" in den Einstellungen.
+    public static bool HatBezahlweiseInhalt(string titel)
+    {
+        return !string.IsNullOrWhiteSpace(GetBezahlweiseInhalt(titel));
     }
 
     // ─────────────────────────────────────────

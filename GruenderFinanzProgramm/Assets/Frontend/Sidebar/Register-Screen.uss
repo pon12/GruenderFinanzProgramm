@@ -349,7 +349,8 @@
 
 .popup-doc-text {
     -unity-text-align: upper-left;
-    white-space: nowrap;
-    width: 560px;
-    height: 1000px;
+    white-space: normal;
+    font-size: 14px;
+    color: rgb(220, 220, 220);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
