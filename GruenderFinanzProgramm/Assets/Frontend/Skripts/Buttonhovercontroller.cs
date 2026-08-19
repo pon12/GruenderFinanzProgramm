@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public static class ButtonHoverController
