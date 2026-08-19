@@ -41,6 +41,13 @@ public class DocumentDashboard : MonoBehaviour
     private VisualElement editPopupOverlay;
     private TextField editDocNameInput;
     private TextField editInhaltInput;
+    private TextField editStandardTitelInput, editStandardDatumInput;
+    private VisualElement feldGruppeInhalt, feldGruppeCheckliste, feldGruppeDiagramm;
+    private VisualElement editChecklisteBox, editDiagrammDatenBox, editDiagrammVorschau;
+    private Button btnChecklisteHinzufuegen, btnDiagrammHinzufuegen;
+    private EinfachesBalkendiagrammElement diagrammVorschauElement;
+    private List<ChecklistPunkt> aktiveChecklistPunkte = new List<ChecklistPunkt>();
+    private List<DiagrammPunkt> aktiveDiagrammPunkte = new List<DiagrammPunkt>();
     private Button editPopupSubmitButton;
     private Button editPopupCancelButton;
     private Button btnEditTypeStandard;
@@ -61,16 +68,21 @@ public class DocumentDashboard : MonoBehaviour
     private string selectedEditType = "Standard";
     private string activeCategoryForList = "";
     private DocumentData activeDocForEditing;
-    private List<TextField> aktiveStrukturFelder = new List<TextField>();
+    private List<VisualElement> aktiveStrukturFelder = new List<VisualElement>();
 
     // ============================================================
     // FELD-DEFINITION – ein einzelnes strukturiertes Eingabefeld
     // ============================================================
+    // Text = normales Eingabefeld, Dropdown = feste Auswahl, JaNein = Checkbox.
+    private enum FeldTyp { Text, Dropdown, JaNein }
+
     private class FeldDefinition
     {
         public string key;         // interner Schlüssel, z.B. "iban"
         public string label;       // Anzeigename, z.B. "IBAN"
         public string placeholder; // Platzhaltertext im Feld
+        public FeldTyp typ = FeldTyp.Text;
+        public string[] optionen;  // nur bei typ = Dropdown
     }
 
     // ============================================================
@@ -93,11 +105,11 @@ public class DocumentDashboard : MonoBehaviour
         new KategorieDefinition { name = "Gründung",             istFest = true,  pflichtDocs = new List<string> { "Unternehmensstammdaten", "Gründungsurkunde", "Gesellschaftsvertrag", "Handelsregisterauszug", "Fragebogen zur Steuerlichen Erfassung", "Gewerbeanmeldung", "Anmeldung Berufsgenossenschaft", "Organigramm", "Gesellschafterliste" } },
         new KategorieDefinition { name = "Bezahlweise",            istFest = true,  pflichtDocs = new List<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen", "AGB", "Disclaimer", "Barzahlung", "Überweisung", "SEPA-Basislastschrift-Mandat", "Widerrufsbelehrung", "Mahnverfahren", "Ratenzahlungsbestimmungen" } },
         new KategorieDefinition { name = "Finanzen",               istFest = false, pflichtDocs = new List<string> { "Eröffnungsbilanz" } },
-        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum", "Copyright Hinweis", "Lizenzhinweis Einfach" } },
-        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag" } },
-        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse" } },
-        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur" } },
-        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string>() },
+        new KategorieDefinition { name = "Recht & Steuern",        istFest = false, pflichtDocs = new List<string> { "Datenschutzerklärung (DSGVO)", "Steuernummer-Bescheid / USt-IdNr", "Impressum", "Copyright Hinweis", "Lizenzhinweis Einfach", "Lizenzhinweis Erweitert", "Vertraulichkeitserklärung" } },
+        new KategorieDefinition { name = "Marketing & Personal",   istFest = false, pflichtDocs = new List<string> { "Dienstleistungskatalog / Preisliste", "Corporate Identity Manual", "Muster-Arbeitsvertrag", "Vorlage Kündigung", "Stellenbeschreibung", "Urlaubsantrag", "Unternehmensrichtlinien", "Social Media Strategie" } },
+        new KategorieDefinition { name = "Strategie & Planung",    istFest = true,  pflichtDocs = new List<string> { "Businessplan", "Markt- & Wettbewerbsanalyse", "SWOT-Analyse", "Zielgruppenanalyse" } },
+        new KategorieDefinition { name = "Vorlagen & Checklisten", istFest = false, pflichtDocs = new List<string> { "Gründungs-Checkliste", "Inventarliste", "Inventur", "Fördermittelübersicht", "Darlehensübersicht", "Versicherungsübersicht", "Kundenzufriedenheitsumfrage", "Vollmachtvorlage", "Gutschriftvorlage" } },
+        new KategorieDefinition { name = "Sonstiges",              istFest = false, pflichtDocs = new List<string> { "Besprechungsprotokoll" } },
     };
 
     // ============================================================
@@ -144,14 +156,14 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "beginnTaetigkeit",   label = "Beginn der Tätigkeit",         placeholder = "Datum der ersten Betriebseinnahme oder -ausgabe (TT.MM.JJJJ)" },
             new FeldDefinition { key = "umsatzJahr1",        label = "Geschätzter Umsatz (Jahr 1)",  placeholder = "Dein voraussichtlicher Bruttoumsatz für das erste Jahr" },
             new FeldDefinition { key = "gewinnJahr1",        label = "Geschätzter Gewinn (Jahr 1)",  placeholder = "Dein voraussichtlicher Reingewinn nach Abzug aller Kosten" },
-            new FeldDefinition { key = "kleinunternehmer",   label = "Kleinunternehmer-Regelung",    placeholder = "Ja/Nein (Umsatz < 22.000 € im ersten Jahr)" },
+            new FeldDefinition { key = "kleinunternehmer",   label = "Kleinunternehmer-Regelung (Umsatz < 22.000 € im ersten Jahr)", typ = FeldTyp.JaNein },
         },
             ["Gewerbeanmeldung"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "behoerde",         label = "Zuständige Behörde",   placeholder = "Name des örtlichen Gewerbeamts (z.B. Stadt Mittweida)" },
             new FeldDefinition { key = "beginnTaetigkeit", label = "Beginn der Tätigkeit", placeholder = "Datum des tatsächlichen Starts (auch rückwirkend möglich)" },
             new FeldDefinition { key = "anzahlMitarbeiter",label = "Zahl der Mitarbeiter", placeholder = "Anzahl der Angestellten zum Start (ohne Inhaber)" },
-            new FeldDefinition { key = "nebenerwerb",      label = "Nebenerwerb",          placeholder = "„Ja“, wenn du noch hauptberuflich angestellt bist" },
+            new FeldDefinition { key = "nebenerwerb",      label = "Nebenerwerb (hauptberuflich noch angestellt)", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "anmeldungsgrund",  label = "Anmeldungsgrund",      placeholder = "z.B. Neugründung oder Übernahme" },
         },
             ["Anmeldung Berufsgenossenschaft"] = new List<FeldDefinition>
@@ -215,7 +227,7 @@ public class DocumentDashboard : MonoBehaviour
         {
             new FeldDefinition { key = "gueltigkeitsbereich", label = "Gültigkeitsbereich", placeholder = "Wofür wird dieser Vordruck genutzt? (z.B. „Bürokasse“, „Projekt XY“)" },
             new FeldDefinition { key = "zusatzhinweis",       label = "Zusatzhinweis",      placeholder = "Interner Vermerk oder Anweisung (z.B. „Nur für Kleinbeträge bis 250 €“)" },
-            new FeldDefinition { key = "ausfuehrung",         label = "Ausführung",         placeholder = "Einfache Ausführung / Zweifache Ausführung" },
+            new FeldDefinition { key = "ausfuehrung",         label = "Ausführung",         typ = FeldTyp.Dropdown, optionen = new[] { "Einfache Ausführung", "Zweifache Ausführung" } },
         },
             ["Überweisung"] = new List<FeldDefinition>
         {
@@ -234,9 +246,9 @@ public class DocumentDashboard : MonoBehaviour
             ["Widerrufsbelehrung"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "widerrufsfrist",   label = "Widerrufsfrist",       placeholder = "Gesetzlich z.B. 14 Tage. Nur die Zahl eintragen" },
-            new FeldDefinition { key = "wertersatzklausel",label = "Wertersatz-Klausel",   placeholder = "Pflicht zur Zahlung bereits erbrachter Leistungen (Ja/Nein)" },
+            new FeldDefinition { key = "wertersatzklausel",label = "Wertersatz-Klausel: Pflicht zur Zahlung bereits erbrachter Leistungen", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "kontakt",          label = "Kontakt für Widerruf", placeholder = "E-Mail-Adresse oder Postanschrift deiner Firma" },
-            new FeldDefinition { key = "vorzeitigesErloeschen", label = "Vorzeitiges Erlöschen", placeholder = "Hinweis auf Erlöschen bei vollständiger Ausführung (Ja/Nein)" },
+            new FeldDefinition { key = "vorzeitigesErloeschen", label = "Vorzeitiges Erlöschen: Hinweis auf Erlöschen bei vollständiger Ausführung", typ = FeldTyp.JaNein },
         },
             ["Mahnverfahren"] = new List<FeldDefinition>
         {
@@ -256,7 +268,7 @@ public class DocumentDashboard : MonoBehaviour
             ["Copyright Hinweis"] = new List<FeldDefinition>
         {
             new FeldDefinition { key = "schutzumfang",          label = "Schutzumfang",           placeholder = "Beschreibung der geschützten Werke (z.B. „Programmcode, Designs und UI-Konzepte“)" },
-            new FeldDefinition { key = "referenzklausel",       label = "Referenzklausel",        placeholder = "Recht zur Nutzung als Referenz aktiv bewerben? (Ja/Nein)" },
+            new FeldDefinition { key = "referenzklausel",       label = "Referenzklausel: Recht zur Nutzung als Referenz aktiv bewerben?", typ = FeldTyp.JaNein },
             new FeldDefinition { key = "schadensersatzfaktor",  label = "Schadensersatzfaktor",   placeholder = "Faktor bei Verstößen (Vorgabe: 3-fache Höhe)" },
             new FeldDefinition { key = "zusatzangabe",          label = "Zusatzangabe",           placeholder = "Optionale Einschränkungen (z.B. „Anonymisierte Referenz auf Wunsch möglich“)" },
         },
@@ -265,6 +277,243 @@ public class DocumentDashboard : MonoBehaviour
             new FeldDefinition { key = "zusatzangabe",              label = "Zusatzangabe",                  placeholder = "Beschreibung der erweiterten Rechte (z.B. „Inklusive Recht zur Bearbeitung und Dekompilierung des Quellcodes“)" },
             new FeldDefinition { key = "kontakt",                   label = "Kontakt",                       placeholder = "E-Mail oder Ansprechpartner für Rückfragen (z.B. support@deinefirma.de)" },
             new FeldDefinition { key = "preisErweiterteNutzung",    label = "Preis für erweiterte Nutzung",  placeholder = "Betrag in Euro" },
+        },
+            ["Lizenzhinweis Erweitert"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geltungsbereich",         label = "Geltungsbereich",                placeholder = "Für welche Leistungen gilt dies? (Standard: „Alle erbrachten Werke & Leistungen“)" },
+            new FeldDefinition { key = "bedingungRechteuebergang", label = "Bedingung für Rechteübergang",   placeholder = "Wann gehen die Rechte über? (z.B. „Vollständige Zahlung der Vergütung“)" },
+            new FeldDefinition { key = "nutzungsumfang",          label = "Nutzungsumfang",                 placeholder = "Was darf der Kunde tun? (z.B. „Jegliche gewerbliche Nutzung, Vervielfältigung & Bearbeitung“)" },
+            new FeldDefinition { key = "raeumlicheReichweite",    label = "Räumliche Reichweite",           placeholder = "Wo darf das Werk genutzt werden? (z.B. „Weltweit / Unbeschränkt“)" },
+            new FeldDefinition { key = "zeitlicheReichweite",     label = "Zeitliche Reichweite",           placeholder = "Wie lange gilt das Recht? (Standard: „Zeitlich unbeschränkt / Unbefristet“)" },
+            new FeldDefinition { key = "zusatzvereinbarung",      label = "Zusatzvereinbarung",             placeholder = "Besondere Hinweise (z.B. „Inklusive Recht zur Unterlizensierung“)" },
+        },
+            ["Eröffnungsbilanz"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "bilanzstichtag", label = "Bilanzstichtag",  placeholder = "Datum der Bilanzaufstellung (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "anmerkungen",    label = "Anmerkungen",     placeholder = "Optionale Erläuterungen zu den Bilanzpositionen" },
+        },
+            ["Steuernummer-Bescheid / USt-IdNr"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "finanzamt",         label = "Zuständiges Finanzamt", placeholder = "Name des Finanzamts, das den Bescheid ausgestellt hat" },
+            new FeldDefinition { key = "steuernummer",      label = "Steuernummer",          placeholder = "z.B. 123/456/78910" },
+            new FeldDefinition { key = "ustIdNr",           label = "USt-IdNr.",             placeholder = "z.B. DE123456789 (optional)" },
+            new FeldDefinition { key = "ausstellungsdatum", label = "Ausstellungsdatum",     placeholder = "Datum des Bescheids (TT.MM.JJJJ)" },
+        },
+            ["Impressum"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "vertretungsberechtigte", label = "Vertretungsberechtigte Person", placeholder = "Name der laut § 5 TMG anzugebenden Person" },
+            new FeldDefinition { key = "email",                  label = "E-Mail",                        placeholder = "Kontakt-E-Mail für rechtliche Anfragen" },
+            new FeldDefinition { key = "telefon",                label = "Telefon",                       placeholder = "Erreichbare Telefonnummer" },
+            new FeldDefinition { key = "handelsregisternummer",  label = "Handelsregisternummer",         placeholder = "Optional, falls eingetragen" },
+            new FeldDefinition { key = "zusatzangaben",          label = "Zusatzangaben",                 placeholder = "z.B. Berufsbezeichnung, Aufsichtsbehörde" },
+        },
+            ["Dienstleistungskatalog / Preisliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "leistungsuebersicht", label = "Leistungsübersicht", placeholder = "Kurze Auflistung der angebotenen Leistungen" },
+            new FeldDefinition { key = "preismodell",         label = "Preismodell",        typ = FeldTyp.Dropdown, optionen = new[] { "Stundensatz", "Festpreis", "Pauschale", "Individuell" } },
+            new FeldDefinition { key = "zusatzangaben",       label = "Zusatzangaben",      placeholder = "z.B. Rabattstaffeln, Mindestbuchungsdauer" },
+        },
+            ["Gründungs-Checkliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geschaeftskontoEroeffnet",     label = "Geschäftskonto eröffnet",       typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "gewerbeAngemeldet",            label = "Gewerbe angemeldet",            typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "versicherungenAbgeschlossen",  label = "Versicherungen abgeschlossen",  typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "buchhaltungEingerichtet",      label = "Buchhaltung eingerichtet",      typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "websiteErstellt",              label = "Website & Branding erstellt",   typ = FeldTyp.JaNein },
+            new FeldDefinition { key = "notizen",                      label = "Notizen",                       placeholder = "Offene Punkte oder nächste Schritte" },
+        },
+            ["Datenschutzerklärung (DSGVO)"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",         label = "Versionsstand",         placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "verantwortlicheStelle", label = "Verantwortliche Stelle", placeholder = "Name der Person/Abteilung (Standard: Geschäftsführung)" },
+            new FeldDefinition { key = "kontaktDatenschutz",    label = "Kontakt Datenschutz",    placeholder = "E-Mail für Rückfragen (z.B. datenschutz@firma.de)" },
+            new FeldDefinition { key = "zusatzangabe",          label = "Zusatzangabe",           placeholder = "Optional: Hinweis auf spezifische NDAs oder Projekt-Besonderheiten" },
+        },
+            ["Vertraulichkeitserklärung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",   label = "Versionsstand",     placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "dauerDerPflicht", label = "Dauer der Pflicht", placeholder = "Jahre nach Vertragsende (Standard: „unbefristet“ oder z.B. „3 Jahre“)" },
+            new FeldDefinition { key = "kontaktNda",      label = "Kontakt für NDAs",  placeholder = "E-Mail-Adresse für spezifische Geheimhaltungsanfragen" },
+            new FeldDefinition { key = "zusatzangabe",    label = "Zusatzangabe",      placeholder = "Optional: Hinweis auf ergänzende projektbezogene NDAs" },
+        },
+            ["Muster-Arbeitsvertrag"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "vertragsart",         label = "Vertragsart",         placeholder = "Welche Art es ist (Minijob, Senior Developer, CEO, ...)" },
+            new FeldDefinition { key = "stellenbezeichnung",  label = "Stellenbezeichnung",  placeholder = "z.B. „Junior Developer“ oder „UI-Designer“" },
+            new FeldDefinition { key = "vertragsbeginn",      label = "Vertragsbeginn",      placeholder = "Datum des ersten Arbeitstages (TT.MM.JJJJ)" },
+            new FeldDefinition { key = "wochenstunden",       label = "Wochenstunden",       placeholder = "Anzahl der Stunden (z.B. „40 Stunden“)" },
+            new FeldDefinition { key = "bruttogehalt",        label = "Bruttogehalt",        placeholder = "Monatliches Entgelt in EUR" },
+            new FeldDefinition { key = "urlaubstage",         label = "Urlaubstage",         placeholder = "Jährlicher Anspruch (gesetzliches Minimum: 20 bei 5-Tage-Woche)" },
+            new FeldDefinition { key = "probezeit",           label = "Probezeit",           placeholder = "Dauer in Monaten (Standard: 6 Monate)" },
+        },
+            ["Vorlage Kündigung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "arbeitnehmer",       label = "Arbeitnehmer",       placeholder = "Name & Anschrift (aus KDB oder frei eintragen)" },
+            new FeldDefinition { key = "kuendigungsdatum",   label = "Kündigungsdatum",    placeholder = "Datum, an dem das Schreiben übergeben wird" },
+            new FeldDefinition { key = "kuendigungstermin",  label = "Kündigungstermin",   placeholder = "Datum, zu dem das Verhältnis endet (z.B. „30.09.2026“)" },
+            new FeldDefinition { key = "kuendigungsgrund",   label = "Kündigungsgrund",    placeholder = "Fristgerecht / Fristlos / optionaler Freitext" },
+            new FeldDefinition { key = "rueckgabeCheck",     label = "Aufforderung zur Rückgabe von Firmeneigentum einblenden", typ = FeldTyp.JaNein },
+        },
+            ["Stellenbeschreibung"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "stellentitel",        label = "Stellentitel",        placeholder = "Name der Position (z.B. „Backend-Developer“ oder „UI-Lead“)" },
+            new FeldDefinition { key = "abteilung",           label = "Abteilung",           placeholder = "Fachbereich (z.B. „Software-Engineering“ oder „Design“)" },
+            new FeldDefinition { key = "berichtetAn",         label = "Berichtet an",        placeholder = "Vorgesetzte Rolle (z.B. „CTO / Projektleitung“)" },
+            new FeldDefinition { key = "hauptaufgaben",       label = "Hauptaufgaben",       placeholder = "Kernaktivitäten (z.B. „Entwicklung der ERP-Logik“, „Datenmodelle pflegen“)" },
+            new FeldDefinition { key = "anforderungsprofil",  label = "Anforderungsprofil",  placeholder = "Erforderliche Skills (z.B. „C# Kenntnisse“, „Unity UI Toolkit“)" },
+            new FeldDefinition { key = "benefits",            label = "Benefits",            placeholder = "Was die Firma bietet (z.B. „Flexible Arbeitszeiten“, „Home Office“)" },
+            new FeldDefinition { key = "starttermin",         label = "Starttermin",         placeholder = "Datum oder „ab sofort“" },
+        },
+            ["Urlaubsantrag"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "kalenderjahr",       label = "Kalenderjahr",        placeholder = "Jahr, für das die Vorlage gedruckt wird (z.B. „2026“)" },
+            new FeldDefinition { key = "einreichungsfrist",  label = "Einreichungsfrist",   placeholder = "z.B. „Antrag bitte 2 Wochen vor Urlaubsantritt einreichen“" },
+            new FeldDefinition { key = "zusatzhinweis",      label = "Zusatzhinweis",       placeholder = "Optionale Anweisung (z.B. „Bitte in Blockschrift ausfüllen“)" },
+        },
+            ["Corporate Identity Manual"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",   label = "Versionsstand",         placeholder = "Datum oder Nummer (z.B. „Stand: August 2026“)" },
+            new FeldDefinition { key = "markenkern",      label = "Markenkern",            placeholder = "Kurzbeschreibung der Vision (z.B. „Klarheit durch Design“)" },
+            new FeldDefinition { key = "primaerfarbe",    label = "Primärfarbe (HEX)",     placeholder = "Hauptfarbcode (z.B. Grün: #80CF95)" },
+            new FeldDefinition { key = "sekundaerfarbe",  label = "Sekundärfarbe (HEX)",   placeholder = "Akzentfarbcode (z.B. Grau: #646464)" },
+            new FeldDefinition { key = "hausschrift",     label = "Hausschrift",           placeholder = "Name der primären Schriftart (z.B. Poppins)" },
+            new FeldDefinition { key = "aufloesung",      label = "Auflösung",             placeholder = "Optimierte Auflösung bei digital erstellten Inhalten (z.B. 1080p)" },
+            new FeldDefinition { key = "layoutRaster",    label = "Layout-Raster",         placeholder = "Standard-Abstände (z.B. 8px / 16px / 24px)" },
+            new FeldDefinition { key = "zusatzangabe",    label = "Zusatzangabe",          placeholder = "Optional (z.B. „Nutzung von Kristall-Elementen erlaubt“)" },
+        },
+            ["Businessplan"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "geschaeftsidee",     label = "Geschäftsidee",           placeholder = "Was ist der Kern Ihres Unternehmens? Welches Problem lösen Sie?" },
+            new FeldDefinition { key = "zielgruppeMarkt",    label = "Zielgruppe & Markt",      placeholder = "Wer sind Ihre Kunden und wie erreichen Sie diese?" },
+            new FeldDefinition { key = "angebotPreise",      label = "Angebot & Preise",        placeholder = "Was verkaufen Sie konkret und zu welchen Konditionen?" },
+            new FeldDefinition { key = "staerken",           label = "Stärken (SWOT)",          placeholder = "Warum sind Sie besser als der Wettbewerb?" },
+            new FeldDefinition { key = "risiken",            label = "Risiken (SWOT)",          placeholder = "Welche Gefahren gibt es und wie sichern Sie sich ab?" },
+            new FeldDefinition { key = "investitionsbedarf", label = "Investitionsbedarf",      placeholder = "Wie viel Startkapital wird benötigt (z.B. für Hardware, Miete)?" },
+            new FeldDefinition { key = "umsatzJ1",           label = "Umsatzprognose Jahr 1",   placeholder = "Geschätzter Rohgewinn Jahr 1" },
+            new FeldDefinition { key = "umsatzJ2",           label = "Umsatzprognose Jahr 2",   placeholder = "Geschätzter Rohgewinn Jahr 2" },
+            new FeldDefinition { key = "umsatzJ3",           label = "Umsatzprognose Jahr 3",   placeholder = "Geschätzter Rohgewinn Jahr 3" },
+            new FeldDefinition { key = "teamMeilensteine",   label = "Team & Meilensteine",     placeholder = "Wer setzt das Projekt um und was sind die nächsten Ziele?" },
+        },
+            ["Markt- & Wettbewerbsanalyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "marktbeschreibung",       label = "Marktbeschreibung",        placeholder = "In welcher Branche sind Sie tätig? Was sind die aktuellen Trends?" },
+            new FeldDefinition { key = "zielgruppensegmente",     label = "Zielgruppensegmente",      placeholder = "Wer sind Ihre Kernkunden? (z.B. „Software-Startups“)" },
+            new FeldDefinition { key = "direkteWettbewerber",     label = "Direkte Wettbewerber",     placeholder = "Welche Firmen bieten ein identisches Produkt an?" },
+            new FeldDefinition { key = "indirekteWettbewerber",   label = "Indirekte Wettbewerber",   placeholder = "Welche alternativen Lösungen nutzen Kunden aktuell (z.B. Excel)?" },
+            new FeldDefinition { key = "wettbewerbsvorteile",     label = "Wettbewerbsvorteile",      placeholder = "Was ist Ihr Alleinstellungsmerkmal (USP) (z.B. „Guided UI“)?" },
+            new FeldDefinition { key = "marktpotenzial",          label = "Marktpotenzial",           placeholder = "Wie schätzen Sie das Wachstum in den nächsten 3 Jahren ein?" },
+        },
+            ["SWOT-Analyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Was sind Ihre Wettbewerbsvorteile? (z.B. „Hocheffiziente Architektur“)" },
+            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Wo liegen interne Defizite? (z.B. „Begrenzte Personalressourcen“)" },
+            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Welche Markttrends können Sie nutzen? (z.B. „Wachsender Digitalisierungsbedarf“)" },
+            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Welche Gefahren drohen von außen? (z.B. „Markteintritt großer Wettbewerber“)" },
+            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Welche Kernmaßnahmen leiten Sie aus dieser Analyse ab?" },
+        },
+            ["Zielgruppenanalyse"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "kernZielgruppe",         label = "Kern-Zielgruppe",         placeholder = "Wer ist der ideale Kunde? (z.B. „Einzelgründer im IT-Sektor“)" },
+            new FeldDefinition { key = "demografischeMerkmale",  label = "Demografische Merkmale",  placeholder = "Alter, Region, Branche oder Unternehmensgröße" },
+            new FeldDefinition { key = "psychografischeMerkmale",label = "Psychografische Merkmale",placeholder = "Welche Werte und Interessen hat die Zielgruppe?" },
+            new FeldDefinition { key = "painPoints",             label = "Probleme & Pain Points",  placeholder = "Vor welchen Herausforderungen stehen die Kunden aktuell?" },
+            new FeldDefinition { key = "kaufmotivation",         label = "Kaufmotivation",          placeholder = "Warum entscheidet sich der Kunde für Ihr Produkt?" },
+            new FeldDefinition { key = "kommunikationswege",     label = "Kommunikationswege",      placeholder = "Über welche Kanäle erreichen Sie diese Personen?" },
+        },
+            ["Fördermittelübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "planungszeitraum",   label = "Planungszeitraum",      placeholder = "Zeitraum oder Phase (z.B. „Gründungsphase 2026/27“)" },
+            new FeldDefinition { key = "zuschussProgramm1",  label = "Zuschuss-Programm 1",   placeholder = "Name des ersten Zuschusses (z.B. „EXIST-Gründerstipendium“)" },
+            new FeldDefinition { key = "zuschussProgramm2",  label = "Zuschuss-Programm 2",   placeholder = "Weiteres Programm (z.B. „Gründungszuschuss BfA“)" },
+            new FeldDefinition { key = "kreditProgramm1",    label = "Kredit-Programm 1",     placeholder = "Name des Darlehens (z.B. „KfW Startgeld“)" },
+            new FeldDefinition { key = "kreditProgramm2",    label = "Kredit-Programm 2",     placeholder = "Weiteres Darlehen (z.B. „ERP-Gründerkredit“)" },
+            new FeldDefinition { key = "sonstigeMittel",     label = "Sonstige Mittel",       placeholder = "Wettbewerbe oder Sponsoring (z.B. „Businessplan-Wettbewerb Sachsen“)" },
+            new FeldDefinition { key = "strategischeNotizen",label = "Strategische Notizen",  placeholder = "Freitext für Fristen oder nächste Schritte" },
+        },
+            ["Darlehensübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "berichtsstand",         label = "Berichtsstand",         placeholder = "Datum der Erfassung (z.B. „3. Quartal 2026“)" },
+            new FeldDefinition { key = "darlehensbezeichnung",  label = "Darlehensbezeichnung",  placeholder = "Name des Kredits (z.B. „KfW Startgeld“)" },
+            new FeldDefinition { key = "kreditgeber",           label = "Kreditgeber",           placeholder = "Name der Bank oder des Investors" },
+            new FeldDefinition { key = "darlehenssumme",        label = "Darlehenssumme",        placeholder = "Gesamter Nominalbetrag in EUR" },
+            new FeldDefinition { key = "zinssatz",              label = "Zinssatz (%)",          placeholder = "Jährlicher Zinssatz (z.B. „3,0 %“)" },
+            new FeldDefinition { key = "laufzeit",              label = "Laufzeit (Jahre)",      placeholder = "Dauer der Rückzahlung (z.B. „3 Jahre“)" },
+            new FeldDefinition { key = "monatlicheRate",        label = "Monatliche Rate",       placeholder = "Betrag für Zins und Tilgung in EUR" },
+            new FeldDefinition { key = "verwendungszweck",      label = "Verwendungszweck",      placeholder = "Wofür wurde das Geld genutzt? (z.B. „Büroausstattung“)" },
+        },
+            ["Versicherungsübersicht"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "berichtsstand",        label = "Berichtsstand",        placeholder = "Datum der Erfassung (z.B. „August 2026“)" },
+            new FeldDefinition { key = "versicherungstyp",     label = "Versicherungstyp",     placeholder = "Art der Absicherung (z.B. „IT-Haftpflicht“ oder „Rechtsschutz“)" },
+            new FeldDefinition { key = "versicherer",          label = "Versicherer",          placeholder = "Name der Versicherungsgesellschaft" },
+            new FeldDefinition { key = "versicherungsnummer",  label = "Versicherungsnummer",  placeholder = "Eindeutige Kennung der Police" },
+            new FeldDefinition { key = "beitrag",              label = "Beitrag (EUR)",        placeholder = "Monatliche oder jährliche Prämie" },
+            new FeldDefinition { key = "zahlungsrhythmus",     label = "Zahlungsrhythmus",     typ = FeldTyp.Dropdown, optionen = new[] { "monatlich", "vierteljährlich", "jährlich" } },
+            new FeldDefinition { key = "zusatznotiz",          label = "Zusatznotiz",          placeholder = "Optionale Infos (z.B. „inkl. Cyber-Risk-Abdeckung“)" },
+        },
+            ["Kundenzufriedenheitsumfrage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "befragungszeitraum", label = "Befragungszeitraum", placeholder = "Zeitraum oder Projektname (z.B. „Projekt XY – Q3 2026“)" },
+            new FeldDefinition { key = "einleitungstext",    label = "Einleitungstext",     placeholder = "Persönliche Ansprache (z.B. „Helfen Sie uns, besser zu werden“)" },
+            new FeldDefinition { key = "leistungsfokus",     label = "Leistungsfokus",      placeholder = "Was wurde bewertet? (z.B. „Software-Implementierung“)" },
+            new FeldDefinition { key = "frage1",             label = "Frage 1",             placeholder = "Erste Qualitätsabfrage (z.B. „Wie zufrieden sind Sie mit der Usability?“)" },
+            new FeldDefinition { key = "frage2",             label = "Frage 2",             placeholder = "Zweite Qualitätsabfrage (z.B. „Wie klar war die Kommunikation?“)" },
+            new FeldDefinition { key = "frage3",             label = "Frage 3",             placeholder = "Dritte Qualitätsabfrage (z.B. „Entspricht das Ergebnis Ihren Erwartungen?“)" },
+            new FeldDefinition { key = "schlusswort",        label = "Schlusswort",         placeholder = "Dankesformel an den Kunden" },
+        },
+            ["Vollmachtvorlage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "betreff", label = "Betreff (optional)", placeholder = "Kurztitel für die Kopfzeile (z.B. „Postvollmacht“)" },
+        },
+            ["Gesellschafterliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "erstellungsdatum",  label = "Erstellungsdatum",       placeholder = "Datum der aktuellen Liste (Stichtag, TT.MM.JJJJ)" },
+            new FeldDefinition { key = "gesellschafter1",   label = "Gesellschafter 1",       placeholder = "Name, Vorname, Geburtsdatum, Wohnort" },
+            new FeldDefinition { key = "anteil1",           label = "Anteil 1 (Betrag)",      placeholder = "Nennbetrag des Anteils in EUR (z.B. „12.500 €“)" },
+            new FeldDefinition { key = "gesellschafter2",   label = "Gesellschafter 2",       placeholder = "Name, Vorname, Geburtsdatum, Wohnort" },
+            new FeldDefinition { key = "anteil2",           label = "Anteil 2 (Betrag)",      placeholder = "Nennbetrag des Anteils in EUR" },
+            new FeldDefinition { key = "stammkapitalGesamt",label = "Stammkapital Gesamt",    placeholder = "Summe aller Anteile in EUR" },
+            new FeldDefinition { key = "zusatzangaben",     label = "Zusatzangaben",          placeholder = "z.B. „Laufende Nummern der Anteile 1 bis X“" },
+        },
+            ["Gutschriftvorlage"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "tabellenzeilen", label = "Tabellenzeilen", placeholder = "Anzahl der Leerzeilen für Positionen (z.B. „5“)" },
+            new FeldDefinition { key = "zusatzhinweis",  label = "Zusatzhinweis",  placeholder = "Optionaler Text (z.B. „Bitte Grund der Gutschrift angeben“)" },
+        },
+            ["Besprechungsprotokoll"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "themenFokus",         label = "Themen-Fokus",           placeholder = "Projekttitel oder Bereich (z.B. „Projekt XY – Meilenstein 1“)" },
+            new FeldDefinition { key = "anzahlAufgabenzeilen",label = "Anzahl Aufgabenzeilen",  placeholder = "Auswahl: „Standard (8 Zeilen)“" },
+            new FeldDefinition { key = "zusatzhinweis",       label = "Zusatzhinweis",          placeholder = "Optionaler Text (z.B. „Bitte zur Dokumentation in die Cloud hochladen“)" },
+        },
+            ["Inventarliste"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "tabellenzeilen",  label = "Tabellenzeilen",   placeholder = "Anzahl der Leerzeilen (z.B. „15“ oder „Ganze Seite“)" },
+            new FeldDefinition { key = "inventurBereich", label = "Inventur-Bereich", placeholder = "Optionaler Fokus (z.B. „IT-Hardware“ oder „Büroausstattung“)" },
+        },
+            ["Unternehmensrichtlinien"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "versionsstand",        label = "Versionsstand",           placeholder = "Datum oder Nummer (z.B. „v1.0 – Stand August 2026“)" },
+            new FeldDefinition { key = "vision",               label = "Vision",                  placeholder = "Was ist die Unternehmensvision in einem kurzen Text" },
+            new FeldDefinition { key = "unternehmenskultur",   label = "Unternehmenskultur",      placeholder = "Kurzbeschreibung der Werte (z.B. „Transparenz & Eigenverantwortung“)" },
+            new FeldDefinition { key = "reaktionszeit",        label = "Reaktionszeit (Std.)",    placeholder = "Zeitfenster für interne Rückmeldungen (Standard: „24 Stunden“)" },
+            new FeldDefinition { key = "technologieStack",     label = "Technologie-Stack",       placeholder = "Genutzte Tools (z.B. „Unity, GitHub, SQLite, Ventoriq“)" },
+            new FeldDefinition { key = "designStack",          label = "Design-Stack",            placeholder = "Genutzte Tools und Details (z.B. „Unity, GitHub, SQLite, Ventoriq, 1080p“)" },
+            new FeldDefinition { key = "uxStack",              label = "UX-Stack",                placeholder = "Details zum Ablauf und zur Sicherstellung der Qualitätssicherung" },
+            new FeldDefinition { key = "datenschutzabschnitt", label = "Datenschutzabschnitt",    placeholder = "Kurzbeschreibung wie der Datenschutz aussieht" },
+            new FeldDefinition { key = "datensicherheitabschnitt", label = "Datensicherheitsabschnitt", placeholder = "Kurzbeschreibung wie es zum Thema Datensicherheit steht" },
+            new FeldDefinition { key = "zusatzangaben",        label = "Zusatzangaben",           placeholder = "Optionale spezifische Regeln (z.B. „Home-Office-Vorgaben“)" },
+        },
+            ["Social Media Strategie"] = new List<FeldDefinition>
+        {
+            new FeldDefinition { key = "primaereKanaele",   label = "Primäre Kanäle",     placeholder = "Auswahl der Plattformen (z.B. „LinkedIn & Discord“)" },
+            new FeldDefinition { key = "kernbotschaft",     label = "Kernbotschaft",      placeholder = "Die Hauptaussage (z.B. „Gründen ohne kognitive Last“)" },
+            new FeldDefinition { key = "postFrequenz",      label = "Post-Frequenz",      placeholder = "Wie oft wird gepostet? (z.B. „3x wöchentlich“)" },
+            new FeldDefinition { key = "zielgruppe",        label = "Zielgruppe",         placeholder = "Definition (z.B. „Software-Gründer & Startups“)" },
+            new FeldDefinition { key = "zusatzangabe",      label = "Zusatzangabe",       placeholder = "Besondere Kampagnen (z.B. „Release-Countdown zum 01.07.“)" },
+            new FeldDefinition { key = "productInsights",  label = "Product Insights",   placeholder = "Contentschwerpunkt - Inhalt für Produkte" },
+            new FeldDefinition { key = "techTransparenz",  label = "Tech Transparenz",   placeholder = "Contentschwerpunkt - Inhalt für Technik & Transparenz" },
+            new FeldDefinition { key = "startupEducation", label = "Startup Education",  placeholder = "Contentschwerpunkt - Inhalt für Weiteres" },
         },
         };
 
@@ -313,10 +562,36 @@ public class DocumentDashboard : MonoBehaviour
         public bool istPflichtdokument;
         public string inhalt;
         public List<StrukturFeldWert> strukturFelder;
+        // Nur bei type == "Standard" bzw. "Checklist"/"Diagramm" befüllt.
+        public StandardDokumentDaten standardDaten;
+        public List<ChecklistPunkt> checkliste;
+        public List<DiagrammPunkt> diagrammDaten;
         // Zeitpunkt der letzten Änderung (yyyy-MM-dd) - für die Sortierung
         // im Export-Screen. Bei alten, bereits gespeicherten Dokumenten
         // leer, bis sie das nächste Mal bearbeitet werden.
         public string datum;
+    }
+
+    [System.Serializable]
+    public class ChecklistPunkt
+    {
+        public string text;
+        public bool erledigt;
+    }
+
+    [System.Serializable]
+    public class DiagrammPunkt
+    {
+        public string label;
+        public float wert;
+    }
+
+    [System.Serializable]
+    public class StandardDokumentDaten
+    {
+        public string titel;
+        public string datum;
+        public string inhalt;
     }
 
     [System.Serializable]
@@ -369,6 +644,47 @@ public class DocumentDashboard : MonoBehaviour
         editPopupOverlay = root.Q<VisualElement>("Edit-Popup-Overlay");
         editDocNameInput = root.Q<TextField>("Edit-Doc-Name-Input");
         editInhaltInput = root.Q<TextField>("Edit-Inhalt-Input");
+        editStandardTitelInput = root.Q<TextField>("Edit-Standard-Titel-Input");
+        editStandardDatumInput = root.Q<TextField>("Edit-Standard-Datum-Input");
+
+        // Platzhalter nur EINMAL registrieren - diese drei Felder sind
+        // wiederverwendet (anders als die Checklisten-/Diagramm-Zeilen,
+        // die bei jedem Öffnen frisch gebaut werden). Würde
+        // SetzeFeldPlatzhalter hier bei jedem Popup-Öffnen erneut
+        // aufgerufen, würden sich die FocusIn/FocusOut-Handler mit jedem
+        // Öffnen aufsummieren.
+        RegistrierePersistentenPlatzhalter(editStandardTitelInput, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+        RegistrierePersistentenPlatzhalter(editStandardDatumInput, "TT.MM.JJJJ");
+        RegistrierePersistentenPlatzhalter(editInhaltInput, "Haupttext des Dokuments...");
+        feldGruppeInhalt = root.Q<VisualElement>("feld-gruppe-inhalt");
+        feldGruppeCheckliste = root.Q<VisualElement>("feld-gruppe-checkliste");
+        feldGruppeDiagramm = root.Q<VisualElement>("feld-gruppe-diagramm");
+        editChecklisteBox = root.Q<VisualElement>("Edit-Checkliste-Box");
+        editDiagrammDatenBox = root.Q<VisualElement>("Edit-Diagramm-Daten-Box");
+        editDiagrammVorschau = root.Q<VisualElement>("Edit-Diagramm-Vorschau");
+        btnChecklisteHinzufuegen = root.Q<Button>("Btn-Checkliste-Hinzufuegen");
+        btnDiagrammHinzufuegen = root.Q<Button>("Btn-Diagramm-Hinzufuegen");
+
+        if (editDiagrammVorschau != null)
+        {
+            diagrammVorschauElement = new EinfachesBalkendiagrammElement();
+            diagrammVorschauElement.style.flexGrow = 1;
+            editDiagrammVorschau.Add(diagrammVorschauElement);
+        }
+
+        if (btnChecklisteHinzufuegen != null)
+            btnChecklisteHinzufuegen.clicked += () =>
+            {
+                aktiveChecklistPunkte.Add(new ChecklistPunkt { text = "", erledigt = false });
+                BaueChecklistenUI();
+            };
+
+        if (btnDiagrammHinzufuegen != null)
+            btnDiagrammHinzufuegen.clicked += () =>
+            {
+                aktiveDiagrammPunkte.Add(new DiagrammPunkt { label = "", wert = 0f });
+                BaueDiagrammUI();
+            };
         editPopupSubmitButton = root.Q<Button>("Btn-Edit-Submit");
         editPopupCancelButton = root.Q<Button>("Btn-Edit-Cancel");
         btnEditTypeStandard = root.Q<Button>("Btn-Edit-Type-Standard");
@@ -433,7 +749,25 @@ public class DocumentDashboard : MonoBehaviour
         SpawnAllCardsAtStart();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(root);
+
+        // Von einem anderen Screen aus (z.B. Einstellungen -> "Bearbeiten"
+        // bei AGB/Disclaimer/Barzahlung/Überweisung) angefordert: direkt
+        // das Bearbeiten-Popup für ein bestimmtes Dokument öffnen, statt
+        // den Nutzer erst manuell die Karte suchen und anklicken zu lassen.
+        if (!string.IsNullOrEmpty(OeffneDokumentBeimStart))
+        {
+            string gesuchterTitel = OeffneDokumentBeimStart;
+            OeffneDokumentBeimStart = null;
+
+            var zielDoc = speicherDaten.savedDocs.FirstOrDefault(d => d.title == gesuchterTitel);
+            if (zielDoc != null) OpenEditPopup(zielDoc);
+        }
     }
+
+    // Von außen (z.B. EinstellungenController) setzbar: Titel des
+    // Dokuments, dessen Bearbeiten-Popup beim Laden dieses Screens
+    // automatisch geöffnet werden soll.
+    public static string OeffneDokumentBeimStart = null;
 
     // ─────────────────────────────────────────
     // PFLICHTDOKUMENTE SICHERSTELLEN
@@ -489,6 +823,19 @@ public class DocumentDashboard : MonoBehaviour
                 }
             }
         }
+
+        // Aufräumen: verwaiste Pflichtdokument-Einträge entfernen, deren
+        // (Kategorie, Titel)-Kombination zu KEINEM aktuellen Pflichtdokument
+        // mehr passt - z.B. Reste vom Split "Gründungsurkunde /
+        // Gesellschaftsvertrag" -> "Gründungsurkunde" + "Gesellschaftsvertrag".
+        // Deren Feldstruktur ist ohnehin veraltet/inkompatibel, ein
+        // Migrieren der alten Werte wäre nicht sauber möglich.
+        var gueltigeKombinationen = new HashSet<(string, string)>(
+            kategorien.SelectMany(k => k.pflichtDocs.Select(titel => (k.name, titel))));
+
+        int entfernt = speicherDaten.savedDocs.RemoveAll(d =>
+            d.istPflichtdokument && !gueltigeKombinationen.Contains((d.category, d.title)));
+        if (entfernt > 0) geaendert = true;
 
         if (geaendert) SaveDataLocally();
 
@@ -592,7 +939,18 @@ public class DocumentDashboard : MonoBehaviour
 
     private void SpawnAllCardsAtStart()
     {
-        if (gridContainer == null || categoryCardTemplate == null) return;
+        if (gridContainer == null)
+        {
+            Debug.LogError("[Dokumente] gridContainer ist leer - UXML-Struktur oder UIDocument-Zuweisung prüfen.");
+            return;
+        }
+        if (categoryCardTemplate == null)
+        {
+            Debug.LogError("[Dokumente] categoryCardTemplate ist im Inspector nicht zugewiesen - " +
+                "dadurch werden keine Kategorie-Karten angezeigt. Bitte am DocumentDashboard-" +
+                "GameObject die CategoryCard.uxml-Datei ins Feld 'Category Card Template' ziehen.");
+            return;
+        }
         gridContainer.Clear();
 
         foreach (var kategorie in kategorien)
@@ -730,6 +1088,17 @@ public class DocumentDashboard : MonoBehaviour
             string wert = ersterAusgefuellterWert.wert;
             if (wert.Length > 18) wert = wert.Substring(0, 15) + "...";
             return $"{label}: {wert}";
+        }
+
+        if (doc.type == "Checklist" && doc.checkliste != null && doc.checkliste.Count > 0)
+        {
+            int erledigt = doc.checkliste.Count(p => p.erledigt);
+            return $"{erledigt} von {doc.checkliste.Count} erledigt";
+        }
+
+        if (doc.type == "Diagramm" && doc.diagrammDaten != null && doc.diagrammDaten.Count > 0)
+        {
+            return $"{doc.diagrammDaten.Count} Werte im Diagramm";
         }
 
         if (!string.IsNullOrEmpty(doc.inhalt))
@@ -904,7 +1273,17 @@ public class DocumentDashboard : MonoBehaviour
     private void OpenEditPopup(DocumentData doc)
     {
         activeDocForEditing = doc;
-        selectedEditType = doc.type;
+        selectedEditType = string.IsNullOrEmpty(doc.type) ? "Standard" : doc.type;
+
+        // Checklisten-/Diagramm-Daten des Dokuments in die aktiven Listen
+        // laden (Kopie, damit ein Abbrechen nicht die gespeicherten Daten
+        // anfasst).
+        aktiveChecklistPunkte = doc.checkliste != null
+            ? doc.checkliste.Select(p => new ChecklistPunkt { text = p.text, erledigt = p.erledigt }).ToList()
+            : new List<ChecklistPunkt>();
+        aktiveDiagrammPunkte = doc.diagrammDaten != null
+            ? doc.diagrammDaten.Select(p => new DiagrammPunkt { label = p.label, wert = p.wert }).ToList()
+            : new List<DiagrammPunkt>();
 
         if (editPopupOverlay != null)
             editPopupOverlay.style.display = DisplayStyle.Flex;
@@ -939,11 +1318,21 @@ public class DocumentDashboard : MonoBehaviour
         if (vorlagenLabelZeile != null)
             vorlagenLabelZeile.style.display = doc.istPflichtdokument ? DisplayStyle.None : DisplayStyle.Flex;
 
-        var inhaltGroup = editInhaltInput?.parent;
+        var inhaltGroup = editInhaltInput?.parent?.parent; // feld-gruppe-inhalt (äußere Gruppe)
         if (inhaltGroup != null)
             inhaltGroup.style.display = zeigeStrukturFelder ? DisplayStyle.None : DisplayStyle.Flex;
-        if (editInhaltInput != null)
-            editInhaltInput.value = doc.inhalt ?? "";
+
+        // Standard-Felder laden: bei neueren Dokumenten aus standardDaten,
+        // bei älteren (vor diesem Umbau gespeicherten) Dokumenten landet
+        // der komplette alte Freitext ersatzweise im Inhalt-Feld, damit
+        // nichts verloren geht.
+        string standardTitel = doc.standardDaten?.titel ?? "";
+        string standardDatum = doc.standardDaten?.datum ?? "";
+        string standardInhalt = doc.standardDaten?.inhalt ?? (doc.standardDaten == null ? (doc.inhalt ?? "") : "");
+
+        LadeFeldMitPlatzhalter(editStandardTitelInput, standardTitel, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+        LadeFeldMitPlatzhalter(editStandardDatumInput, standardDatum, "TT.MM.JJJJ");
+        LadeFeldMitPlatzhalter(editInhaltInput, standardInhalt, "Haupttext des Dokuments...");
 
         if (editStrukturFelderBox != null)
         {
@@ -969,7 +1358,35 @@ public class DocumentDashboard : MonoBehaviour
                     feldLabel.AddToClassList("field-label");
                     feldGroup.Add(feldLabel);
 
-                    var feldInput = new TextField { value = aktuellerWert };
+                    VisualElement feldInput;
+
+                    switch (def.typ)
+                    {
+                        case FeldTyp.Dropdown:
+                        {
+                            var dropdown = new DropdownField();
+                            dropdown.choices = def.optionen?.ToList() ?? new List<string>();
+                            dropdown.value = !string.IsNullOrEmpty(aktuellerWert) && dropdown.choices.Contains(aktuellerWert)
+                                ? aktuellerWert
+                                : (dropdown.choices.Count > 0 ? dropdown.choices[0] : "");
+                            feldInput = dropdown;
+                            break;
+                        }
+                        case FeldTyp.JaNein:
+                        {
+                            var toggle = new Toggle { value = aktuellerWert == "Ja" };
+                            toggle.AddToClassList("field-checkbox");
+                            feldInput = toggle;
+                            break;
+                        }
+                        default:
+                        {
+                            var textField = new TextField { value = aktuellerWert };
+                            feldInput = textField;
+                            break;
+                        }
+                    }
+
                     feldInput.name = $"struktur-feld-{def.key}";
                     feldGroup.Add(feldInput);
 
@@ -978,15 +1395,11 @@ public class DocumentDashboard : MonoBehaviour
 
                     feldInput.userData = def.key;
 
-                    // FIX: Hinweistext war bisher nur als natives .tooltip
-                    // gesetzt - das erfordert Hovern und rendert im Build
-                    // ohnehin oft nicht zuverlässig (gleiches Problem wie
-                    // beim Kalender-Tooltip). Jetzt echte Platzhalter-
-                    // Simulation: grauer Hinweistext direkt im leeren Feld,
-                    // verschwindet beim Fokussieren, kommt beim Verlassen
-                    // zurück falls das Feld leer bleibt.
-                    if (string.IsNullOrEmpty(aktuellerWert))
-                        SetzeFeldPlatzhalter(feldInput, def.placeholder);
+                    // Platzhalter-Simulation gibt's nur bei normalen
+                    // Textfeldern - Dropdown/Checkbox brauchen sowas nicht,
+                    // die haben ja schon eine sichtbare Auswahl.
+                    if (def.typ == FeldTyp.Text && feldInput is TextField tf && string.IsNullOrEmpty(aktuellerWert))
+                        SetzeFeldPlatzhalter(tf, def.placeholder);
                 }
 
                 if (doc.istPflichtdokument && aktiveStrukturFelder.Count > 0)
@@ -998,6 +1411,9 @@ public class DocumentDashboard : MonoBehaviour
         }
 
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
+        AktualisiereTypSichtbarkeit();
+        BaueChecklistenUI();
+        BaueDiagrammUI();
     }
 
     private void CloseEditPopup()
@@ -1012,11 +1428,198 @@ public class DocumentDashboard : MonoBehaviour
     {
         selectedEditType = typeName;
         MarkiereAusgewaehlteVorlage(btnEditTypeStandard, btnEditTypeDiagramm, btnEditTypeChecklist, selectedEditType);
+        AktualisiereTypSichtbarkeit();
+    }
+
+    // Blendet je nach gewähltem Dokumenttyp den richtigen Bereich ein
+    // (Freitext / Checkliste / Diagramm) - vorher gab's dafür GAR KEINE
+    // Umschaltung, alle drei Typen zeigten exakt dasselbe Textfeld.
+    private void AktualisiereTypSichtbarkeit()
+    {
+        // FIX: Pflichtdokumente nutzen ausschließlich die Struktur-Felder,
+        // niemals das Freitext-/Checklist-/Diagramm-System - unabhängig
+        // vom (bei Pflichtdokumenten immer auf "Standard" stehenden)
+        // type-Feld. Vorher wurde hier blind nach selectedEditType
+        // umgeschaltet, wodurch bei JEDEM Pflichtdokument zusätzlich das
+        // leere Freitextfeld neben den Struktur-Feldern auftauchte.
+        bool istStrukturDokument = activeDocForEditing != null
+            && activeDocForEditing.istPflichtdokument
+            && felderProPflichtDoc.ContainsKey(activeDocForEditing.title);
+
+        if (istStrukturDokument)
+        {
+            if (feldGruppeInhalt != null) feldGruppeInhalt.style.display = DisplayStyle.None;
+            if (feldGruppeCheckliste != null) feldGruppeCheckliste.style.display = DisplayStyle.None;
+            if (feldGruppeDiagramm != null) feldGruppeDiagramm.style.display = DisplayStyle.None;
+            return;
+        }
+
+        if (feldGruppeInhalt != null) feldGruppeInhalt.style.display = selectedEditType == "Standard" ? DisplayStyle.Flex : DisplayStyle.None;
+        if (feldGruppeCheckliste != null) feldGruppeCheckliste.style.display = selectedEditType == "Checklist" ? DisplayStyle.Flex : DisplayStyle.None;
+        if (feldGruppeDiagramm != null) feldGruppeDiagramm.style.display = selectedEditType == "Diagramm" ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (selectedEditType == "Checklist" && aktiveChecklistPunkte.Count == 0)
+        {
+            aktiveChecklistPunkte.Add(new ChecklistPunkt { text = "", erledigt = false });
+            BaueChecklistenUI();
+        }
+
+        if (selectedEditType == "Diagramm" && aktiveDiagrammPunkte.Count == 0)
+        {
+            aktiveDiagrammPunkte.Add(new DiagrammPunkt { label = "", wert = 0f });
+            BaueDiagrammUI();
+        }
+    }
+
+    // Baut die Checklisten-Zeilen (Checkbox + Text + Löschen) neu auf.
+    private void BaueChecklistenUI()
+    {
+        if (editChecklisteBox == null) return;
+        editChecklisteBox.Clear();
+
+        for (int i = 0; i < aktiveChecklistPunkte.Count; i++)
+        {
+            int index = i; // für die Closures unten
+            var punkt = aktiveChecklistPunkte[i];
+
+            var zeile = new VisualElement();
+            zeile.style.flexDirection = FlexDirection.Row;
+            zeile.style.alignItems = Align.Center;
+            zeile.style.marginBottom = 6;
+
+            var toggle = new Toggle { value = punkt.erledigt };
+            toggle.RegisterValueChangedCallback(evt => punkt.erledigt = evt.newValue);
+            zeile.Add(toggle);
+
+            var textFeld = new TextField { value = punkt.text };
+            textFeld.style.flexGrow = 1;
+            textFeld.style.marginLeft = 6;
+            textFeld.style.marginRight = 6;
+            if (string.IsNullOrEmpty(punkt.text)) SetzeFeldPlatzhalter(textFeld, "Was soll erledigt werden?");
+            textFeld.RegisterValueChangedCallback(evt => punkt.text = evt.newValue == "Was soll erledigt werden?" ? "" : evt.newValue);
+            zeile.Add(textFeld);
+
+            var loeschBtn = new Button(() =>
+            {
+                aktiveChecklistPunkte.RemoveAt(index);
+                BaueChecklistenUI();
+            }) { text = "✕" };
+            loeschBtn.style.width = 28;
+            zeile.Add(loeschBtn);
+
+            editChecklisteBox.Add(zeile);
+        }
+    }
+
+    // Baut die Diagramm-Datenzeilen (Label + Wert + Löschen) neu auf und
+    // aktualisiert die Live-Vorschau darunter.
+    private void BaueDiagrammUI()
+    {
+        if (editDiagrammDatenBox == null) return;
+        editDiagrammDatenBox.Clear();
+
+        for (int i = 0; i < aktiveDiagrammPunkte.Count; i++)
+        {
+            int index = i;
+            var punkt = aktiveDiagrammPunkte[i];
+
+            var zeile = new VisualElement();
+            zeile.style.flexDirection = FlexDirection.Row;
+            zeile.style.alignItems = Align.Center;
+            zeile.style.marginBottom = 6;
+
+            var labelFeld = new TextField { value = punkt.label };
+            labelFeld.style.flexGrow = 1;
+            labelFeld.style.marginRight = 6;
+            if (string.IsNullOrEmpty(punkt.label)) SetzeFeldPlatzhalter(labelFeld, "z.B. Januar, Produkt A, ...");
+            labelFeld.RegisterValueChangedCallback(evt => { punkt.label = evt.newValue == "z.B. Januar, Produkt A, ..." ? "" : evt.newValue; AktualisiereDiagrammVorschau(); });
+            zeile.Add(labelFeld);
+
+            var wertFeld = new TextField { value = punkt.wert.ToString("0.##") };
+            wertFeld.style.width = 80;
+            wertFeld.style.marginRight = 6;
+            if (punkt.wert == 0f && string.IsNullOrEmpty(punkt.label)) SetzeFeldPlatzhalter(wertFeld, "z.B. 100");
+            wertFeld.RegisterValueChangedCallback(evt =>
+            {
+                float.TryParse(evt.newValue.Replace(",", "."), System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out float wert);
+                punkt.wert = wert;
+                AktualisiereDiagrammVorschau();
+            });
+            zeile.Add(wertFeld);
+
+            var loeschBtn = new Button(() =>
+            {
+                aktiveDiagrammPunkte.RemoveAt(index);
+                BaueDiagrammUI();
+                AktualisiereDiagrammVorschau();
+            }) { text = "✕" };
+            loeschBtn.style.width = 28;
+            zeile.Add(loeschBtn);
+
+            editDiagrammDatenBox.Add(zeile);
+        }
+
+        AktualisiereDiagrammVorschau();
+    }
+
+    private void AktualisiereDiagrammVorschau()
+    {
+        if (diagrammVorschauElement == null) return;
+        var daten = new List<(string, float)>();
+        foreach (var p in aktiveDiagrammPunkte) daten.Add((p.label, p.wert));
+        diagrammVorschauElement.SetzeDaten(daten);
     }
 
     // Echte Platzhalter-Simulation für die Struktur-Felder (gleiches Muster
     // wie SetupPlaceholderSimulation im Kassenbuch) - UI Toolkit TextFields
     // haben in dieser Unity-Version kein natives Platzhalter-Verhalten.
+    // Für wiederverwendete (persistente) Felder wie die drei Standard-
+    // Felder: registriert die Platzhalter-Events nur EIN einziges Mal
+    // (im Gegensatz zu SetzeFeldPlatzhalter, das für frisch erzeugte
+    // Felder gedacht ist und bei jedem Aufruf neu registriert).
+    // Lädt einen Wert in ein persistentes Feld: echten Wert wenn vorhanden,
+    // sonst grauen Platzhalter (konsistent mit RegistrierePersistentenPlatzhalter).
+    private void LadeFeldMitPlatzhalter(TextField field, string wert, string placeholder)
+    {
+        if (field == null) return;
+        if (!string.IsNullOrEmpty(wert))
+        {
+            field.SetValueWithoutNotify(wert);
+            field.style.color = new StyleColor(StyleKeyword.Null);
+        }
+        else
+        {
+            field.SetValueWithoutNotify(placeholder);
+            field.style.color = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+        }
+    }
+
+    private void RegistrierePersistentenPlatzhalter(TextField field, string placeholder)
+    {
+        if (field == null) return;
+
+        var platzhalterFarbe = new StyleColor(new Color(140f / 255f, 140f / 255f, 140f / 255f));
+
+        field.RegisterCallback<FocusInEvent>(_ =>
+        {
+            if (field.value == placeholder)
+            {
+                field.SetValueWithoutNotify("");
+                field.style.color = new StyleColor(StyleKeyword.Null);
+            }
+        });
+
+        field.RegisterCallback<FocusOutEvent>(_ =>
+        {
+            if (string.IsNullOrEmpty(field.value))
+            {
+                field.SetValueWithoutNotify(placeholder);
+                field.style.color = platzhalterFarbe;
+            }
+        });
+    }
+
     private void SetzeFeldPlatzhalter(TextField field, string placeholder)
     {
         if (field == null || string.IsNullOrEmpty(placeholder)) return;
@@ -1078,12 +1681,31 @@ public class DocumentDashboard : MonoBehaviour
                     string key = feldInput.userData as string;
                     if (key == null) continue;
 
-                    // Falls das Feld noch den grauen Platzhaltertext zeigt
-                    // (nie angeklickt oder wieder leer verlassen), zählt das
-                    // als "nichts eingegeben" - sonst würde der Hinweistext
-                    // selbst als Wert gespeichert werden.
-                    string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
-                    string wert = (platzhalter != null && feldInput.value == platzhalter) ? "" : feldInput.value;
+                    // Wert je nach Steuerelement-Typ auslesen - TextField,
+                    // DropdownField und Toggle haben kein gemeinsames
+                    // ".value" auf VisualElement-Ebene.
+                    string wert;
+                    if (feldInput is Toggle toggleFeld)
+                    {
+                        wert = toggleFeld.value ? "Ja" : "Nein";
+                    }
+                    else if (feldInput is DropdownField dropdownFeld)
+                    {
+                        wert = dropdownFeld.value ?? "";
+                    }
+                    else if (feldInput is TextField textFeld)
+                    {
+                        // Falls das Feld noch den grauen Platzhaltertext
+                        // zeigt (nie angeklickt oder wieder leer verlassen),
+                        // zählt das als "nichts eingegeben" - sonst würde
+                        // der Hinweistext selbst als Wert gespeichert werden.
+                        string platzhalter = definitionen.FirstOrDefault(d => d.key == key)?.placeholder;
+                        wert = (platzhalter != null && textFeld.value == platzhalter) ? "" : textFeld.value;
+                    }
+                    else
+                    {
+                        wert = "";
+                    }
 
                     var bestehenderEintrag = docInList.strukturFelder.FirstOrDefault(f => f.key == key);
                     if (bestehenderEintrag != null)
@@ -1095,7 +1717,51 @@ public class DocumentDashboard : MonoBehaviour
             else
             {
                 docInList.type = selectedEditType;
-                docInList.inhalt = editInhaltInput != null ? editInhaltInput.value : "";
+
+                // Nur die zum gewählten Typ passenden Daten speichern -
+                // verhindert verwaiste alte Daten, falls jemand den Typ
+                // eines Dokuments nachträglich wechselt.
+                if (selectedEditType == "Checklist")
+                {
+                    docInList.checkliste = aktiveChecklistPunkte
+                        .Where(p => !string.IsNullOrWhiteSpace(p.text))
+                        .Select(p => new ChecklistPunkt { text = p.text, erledigt = p.erledigt })
+                        .ToList();
+                    docInList.diagrammDaten = null;
+                    docInList.inhalt = "";
+                }
+                else if (selectedEditType == "Diagramm")
+                {
+                    docInList.diagrammDaten = aktiveDiagrammPunkte
+                        .Where(p => !string.IsNullOrWhiteSpace(p.label))
+                        .Select(p => new DiagrammPunkt { label = p.label, wert = p.wert })
+                        .ToList();
+                    docInList.checkliste = null;
+                    docInList.inhalt = "";
+                }
+                else
+                {
+                    string HoleWert(TextField feld, string platzhalter) =>
+                        feld != null && feld.value != platzhalter ? feld.value.Trim() : "";
+
+                    string titel = HoleWert(editStandardTitelInput, "z.B. Rechnungsvorlage, Angebot Website-Relaunch, ...");
+                    string datum = HoleWert(editStandardDatumInput, "TT.MM.JJJJ");
+                    string inhalt = HoleWert(editInhaltInput, "Haupttext des Dokuments...");
+
+                    docInList.standardDaten = new StandardDokumentDaten { titel = titel, datum = datum, inhalt = inhalt };
+
+                    // Für Vorschau/Export weiterhin einen zusammengesetzten
+                    // Text ablegen (Rückwärtskompatibilität mit allem, was
+                    // bisher nur doc.inhalt kennt).
+                    var teile = new List<string>();
+                    if (!string.IsNullOrEmpty(titel)) teile.Add(titel);
+                    if (!string.IsNullOrEmpty(datum)) teile.Add("Datum: " + datum);
+                    if (!string.IsNullOrEmpty(inhalt)) teile.Add(inhalt);
+                    docInList.inhalt = string.Join("\n\n", teile);
+
+                    docInList.checkliste = null;
+                    docInList.diagrammDaten = null;
+                }
             }
         }
 
@@ -1255,7 +1921,32 @@ public class DocumentDashboard : MonoBehaviour
         var alle = GetSavedDocuments();
         var doc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Bezahlweise" && d.title == titel);
-        return doc?.inhalt ?? "";
+        if (doc == null) return "";
+
+        // FIX: Las bisher nur doc.inhalt - AGB/Disclaimer/Barzahlung/
+        // Überweisung sind aber längst strukturierte Dokumente (siehe
+        // felderProPflichtDoc), ihre Daten liegen in strukturFelder, nicht
+        // in .inhalt. .inhalt ist bei denen praktisch immer leer -
+        // die Vorschau in den Einstellungen zeigte deshalb nie etwas an,
+        // egal was im Dok-Pool eingetragen wurde.
+        if (!string.IsNullOrWhiteSpace(doc.inhalt)) return doc.inhalt;
+
+        if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
+        {
+            var ausgefuellte = doc.strukturFelder.Where(f => !string.IsNullOrWhiteSpace(f.wert)).ToList();
+            if (ausgefuellte.Count > 0)
+                return string.Join(" · ", ausgefuellte.Select(f => f.wert));
+        }
+
+        return "";
+    }
+
+    // Prüft, ob für ein Bezahlweise-Dokument überhaupt Daten hinterlegt
+    // sind (egal ob Freitext oder Struktur-Felder) - für den Status
+    // "hinterlegt"/"nicht hinterlegt" in den Einstellungen.
+    public static bool HatBezahlweiseInhalt(string titel)
+    {
+        return !string.IsNullOrWhiteSpace(GetBezahlweiseInhalt(titel));
     }
 
     // ─────────────────────────────────────────

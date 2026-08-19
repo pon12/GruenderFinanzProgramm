@@ -39,18 +39,37 @@ public static class GruenderpfadAutoErkennung
         { "Ratenzahlungsbestimmungen",                "betr_3" },
         { "Businessplan",                            "vorb_3" },
         { "Markt- & Wettbewerbsanalyse",             "vorb_2" },
+        { "SWOT-Analyse",                             "vorb_2" },
+        { "Zielgruppenanalyse",                       "vorb_2" },
         { "Er\u00f6ffnungsbilanz",                   "fin_2"  },
         { "Datenschutzerkl\u00e4rung (DSGVO)",       "betr_3" },
         { "Steuernummer-Bescheid / USt-IdNr",        "anm_4"  },
         { "Impressum",                               "betr_2" },
         { "Copyright Hinweis",                        "betr_3" },
         { "Lizenzhinweis Einfach",                    "betr_3" },
+        { "Lizenzhinweis Erweitert",                   "betr_3" },
+        { "Vertraulichkeitserklärung",                "betr_3" },
         { "Dienstleistungskatalog / Preisliste",     "betr_1" },
         { "Corporate Identity Manual",               "betr_2" },
+        { "Unternehmensrichtlinien",                  "betr_3" },
+        { "Social Media Strategie",                   "betr_2" }, // Website & Branding
         { "Muster-Arbeitsvertrag",                   "sonst_1"},
+        { "Vorlage Kündigung",                        "sonst_1"},
+        { "Stellenbeschreibung",                       "sonst_1"},
+        { "Urlaubsantrag",                             "sonst_1"},
         { "Gr\u00fcndungs-Checkliste",                "vorb_1" },
         { "Inventarliste",                            "fin_2"  },
         { "Inventur",                                 "fin_2"  },
+        { "Fördermittelübersicht",                    "sonst_2" }, // Fördermittel beantragen (genauere Passung als vorb_5)
+        { "Darlehensübersicht",                        "vorb_5" }, // Finanzierung klären
+        { "Versicherungsübersicht",                    "fin_3"  }, // Versicherungen abschließen
+        { "Kundenzufriedenheitsumfrage",                "betr_1" }, // Erste Kunden akquiriert / Kundenpflege
+        { "Vollmachtvorlage",                            "betr_3" }, // Prozesse dokumentieren
+        { "Gutschriftvorlage",                           "fin_2"  }, // Buchhaltung einrichten
+        // Besprechungsprotokoll: bewusst KEINE Gründungspfad-Zuordnung -
+        // es ist ein reines internes Protokoll-Werkzeug ohne Bezug zu
+        // einem konkreten Gründungsmeilenstein. Zählt zwar für "Alle
+        // Dokumente vollständig", aber nicht für einen Einzelschritt.
     };
 
     // Welche Schritt-IDs lassen sich aus ausgefüllten Pflichtdokumenten ableiten?

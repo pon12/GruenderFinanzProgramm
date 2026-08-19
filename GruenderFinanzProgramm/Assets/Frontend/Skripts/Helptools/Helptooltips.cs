@@ -5,10 +5,11 @@ using Color = UnityEngine.Color;
 // Universelles Hilfe-Tooltip-System mit dynamisch gespiegeltem Ganzkörper-Begleiter.
 public static class HelpTooltip
 {
-    private const float BubbleBreite = 280f;
+    private const float BubbleBreite = 320f;
     private const float BubblePadding = 14f;
     private const float BubbleAbstand = 10f;
-    private const int BubbleSchrift = 13;
+    private const int BubbleSchrift = 11;
+    private const float BubbleMaxHoehe = 320f;
 
     // Verzögerung, bevor der Tooltip beim Hovern erscheint - verhindert,
     // dass er beim bloßen Drüberwischen mit der Maus schon aufpoppt.
@@ -293,6 +294,8 @@ public static class HelpTooltip
         bubble.style.paddingBottom = BubblePadding;
         bubble.style.paddingLeft = BubblePadding;
         bubble.style.paddingRight = BubblePadding;
+        bubble.style.maxHeight = BubbleMaxHoehe;
+        bubble.style.overflow = Overflow.Hidden;
 
         var label = new Label(text);
         label.style.color = new Color(0.88f, 0.88f, 0.88f);

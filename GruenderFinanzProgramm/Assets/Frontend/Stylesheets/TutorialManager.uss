@@ -1,0 +1,191 @@
+/* ── TutorialManager USS – Ventoriq Dark Theme ──────────────────────────── */
+
+/* Unsichtbares Root-Element – kein Hintergrund, keine Pointer-Events außer Kinder */
+.tutorial-overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+/* ── StartDialog ────────────────────────────────────────────────────────── */
+
+.start-dialog-wrapper {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #000000B8; /* rgba(0, 0, 0, 0.72) */
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog {
+    background-color: #1C2126;
+    border-radius: 10px;
+    padding: 32px;
+    width: 400px;
+    align-items: center;
+    border-width: 1px;
+    border-color: #323941;
+}
+
+.dialog-headline {
+    color: #80CF95;
+    font-size: 20px;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+    -unity-text-align: middle-center;
+}
+
+.dialog-text {
+    color: #BEC3C8;
+    font-size: 14px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    margin-bottom: 24px;
+}
+
+/* ── Tutorial-Modus ─────────────────────────────────────────────────────── */
+
+/* Halbtransparenter Hintergrund, Erklärungsbox unten zentriert */
+.tutorial-modus {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #00000085; /* rgba(0, 0, 0, 0.52) */
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 40px;
+}
+
+/* Highlight-Ring – Größe und Position werden per Script gesetzt */
+.highlight-rahmen {
+    position: absolute;
+    border-width: 5px;
+    border-color: #80CF95;
+    border-radius: 10px;
+}
+
+/* Erklärungsbox */
+.erklaerung-box {
+    width: 680px;
+    background-color: #161B20;
+    border-radius: 10px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+    border-width: 1px;
+    border-color: #323941;
+}
+
+.erklaerung-text {
+    color: #D2D7DC;
+    font-size: 16px;
+    white-space: normal;
+    margin-bottom: 24px;
+}
+
+.nav-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schritt-anzeige {
+    color: #828791;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+}
+
+/* Beenden-Button oben rechts */
+Button.btn-beenden {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background-color: #2C323A;
+    color: #BEC3C8;
+    border-width: 0px;
+    border-radius: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    font-size: 13px;
+    transition-duration: 0.1s;
+}
+
+Button.btn-beenden:hover {
+    background-color: #3C434D;
+    color: #FFFFFF;
+}
+
+Button.btn-beenden:active {
+    background-color: #1F242A !important;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+Button.btn {
+    border-radius: 10px;
+    font-size: 14px;
+    border-width: 0px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 24px;
+    padding-right: 24px;
+    transition-duration: 0.1s;
+}
+
+/* Primär */
+Button.btn-primary {
+    background-color: #80CF95;
+    color: #12161A;
+    -unity-font-style: bold;
+    margin-top: 8px;
+    width: 100%;
+}
+
+Button.btn-primary:hover {
+    background-color: #94DCA7;
+}
+
+Button.btn-primary:active {
+    background-color: #6CB782 !important;
+    color: #0E1215 !important;
+}
+
+Button.btn-primary:disabled {
+    opacity: 0.35;
+}
+
+/* Ghost / Outline */
+Button.btn-ghost {
+    background-color: transparent;
+    color: #80CF95;
+    border-width: 1px;
+    border-color: #80CF95;
+    margin-top: 8px;
+    width: auto;
+}
+
+Button.btn-ghost:hover {
+    background-color: #80CF951A; /* 10% Opacity Hex */
+    color: #94DCA7;
+}
+
+Button.btn-ghost:active {
+    background-color: #80CF9533 !important; /* 20% Opacity Hex */
+    color: #6CB782 !important;
+}
+
+/* Weiter/Zurück in der Nav-Row: kein full-width */
+.nav-row Button.btn-primary {
+    width: auto;
+    margin-top: 0px;
+}

@@ -32,7 +32,7 @@
             <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay">
+    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: flex;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
                 <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
@@ -53,15 +53,15 @@
             <ui:Button text="Zur Anmeldung" name="btnZurAnmeldung" class="btn-submit"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="PopUpAGB" class="popup-overlay">
+    <ui:VisualElement name="PopUpAGB" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-agb" class="popup-doc-card">
             <ui:VisualElement name="row-popup-agb-header" class="popup-doc-header">
                 <ui:Label text="AGB" name="label-popup-agb-titel" class="popup-doc-title"/>
                 <ui:Button text="" name="btnAGBclose" class="btn-doc-close"/>
             </ui:VisualElement>
-            <ui:VisualElement name="container-popup-agb-inhalt" class="popup-doc-content">
-                <ui:Label text="Lol hier ist eigentlich so n Text" name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
-            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-agb-inhalt" class="popup-doc-content">
+                <ui:Label text="§ 1 Gegenstand und akademischer Rahmen&#10;Die Software „Ventoriq – Dein digitaler Mentor&quot; ist eine modulare Desktop-Anwendung zur Unterstützung von Startup-Gründern. Dieses System entstand als studentisches Projekt im Rahmen des Moduls Wissenschaft und Wirtschaft 1 (WW1) im Sommersemester 2026 an der Hochschule Mittweida (Studiengang Medieninformatik und Interaktives Entertainment).&#10;&#10;§ 2 Nutzungsberechtigung und Zweck&#10;Die Software dient der Reduktion der kognitiven Last in der Gründungsphase durch geführte Prozesse (Guided UI). Die Nutzung ist im aktuellen Entwicklungsstadium (MVP) primär für Pilotgründer und zu Evaluationszwecken im akademischen Rahmen vorgesehen.&#10;&#10;§ 3 Haftungsausschluss und KI-Hinweis&#10;Da es sich um einen Prototypen (Minimum Viable Product) handelt, wird keine Gewähr für die Richtigkeit der berechneten Finanzdaten oder die Vollständigkeit der rechtlichen Hinweise übernommen. Inhalte der Wissensdatenbank sowie Teile der Systemlogik können unter Zuhilfenahme von KI-Technologien generiert worden sein und dienen lediglich der Orientierung. Die Software ersetzt keine professionelle Steuer- oder Rechtsberatung. Die Nutzung erfolgt auf eigene Gefahr.&#10;&#10;§ 4 Lokale Datenspeicherung&#10;Alle Eingaben werden ausschließlich in einer lokalen SQLite-Datenbank auf dem Endgerät des Nutzers gespeichert. Der Nutzer ist für die Sicherung dieser Datenbankdatei (Backup-Funktion unter Einstellungen) selbst verantwortlich." name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="PopUpDatenschutz" class="popup-overlay">
@@ -70,9 +70,9 @@
                 <ui:Label text="Datenschutzrichtlinie" name="label-popup-datenschutz-titel" class="popup-doc-title"/>
                 <ui:Button text="" name="btnDatenschutzclose" class="btn-doc-close"/>
             </ui:VisualElement>
-            <ui:VisualElement name="container-popup-datenschutz-inhalt" class="popup-doc-content">
-                <ui:Label text="Lol hier ist eigentlich so n Text" name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
-            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-datenschutz-inhalt" class="popup-doc-content">
+                <ui:Label text="Grundsatz der Datensouveränität&#10;Der Schutz deiner Daten hat bei Ventoriq oberste Priorität. Die Software folgt dem Prinzip der lokalen Datenhaltung. Das bedeutet: Sämtliche von dir eingegebenen Unternehmensdaten, Finanztransaktionen und persönlichen Profileinstellungen werden ausschließlich lokal in einer verschlüsselten SQLite-Datenbank auf deinem Rechner gespeichert.&#10;&#10;Keine Cloud-Übertragung&#10;In der vorliegenden MVP-Version erfolgt keine Übertragung deiner Daten an externe Server oder Cloud-Dienste. Es findet keine Analyse deines Nutzerverhaltens durch die Entwickler statt.&#10;&#10;Authentifizierung und Sicherheit&#10;Zum Schutz deines Lokalprofils nutzt Ventoriq ein Passkey-Verfahren. Deine PIN wird nicht im Klartext gespeichert, sondern mittels SHA-256-Hashing verschlüsselt hinterlegt. Ein Zugriff auf deine Daten ist ohne diesen lokalen Schlüssel nicht möglich.&#10;&#10;Auskunfts- und Löschungsrecht&#10;Da alle Daten physisch auf deinem Gerät liegen, hast du die volle Kontrolle. Durch das Löschen der lokalen Datenbankdatei oder die Deinstallation der Anwendung werden alle gespeicherten Informationen unwiderruflich entfernt." name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

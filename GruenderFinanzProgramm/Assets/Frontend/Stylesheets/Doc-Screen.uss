@@ -489,7 +489,8 @@
 /* ---------- BEARBEITEN-POPUP ---------- */
 .edit-popup-box {
     width: 100%;
-    max-width: 520px;
+    max-width: 640px;
+    max-height: 90%;
     padding: 28px;
     flex-direction: column;
 }

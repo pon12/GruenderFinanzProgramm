@@ -294,37 +294,41 @@
                     <ui:Label text="Bezahlweise – Dokumente" name="label-popup-titel-bezahlweise" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
                     <ui:Button name="btn-close-bezahlweise" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
                 </ui:VisualElement>
-                <ui:Label text="Diese Dokumente werden in den Dokumenten-Screen übernommen." name="label-bezahlweise-hinweis" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 24px;"/>
+                <ui:Label text="Diese Dokumente werden im Dokumenten-Screen gepflegt - hier siehst du nur eine Vorschau. Klicke auf „Bearbeiten“, um sie dort anzupassen." name="label-bezahlweise-hinweis" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 24px; white-space: normal;"/>
                 <ui:VisualElement name="box-agb" style="background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px; margin-bottom: 12px;">
                     <ui:VisualElement name="row-agb-status" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                         <ui:Label text="AGB" name="label-box-agb-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 15px; color: rgb(255, 255, 255);"/>
                         <ui:Label name="label-status-agb" text="nicht hinterlegt" style="font-size: 12px; color: rgb(160, 160, 160);"/>
                     </ui:VisualElement>
-                    <ui:TextField name="input-agb" multiline="true" class="dark-input" style="height: 80px;"/>
+                    <ui:Label name="label-vorschau-agb" text="Keine Angaben hinterlegt." style="font-size: 13px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 10px;"/>
+                    <ui:Button text="Bearbeiten" name="btn-bearbeiten-agb" class="doc-btn-secondary" style="align-self: flex-start;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="box-disclaimer" style="background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px; margin-bottom: 12px;">
                     <ui:VisualElement name="row-disclaimer-status" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                         <ui:Label text="Disclaimer" name="label-box-disclaimer-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 15px; color: rgb(255, 255, 255);"/>
                         <ui:Label name="label-status-disclaimer" text="nicht hinterlegt" style="font-size: 12px; color: rgb(160, 160, 160);"/>
                     </ui:VisualElement>
-                    <ui:TextField name="input-disclaimer" multiline="true" class="dark-input" style="height: 80px;"/>
+                    <ui:Label name="label-vorschau-disclaimer" text="Keine Angaben hinterlegt." style="font-size: 13px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 10px;"/>
+                    <ui:Button text="Bearbeiten" name="btn-bearbeiten-disclaimer" class="doc-btn-secondary" style="align-self: flex-start;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="box-barzahlung" style="background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px; margin-bottom: 12px;">
                     <ui:VisualElement name="row-barzahlung-status" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                         <ui:Label text="Barzahlung" name="label-box-barzahlung-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 15px; color: rgb(255, 255, 255);"/>
                         <ui:Label name="label-status-bar" text="nicht hinterlegt" style="font-size: 12px; color: rgb(160, 160, 160);"/>
                     </ui:VisualElement>
-                    <ui:TextField name="input-barzahlung" multiline="true" class="dark-input" style="height: 80px;"/>
+                    <ui:Label name="label-vorschau-barzahlung" text="Keine Angaben hinterlegt." style="font-size: 13px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 10px;"/>
+                    <ui:Button text="Bearbeiten" name="btn-bearbeiten-barzahlung" class="doc-btn-secondary" style="align-self: flex-start;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="box-ueberweisung" style="background-color: rgb(50, 50, 50); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 16px; margin-bottom: 24px;">
                     <ui:VisualElement name="row-ueberweisung-status" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                         <ui:Label text="Überweisung" name="label-box-ueberweisung-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 15px; color: rgb(255, 255, 255);"/>
                         <ui:Label name="label-status-ueberweisung" text="nicht hinterlegt" style="font-size: 12px; color: rgb(160, 160, 160);"/>
                     </ui:VisualElement>
-                    <ui:TextField name="input-ueberweisung" multiline="true" class="dark-input" style="height: 80px;"/>
+                    <ui:Label name="label-vorschau-ueberweisung" text="Keine Angaben hinterlegt." style="font-size: 13px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 10px;"/>
+                    <ui:Button text="Bearbeiten" name="btn-bearbeiten-ueberweisung" class="doc-btn-secondary" style="align-self: flex-start;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="row-popup-footer-bezahlweise" style="flex-direction: row; justify-content: flex-end;">
-                    <ui:Button text="Abbrechen" name="btn-cancel-bezahlweise" class="btn-red" style="margin-right: 12px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>                    <ui:Button text="Speichern" name="btn-save-bezahlweise" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                    <ui:Button text="Schließen" name="btn-cancel-bezahlweise" class="btn-red" style="border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
