@@ -191,7 +191,11 @@ public class DataBase : DatabaseManager
 
     public int createOffer(Offer offer)
     {
-        return insert(offer);
+        // FIX: insert() gibt bei SQLite-net nur die Anzahl eingefügter Zeilen zurück
+        // (praktisch immer 1), nicht die echte Autoincrement-ID. Dadurch bekamen alle
+        // OfferItem-Positionen die falsche offerId zugewiesen und ließen sich später
+        // nicht mehr über getItemsByOffer(angebot.id) wiederfinden.
+        return insertAndGetId(offer);
     }
     public int updateOffer(Offer offer)
     {
@@ -333,9 +337,16 @@ public class DataBase : DatabaseManager
 
     public int createEinkommen(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
+        // FIX: insert() gab bisher nur die Zeilenanzahl zurück, nicht die echte ID -
+        // dadurch ließ sich ein Kassenbucheintrag nicht mit einer Rechnung verknüpfen.
+        return insertAndGetId(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
     }
 
+    public int updateEinkommen(Einkommen eintrag)
+    {
+        return update(eintrag);
+    }
+    
     public int createAusgaben(float amount, string description, string datum, string art = "", string kategorie = "")
     {
         return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });

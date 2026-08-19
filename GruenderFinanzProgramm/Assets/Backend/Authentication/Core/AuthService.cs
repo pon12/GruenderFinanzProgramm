@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using System.IO;
+using System.Linq;
 
 public class AuthService
 {
@@ -130,6 +132,92 @@ public class AuthService
         Debug.Log("Hinweis: Neuer PassKey wurde nur als Hash gespeichert.");
 
         return newPassKey;
+    }
+
+    public bool deleteLocalProfileWithRecoveryKey(string enteredRecoveryKey, PassKeyRecord expectedUser)
+    {
+        if (string.IsNullOrWhiteSpace(enteredRecoveryKey))
+        {
+            Debug.LogError("Löschen fehlgeschlagen: Kein RecoveryKey eingegeben.");
+            return false;
+        }
+
+        string cleanedRecoveryKey = new string(enteredRecoveryKey.Where(char.IsDigit).ToArray());
+
+        if (cleanedRecoveryKey.Length != 16)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: RecoveryKey muss 16 Ziffern enthalten.");
+            return false;
+        }
+
+        string recoveryKeyHash = hashValue(cleanedRecoveryKey);
+        PassKeyRecord user = authDatabaseService.getUserByRecoveryKeyHash(recoveryKeyHash);
+
+        if (user == null)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: RecoveryKey ist ungültig.");
+            return false;
+        }
+
+        if (expectedUser == null)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: Kein aktiver Nutzer vorhanden.");
+            return false;
+        }
+
+        if (user.databaseName != expectedUser.databaseName)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: RecoveryKey gehört nicht zum aktuell angemeldeten Nutzer.");
+            return false;
+        }
+
+        string userDatabasePath = Path.Combine(Application.persistentDataPath, user.databaseName + ".db");
+
+        try
+        {
+            GlobalDatabaseManager.Instance.CloseDatabase(user.databaseName);
+        }
+        catch
+        {
+            // Wenn die DB nicht offen oder nicht registriert ist, ist das kein Blocker.
+        }
+
+        bool databaseDeleted = true;
+
+        try
+        {
+            if (File.Exists(userDatabasePath))
+            {
+                File.Delete(userDatabasePath);
+                Debug.Log("Nutzer-Datenbank gelöscht: " + userDatabasePath);
+            }
+            else
+            {
+                Debug.LogWarning("Nutzer-Datenbank war nicht vorhanden: " + userDatabasePath);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            databaseDeleted = false;
+            Debug.LogError("Nutzer-Datenbank konnte nicht gelöscht werden: " + ex.Message);
+        }
+
+        bool authDeleted = authDatabaseService.deleteAuthUserByRecoveryKeyHash(recoveryKeyHash);
+
+        if (!authDeleted)
+        {
+            Debug.LogError("Lokalprofil nicht vollständig gelöscht: User-Eintrag konnte nicht entfernt werden.");
+            return false;
+        }
+
+        if (!databaseDeleted)
+        {
+            Debug.LogError("Lokalprofil nicht vollständig gelöscht: Nutzer-Datenbank konnte nicht entfernt werden.");
+            return false;
+        }
+
+        Debug.Log("Lokalprofil vollständig gelöscht: " + user.username);
+        return true;
     }
 
     private string generateUniquePassKey()

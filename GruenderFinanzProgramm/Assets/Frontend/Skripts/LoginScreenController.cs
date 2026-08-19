@@ -119,31 +119,39 @@ public class LoginFlowController : MonoBehaviour
     // ─────────────────────────────────────────────────
 
     private void OnLoginSubmit()
+{
+    if (_loginPasskeyInput.Length < 4)
     {
-        if (_loginPasskeyInput.Length < 4)
-        {
-            Debug.LogWarning("[Login] Passkey unvollstaendig.");
-            return;
-        }
-
-        if (passKeyAuthController == null)
-        {
-            Debug.LogError("[Login] PassKeyAuthController fehlt.");
-            return;
-        }
-
-        bool loginSuccessful = passKeyAuthController.loginWithPassKeyValue(_loginPasskeyInput);
-
-        if (!loginSuccessful)
-        {
-            Debug.LogWarning("[Login] Login fehlgeschlagen – zeige Fehler-Popup.");
-            ShowErrorPopup();
-            return;
-        }
-
-        Debug.Log("[Login] Login erfolgreich – lade Dashboard.");
-        SceneManager.LoadScene(DASHBOARD_SCENE);
+        Debug.LogWarning("[Login] Passkey unvollstaendig.");
+        return;
     }
+
+    if (passKeyAuthController == null)
+    {
+        Debug.LogError("[Login] PassKeyAuthController fehlt.");
+        return;
+    }
+
+    bool loginSuccessful = passKeyAuthController.loginWithPassKeyValue(_loginPasskeyInput);
+
+    if (!loginSuccessful)
+    {
+        Debug.LogWarning("[Login] Login fehlgeschlagen – zeige Fehler-Popup.");
+        ShowErrorPopup();
+        return;
+    }
+
+    // ── Tutorial-Check ──────────────────────────────
+    if (TutorialManager.Instance != null)
+    {
+        string nutzername = StateManager.Instance?.getCurrentUser()?.username ?? "default";
+        TutorialManager.Instance.PruefeErstenStart(nutzername);
+    }
+    // ────────────────────────────────────────────────
+
+    Debug.Log("[Login] Login erfolgreich – lade Dashboard.");
+    SceneManager.LoadScene(DASHBOARD_SCENE);
+}
 
     // ─────────────────────────────────────────────────
     // POPUP STEUERUNG

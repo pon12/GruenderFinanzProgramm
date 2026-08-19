@@ -99,8 +99,35 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="Edit-Struktur-Felder-Box" style="display: none;"/>
                 <ui:VisualElement name="feld-gruppe-inhalt" class="form-group">
-                    <ui:Label text="Inhalt" name="label-feld-inhalt" class="field-label"/>
-                    <ui:TextField label="" placeholder-text="z.B. Notizen, Beschreibung..." name="Edit-Inhalt-Input" multiline="true" class="edit-textarea"/>
+                    <ui:VisualElement name="feld-gruppe-standard-titel" style="margin-bottom: 10px;">
+                        <ui:Label text="Titel" name="label-feld-standard-titel" class="field-label"/>
+                        <ui:TextField label="" name="Edit-Standard-Titel-Input"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="feld-gruppe-standard-datum" style="margin-bottom: 10px;">
+                        <ui:Label text="Datum" name="label-feld-standard-datum" class="field-label"/>
+                        <ui:TextField label="" name="Edit-Standard-Datum-Input"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="feld-gruppe-standard-inhalt">
+                        <ui:Label text="Inhalt" name="label-feld-inhalt" class="field-label"/>
+                        <ui:TextField label="" name="Edit-Inhalt-Input" multiline="true" class="edit-textarea"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="feld-gruppe-checkliste" class="form-group" style="display: none;">
+                    <ui:Label text="Checkliste" name="label-feld-checkliste" class="field-label"/>
+                    <ui:ScrollView name="Edit-Checkliste-Box" style="max-height: 260px; background-color: rgb(30, 30, 30); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; padding: 8px;"/>
+                    <ui:Button text="+ Punkt hinzufügen" name="Btn-Checkliste-Hinzufuegen" class="doc-btn-secondary" style="margin-top: 8px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="feld-gruppe-diagramm" class="form-group" style="display: none;">
+                    <ui:Label text="Diagramm-Daten" name="label-feld-diagramm" class="field-label"/>
+                    <ui:Label text="Trag hier Zeile für Zeile eine Bezeichnung und den dazugehörigen Zahlenwert ein - z.B. &quot;Januar&quot; und &quot;120&quot;. Jede Zeile wird unten als ein Balken angezeigt." name="hinweis-diagramm" style="font-size: 11px; color: rgb(150, 150, 150); white-space: normal; margin-bottom: 6px;"/>
+                    <ui:VisualElement name="row-diagramm-spaltentitel" style="flex-direction: row; margin-bottom: 4px;">
+                        <ui:Label text="Bezeichnung" name="label-diagramm-spalte-bezeichnung" style="flex-grow: 1; font-size: 11px; color: rgb(150, 150, 150);"/>
+                        <ui:Label text="Wert" name="label-diagramm-spalte-wert" style="width: 80px; margin-right: 34px; font-size: 11px; color: rgb(150, 150, 150);"/>
+                    </ui:VisualElement>
+                    <ui:ScrollView name="Edit-Diagramm-Daten-Box" style="max-height: 220px; background-color: rgb(30, 30, 30); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; padding: 8px;"/>
+                    <ui:Button text="+ Wert hinzufügen" name="Btn-Diagramm-Hinzufuegen" class="doc-btn-secondary" style="margin-top: 8px;"/>
+                    <ui:Label text="Vorschau:" name="label-diagramm-vorschau-titel" style="font-size: 11px; color: rgb(150, 150, 150); margin-top: 10px;"/>
+                    <ui:VisualElement name="Edit-Diagramm-Vorschau" style="height: 180px; margin-top: 4px; background-color: rgb(30, 30, 30); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="row-dokumenttyp-titel" style="flex-direction: row; align-items: center; margin-top: 12px; margin-bottom: 6px;">
                     <ui:Label text="Dokumenttyp" name="label-dokumenttyp-titel" style="font-size: 13px; color: rgb(160, 160, 160); flex-grow: 1;"/>
