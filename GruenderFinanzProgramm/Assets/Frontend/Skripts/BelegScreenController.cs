@@ -1328,7 +1328,6 @@ public abstract class BelegScreenController : MonoBehaviour
     _anhangAusgewaehlt.Clear();
 
     // Nur diese Anhänge dürfen auswählbar sein.
-    // Kontodaten sind immer dabei und deshalb nicht Teil dieser Liste.
     var anhangTitel = new List<string>
     {
         "Zahlungsbedingungen",
@@ -1366,70 +1365,7 @@ public abstract class BelegScreenController : MonoBehaviour
     scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
     scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
 
-    // ------------------------------------------------------------
-    // Kontodaten – IMMER angezeigt, NICHT auswählbar
-    // ------------------------------------------------------------
-
-    var kontoZeile = new VisualElement();
-
-    kontoZeile.style.flexDirection = FlexDirection.Row;
-    kontoZeile.style.alignItems = Align.Center;
-    kontoZeile.style.marginBottom = 4;
-    kontoZeile.style.paddingTop = 4;
-    kontoZeile.style.paddingBottom = 4;
-    kontoZeile.style.paddingLeft = 8;
-    kontoZeile.style.paddingRight = 8;
-
-    kontoZeile.style.borderTopLeftRadius = 6;
-    kontoZeile.style.borderTopRightRadius = 6;
-    kontoZeile.style.borderBottomLeftRadius = 6;
-    kontoZeile.style.borderBottomRightRadius = 6;
-
-    kontoZeile.style.backgroundColor =
-        new Color(55f / 255f, 55f / 255f, 55f / 255f);
-
-    var kontoBox = new VisualElement();
-
-    kontoBox.style.width = 18;
-    kontoBox.style.height = 18;
-    kontoBox.style.flexShrink = 0;
-    kontoBox.style.marginRight = 8;
-
-    kontoBox.style.borderTopLeftRadius = 4;
-    kontoBox.style.borderTopRightRadius = 4;
-    kontoBox.style.borderBottomLeftRadius = 4;
-    kontoBox.style.borderBottomRightRadius = 4;
-
-    kontoBox.style.backgroundColor = Gruen;
-    kontoBox.style.borderTopWidth = 1;
-    kontoBox.style.borderRightWidth = 1;
-    kontoBox.style.borderBottomWidth = 1;
-    kontoBox.style.borderLeftWidth = 1;
-
-    kontoBox.style.borderTopColor = Gruen;
-    kontoBox.style.borderRightColor = Gruen;
-    kontoBox.style.borderBottomColor = Gruen;
-    kontoBox.style.borderLeftColor = Gruen;
-
-    var kontoHaken = new Label("✓");
-
-    kontoHaken.style.fontSize = 11;
-    kontoHaken.style.color =
-        new Color(38f / 255f, 38f / 255f, 38f / 255f);
-    kontoHaken.style.unityTextAlign = TextAnchor.MiddleCenter;
-
-    kontoBox.Add(kontoHaken);
-
-    var kontoLabel = new Label("Kontodaten (IBAN/BIC)");
-
-    kontoLabel.style.fontSize = 12;
-    kontoLabel.style.color = Color.white;
-    kontoLabel.style.flexGrow = 1;
-
-    kontoZeile.Add(kontoBox);
-    kontoZeile.Add(kontoLabel);
-
-    scrollView.Add(kontoZeile);
+    
 
     // ------------------------------------------------------------
     // Optionale Anhänge

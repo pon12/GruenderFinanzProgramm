@@ -1856,17 +1856,114 @@ public class DocumentDashboard : MonoBehaviour
     // STATISCHER ZUGRIFF FÜR EXPORT-SCREEN
     // ─────────────────────────────────────────
 
-    public static string GetSaveFilePath()
-    {
-        return Path.Combine(Application.persistentDataPath, "MyDashboardSave.json");
-    }
+    // ============================================================
+// BENUTZERBEZOGENER DOKUMENT-SPEICHER
+// ============================================================
 
-    public static DocumentSaveData GetSavedDocuments()
+private static string GetCurrentUserFolder()
+{
+    try
     {
-        string path = GetSaveFilePath();
-        if (!File.Exists(path)) return new DocumentSaveData();
-        return JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(path));
+        // Der aktuell eingeloggte Benutzer wird über den StateManager
+        // bestimmt. Das entspricht eurem bestehenden Login-System.
+        PassKeyRecord currentUser = StateManager.Instance?.getCurrentUser();
+
+        if (currentUser == null || string.IsNullOrWhiteSpace(currentUser.userId))
+        {
+            Debug.LogError(
+                "[DocumentDashboard] Kein eingeloggter Benutzer gefunden."
+            );
+
+            return null;
+        }
+
+        // user_1 -> 1
+        string rawUserId = currentUser.userId;
+
+        if (rawUserId.StartsWith("user_"))
+            rawUserId = rawUserId.Substring("user_".Length);
+
+        // Sicherheitsprüfung:
+        // Nur eine numerische User-ID darf als Ordnername verwendet werden.
+        if (!int.TryParse(rawUserId, out int userId))
+        {
+            Debug.LogError(
+                "[DocumentDashboard] Ungültige User-ID: " +
+                currentUser.userId
+            );
+
+            return null;
+        }
+
+        string folderPath = Path.Combine(
+            Application.persistentDataPath,
+            "Dokumente",
+            "User_" + userId
+        );
+
+        Directory.CreateDirectory(folderPath);
+
+        return folderPath;
     }
+    catch (System.Exception exception)
+    {
+        Debug.LogError(
+            "[DocumentDashboard] Fehler beim Ermitteln des Benutzerordners: " +
+            exception.Message
+        );
+
+        return null;
+    }
+}
+
+public static string GetSaveFilePath()
+{
+    string userFolder = GetCurrentUserFolder();
+
+    if (string.IsNullOrEmpty(userFolder))
+        return null;
+
+    return Path.Combine(
+        userFolder,
+        "MyDashboardSave.json"
+    );
+}
+
+public static DocumentSaveData GetSavedDocuments()
+{
+    string path = GetSaveFilePath();
+
+    if (string.IsNullOrEmpty(path))
+        return new DocumentSaveData();
+
+    try
+    {
+        if (!File.Exists(path))
+            return new DocumentSaveData();
+
+        string json = File.ReadAllText(path);
+
+        if (string.IsNullOrWhiteSpace(json))
+            return new DocumentSaveData();
+
+        DocumentSaveData data =
+            JsonUtility.FromJson<DocumentSaveData>(json);
+
+        if (data == null || data.savedDocs == null)
+            return new DocumentSaveData();
+
+        return data;
+    }
+    catch (System.Exception exception)
+    {
+        Debug.LogError(
+            "[DocumentDashboard] Fehler beim Laden der Dokumentdaten: " +
+            exception.Message
+        );
+
+        return new DocumentSaveData();
+    }
+}
 
     // Liefert die Unternehmensstammdaten als Key-Value-Dictionary.
     // Verwendung: var daten = DocumentDashboard.GetUnternehmenFelder();
