@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class MainLogoutController : MonoBehaviour
 {
-    [SerializeField] private string loginSceneName = "LoginScene";
+    [SerializeField] private string loginSceneName = "Login";
     [SerializeField] private AuthService authService;
     
     public void logout()

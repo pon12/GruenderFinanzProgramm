@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StartUpChecker : MonoBehaviour
 {
-    [SerializeField] private string version = "0.1.0";
+    [SerializeField] private string version = "0.6.0";
 
     private void Start()
     {
