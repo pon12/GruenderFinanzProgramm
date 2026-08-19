@@ -11,17 +11,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c9b04849-62dd-48ee-a981-e0371bfeb1a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/indexLayout.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GruenderFinanzProgramm/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Angebot.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Dienstleistungen/Dienstleistungen.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Resources/Icons/Dienstleistungen icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Resources/Icons/Dienstleistungen icon.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Einstellungen.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Einstellungen.uxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/KDB.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Rechnung.uxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Angebot.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Dienstleistungen.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB Asset.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/KDB/KDB.uss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Vorlagen/kunden-item-template.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Login Screen UXML.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Login Screen UXML.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Screens/Regestrierungs Screen UXML.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Screens/Regestrierungs Screen UXML.uxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/Login-Screen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Sidebar/Login-Screen.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Sidebar/Register-Screen.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Sidebar/Register-Screen.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Skripts/Buttonhovercontroller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Skripts/Buttonhovercontroller.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Einstellungen USS.uss" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/Stylesheets/Einstellungen USS.uss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Frontend/UI/sidebar.uxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +38,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -59,12 +60,13 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Alina-will-nicht-mehr&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;alina-design&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -189,6 +191,46 @@
       <workItem from="1782432266411" duration="5000" />
       <workItem from="1782432297312" duration="11000" />
       <workItem from="1782432388139" duration="6000" />
+      <workItem from="1785853204328" duration="44000" />
+      <workItem from="1785853380614" duration="755000" />
+      <workItem from="1785854174100" duration="7000" />
+      <workItem from="1785854200381" duration="6000" />
+      <workItem from="1785854222922" duration="79000" />
+      <workItem from="1785854319722" duration="57000" />
+      <workItem from="1785855726384" duration="261000" />
+      <workItem from="1785856006051" duration="24000" />
+      <workItem from="1785856465715" duration="638000" />
+      <workItem from="1785857711792" duration="237000" />
+      <workItem from="1785857993125" duration="196000" />
+      <workItem from="1785858439924" duration="135000" />
+      <workItem from="1785858588604" duration="36000" />
+      <workItem from="1785858637749" duration="57000" />
+      <workItem from="1785858712537" duration="31000" />
+      <workItem from="1785858755724" duration="615000" />
+      <workItem from="1785882242814" duration="47000" />
+      <workItem from="1785882358893" duration="341000" />
+      <workItem from="1785882786308" duration="590000" />
+      <workItem from="1785883441383" duration="112000" />
+      <workItem from="1785884042219" duration="78000" />
+      <workItem from="1785884190012" duration="220000" />
+      <workItem from="1785884525920" duration="576000" />
+      <workItem from="1785885131539" duration="41000" />
+      <workItem from="1785885196170" duration="111000" />
+      <workItem from="1785885552589" duration="83000" />
+      <workItem from="1785885674885" duration="2039000" />
+      <workItem from="1785887738978" duration="31000" />
+      <workItem from="1785887780970" duration="1242000" />
+      <workItem from="1786039077971" duration="1626000" />
+      <workItem from="1786040741189" duration="2683000" />
+      <workItem from="1786043718763" duration="97000" />
+      <workItem from="1786043833510" duration="3331000" />
+      <workItem from="1786047285219" duration="207000" />
+      <workItem from="1786189089964" duration="1780000" />
+      <workItem from="1786190995998" duration="447000" />
+      <workItem from="1786199001020" duration="1850000" />
+      <workItem from="1786200987928" duration="640000" />
+      <workItem from="1786201643451" duration="700000" />
+      <workItem from="1786202456613" duration="199000" />
     </task>
     <servers />
   </component>

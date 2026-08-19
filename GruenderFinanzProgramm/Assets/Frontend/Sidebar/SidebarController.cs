@@ -43,7 +43,7 @@ public class SidebarController : MonoBehaviour
         { "nav-item-buchhaltung",      "Buchhaltung"      },
         { "nav-item-finanzen",         "Finanzdashboard"         },
         { "nav-item-dokumente",        "Dokument-Screen"  },
-        { "nav-item-gründerpfad",    "Gründungspfad"    },
+        { "nav-item-gründerpfad",    "Gründerpfad"    },
         { "nav-item-wissensdatenbank", "Wissensdatenbank" },
         { "nav-item-erfolge",          "Erfolge"          },
         { "nav-item-angebot",          "Angebot"          },
@@ -54,7 +54,6 @@ public class SidebarController : MonoBehaviour
         { "nav-item-export",           "Export-Screen"    },
         { "nav-item-liquidität",        "Finanzen1"        },
         { "nav-item-rentabilität",      "Finanzen2"        },
-        { "nav-item-kennzahlen",       "Finanzen3"        },
         { "nav-item-einstellungen",    "Einstellungen"    },
     };
 
@@ -79,7 +78,6 @@ public class SidebarController : MonoBehaviour
         "nav-item-export",
         "nav-item-liquidit\u00e4t",
         "nav-item-rentabilit\u00e4t",
-        "nav-item-kennzahlen",
     };
 
     // ─────────────────────────────────────────────────
@@ -215,27 +213,55 @@ public class SidebarController : MonoBehaviour
     private void ToggleFortschrittSubmenu()
     {
         _fortschrittOpen = !_fortschrittOpen;
-        ApplySubmenuState(_fortschrittSubmenu, _fortschrittToggleBtn, _fortschrittOpen);
+
+        // Wenn Fortschritt geöffnet wird, alle anderen schließen
+        if (_fortschrittOpen)
+        {
+            _buchhaltungOpen = false;
+            _finanzenOpen = false;
+        }
+
+        UpdateAllSubmenus();
         SaveState();
     }
 
     private void ToggleBuchhaltungSubmenu()
     {
         _buchhaltungOpen = !_buchhaltungOpen;
-        ApplySubmenuState(_buchhaltungSubmenu, _buchhaltungToggleBtn, _buchhaltungOpen);
+
+        // Wenn Buchhaltung geöffnet wird, alle anderen schließen
+        if (_buchhaltungOpen)
+        {
+            _fortschrittOpen = false;
+            _finanzenOpen = false;
+        }
+
+        UpdateAllSubmenus();
         SaveState();
     }
 
     private void ToggleFinanzenSubmenu()
     {
         _finanzenOpen = !_finanzenOpen;
-        ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, _finanzenOpen);
+
+        // Wenn Finanzen geöffnet wird, alle anderen schließen
+        if (_finanzenOpen)
+        {
+            _fortschrittOpen = false;
+            _buchhaltungOpen = false;
+        }
+
+        UpdateAllSubmenus();
         SaveState();
     }
 
-    // ─────────────────────────────────────────────────
-    // ACTIVE NAV ITEM HIGHLIGHTING
-    // ─────────────────────────────────────────────────
+    // Hilfsmethode: Wendet den aktuellen Zustand auf alle 3 Submenüs an
+    private void UpdateAllSubmenus()
+    {
+        ApplySubmenuState(_fortschrittSubmenu, _fortschrittToggleBtn, _fortschrittOpen);
+        ApplySubmenuState(_buchhaltungSubmenu, _buchhaltungToggleBtn, _buchhaltungOpen);
+        ApplySubmenuState(_finanzenSubmenu, _finanzenToggleBtn, _finanzenOpen);
+    }
 
     private void SetActiveNavItem()
     {

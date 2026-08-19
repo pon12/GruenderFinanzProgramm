@@ -222,6 +222,7 @@ public class WissensdatenbankController : MonoBehaviour
                         plusBtn.text    = "\U0001f441";
                         plusBtn.tooltip = "Anzeigen";
                         plusBtn.clicked += () => OpenViewPopup(eintrag);
+                        RegistriereEyeButtonHover(plusBtn);
                     }
                 }
                 else
@@ -299,6 +300,60 @@ public class WissensdatenbankController : MonoBehaviour
         }
     }
 
+    // ============================================================
+    // EYE-BUTTON HOVER (manuell statt :hover-Pseudoklasse)
+    // ------------------------------------------------------------
+    // BUG-FIX: Wenn man auf das Augen-Icon klickt, öffnet sich das
+    // View-Popup-Overlay direkt über dem Button, während der Mauszeiger
+    // noch drüber steht. Dadurch bekommt Unity nie ein PointerLeave für
+    // den Button und die grüne :hover-Farbe aus dem Stylesheet bleibt
+    // hängen, auch nachdem die Maus längst woanders ist. Deshalb hier
+    // eigene, garantiert korrekte Hover-Steuerung per Inline-Style
+    // (überschreibt immer die evtl. hängengebliebene CSS-Pseudoklasse)
+    // plus ein Zwangs-Reset beim Öffnen/Schließen des Popups.
+    // ============================================================
+    private static readonly Color EyeBtnNormalBg     = new Color(40f / 255f, 40f / 255f, 40f / 255f);
+    private static readonly Color EyeBtnNormalBorder  = new Color(70f / 255f, 70f / 255f, 70f / 255f);
+    private static readonly Color EyeBtnNormalText    = new Color(128f / 255f, 207f / 255f, 149f / 255f);
+    private static readonly Color EyeBtnHoverBg       = new Color(128f / 255f, 207f / 255f, 149f / 255f);
+    private static readonly Color EyeBtnHoverText     = new Color(20f / 255f, 20f / 255f, 20f / 255f);
+
+    private void RegistriereEyeButtonHover(Button btn)
+    {
+        SetzeEyeButtonNormal(btn);
+        btn.RegisterCallback<PointerEnterEvent>(_ =>
+        {
+            // WICHTIG: Bei schnellem Mausbewegen zwischen mehreren Augen-Icons
+            // feuert PointerLeave beim vorherigen Button in Unity manchmal
+            // nicht zuverlässig (bekannte UI-Toolkit-Eigenheit). Deshalb hier
+            // NICHT auf das eigene Leave-Event verlassen, sondern bei jedem
+            // Enter zwangsweise ALLE anderen Augen-Icons zurücksetzen -
+            // Enter feuert zuverlässig, Leave nicht.
+            gridContainer?.Query<Button>(className: "doc-mini-plus").ForEach(other =>
+            {
+                if (other != btn) SetzeEyeButtonNormal(other);
+            });
+            SetzeEyeButtonHover(btn);
+        });
+        btn.RegisterCallback<PointerLeaveEvent>(_ => SetzeEyeButtonNormal(btn));
+    }
+
+    private void SetzeEyeButtonHover(Button btn)
+    {
+        btn.style.backgroundColor = new StyleColor(EyeBtnHoverBg);
+        btn.style.borderTopColor = btn.style.borderBottomColor =
+            btn.style.borderLeftColor = btn.style.borderRightColor = new StyleColor(EyeBtnHoverBg);
+        btn.style.color = new StyleColor(EyeBtnHoverText);
+    }
+
+    private void SetzeEyeButtonNormal(Button btn)
+    {
+        btn.style.backgroundColor = new StyleColor(EyeBtnNormalBg);
+        btn.style.borderTopColor = btn.style.borderBottomColor =
+            btn.style.borderLeftColor = btn.style.borderRightColor = new StyleColor(EyeBtnNormalBorder);
+        btn.style.color = new StyleColor(EyeBtnNormalText);
+    }
+
     private void CloseDetailPopup()
     {
         if (detailPopupOverlay != null)
@@ -307,6 +362,10 @@ public class WissensdatenbankController : MonoBehaviour
 
     private void OpenViewPopup(WissensEintrag eintrag)
     {
+        // Sicherheits-Reset: alle Augen-Icons zwingend auf "normal" setzen,
+        // bevor das Overlay sie verdeckt (siehe Kommentar oben).
+        gridContainer?.Query<Button>(className: "doc-mini-plus").ForEach(SetzeEyeButtonNormal);
+
         if (viewPopupOverlay != null) viewPopupOverlay.style.display = DisplayStyle.Flex;
         if (viewPopupTitle   != null) viewPopupTitle.text            = eintrag.title;
         if (viewPopupInhalt  != null)
@@ -321,6 +380,10 @@ public class WissensdatenbankController : MonoBehaviour
     {
         if (viewPopupOverlay != null)
             viewPopupOverlay.style.display = DisplayStyle.None;
+
+        // Nochmal zur Sicherheit zurücksetzen (falls die Maus beim
+        // Schließen zufällig noch über einem Augen-Icon steht).
+        gridContainer?.Query<Button>(className: "doc-mini-plus").ForEach(SetzeEyeButtonNormal);
     }
 
     // ============================================================

@@ -16,33 +16,37 @@ public class MainMenuManager : MonoBehaviour
     }
 
     void Start()
+{
+    // 1. Prüfen, ob das Tutorial beim allerersten Start getriggert werden soll
+    if (TutorialManager.Instance != null)
     {
-        // 1. Der alte Start-Screen-Fade-Code:
-        if (startScreenObj != null && startScreenObj.activeSelf)
-        {
-            fadeCoroutine = StartCoroutine(FadeOutStartScreen());
-        }
+        TutorialManager.Instance.PruefeErstenAppStart();
+    }
 
-        // --- HIER IST NEU: DIE EVENT-VERBINDUNG ZUM REGISTRIERUNGSSCREEN ---
-        if (registrationScreenObj != null)
-        {
-            // Wir holen uns die Logik-Komponente vom Registrierungs-Objekt
-            RegestrierungLogik regSkript = registrationScreenObj.GetComponent<RegestrierungLogik>();
+    // 2. PRÜFUNG: Wenn das Tutorial läuft, KEINEN automatischen Start-Screen-Fade ausführen!
+    bool tutorialAktiv = TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialAktiv;
 
-            if (regSkript != null)
+    if (!tutorialAktiv && startScreenObj != null && startScreenObj.activeSelf)
+    {
+        fadeCoroutine = StartCoroutine(FadeOutStartScreen());
+    }
+
+    // --- EVENT-VERBINDUNG ZUM REGISTRIERUNGSSCREEN ---
+    if (registrationScreenObj != null)
+    {
+        RegestrierungLogik regSkript = registrationScreenObj.GetComponent<RegestrierungLogik>();
+
+        if (regSkript != null)
+        {
+            regSkript.OnBackToLoginRequested += ShowLogin;
+
+            regSkript.OnRegistrationSuccessful += (username) => 
             {
-                // Wenn im Reg-Skript das Back-Event gefeuert wird, rufen wir hier "ShowLogin()" auf
-                regSkript.OnBackToLoginRequested += ShowLogin;
-
-                // Wenn die Registrierung erfolgreich war, fangen wir das hier ab
-                regSkript.OnRegistrationSuccessful += (username) => 
-                {
-                    Debug.Log($"MainMenuManager meldet: {username} hat sich erfolgreich registriert!");
-                    // Hier könntest du später z.B. automatisch zum Hauptmenü weiterleiten
-                };
-            }
+                Debug.Log($"MainMenuManager meldet: {username} hat sich erfolgreich registriert!");
+            };
         }
     }
+}
 
     // --- START SCREEN LOGIK ---
     void SetupStartScreen()

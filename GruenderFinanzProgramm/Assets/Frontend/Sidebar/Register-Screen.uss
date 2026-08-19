@@ -1,29 +1,103 @@
 :root {
-
 }
 
-.Key-button {
-    background-color: rgb(128, 207, 149);
-    font-size: 30px;
-    color: white;
-    -unity-text-align: middle-center;
-    -unity-font-style: bold;
-    border-radius: 8px;
-    border-width: 0;
-    padding: 10px 20px;
+/* ==========================================
+   Generelle Layouts & Container
+   ========================================== */
+.fullscreen-bg {
+    flex-grow: 1;
 }
 
+.container-main {
+    flex-grow: 1;
+}
+
+.centered-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+}
+
+.header-row {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.header-logo {
+    width: 200px;
+    height: 144px;
+    align-self: center;
+}
+
+.container-subheading {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-around;
+    height: auto;
+    margin-top: -32px;
+}
+
+.container-passkey-gen {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    margin-top: -48px;
+}
+
+.container-error {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 912px;
+}
+
+.lbl-error {
+    font-size: 24px;
+    color: rgb(255, 100, 100);
+}
+
+.row-agb {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.toggle-agb {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* ==========================================
+   Typografie & Buttons (Hauptscreen)
+   ========================================== */
 .ueberschrift {
     color: rgb(255, 255, 255);
     -unity-text-align: middle-center;
-    font-size: 90px;
+    font-size: 88px;
+    width: 576px;
+    height: 96px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
 
 .Profilname {
     color: rgb(255, 255, 255);
     -unity-text-align: middle-center;
-    font-size: 52px;
+    font-size: 48px;
+    width: 336px;
+    height: 56px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
 
@@ -37,7 +111,7 @@
 .text {
     color: #AEAEAE;
     -unity-text-align: middle-center;
-    font-size: 26px;
+    font-size: 24px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
 }
 
@@ -46,4 +120,236 @@
     -unity-text-align: middle-center;
     font-size: 32px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
+
+.input-profile {
+    width: 984px;
+    height: 104px;
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    border-width: 0;
+}
+
+.input-profile:hover {
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+}
+
+.btn-back {
+    position: absolute;
+    right: 40px;
+    top: 24px;
+    width: 160px;
+    height: 56px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(100, 100, 100);
+    border-width: 0;
+    border-radius: 10px;
+}
+.btn-back:hover {
+    background-color: rgb(142, 141, 141);
+}
+
+.Key-button {
+    width: 480px;
+    height: 96px;
+    background-color: rgb(128, 207, 149);
+    font-size: 24px;
+    color: white;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    border-radius: 10px;
+    border-width: 0;
+    padding: 8px 16px;
+}
+.Key-button:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+/* ==========================================
+   Overlay & Popups
+   ========================================== */
+.popup-overlay {
+    flex-grow: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-card {
+    width: 900px;
+    background-color: rgb(38, 38, 38);
+    border-radius: 20px;
+    border-color: rgb(128, 207, 149);
+    border-width: 2px;
+    padding: 32px 40px;
+}
+
+.popup-header-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.popup-title {
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.btn-popup-close {
+    -unity-text-align: middle-center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: rgb(180, 180, 180);
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    padding: 0;
+}
+
+.popup-passkey-display {
+    background-color: rgb(70, 70, 70);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.popup-row-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.popup-row-item-last {
+    margin-bottom: 0;
+}
+
+.lbl-key-display {
+    font-size: 24px;
+    color: rgb(255, 255, 255);
+    flex-grow: 1;
+    white-space: normal;
+}
+
+.btn-copy {
+    width: 80px;
+    height: 48px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 16px;
+    background-color: rgb(100, 100, 100);
+    border-width: 0;
+    border-radius: 10px;
+    color: #FFFFFF;
+}
+
+/* Hover Zustand (Maus drüber) */
+.btn-copy:hover {
+    background-color: rgb(142, 141, 141);
+    color: rgb(255, 255, 255);
+}
+
+/* Klick Zustand (Während der Button gedrückt wird) */
+.btn-copy:active {
+    background-color: rgb(56, 54, 54);
+    color: #FFFFFF;
+}
+
+.btn-decrypt {
+    height: 56px;
+    background-color: rgb(100, 100, 100);
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    border-radius: 10px;
+    border-width: 0;
+    margin-bottom: 16px;
+}
+.btn-decrypt:hover {
+    background-color: rgb(142, 141, 141);
+}
+
+.popup-hint {
+    font-size: 16px;
+    color: rgb(160, 160, 160);
+    -unity-text-align: upper-center;
+    margin-bottom: 24px;
+    white-space: normal;
+}
+
+.btn-submit {
+    height: 64px;
+    background-color: rgb(128, 207, 149);
+    color: rgb(30, 30, 30);
+    font-size: 24px;
+    -unity-font-style: bold;
+    border-radius: 10px;
+    border-width: 0;
+}
+.btn-submit:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+/* Document Popups (AGB / Datenschutz) */
+.popup-doc-card {
+    flex-grow: 1;
+    width: 560px;
+    height: 1000px;
+    background-color: rgb(56, 56, 56);
+    border-color: rgb(179, 226, 196);
+    border-width: 3px;
+    border-radius: 30px;
+    color: rgb(255, 255, 255);
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.popup-doc-header {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 560px;
+}
+
+.popup-doc-title {
+    height: auto;
+    font-size: 32px;
+    -unity-text-align: middle-left;
+    white-space: pre-wrap;
+    width: 456px;
+}
+
+.btn-doc-close {
+    height: 32px;
+    width: 32px;
+    background-image: url("project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&guid=9cd0944736a9a324195ad03398faae90&type=3#close");
+    border-radius: 30px;
+    border-color: rgb(26, 26, 26);
+    border-width: 1px;
+    background-color: rgb(51, 51, 51);
+}
+
+.popup-doc-content {
+    flex-grow: 1;
+}
+
+.popup-doc-text {
+    -unity-text-align: upper-left;
+    white-space: nowrap;
+    width: 560px;
+    height: 1000px;
 }

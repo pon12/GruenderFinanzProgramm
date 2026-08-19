@@ -4,54 +4,54 @@
     <Style src="project://database/Assets/Frontend/Stylesheets/Gruendungspfad.uss?fileID=7433441132597879392&amp;guid=563a36f6e1d4ab8469e044a04505abe5&amp;type=3#Gruendungspfad"/>
     <ui:VisualElement name="root-container" style="flex-grow: 1; background-color: rgb(30, 30, 30);">
         <ui:VisualElement name="main-content" style="flex: 1; flex-direction: column; padding: 30px 40px 20px 430px;">
-            <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <ui:VisualElement style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement>
-                        <ui:Label text="Gründungspfad" class="page-title"/>
-                        <ui:Label text="Deine persönliche Roadmap von der Idee zur erfolgreichen Gründung" class="page-subtitle"/>
+            <ui:VisualElement name="row-kopfzeile" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <ui:VisualElement name="row-titel-gruppe" style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="container-titel-text">
+                        <ui:Label text="Gründerpfad" name="label-titel" class="page-title"/>
+                        <ui:Label text="Deine persönliche Roadmap von der Idee zur erfolgreichen Gründung" name="label-untertitel" class="page-subtitle"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; right: 236px; bottom: 15px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; align-items: center;">
+                <ui:VisualElement name="row-schritt-hinzufuegen" style="flex-direction: row; align-items: center;">
                     <ui:Button text="+ Eigenen Schritt hinzufügen" name="btn-schritt-hinzufuegen" class="pfad-btn-primary"/>
                     <ui:VisualElement name="btn-help-schritt-hinzufuegen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement class="gesamt-fortschritt-box" style="background-color: rgb(44, 44, 44);">
-                <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center;">
-                        <ui:Label text="Gesamtfortschritt" class="fortschritt-header-label"/>
+            <ui:VisualElement name="panel-gesamtfortschritt" class="gesamt-fortschritt-box" style="background-color: rgb(44, 44, 44);">
+                <ui:VisualElement name="row-fortschritt-kopf" style="flex-direction: row; justify-content: space-between; margin-bottom: 8px;">
+                    <ui:VisualElement name="row-fortschritt-titel" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Gesamtfortschritt" name="label-fortschritt-titel" class="fortschritt-header-label"/>
                         <ui:VisualElement name="btn-help-fortschritt" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 28px; height: 28px; min-width: 28px; min-height: 28px; flex-shrink: 0; margin-left: 8px;"/>
                     </ui:VisualElement>
                     <ui:Label text="0% abgeschlossen" name="lbl-gesamtfortschritt" class="fortschritt-prozent-label"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="fortschritt-balken-bg">
+                <ui:VisualElement name="bar-fortschritt-hintergrund" class="fortschritt-balken-bg">
                     <ui:VisualElement name="fortschritt-balken-fill" class="fortschritt-balken-fill" style="width: 0%;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:ScrollView style="flex-grow: 1; margin-top: 16px;">
+            <ui:ScrollView name="scroll-schritte-liste" style="flex-grow: 1; margin-top: 16px;">
                 <ui:VisualElement name="main-container"/>
             </ui:ScrollView>
         </ui:VisualElement>
         <ui:VisualElement name="neuer-schritt-popup" class="popup-overlay" style="display: none;">
-            <ui:VisualElement class="pfad-popup-box">
-                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px;">
-                    <ui:Label text="Eigenen Schritt hinzufügen" class="pfad-popup-title" style="flex-grow: 1; margin-bottom: 0;"/>
+            <ui:VisualElement name="container-popup" class="pfad-popup-box">
+                <ui:VisualElement name="row-popup-titel" style="flex-direction: row; align-items: center; margin-bottom: 4px;">
+                    <ui:Label text="Eigenen Schritt hinzufügen" name="label-popup-titel" class="pfad-popup-title" style="flex-grow: 1; margin-bottom: 0;"/>
                     <ui:VisualElement name="btn-help-popup" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="pfad-form-group">
-                    <ui:Label text="Titel *" class="pfad-field-label"/>
+                <ui:VisualElement name="feld-gruppe-titel" class="pfad-form-group">
+                    <ui:Label text="Titel *" name="label-feld-titel" class="pfad-field-label"/>
                     <ui:TextField label="" placeholder-text="z.B. Logo erstellen" name="neuer-schritt-titel"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="pfad-form-group">
-                    <ui:Label text="Beschreibung (optional)" class="pfad-field-label"/>
+                <ui:VisualElement name="feld-gruppe-beschreibung" class="pfad-form-group">
+                    <ui:Label text="Beschreibung (optional)" name="label-feld-beschreibung" class="pfad-field-label"/>
                     <ui:TextField label="" placeholder-text="Kurze Erklärung..." name="neuer-schritt-beschreibung" multiline="true" style="min-height: 64px;"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="pfad-form-group">
-                    <ui:Label text="Phase" class="pfad-field-label"/>
+                <ui:VisualElement name="feld-gruppe-phase" class="pfad-form-group">
+                    <ui:Label text="Phase" name="label-feld-phase" class="pfad-field-label"/>
                     <ui:DropdownField label="" name="neuer-schritt-phase" class="pfad-dropdown"/>
                 </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+                <ui:VisualElement name="row-popup-buttons" style="flex-direction: row; justify-content: flex-end; gap: 12px; margin-top: 16px;">
                     <ui:Button text="Abbrechen" name="btn-neuer-schritt-abbrechen" class="pfad-btn-secondary"/>
                     <ui:Button text="Hinzufügen" name="btn-neuer-schritt-speichern" class="pfad-btn-primary"/>
                 </ui:VisualElement>

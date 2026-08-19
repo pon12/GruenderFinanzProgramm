@@ -707,6 +707,288 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f739123d8550684a9eabd98cfa8e89e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KeyGeneratorController
+--- !u!1 &1363661632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1363661635}
+  - component: {fileID: 1363661634}
+  - component: {fileID: 1363661633}
+  m_Layer: 0
+  m_Name: TutorialManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1363661633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363661632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c46759be7f87b04fb81850f6e445df3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
+  uiDocument: {fileID: 1363661634}
+  alleSchritte:
+  - Erklaerung: Willkommen auf ihrer zentralen Steuerzentrale!
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Dashboard
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier sehen sie all ihre wichtigen Gesch\xE4ftszahlen auf einen Blick
+      \u2013 von der Anzahl ihrer Kunden bis hin zum aktuellen Kontostand. \xDCber
+      die direkten Buttons k\xF6nnen sie ohne Umwege sofort neue Kunden anlegen,
+      Angebote schreiben oder Rechnungen erstellen"
+    ElementName: stats-grid
+    inKurzversion: 1
+    SceneName: Dashboard
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "In diesem Bereich wird ihre finanzielle Entwicklung des gesamten
+      Jahres \xFCbersichtlich als Diagramm aufbereitet. Auf der linken Seite sehen
+      sie die Betr\xE4ge, w\xE4hrend die Achse unten ihre Ums\xE4tze von Januar bis
+      Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr
+      Gesch\xE4ft besonders gut l\xE4uft."
+    ElementName: kassenbuch-statistik-panel
+    inKurzversion: 1
+    SceneName: Dashboard
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Mit dem Fristenkalender verpassen die garantiert keine wichtigen
+      Termine oder steuerlichen Abgabefristen mehr. Navigieren sie einfach durch
+      die Monate und Jahre, um ihre F\xE4lligkeiten bequem im Voraus zu planen. Ein
+      Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an."
+    ElementName: kalender-panel
+    inKurzversion: 1
+    SceneName: Dashboard
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Auf der linken Seite k\xF6nnen Sie wichtigen Daten f\xFCr Sie und
+      Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen."
+    ElementName: col-left
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Auf der rechten Seite sind Steuers\xE4tze und Design-Einstellungen
+      zu finden. Sie k\xF6nnen ebenfalls ihren aktuellen Passkey zur\xFCcksetzen
+      oder ihr Konto l\xF6schen"
+    ElementName: col-right
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Ganz unten finden Sie den Tutorial-Button \u2013 Sie k\xF6nnen diese
+      Einf\xFChrung jederzeit erneut starten."
+    ElementName: card-hilfe
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg
+      zur Gr\xFCndung."
+    ElementName: panel-letzte-erfolge
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote
+      zu erstellen.
+    ElementName: 
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier w\xE4hlst du den Kunden aus dem Ihr das Angebot erstellt oder
+      tr\xE4gst einen neuen ein."
+    ElementName: card-partner
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier pflegst du Angebotsnummer, Datum, Status und W\xE4hrung."
+    ElementName: card-grunddaten
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier kannst du Dateien und Dokumente direkt an das Angebot anh\xE4ngen."
+    ElementName: card-anhaenge
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Trage hier alle Artikel und Leistungen mit Menge und Preis ein.
+    ElementName: card-positionen
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.
+    ElementName: card-details
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten
+      erscheint.
+    ElementName: card-Lokaler-Nutzer
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: Mit diesem Button legst du einen neuen Kunden in deiner Datenbank
+      an.
+    ElementName: btn-add-coustomer
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du deine Rentabilit\xE4tskennzahlen \u2013 Umsatz, Kosten
+      und Gewinn im \xDCberblick."
+    ElementName: panel-rentabilitaet
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Bereich zeigt deine Liquidit\xE4t zum Gesch\xE4ftsbeginn
+      \u2013 was du zum Start ben\xF6tigst."
+    ElementName: panel-liquiditaet
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Die Liquidit\xE4tsplanung gibt dir einen \xDCberblick \xFCber Ein-
+      und Ausgaben \xFCber die Zeit."
+    ElementName: panel-liquiditaetsplanung
+    inKurzversion: 0
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "W\xE4hle hier eine Vorlage f\xFCr dein neues Dokument: Standard-Text,
+      Diagramm oder Checkliste."
+    ElementName: Template-Grid
+    inKurzversion: 1
+    SceneName: 
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  startScreenObj: {fileID: 457497950}
+  loginScreenObj: {fileID: 1136899310}
+  registrationScreenObj: {fileID: 1318028743}
+  settingsScreenObj: {fileID: 0}
+--- !u!114 &1363661634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363661632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 905a9c3354086ae4faf9bb654c128042, type: 3}
+  m_SortingOrder: 10
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &1363661635
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363661632}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1324.0913, y: 709.9944, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1449622030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1449622032}
+  - component: {fileID: 1449622031}
+  m_Layer: 0
+  m_Name: ScreenshotScript
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1449622031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449622030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5cd796337b1bf545b1f9484dbe0a199, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenshotHelper
+  prefix: Tutorial
+--- !u!4 &1449622032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449622030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1324.0913, y: 709.9944, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1634313190
 GameObject:
   m_ObjectHideFlags: 0
@@ -812,3 +1094,5 @@ SceneRoots:
   - {fileID: 1253357239}
   - {fileID: 1101171737}
   - {fileID: 1034291350}
+  - {fileID: 1449622032}
+  - {fileID: 1363661635}

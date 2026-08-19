@@ -264,7 +264,7 @@ public class GruendungspfadController : MonoBehaviour
 
         LadeFortschritt();
         WendeFortschrittAn();
-        WendeDokumenteFortschrittAn();
+        WendeAutomatischeErkennungAn();
         BaueUI();
 
         // Feste UXML-Icons registrieren
@@ -302,56 +302,33 @@ public class GruendungspfadController : MonoBehaviour
     // DOKUMENTE → GRÜNDERPFAD MAPPING
     // ============================================================
 
-    private static readonly Dictionary<string, string> DokZuSchrittId
-        = new Dictionary<string, string>
+    // ============================================================
+    // AUTOMATISCHE ERKENNUNG (Dokumente + echte App-Daten)
+    // ============================================================
+    // Nutzt GruenderpfadAutoErkennung (siehe dort) - dieselbe Logik wie
+    // Fortschritt- und Erfolge-Screen, damit alle drei immer denselben
+    // Stand zeigen. WICHTIG: wird jetzt tatsächlich gespeichert (vorher
+    // wurde das Ergebnis nur für diese eine Anzeige gesetzt und ging beim
+    // Wechsel auf einen anderen Screen wieder "verloren").
+    private void WendeAutomatischeErkennungAn()
     {
-        { "Unternehmensstammdaten",                  "vorb_1" },
-        { "Gr\u00fcndungsurkunde / Gesellschaftsvertrag", "anm_2"  },
-        { "Handelsregisterauszug",                   "anm_3"  },
-        { "Gewerbeanmeldung",                        "anm_1"  },
-        { "Gesellschafterliste",                     "anm_2"  },
-        { "Kontodaten (IBAN/BIC)",                   "fin_1"  },
-        { "Zahlungsbedingungen",                     "fin_1"  },
-        { "AGB",                                     "betr_3" },
-        { "Disclaimer",                              "betr_3" },
-        { "SEPA-Basislastschrift-Mandat",            "fin_1"  },
-        { "Widerrufsbelehrung",                      "betr_3" },
-        { "Businessplan",                            "vorb_3" },
-        { "Markt- & Wettbewerbsanalyse",             "vorb_2" },
-        { "Er\u00f6ffnungsbilanz",                   "fin_2"  },
-        { "Datenschutzerkl\u00e4rung (DSGVO)",       "betr_3" },
-        { "Steuernummer-Bescheid / USt-IdNr",        "anm_4"  },
-        { "Impressum",                               "betr_2" },
-        { "Dienstleistungskatalog / Preisliste",     "betr_1" },
-        { "Corporate Identity Manual",               "betr_2" },
-        { "Muster-Arbeitsvertrag",                   "sonst_1"},
-        { "Gr\u00fcndungs-Checkliste",               "vorb_1" },
-        { "Inventarliste",                           "fin_2"  },
-        { "Inventur",                                "fin_2"  },
-    };
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        var autoErledigt = GruenderpfadAutoErkennung.ErmittleAlle(db);
 
-    private void WendeDokumenteFortschrittAn()
-    {
-        var gespeichert = DocumentDashboard.GetSavedDocuments();
-        if (gespeichert?.savedDocs == null) return;
-
-        foreach (var doc in gespeichert.savedDocs)
+        bool geaendert = false;
+        foreach (var phase in phasen)
         {
-            if (!doc.istPflichtdokument) continue;
-
-            bool hatInhalt   = !string.IsNullOrWhiteSpace(doc.inhalt);
-            bool hatFeldwert = doc.strukturFelder != null &&
-                               doc.strukturFelder.Any(f => !string.IsNullOrWhiteSpace(f.wert));
-
-            if (!hatInhalt && !hatFeldwert) continue;
-            if (!DokZuSchrittId.TryGetValue(doc.title, out string schrittId)) continue;
-
-            foreach (var phase in phasen)
+            foreach (var schritt in phase.schritte)
             {
-                var schritt = phase.schritte.FirstOrDefault(s => s.id == schrittId);
-                if (schritt != null) schritt.erledigt = true;
+                if (autoErledigt.Contains(schritt.id) && !schritt.erledigt)
+                {
+                    schritt.erledigt = true;
+                    geaendert = true;
+                }
             }
         }
+
+        if (geaendert) SpeichereFortschritt();
     }
 
     // ============================================================

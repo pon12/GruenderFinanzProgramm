@@ -91,6 +91,28 @@ public class AuthDatabaseService
         authDatabase.updateUser(user);
     }
 
+    public bool deleteAuthUserByRecoveryKeyHash(string recoveryKeyHash)
+    {
+        UserDB user = getUserDBByRecoveryKeyHash(recoveryKeyHash);
+
+        if (user == null)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: Nutzer wurde in userData.db nicht gefunden.");
+            return false;
+        }
+
+        int result = authDatabase.deleteUser(user.id);
+
+        if (result <= 0)
+        {
+            Debug.LogError("Löschen fehlgeschlagen: User-Eintrag konnte nicht aus userData.db gelöscht werden.");
+            return false;
+        }
+
+        Debug.Log("User-Eintrag aus userData.db gelöscht: " + user.name);
+        return true;
+    }
+
     public string createUserDatabase(string username)
     {
         string databaseName = createSafeDatabaseName(username);

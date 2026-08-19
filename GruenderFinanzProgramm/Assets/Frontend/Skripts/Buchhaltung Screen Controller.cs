@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,10 +9,13 @@ using UnityEngine.UIElements;
 public class BuchhaltungScreenController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
+    [SerializeField] private VisualTreeAsset buchhaltungZeileTemplate;
 
     private static readonly Color Gruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
     private static readonly Color Rot   = new Color(230f / 255f,  57f / 255f,  70f / 255f);
     private static readonly Color Grau  = new Color(150f / 255f, 150f / 255f, 150f / 255f);
+    // Header-Grundfarbe = Marken-Grün, damit alle Tabellen-Header einheitlich aussehen.
+    private static readonly Color HeaderGruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
 
     private const float PADDING_EXPANDED  = 430f;
     private const float PADDING_COLLAPSED = 140f;
@@ -22,7 +26,7 @@ public class BuchhaltungScreenController : MonoBehaviour
     private ScrollView    _liste;
     private float _currentPadding = PADDING_EXPANDED;
 
-    // Struktur für eine einheitliche Anzeige von Angeboten und Rechnungen
+    // Einheitliche Struktur für die Anzeige von Angeboten und Rechnungen
     private class BuchhaltungsEintrag
     {
         public string Typ;
@@ -36,11 +40,11 @@ public class BuchhaltungScreenController : MonoBehaviour
     }
 
     private List<BuchhaltungsEintrag> _eintraege = new();
-    private string      _sortColumn   = "Bezeichnung";
-    private bool        _sortAscending = true;
+    private string _sortColumn    = "Bezeichnung";
+    private bool   _sortAscending = true;
 
-    // Header-Labels (für Pfeil-Update)
-    private Label _hBezeichnung, _hErstellt, _hFaellig, _hStatus;
+    // Header-Labels aus der UXML (für Sortierung und Pfeil-Anzeige)
+    private Label _hBezeichnung, _hArt, _hErstellt, _hFaellig, _hStatus;
 
     // ─────────────────────────────────────────────────
     // UNITY LIFECYCLE
@@ -59,29 +63,15 @@ public class BuchhaltungScreenController : MonoBehaviour
 
         bool collapsed = PlayerPrefs.GetInt("sidebar_collapsed", 0) == 1;
         _currentPadding = collapsed ? PADDING_COLLAPSED : PADDING_EXPANDED;
-        
+
         if (_mainContent != null)
             _mainContent.style.paddingLeft = _currentPadding;
 
-        // Header als Geschwister-Element vor der ScrollView einfügen
-        if (_liste?.parent != null)
-        {
-            var header = ErstelleHeader();
-            int idx = _liste.parent.IndexOf(_liste);
-            _liste.parent.Insert(idx, header);
-        }
-
+        LadeGespeicherteSortierung();
+        RegistriereSortHeader();
         LadeEintraege();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(_root);
-    }
-
-    private void RegistriereHelpTooltips()
-    {
-        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
-            "Das Buchhaltungs-Dashboard zeigt alle Angebote und Rechnungen in einer Übersicht. " +
-            "Du kannst nach Bezeichnung, Erstelldatum, Fälligkeit und Status sortieren. " +
-            "Klicke auf eine Spaltenüberschrift, um die Sortierung zu ändern.");
     }
 
     // ─────────────────────────────────────────────────
@@ -118,15 +108,124 @@ public class BuchhaltungScreenController : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────────
+    // SORTIERUNG (Header kommt aus der UXML, nicht mehr aus C#)
+    // ─────────────────────────────────────────────────
+
+    private void RegistriereSortHeader()
+    {
+        _hBezeichnung = _root.Q<Label>("header-bezeichnung");
+        _hArt         = _root.Q<Label>("header-art");
+        _hErstellt    = _root.Q<Label>("header-erstellt");
+        _hFaellig     = _root.Q<Label>("header-faellig");
+        _hStatus      = _root.Q<Label>("header-status");
+
+        RegistriereEinzelnenHeader(_hBezeichnung, "Bezeichnung");
+        RegistriereEinzelnenHeader(_hArt,         "Art");
+        RegistriereEinzelnenHeader(_hErstellt,    "Erstellt");
+        RegistriereEinzelnenHeader(_hFaellig,     "Faellig");
+        RegistriereEinzelnenHeader(_hStatus,      "Status");
+
+        AktualisiereHeaderPfeile();
+    }
+
+    private void RegistriereEinzelnenHeader(Label lbl, string columnKey)
+    {
+        if (lbl == null) return;
+        lbl.pickingMode = PickingMode.Position;
+        lbl.RegisterCallback<ClickEvent>(_ => SetSortColumn(columnKey));
+        lbl.RegisterCallback<MouseEnterEvent>(_ => lbl.style.color = Color.white);
+        lbl.RegisterCallback<MouseLeaveEvent>(_ =>
+            lbl.style.color = (_sortColumn == columnKey) ? Color.white : HeaderGruen);
+    }
+
+    private void SetSortColumn(string column)
+    {
+        if (_sortColumn == column)
+            _sortAscending = !_sortAscending; // gleiche Spalte -> Richtung umkehren
+        else
+        {
+            _sortColumn    = column;
+            _sortAscending = true; // neue Spalte -> aufsteigend starten
+        }
+
+        SpeichereSortierung();
+        AktualisiereHeaderPfeile();
+        RenderListe();
+    }
+
+    // Merkt sich die aktuelle Sortierung nutzerspezifisch, damit sie nach einem
+    // Szenenwechsel (z. B. zurück von Bearbeiten) erhalten bleibt.
+    private void SpeichereSortierung()
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        PlayerPrefs.SetString(prefix + "_buchhaltung_sortColumn", _sortColumn);
+        PlayerPrefs.SetInt(prefix + "_buchhaltung_sortAscending", _sortAscending ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    private void LadeGespeicherteSortierung()
+    {
+        string prefix = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
+        string gespeicherteSpalte = PlayerPrefs.GetString(prefix + "_buchhaltung_sortColumn", "");
+
+        if (!string.IsNullOrEmpty(gespeicherteSpalte))
+        {
+            _sortColumn = gespeicherteSpalte;
+            _sortAscending = PlayerPrefs.GetInt(prefix + "_buchhaltung_sortAscending", 1) == 1;
+        }
+    }
+
+    private void AktualisiereHeaderPfeile()
+    {
+        string pfeil = _sortAscending ? " ↑" : " ↓";
+
+        void Aktualisiere(Label lbl, string key, string basisText)
+        {
+            if (lbl == null) return;
+            bool aktiv  = _sortColumn == key;
+            lbl.text    = aktiv ? basisText + pfeil : basisText;
+            lbl.style.color = aktiv ? Color.white : HeaderGruen;
+        }
+
+        Aktualisiere(_hBezeichnung, "Bezeichnung", "Bezeichnung");
+        Aktualisiere(_hArt,         "Art",         "Art");
+        Aktualisiere(_hErstellt,    "Erstellt",    "Erstellt");
+        Aktualisiere(_hFaellig,     "Faellig",     "Fällig");
+        Aktualisiere(_hStatus,      "Status",      "Status");
+    }
+
+    private IEnumerable<BuchhaltungsEintrag> SortiereEintraege()
+    {
+        IEnumerable<BuchhaltungsEintrag> sortiert = _sortColumn switch
+        {
+            "Bezeichnung" => _eintraege.OrderBy(e => e.Bezeichnung, StringComparer.OrdinalIgnoreCase),
+            "Art"         => _eintraege.OrderBy(e => e.Typ, StringComparer.OrdinalIgnoreCase),
+            "Erstellt"    => _eintraege.OrderBy(e => e.TicksErstellt),
+            "Faellig"     => _eintraege.OrderBy(e => e.TicksFaellig),
+            "Status"      => _eintraege.OrderBy(e => e.Status, StringComparer.OrdinalIgnoreCase),
+            _             => _eintraege.OrderBy(e => e.TicksErstellt)
+        };
+
+        return _sortAscending ? sortiert : sortiert.Reverse();
+    }
+
+    private static long DatumZuTicks(string datum)
+    {
+        if (DateTime.TryParse(datum, out var dt))
+            return dt.Ticks;
+        return 0;
+    }
+
+    // ─────────────────────────────────────────────────
     // DATEN LADEN
     // ─────────────────────────────────────────────────
 
     private void LadeEintraege()
     {
-        if (_liste == null) 
-        { 
-            Debug.LogError("[Buchhaltung] ScrollView nicht gefunden!");
-            return; 
+        if (_liste == null)
+        {
+            Debug.LogError("[Buchhaltung] ScrollView nicht gefunden.");
+            return;
         }
 
         try
@@ -134,49 +233,44 @@ public class BuchhaltungScreenController : MonoBehaviour
             var db = UserDatabaseAccess.getCurrentUserDatabase();
             if (db == null)
             {
-                Debug.LogError("[Buchhaltung] db ist null");
+                Debug.LogError("[Buchhaltung] Keine aktive Datenbank.");
                 ZeigeLeermeldung("Keine Datenbankverbindung.");
                 return;
             }
 
             _eintraege.Clear();
 
-            // 1. Angebote (Offers) laden
+            // Angebote laden
             var angebote = db.getAllOffers() ?? new List<Offer>();
             foreach (var a in angebote)
             {
-                string kundenName = string.IsNullOrWhiteSpace(a.customerName) ? "Unbekannter Kunde" : a.customerName;
                 _eintraege.Add(new BuchhaltungsEintrag
                 {
-                    Typ = "Angebot",
-                    Nummer = a.offerNumber,
-                    Bezeichnung = $"Angebot {a.offerNumber} – {kundenName}",
-                    Erstellt = a.date,
-                    Faellig = a.validUntil,
-                    Status = a.status,
+                    Typ           = "Angebot",
+                    Nummer        = a.offerNumber,
+                    Bezeichnung   = a.offerNumber,
+                    Erstellt      = a.date,
+                    Faellig       = a.validUntil,
+                    Status        = a.status,
                     TicksErstellt = DatumZuTicks(a.date),
-                    TicksFaellig = DatumZuTicks(a.validUntil)
+                    TicksFaellig  = DatumZuTicks(a.validUntil)
                 });
             }
 
-            // 2. Rechnungen (Invoices) laden
+            // Rechnungen laden
             var rechnungen = db.getAllInvoices() ?? new List<Invoice>();
             foreach (var r in rechnungen)
             {
-                string kundenName = string.IsNullOrWhiteSpace(r.customerName) ? "Unbekannter Kunde" : r.customerName;
-                
-                // Hinweis: Falls die Variablen in deiner Invoice-Klasse anders heißen (z.B. 'validUntil' statt 'dueDate'),
-                // passe 'r.invoiceNumber' oder 'r.dueDate' hier einfach entsprechend an.
                 _eintraege.Add(new BuchhaltungsEintrag
                 {
-                    Typ = "Rechnung",
-                    Nummer = r.invoiceNumber,
-                    Bezeichnung = $"Rechnung {r.invoiceNumber} – {kundenName}",
-                    Erstellt = r.date,
-                    Faellig = r.dueDate, 
-                    Status = r.status,
+                    Typ           = "Rechnung",
+                    Nummer        = r.invoiceNumber,
+                    Bezeichnung   = r.invoiceNumber,
+                    Erstellt      = r.date,
+                    Faellig       = r.dueDate,
+                    Status        = r.status,
                     TicksErstellt = DatumZuTicks(r.date),
-                    TicksFaellig = DatumZuTicks(r.dueDate)
+                    TicksFaellig  = DatumZuTicks(r.dueDate)
                 });
             }
 
@@ -196,200 +290,75 @@ public class BuchhaltungScreenController : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────────
-    // SORTIERUNG
-    // ─────────────────────────────────────────────────
-
-    private void SetSortColumn(string column)
-    {
-        if (_sortColumn == column)
-            _sortAscending = !_sortAscending; // Gleiche Spalte → Richtung umkehren
-        else
-        {
-            _sortColumn    = column;
-            _sortAscending = true; // Neue Spalte → aufsteigend starten
-        }
-
-        AktualisiereHeaderPfeile();
-        RenderListe();
-    }
-
-    private IEnumerable<BuchhaltungsEintrag> SortiereEintraege()
-    {
-        IEnumerable<BuchhaltungsEintrag> sorted = _sortColumn switch
-        {
-            "Bezeichnung" => _eintraege.OrderBy(e => e.Bezeichnung, StringComparer.OrdinalIgnoreCase),
-            "Erstellt"    => _eintraege.OrderBy(e => e.TicksErstellt),
-            "Faellig"     => _eintraege.OrderBy(e => e.TicksFaellig),
-            "Status"      => _eintraege.OrderBy(e => e.Status, StringComparer.OrdinalIgnoreCase),
-            _             => _eintraege.OrderBy(e => e.TicksErstellt)
-        };
-
-        return _sortAscending ? sorted : sorted.Reverse();
-    }
-
-    private static long DatumZuTicks(string datum)
-    {
-        if (DateTime.TryParse(datum, out var dt))
-            return dt.Ticks;
-        return 0;
-    }
-
-    // ─────────────────────────────────────────────────
     // UI AUFBAU
     // ─────────────────────────────────────────────────
 
     private void RenderListe()
-{
-    if (_liste == null) return;
-    _liste.Clear();
-
-    foreach (var e in SortiereEintraege())
     {
-        _liste.Add(ErstelleZeile(e)); // Übergibt jetzt das ganze Objekt
-    }
-}
+        if (_liste == null) return;
+        _liste.Clear();
 
-    private VisualElement ErstelleHeader()
-    {
-        var header = new VisualElement();
-        header.style.flexDirection = FlexDirection.Row;
-        header.style.alignItems    = Align.Center;
-        header.style.width         = Length.Percent(100);
-        header.style.paddingTop    = 4;
-        header.style.paddingBottom = 4;
-        header.style.paddingLeft   = 12;
-        header.style.paddingRight  = 12;
-        header.style.marginBottom  = 2;
-
-        _hBezeichnung = ErstelleHeaderSpalte("Bezeichnung", "Bezeichnung", "col-bezeichnung");
-        _hErstellt    = ErstelleHeaderSpalte("Erstellt",    "Erstellt",    "col-erstellt");
-        _hFaellig     = ErstelleHeaderSpalte("Fällig",      "Faellig",     "col-faellig");
-        _hStatus      = ErstelleHeaderSpalte("Status",      "Status",      "col-status");
-
-        header.Add(_hBezeichnung);
-        header.Add(_hErstellt);
-        header.Add(_hFaellig);
-        header.Add(_hStatus);
-
-        AktualisiereHeaderPfeile();
-        return header;
-    }
-
-    private Label ErstelleHeaderSpalte(string text, string columnKey, string ussClass, float flexGrow = 0)
-    {
-        var lbl = new Label(text);
-        lbl.AddToClassList(ussClass);
-        lbl.style.color                   = Grau;
-        lbl.style.fontSize                 = 16;
-        lbl.style.unityFontStyleAndWeight  = FontStyle.Bold;
-
-        if (flexGrow > 0) lbl.style.flexGrow = flexGrow;
-
-        lbl.RegisterCallback<MouseEnterEvent>(_ => lbl.style.color = Color.white);
-        lbl.RegisterCallback<MouseLeaveEvent>(_ =>
-            lbl.style.color = (_sortColumn == columnKey) ? Color.white : Grau);
-        lbl.RegisterCallback<ClickEvent>(_ => SetSortColumn(columnKey));
-
-        return lbl;
-    }
-
-    private void AktualisiereHeaderPfeile()
-    {
-        string pfeil = _sortAscending ? " ↑" : " ↓";
-
-        void Aktualisiere(Label lbl, string key, string basisText)
-        {
-            bool aktiv  = _sortColumn == key;
-            lbl.text    = aktiv ? basisText + pfeil : basisText;
-            lbl.style.color = aktiv ? Color.white : Grau;
-        }
-
-        Aktualisiere(_hBezeichnung, "Bezeichnung", "Bezeichnung");
-        Aktualisiere(_hErstellt,    "Erstellt",    "Erstellt");
-        Aktualisiere(_hFaellig,     "Faellig",     "Fällig");
-        Aktualisiere(_hStatus,      "Status",      "Status");
+        foreach (var eintrag in SortiereEintraege())
+            _liste.Add(ErstelleZeile(eintrag));
     }
 
     private VisualElement ErstelleZeile(BuchhaltungsEintrag eintrag)
-{
-    var zeile = new VisualElement();
-    // ... (Deine bisherigen Styles für die Zeile bleiben genau so!) ...
-    zeile.style.flexDirection = FlexDirection.Row;
-    zeile.style.alignItems = Align.Center;
-    zeile.style.width = Length.Percent(100);
-    zeile.style.paddingTop = 10;
-    zeile.style.paddingBottom = 10;
-    zeile.style.marginBottom = 4;
-    zeile.style.backgroundColor = new Color(55f / 255f, 55f / 255f, 55f / 255f);
-    // Radius etc...
+    {
+        if (buchhaltungZeileTemplate == null)
+        {
+            Debug.LogError("[Buchhaltung] buchhaltungZeileTemplate ist im Inspector nicht zugewiesen.");
+            return new VisualElement();
+        }
 
-    // 1. Bezeichnung
-    var lblBezeichnung = new Label(eintrag.Bezeichnung);
-    lblBezeichnung.AddToClassList("col-bezeichnung");
-    // ... (bisherige Styles)
+        VisualElement zeile = buchhaltungZeileTemplate.Instantiate();
 
-    // 2. Erstellt
-    var lblErstellt = new Label(eintrag.Erstellt);
-    lblErstellt.AddToClassList("col-erstellt");
+        Label         lblBezeichnung  = zeile.Q<Label>("row-bezeichnung");
+        Label         lblArt          = zeile.Q<Label>("row-art");
+        Label         lblErstellt     = zeile.Q<Label>("row-erstellt");
+        Label         lblFaellig      = zeile.Q<Label>("row-faellig");
+        DropdownField dropdownStatus  = zeile.Q<DropdownField>("row-status-dropdown");
+        Button        btnBearbeiten   = zeile.Q<Button>("btn-bearbeiten");
+        Button        btnPfad         = zeile.Q<Button>("btn-open-pfad");
+        Button        btnExportieren  = zeile.Q<Button>("btn-exportieren");
 
-    // 3. Fällig
-    var lblFaellig = new Label(eintrag.Faellig);
-    lblFaellig.AddToClassList("col-faellig");
+        if (lblBezeichnung != null) lblBezeichnung.text = eintrag.Bezeichnung;
+        if (lblArt         != null) lblArt.text         = eintrag.Typ;
+        if (lblErstellt    != null) lblErstellt.text    = eintrag.Erstellt;
+        if (lblFaellig     != null) lblFaellig.text     = eintrag.Faellig;
 
-    // 4. Status
-    var statusContainer = new VisualElement();
-    statusContainer.AddToClassList("col-status");
-    var statusBadge = new Label(eintrag.Status);
-    // ... (bisherige Badge-Erstellung)
-    statusContainer.Add(statusBadge);
+        BuchhaltungsEintrag lokalerEintrag = eintrag;
 
-    // 5. NEU: Bearbeiten-Button am Ende der Zeile
-    var btnBearbeiten = new Button();
-    btnBearbeiten.text = "Bearbeiten";
-    btnBearbeiten.style.fontSize = 12;
-    btnBearbeiten.style.paddingLeft = 12;
-    btnBearbeiten.style.paddingRight = 12;
-    btnBearbeiten.style.paddingTop = 6;
-    btnBearbeiten.style.paddingBottom = 6;
-    btnBearbeiten.style.backgroundColor = new Color(75f / 255f, 75f / 255f, 75f / 255f);
-    btnBearbeiten.style.color = Color.white;
-    btnBearbeiten.style.borderTopLeftRadius = 6;
-    btnBearbeiten.style.borderTopRightRadius = 6;
-    btnBearbeiten.style.borderBottomLeftRadius = 6;
-    btnBearbeiten.style.borderBottomRightRadius = 6;
-    btnBearbeiten.style.borderLeftWidth = 0;
-    btnBearbeiten.style.borderRightWidth = 0;
-    btnBearbeiten.style.borderTopWidth = 0;
-    btnBearbeiten.style.borderBottomWidth = 0;
-    btnBearbeiten.style.marginLeft = StyleKeyword.Auto; // Schiebt den Button ganz nach rechts
-    btnBearbeiten.style.marginRight = 12;
+        if (dropdownStatus != null)
+        {
+            dropdownStatus.choices = (eintrag.Typ == "Rechnung")
+                ? new List<string> { "Versendet", "Bezahlt", "Storniert" }
+                : new List<string> { "Entwurf", "Versendet", "Angenommen", "Abgelehnt" };
+            dropdownStatus.SetValueWithoutNotify(eintrag.Status);
+            dropdownStatus.RegisterValueChangedCallback(evt =>
+                AktualisiereStatus(lokalerEintrag, evt.newValue));
+        }
 
-    // Hover-Effekte für den Button
-    btnBearbeiten.RegisterCallback<MouseEnterEvent>(_ => btnBearbeiten.style.backgroundColor = new Color(95f / 255f, 95f / 255f, 95f / 255f));
-    btnBearbeiten.RegisterCallback<MouseLeaveEvent>(_ => btnBearbeiten.style.backgroundColor = new Color(75f / 255f, 75f / 255f, 75f / 255f));
+        if (btnBearbeiten  != null) btnBearbeiten.clicked  += () => OnBearbeitenGeklickt(lokalerEintrag.Typ, lokalerEintrag.Nummer);
+        if (btnPfad        != null) btnPfad.clicked        += () => OeffnePfad(lokalerEintrag);
+        if (btnExportieren != null) btnExportieren.clicked += () => ExportiereBeleg(lokalerEintrag);
 
-    // Klick-Event: Ruft die Weiterleitung auf
-    btnBearbeiten.RegisterCallback<ClickEvent>(_ => OnBearbeitenGeklickt(eintrag.Typ, eintrag.Nummer));
+        var zeilenHelp = zeile.Q<VisualElement>("btn-help-exportieren-zeile");
+        if (zeilenHelp != null)
+            HelpTooltip.RegistriereInKarte(_root, zeilenHelp,
+                "Exportiert diesen Beleg als PDF. Mit dem Ordner-Symbol öffnest du den zuletzt gespeicherten Ordner.");
 
-    // Alle Elemente der Zeile hinzufügen
-    zeile.Add(lblBezeichnung);
-    zeile.Add(lblErstellt);
-    zeile.Add(lblFaellig);
-    zeile.Add(statusContainer);
-    zeile.Add(btnBearbeiten); // <-- Button anhängen
-
-    return zeile;
-}
+        return zeile;
+    }
 
     private static Color HoleStatusFarbe(string status)
     {
         return status switch
         {
-            "Angenommen" or "Bezahlt"    => Gruen,
-            "Abgelehnt"  or "Überfällig" => Rot,
-            "Entwurf"    or "Offen"      => Grau,
-            "Versendet"                  => new Color(255f / 255f, 195f / 255f, 0f / 255f),
-            _                            => new Color(180f / 255f, 180f / 255f, 180f / 255f)
+            "Angenommen" or "Bezahlt"                   => Gruen,
+            "Abgelehnt"  or "Überfällig" or "Storniert"  => Rot,
+            "Entwurf"    or "Offen"                      => Grau,
+            "Versendet"                                  => new Color(255f / 255f, 195f / 255f, 0f / 255f),
+            _                                             => new Color(180f / 255f, 180f / 255f, 180f / 255f)
         };
     }
 
@@ -404,109 +373,191 @@ public class BuchhaltungScreenController : MonoBehaviour
         _liste.Add(hinweis);
     }
 
+    // ─────────────────────────────────────────────────
+    // AKTIONEN
+    // ─────────────────────────────────────────────────
+
+    private void AktualisiereStatus(BuchhaltungsEintrag eintrag, string neuerStatus)
+    {
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) return;
+
+        if (eintrag.Typ == "Rechnung")
+        {
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == eintrag.Nummer);
+            if (rechnung == null) return;
+            rechnung.status = neuerStatus;
+
+            // customerName ist bei Invoice [Ignore] und wird nicht in der DB gespeichert -
+            // muss über customerId aus der Customer-Tabelle nachgeladen werden, damit die
+            // Kassenbuch-Beschreibung auch aus der Buchhaltung heraus den Kundennamen enthält.
+            if (rechnung.customerId > 0)
+            {
+                var kunde = db.getCustomerById(rechnung.customerId);
+                if (kunde != null) rechnung.customerName = kunde.name;
+            }
+
+            db.update(rechnung);
+            KassenbuchVerknuepfungController.Aktualisiere(rechnung, db);
+        }
+        else
+        {
+            var angebot = db.getAllOffers()?.Find(o => o.offerNumber == eintrag.Nummer);
+            if (angebot == null) return;
+            angebot.status = neuerStatus;
+            db.update(angebot);
+        }
+
+        eintrag.Status = neuerStatus;
+        Debug.Log($"[Buchhaltung] Status von {eintrag.Typ} {eintrag.Nummer} auf {neuerStatus} geändert.");
+    }
+
     private void OnBearbeitenGeklickt(string typ, string nummer)
-{
-    Debug.Log($"[Buchhaltung] Öffne Bearbeiten-Popup für {typ}: {nummer}");
-
-    if (_root == null)
     {
-        Debug.LogError("[Buchhaltung] _root ist null! Popup kann nicht geöffnet werden.");
-        return;
+        BelegTransfer.AusgewaehlteNummer = nummer;
+        BelegTransfer.IstRechnung = (typ == "Rechnung");
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(typ == "Rechnung" ? "Rechnung" : "Angebot");
     }
 
-    var overlay = _root.Q<VisualElement>("popup-modal-hintergrund");
-    var titelLabel = _root.Q<Label>("popup-titel");
-    var btnSchliessen = _root.Q<Button>("btn-popup-schliessen");
-    
-    var inputKunde = _root.Q<TextField>("popup-input-kunde");
-    var inputRef = _root.Q<TextField>("popup-input-referenz");
-    var dropdownStatus = _root.Q<DropdownField>("popup-dropdown-status");
-    var btnSpeichern = _root.Q<Button>("btn-popup-speichern");
-
-    if (overlay == null || inputKunde == null || inputRef == null || dropdownStatus == null || btnSpeichern == null)
+    private void OeffnePfad(BuchhaltungsEintrag eintrag)
     {
-        Debug.LogError("[Buchhaltung] Eines der Popup-UI-Elemente wurde nicht in der UXML gefunden!");
-        return;
+        var currentUser = StateManager.Instance?.getCurrentUser();
+        if (currentUser == null) { Debug.LogWarning("[Buchhaltung] Kein eingeloggter Nutzer."); return; }
+
+        string username    = GetSafeFolderName(currentUser.username);
+        string unterordner = eintrag.Typ == "Rechnung" ? "Rechnungen" : "Angebote";
+        string ordner       = Path.Combine(Application.persistentDataPath, "PDFs", username, unterordner);
+
+        OeffneOrdner(ordner);
     }
 
-    titelLabel.text = $"{typ} bearbeiten – {nummer}";
-    overlay.RemoveFromClassList("popup-hidden"); 
-
-    // Schließen-Button sicher zuweisen
-    btnSchliessen.clickable.clicked += () => overlay.AddToClassList("popup-hidden");
-
-    var db = UserDatabaseAccess.getCurrentUserDatabase();
-    if (db == null) return;
-
-    List<string> statusOptionen = (typ == "Rechnung") 
-        ? new List<string> { "Entwurf", "Versendet", "Bezahlt", "Abgelehnt" }
-        : new List<string> { "Entwurf", "Versendet", "Angenommen", "Abgelehnt" };
-    
-    dropdownStatus.choices = statusOptionen;
-
-    // Neues Clickable-Objekt zur fehlerfreien Event-Isolierung erstellen
-    btnSpeichern.clickable = new Clickable(() => 
+    private void OeffneOrdner(string filePath)
     {
-        if (typ == "Rechnung")
+        if (string.IsNullOrEmpty(filePath)) { Debug.LogWarning("[Buchhaltung] Kein Pfad vorhanden."); return; }
+
+        string ordner = Directory.Exists(filePath)
+            ? filePath
+            : Path.GetDirectoryName(filePath);
+
+        if (string.IsNullOrEmpty(ordner) || !Directory.Exists(ordner))
         {
-            var rechnungen = db.getAllInvoices();
-            Invoice rechnung = rechnungen?.Find(r => r.invoiceNumber == nummer);
+            Debug.LogWarning("[Buchhaltung] Ordner nicht gefunden: " + ordner);
+            return;
+        }
 
-            if (rechnung != null)
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                rechnung.customerName = inputKunde.value;
-                rechnung.status = dropdownStatus.value;
-                
-                db.update(rechnung);
-                Debug.Log($"[Buchhaltung] Rechnung {nummer} erfolgreich aktualisiert.");
-                
-                overlay.AddToClassList("popup-hidden"); 
-                LadeEintraege(); 
-            }
+                FileName        = ordner,
+                UseShellExecute = true,
+                Verb            = "open"
+            });
         }
-        else if (typ == "Angebot")
+        catch (Exception e)
         {
-            var angebote = db.getAllOffers();
-            Offer angebot = angebote?.Find(o => o.offerNumber == nummer);
-
-            if (angebot != null)
-            {
-                angebot.customerName = inputKunde.value;
-                angebot.status = dropdownStatus.value;
-                
-                db.update(angebot);
-                Debug.Log($"[Buchhaltung] Angebot {nummer} erfolgreich aktualisiert.");
-                
-                overlay.AddToClassList("popup-hidden"); 
-                LadeEintraege();
-            }
-        }
-    });
-
-    // --- POPUP-FELDER VORAB BEFÜLLEN ---
-    // Da kein 'reference'-Feld im Code existiert, leeren wir das Infofeld standardmäßig 
-    // oder nutzen es als reine UI-Zusatzinfo.
-    inputRef.value = ""; 
-
-    if (typ == "Rechnung")
-    {
-        var rechnungen = db.getAllInvoices();
-        Invoice rechnung = rechnungen?.Find(r => r.invoiceNumber == nummer);
-        if (rechnung != null)
-        {
-            inputKunde.value = rechnung.customerName;
-            dropdownStatus.value = rechnung.status;
+            Debug.LogError("[Buchhaltung] Ordner-Fehler: " + e.Message);
         }
     }
-    else if (typ == "Angebot")
+
+    private void ExportiereBeleg(BuchhaltungsEintrag eintrag)
     {
-        var angebote = db.getAllOffers();
-        Offer angebot = angebote?.Find(o => o.offerNumber == nummer);
-        if (angebot != null)
+        var db = UserDatabaseAccess.getCurrentUserDatabase();
+        if (db == null) { Debug.LogWarning("[Buchhaltung] Keine Datenbank."); return; }
+
+        var currentUser = StateManager.Instance?.getCurrentUser();
+        if (currentUser == null) { Debug.LogWarning("[Buchhaltung] Kein eingeloggter Nutzer."); return; }
+
+        string rawUserId = currentUser.userId.Replace("user_", "");
+        if (!int.TryParse(rawUserId, out int userId)) return;
+
+        if (eintrag.Typ == "Rechnung")
         {
-            inputKunde.value = angebot.customerName;
-            dropdownStatus.value = angebot.status;
+            var rechnung = db.getAllInvoices()?.Find(r => r.invoiceNumber == eintrag.Nummer);
+            if (rechnung == null) { Debug.LogWarning("[Buchhaltung] Rechnung nicht gefunden: " + eintrag.Nummer); return; }
+
+            var items = db.getItemsByInvoice(rechnung.id) ?? new List<InvoiceItem>();
+            Debug.Log($"[Buchhaltung] Rechnung-id={rechnung.id}, {items.Count} Positionen geladen.");
+            var anhaenge = HoleGespeicherteAnhaenge(rechnung.selectedAttachments);
+            InvoicePdfExporter.ExportInvoiceToPdf(rechnung, items, userId, db, anhaenge);
+        }
+        else
+        {
+            var angebot = db.getAllOffers()?.Find(a => a.offerNumber == eintrag.Nummer);
+            if (angebot == null) { Debug.LogWarning("[Buchhaltung] Angebot nicht gefunden: " + eintrag.Nummer); return; }
+
+            var items = db.getItemsByOffer(angebot.id) ?? new List<OfferItem>();
+            Debug.Log($"[Buchhaltung] Angebot-id={angebot.id}, {items.Count} Positionen geladen.");
+            var anhaenge = HoleGespeicherteAnhaenge(angebot.selectedAttachments);
+            OfferPdfExporter.ExportOfferToPdf(angebot, items, userId, db, anhaenge);
         }
     }
-}
+
+    // Liest die beim Speichern gewählten Anhänge aus dem Beleg (kommagetrennt gespeichert).
+    // null = Feld existiert noch nicht befüllt (Beleg vor der Migration) -> Fallback auf alle Pflichtdokumente.
+    // "" (leerer String) = bewusst keine Anhänge ausgewählt -> keine hinzufügen.
+    private List<string> HoleGespeicherteAnhaenge(string gespeichert)
+    {
+        if (gespeichert == null)
+            return new List<string>(BelegAnhangController.AnhangSchluessel);
+
+        if (string.IsNullOrWhiteSpace(gespeichert))
+            return new List<string>();
+
+        return gespeichert
+            .Split(',')
+            .Select(s => s.Trim())
+            .Where(s => s.Length > 0)
+            .ToList();
+    }
+
+    // Entspricht GetSafeFolderName aus OfferPdfExporter/InvoicePdfExporter,
+    // damit der Ordnerpfad für den Pfad-Button exakt übereinstimmt.
+    private static string GetSafeFolderName(string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName)) return "User";
+
+        string safeName = folderName.Trim();
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            safeName = safeName.Replace(invalidChar.ToString(), "");
+
+        return string.IsNullOrWhiteSpace(safeName) ? "User" : safeName;
+    }
+
+    // ─────────────────────────────────────────────────
+    // TOOLTIPS
+    // ─────────────────────────────────────────────────
+
+    private void RegistriereHelpTooltips()
+    {
+        HelpTooltip.Registriere(_root, "btn-help-seitentitel",
+            "Das Buchhaltungs-Dashboard zeigt alle Angebote und Rechnungen in einer Übersicht. " +
+            "Du kannst nach Bezeichnung, Art, Erstelldatum, Fälligkeit und Status sortieren. " +
+            "Klicke auf eine Spaltenüberschrift, um die Sortierung zu ändern.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bezeichnung",
+            "Nummer des Angebots oder der Rechnung.");
+
+        HelpTooltip.Registriere(_root, "btn-help-art",
+            "Zeigt an, ob es sich um ein Angebot oder eine Rechnung handelt.");
+
+        HelpTooltip.Registriere(_root, "btn-help-erstellt",
+            "Datum, an dem der Beleg erstellt wurde.");
+
+        HelpTooltip.Registriere(_root, "btn-help-faellig",
+            "Datum, bis zu dem das Angebot gültig ist bzw. an dem die Rechnung fällig wird.");
+
+        HelpTooltip.Registriere(_root, "btn-help-status",
+            "Aktueller Status des Belegs. Kann direkt über das Dropdown in der Zeile geändert werden.");
+
+        HelpTooltip.Registriere(_root, "btn-help-bearbeiten",
+            "Öffnet den Beleg zur Bearbeitung im Angebots- bzw. Rechnungsscreen.");
+
+        HelpTooltip.Registriere(_root, "btn-help-pfad",
+            "Öffnet den Speicherort der zuletzt exportierten Datei.");
+
+        HelpTooltip.Registriere(_root, "btn-help-exportieren",
+            "Exportiert den Beleg als PDF.");
+    }
 }

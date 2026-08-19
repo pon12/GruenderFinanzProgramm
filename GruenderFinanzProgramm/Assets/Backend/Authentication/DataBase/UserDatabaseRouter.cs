@@ -12,7 +12,7 @@ public class UserDatabaseRouter
 
     public UserDatabaseRouter()
     {
-        databaseFolderPath = Path.Combine(Application.dataPath, "Backend/Databases");
+        databaseFolderPath = Path.Combine(Application.persistentDataPath, "Databases");
 
         if (!Directory.Exists(databaseFolderPath))
         {

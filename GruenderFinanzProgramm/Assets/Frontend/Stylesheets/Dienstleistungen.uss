@@ -7,28 +7,29 @@
 }
 
 .add-btn {
-    background-color: rgb(128, 207, 149);
+    background-color: #80CF95;
     color: rgb(0, 0, 0);
     font-size: 16px;
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
-    border-radius: 8px;
+    border-radius: 10px;
     border-top-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
     border-left-width: 0;
-    height: 44px;
+    height: 48px;
     padding-left: 24px;
     padding-right: 24px;
     margin-bottom: 16px;
     align-self: flex-end;
 }
+
 .add-btn:hover {
-    background-color: rgb(179, 226, 196);
+    background-color: #B3E2C4;
 }
 
 .add-btn:active {
-    background-color: rgb(102, 165, 11);
+    background-color: #66A577;
 }
 
 .tabelle-wrapper {
@@ -37,11 +38,11 @@
     border-top-right-radius: 10px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-color: rgb(142, 141, 141);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: #3c3c3c;
     overflow: hidden;
 }
 
@@ -62,27 +63,31 @@
 
 .tabelle-zeile {
     flex-direction: row;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    align-items: center;
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 8px;
     padding-left: 8px;
     padding-right: 8px;
     border-top-width: 2px;
-    border-color: rgb(60, 60, 60);
-    background-color: rgb(38, 38, 38);
-    border-radius: 8px;
+    border-color: #3c3c3c;
+    background-color: #262626;
 }
 
 .tabelle-zeile:hover {
-    background-color: rgb(50, 50, 50);
+    background-color: #313131;
+    border-width: 2px;
+    border-color: #80CF95;
 }
 
 .tabelle-zelle {
-    color: #ffffff;
-    font-size: 15px;
+    color: #FFFFFF;
+    font-size: 16px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
     -unity-text-align: middle-center;
+    text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    padding-right: 8px;
 }
 
 .col-titel {
@@ -99,7 +104,9 @@
 .col-beschreibung {
     width: 35%;
     flex-shrink: 0;
-    -unity-text-align: middle-center;
+    -unity-text-align: middle-left;
+    text-overflow: ellipsis;
+    white-space: normal;
     margin-top: 8px;
     margin-right: 0;
     margin-bottom: 8px;
@@ -140,10 +147,10 @@
     padding: 0;
 }
 
-.zeile-btn {
+.zeile-btn-bearbeiten {
     flex-grow: 0;
     height: 32px;
-    border-radius: 6px;
+    border-radius: 10px;
     border-top-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
@@ -154,16 +161,24 @@
     color: rgb(0, 0, 0);
     background-color: #80CF95;
     margin-right: 8px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.zeile-btn-bearbeiten:hover {
+    background-color: #B3E2C4;
 }
 
 .zeile-btn-loeschen {
-    background-color: rgb(207, 80, 80);
-    color: rgb(255, 255, 255);
+    background-color: #E63946;
+    color: #FFFFFF;
     margin-right: 0;
+}
+
+.zeile-btn-loeschen:hover {
+    background-color: #E56770;
 }
 
 .popup-overlay {
@@ -178,31 +193,31 @@
 }
 
 .popup-box {
-    width: 600px;
-    background-color: rgb(38, 38, 38);
-    border-radius: 16px;
+    width: 800px;
+    background-color: #1E1E1E;
+    border-radius: 20px;
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
-    border-color: rgb(128, 207, 149);
+    border-color: #80CF95;
     padding-top: 32px;
     padding-bottom: 32px;
-    padding-left: 36px;
-    padding-right: 36px;
+    padding-left: 32px;
+    padding-right: 32px;
 }
 
 .popup-titel {
     font-size: 26px;
-    color: rgb(255, 255, 255);
+    color: #FFFFFF;
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .popup-label {
     font-size: 14px;
-    color: rgb(160, 160, 160);
+    color: #FFFFFF;
     margin-bottom: 4px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-SemiBold.ttf?fileID=12800000&guid=8cf7aafec04adfb46bae3114f5129d41&type=3#Poppins-SemiBold");
 }
@@ -210,41 +225,41 @@
 .popup-input {
     height: 40px;
     margin-bottom: 16px;
-    border-radius: 6px;
-    border-color: rgb(80, 80, 80);
-    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    border-color: #505050;
+    color: #FFFFFF;
     font-size: 15px;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
 .popup-input > .unity-base-field__input {
-    background-color: rgb(55, 55, 55);
-    border-color: rgb(80, 80, 80);
-    border-radius: 6px;
-    color: rgb(255, 255, 255);
+    background-color: #2C2C2C;
+    border-color: #505050;
+    border-radius: 10px;
+    color: #FFFFFF;
 }
 
 .popup-dropdown {
     height: 40px;
-    margin-bottom: 14px;
-    border-radius: 6px;
-    border-color: rgb(80, 80, 80);
-    color: rgb(255, 255, 255);
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border-color: #505050;
+    color: #FFFFFF;
     font-size: 15px;
 }
 
 .popup-dropdown > .unity-base-field__input {
-    background-color: rgb(80, 80, 80);
-    border-color: rgb(80, 80, 80);
-    border-radius: 6px;
-    color: rgb(255, 255, 255);
+    background-color: #505050;
+    border-color: #505050;
+    border-radius: 10px;
+    color: #FFFFFF;
     padding-left: 8px;
     margin-left: 0;
 }
 
 .popup-btn-fertig {
-    background-color: rgb(128, 207, 149);
-    color: rgb(0, 0, 0);
+    background-color: #80CF95;
+    color: #000000;
     font-size: 18px;
     -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
@@ -255,12 +270,143 @@
     border-left-width: 0;
     height: 50px;
     margin-top: 8px;
+    width: 50%;
 }
+
 .popup-btn-fertig:hover {
-    background-color: rgb(179, 226, 196);
+    background-color: #B3E2C4;
 }
 
 .popup-btn-fertig:active {
-    background-color: rgb(102, 165, 11);
+    background-color: #66A577;
 }
 
+.popup-btn-abbrechen {
+    background-color: #646464;
+    color: #000000;
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=3621564315749d341aeb8593daa0ea7f&type=3#Poppins-Bold");
+    border-radius: 10px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    height: 50px;
+    margin-top: 8px;
+    width: 50%;
+}
+
+.popup-btn-abbrechen:hover {
+    background-color: #8E8D8D
+}
+
+.popup-btn-abbrechen:active {
+    background-color: #383636
+}
+
+.popup-box {
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(100, 100, 100);
+    background-color: transparent;
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.close-btn:hover {
+    color: #E56770;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+/* =========================================================
+   CONFIRM SPEICHERN POPUP  (basiert auf gespeichert.uxml)
+   ========================================================= */
+
+/* Abdunkelnder Hintergrund */
+.confirm-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dialog-Box */
+.confirm-box {
+    width: 400px;
+    background-color: #1E1E1E;
+    border-radius: 20px;
+    padding: 24px;
+}
+
+/* Titel im Dialog */
+.confirm-titel {
+    -unity-text-align: middle-center;
+    font-size: 20px;
+    color: white;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+/* Text im Dialog */
+.confirm-text {
+    font-size: 14px;
+    color: #FFFFFF;
+    white-space: normal;
+    margin-bottom: 24px;
+}
+
+/* Container für die Buttons */
+.confirm-btn-zeile {
+    flex-direction: row;
+}
+
+/* Abbrechen-Button (Standard & Hover) */
+.btn-dialog-abbrechen {
+    flex-grow: 1;
+    height: 48px;
+    border-radius: 10px;
+    border-width: 0;
+    background-color: #646464;
+    color: white;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.btn-dialog-abbrechen:hover {
+    background-color: #8E8D8D;
+    cursor: link;
+}
+
+/* Löschen-Button (Standard & Hover) */
+.btn-dialog-loeschen {
+    flex-grow: 1;
+    height: 48px;
+    border-radius: 10px;
+    border-width: 0;
+    background-color: #E63946;
+    color: white;
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.btn-dialog-loeschen:hover {
+    background-color: #E56770;
+    cursor: link;
+}

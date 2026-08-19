@@ -120,10 +120,10 @@
     flex-shrink: 0;
     height: 82px;
     overflow: hidden;
-    background-color: rgb(50, 50, 50);
+    background-color: rgb(38, 38, 38);
     border-radius: 8px;
     border-width: 1px;
-    border-color: rgb(65, 65, 65);
+    border-color: rgb(55, 55, 55);
     padding: 12px;
     flex-direction: row;
     align-items: center;
@@ -132,7 +132,7 @@
     transition-duration: 0.12s;
 }
 .doc-mini-slot:hover {
-    border-color: rgb(100, 100, 100);
+    background-color: #333333;
 }
 
 .doc-mini-icon {
@@ -185,18 +185,11 @@
     -unity-font-style: bold;
     padding: 0;
     -unity-text-align: middle-center;
-    transition-property: background-color, border-color;
-    transition-duration: 0.1s;
 }
-.doc-mini-plus:hover {
-    background-color: rgb(128, 207, 149);
-    border-color: rgb(128, 207, 149);
-    color: rgb(20, 20, 20);
-}
-.doc-mini-plus:active {
-    background-color: rgb(108, 176, 127);
-    border-color: rgb(108, 176, 127);
-}
+/* Hover-/Aktiv-Farbe wird bewusst NICHT mehr per :hover-Pseudoklasse
+   gesteuert (siehe WissensdatenbankController.RegistriereEyeButtonHover) -
+   die blieb bei schnellem Mausbewegen zwischen mehreren Icons hängen.
+   Steuerung läuft jetzt komplett über C#/Inline-Style. */
 
 /* ---------- ALLGEMEINE BUTTONS (Styleguide: Primär #80CF95, Sekundär #646464) ---------- */
 .doc-btn-primary {
@@ -239,20 +232,18 @@
 }
 
 .doc-btn-danger-outline {
-    background-color: transparent;
-    color: rgb(230, 57, 70);
-    border-width: 1px;
-    border-color: rgb(230, 57, 70);
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+    border-width: 0;
     border-radius: 8px;
     padding: 12px 24px;
     font-size: 13px;
     -unity-font-style: bold;
-    transition-property: background-color, color;
+    transition-property: background-color;
     transition-duration: 0.1s;
 }
 .doc-btn-danger-outline:hover {
-    background-color: rgb(230, 57, 70);
-    color: rgb(255, 255, 255);
+    background-color: rgb(229, 103, 112);
 }
 .doc-btn-danger-outline:active {
     background-color: rgb(180, 40, 52);
@@ -498,7 +489,8 @@
 /* ---------- BEARBEITEN-POPUP ---------- */
 .edit-popup-box {
     width: 100%;
-    max-width: 520px;
+    max-width: 640px;
+    max-height: 90%;
     padding: 28px;
     flex-direction: column;
 }

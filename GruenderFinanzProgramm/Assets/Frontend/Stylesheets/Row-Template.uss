@@ -1,47 +1,6 @@
-.row-item {
-    flex-direction: row;
-    align-items: center;
-    background-color: #121212; /* Etwas dunkleres Grau für die Karten */
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 10px;
-    height: 70px;
-}
-
-.row-item:hover {
-    background-color: rgb(26, 26, 26);
-}
-
-.row-text-main {
-    color: rgb(255, 255, 255);
-    font-size: 16px;
-    -unity-font-style: bold;
-}
-
-.row-text-sub {
-    color: rgb(161, 161, 165);
-    font-size: 15px;
-}
-
-.col-bezeichnung {
-    flex-basis: 35%;
-}
-
-.col-art {
-    flex-basis: 20%;
-}
-
-.col-format {
-    flex-basis: 15%;
-    padding-right: 15px;
-}
-
-.col-pfad {
-    flex-basis: 30%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-}
+/* Spalten-/Zeilen-Basisdesign kommt jetzt einheitlich aus Export.uss
+   (.tabelle-zeile, .tabelle-zelle, .col-bezeichnung usw.) - hier nur noch
+   die Export-spezifischen Steuerelemente (Dropdown, Ordner-Button). */
 
 .format-dropdown {
     background-color: rgb(44, 44, 46);
@@ -62,47 +21,4 @@
 
 .btn-folder:hover {
     background-color: rgb(58, 58, 60);
-}
-
-.btn-export {
-    background-color: rgb(85, 212, 139);
-    color: rgb(255, 255, 255);
-    font-size: 14px;
-    -unity-font-style: bold;
-    padding: 8px 20px;
-    border-radius: 20px;
-    border-width: 0;
-    transition-property: background-color;
-    transition-duration: 0.15s;
-}
-
-.btn-export:hover {
-    background-color: rgb(68, 189, 118);
-}
-
-.btn-export:active {
-    background-color: rgb(51, 153, 93);
-}
-
-/* Standard – kein Hintergrundwechsel */
-.row-item {
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-top-color: rgba(0, 0, 0, 0);
-    border-right-color: rgba(0, 0, 0, 0);
-    border-bottom-color: rgba(0, 0, 0, 0);
-    border-left-color: rgba(0, 0, 0, 0);
-    transition-property: border-color;
-    transition-duration: 0.12s;
-}
-
-/* Hover – grüner Rahmen statt Hintergrundwechsel */
-.row-item:hover {
-    border-top-color: rgb(128, 207, 149);
-    border-right-color: rgb(128, 207, 149);
-    border-bottom-color: rgb(128, 207, 149);
-    border-left-color: rgb(128, 207, 149);
-    background-color: rgba(0, 0, 0, 0);
 }

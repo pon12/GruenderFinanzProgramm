@@ -2,14 +2,14 @@
     <Style src="project://database/Assets/Frontend/Stylesheets/DashboardStyles.uss?fileID=7433441132597879392&amp;guid=fe9c9a54b138ecc469e247e562306177&amp;type=3#DashboardStyles"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <ui:VisualElement name="main-content" style="flex-grow: 1; padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 430px; background-color: rgb(30, 30, 30);">
-        <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 8px;">
-            <ui:Label text="Dashboard" style="font-size: 32px; -unity-font-style: bold; color: rgb(255, 255, 255);"/>
+        <ui:VisualElement name="row-kopfzeile" style="flex-direction: row; align-items: center; margin-bottom: 8px;">
+            <ui:Label text="Dashboard" name="label-titel" style="font-size: 32px; -unity-font-style: bold; color: rgb(255, 255, 255);"/>
             <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px;"/>
         </ui:VisualElement>
         <ui:VisualElement name="progress-section" class="progress-section">
             <ui:VisualElement name="progress-header" class="progress-header">
                 <ui:Label text="Dokumenten-Vollständigkeit" name="section-title" class="section-title"/>
-                <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="spacer-fortschritt-titel" style="flex-grow: 1;"/>
                 <ui:Label text="45%" name="lbl-progress-percent" class="progress-percent"/>
                 <ui:VisualElement name="btn-help-fortschritt" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
             </ui:VisualElement>
@@ -18,40 +18,40 @@
                     <ui:VisualElement name="seg-bg-stammdaten" class="seg-bg">
                         <ui:VisualElement name="seg-fill-stammdaten" class="seg-fill"/>
                     </ui:VisualElement>
-                    <ui:Label text="Stammdaten" class="seg-label"/>
+                    <ui:Label text="Stammdaten" name="label-seg-stammdaten" class="seg-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="seg-vertraege" class="progress-segment-wrap">
                     <ui:VisualElement name="seg-bg-vertraege" class="seg-bg">
                         <ui:VisualElement name="seg-fill-vertraege" class="seg-fill"/>
                     </ui:VisualElement>
-                    <ui:Label text="Verträge" class="seg-label"/>
+                    <ui:Label text="Verträge" name="label-seg-vertraege" class="seg-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="seg-steuer" class="progress-segment-wrap">
                     <ui:VisualElement name="seg-bg-steuer" class="seg-bg">
                         <ui:VisualElement name="seg-fill-steuer" class="seg-fill"/>
                     </ui:VisualElement>
-                    <ui:Label text="Steuerunterlagen" class="seg-label"/>
+                    <ui:Label text="Steuerunterlagen" name="label-seg-steuer" class="seg-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="seg-rechnungen" class="progress-segment-wrap">
                     <ui:VisualElement name="seg-bg-rechnungen" class="seg-bg">
                         <ui:VisualElement name="seg-fill-rechnungen" class="seg-fill"/>
                     </ui:VisualElement>
-                    <ui:Label text="Rechnungen" class="seg-label"/>
+                    <ui:Label text="Rechnungen" name="label-seg-rechnungen" class="seg-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="seg-sonstiges" class="progress-segment-wrap">
                     <ui:VisualElement name="seg-bg-sonstiges" class="seg-bg">
                         <ui:VisualElement name="seg-fill-sonstiges" class="seg-fill"/>
                     </ui:VisualElement>
-                    <ui:Label text="Sonstiges" class="seg-label"/>
+                    <ui:Label text="Sonstiges" name="label-seg-sonstiges" class="seg-label"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="stats-grid" style="flex-grow: 0; flex-direction: row; margin-bottom: 16px;">
             <ui:VisualElement name="stat-kunden-wrap" style="flex-grow: 1; flex-basis: 0; flex-direction: column; margin-right: 12px;">
                 <ui:VisualElement name="stat-kunden" class="stat-card" style="margin-bottom: 8px;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center;">
-                        <ui:Label text="Kunden hinterlegt" class="stat-title"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                    <ui:VisualElement name="row-titel-kunden" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Kunden hinterlegt" name="label-titel-kunden" class="stat-title"/>
+                        <ui:VisualElement name="spacer-titel-kunden" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-kunden" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:Label text="0" name="lbl-kunden" class="stat-value"/>
@@ -60,9 +60,9 @@
             </ui:VisualElement>
             <ui:VisualElement name="stat-angebote-wrap" style="flex-grow: 1; flex-basis: 0; flex-direction: column; margin-right: 12px;">
                 <ui:VisualElement name="stat-angebote" class="stat-card" style="margin-bottom: 8px;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center;">
-                        <ui:Label text="Angebote erstellt" class="stat-title"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                    <ui:VisualElement name="row-titel-angebote" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Angebote erstellt" name="label-titel-angebote" class="stat-title"/>
+                        <ui:VisualElement name="spacer-titel-angebote" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-angebote" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:Label text="0" name="lbl-angebote" class="stat-value"/>
@@ -71,9 +71,9 @@
             </ui:VisualElement>
             <ui:VisualElement name="stat-rechnungen-wrap" style="flex-grow: 1; flex-basis: 0; flex-direction: column; margin-right: 12px;">
                 <ui:VisualElement name="stat-rechnungen" class="stat-card" style="margin-bottom: 8px;">
-                    <ui:VisualElement style="flex-direction: row; align-items: center;">
-                        <ui:Label text="Rechnungen gestellt" class="stat-title"/>
-                        <ui:VisualElement style="flex-grow: 1;"/>
+                    <ui:VisualElement name="row-titel-rechnungen-gestellt" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Rechnungen gestellt" name="label-titel-rechnungen-gestellt" class="stat-title"/>
+                        <ui:VisualElement name="spacer-titel-rechnungen-gestellt" style="flex-grow: 1;"/>
                         <ui:VisualElement name="btn-help-rechnungen" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:Label text="0" name="lbl-rechnungen" class="stat-value"/>
@@ -81,19 +81,19 @@
                 <ui:Button text="Rechnung erstellen" name="btn-nav-rechnung" class="btn-stat-nav"/>
             </ui:VisualElement>
             <ui:VisualElement name="stat-finanz-wrap" style="flex-grow: 2; flex-basis: 0; flex-direction: column;">
-                <ui:VisualElement style="flex-direction: row; margin-bottom: 8px;">
+                <ui:VisualElement name="row-finanz-karten" style="flex-direction: row; margin-bottom: 8px;">
                     <ui:VisualElement name="stat-kassenbuch" class="stat-card" style="flex-grow: 1; flex-basis: 0; margin-right: 12px;">
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
-                            <ui:Label text="Kassenbuch-Umsatz Jahr" class="stat-title"/>
-                            <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="row-titel-kassenbuch-umsatz" style="flex-direction: row; align-items: center;">
+                            <ui:Label text="Kassenbuch-Umsatz Jahr" name="label-titel-kassenbuch-umsatz" class="stat-title"/>
+                            <ui:VisualElement name="spacer-titel-kassenbuch-umsatz" style="flex-grow: 1;"/>
                             <ui:VisualElement name="btn-help-kassenbuch-umsatz" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Label text="€0" name="lbl-kassenbuch" class="stat-value"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="stat-kontostand" class="stat-card" style="flex-grow: 1; flex-basis: 0;">
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
-                            <ui:Label text="Dein Kontostand ist:" class="stat-title"/>
-                            <ui:VisualElement style="flex-grow: 1;"/>
+                        <ui:VisualElement name="row-titel-kontostand" style="flex-direction: row; align-items: center;">
+                            <ui:Label text="Dein Kontostand ist:" name="label-titel-kontostand" class="stat-title"/>
+                            <ui:VisualElement name="spacer-titel-kontostand" style="flex-grow: 1;"/>
                             <ui:VisualElement name="btn-help-kontostand" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:Label text="€0" name="lbl-kontostand" class="stat-value stat-value-green"/>
@@ -104,40 +104,40 @@
         </ui:VisualElement>
         <ui:VisualElement name="bottom-row" style="flex-grow: 1; flex-direction: row;">
             <ui:VisualElement name="kassenbuch-statistik-panel" class="panel-half" style="flex-grow: 1;">
-                <ui:VisualElement style="flex-direction: row; align-items: center;">
-                    <ui:Label text="Jährliche Kassenbuch-Statistik" class="panel-title"/>
-                    <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="row-titel-kassenbuch-statistik" style="flex-direction: row; align-items: center;">
+                    <ui:Label text="Jährliche Kassenbuch-Statistik" name="label-titel-kassenbuch-statistik" class="panel-title"/>
+                    <ui:VisualElement name="spacer-titel-kassenbuch-statistik" style="flex-grow: 1;"/>
                     <ui:VisualElement name="btn-help-kassenbuch-statistik" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="chart-container" class="chart-container">
                     <ui:VisualElement name="chart-y-axis" class="chart-y-axis">
-                        <ui:Label text="€0" class="chart-axis-label"/>
-                        <ui:Label text="€0" class="chart-axis-label"/>
-                        <ui:Label text="€0" class="chart-axis-label"/>
-                        <ui:Label text="€0" class="chart-axis-label"/>
-                        <ui:Label text="€0" class="chart-axis-label"/>
+                        <ui:Label text="€0" name="label-chart-achse-1" class="chart-axis-label"/>
+                        <ui:Label text="€0" name="label-chart-achse-2" class="chart-axis-label"/>
+                        <ui:Label text="€0" name="label-chart-achse-3" class="chart-axis-label"/>
+                        <ui:Label text="€0" name="label-chart-achse-4" class="chart-axis-label"/>
+                        <ui:Label text="€0" name="label-chart-achse-5" class="chart-axis-label"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="chart-canvas" class="chart-canvas"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="chart-x-axis" class="chart-x-axis">
-                    <ui:Label text="Jan" class="chart-month-label"/>
-                    <ui:Label text="Feb" class="chart-month-label"/>
-                    <ui:Label text="Mär" class="chart-month-label"/>
-                    <ui:Label text="Apr" class="chart-month-label"/>
-                    <ui:Label text="Mai" class="chart-month-label"/>
-                    <ui:Label text="Jun" class="chart-month-label"/>
-                    <ui:Label text="Jul" class="chart-month-label"/>
-                    <ui:Label text="Aug" class="chart-month-label"/>
-                    <ui:Label text="Sep" class="chart-month-label"/>
-                    <ui:Label text="Okt" class="chart-month-label"/>
-                    <ui:Label text="Nov" class="chart-month-label"/>
-                    <ui:Label text="Dez" class="chart-month-label"/>
+                    <ui:Label text="Jan" name="label-chart-monat-jan" class="chart-month-label"/>
+                    <ui:Label text="Feb" name="label-chart-monat-feb" class="chart-month-label"/>
+                    <ui:Label text="Mär" name="label-chart-monat-mar" class="chart-month-label"/>
+                    <ui:Label text="Apr" name="label-chart-monat-apr" class="chart-month-label"/>
+                    <ui:Label text="Mai" name="label-chart-monat-mai" class="chart-month-label"/>
+                    <ui:Label text="Jun" name="label-chart-monat-jun" class="chart-month-label"/>
+                    <ui:Label text="Jul" name="label-chart-monat-jul" class="chart-month-label"/>
+                    <ui:Label text="Aug" name="label-chart-monat-aug" class="chart-month-label"/>
+                    <ui:Label text="Sep" name="label-chart-monat-sep" class="chart-month-label"/>
+                    <ui:Label text="Okt" name="label-chart-monat-okt" class="chart-month-label"/>
+                    <ui:Label text="Nov" name="label-chart-monat-nov" class="chart-month-label"/>
+                    <ui:Label text="Dez" name="label-chart-monat-dez" class="chart-month-label"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="kalender-panel" class="panel-half" style="flex-grow: 1;">
-                <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 4px;">
-                    <ui:Label text="Fristenkalender" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255);"/>
-                    <ui:VisualElement style="flex-grow: 1;"/>
+                <ui:VisualElement name="row-titel-fristenkalender" style="flex-direction: row; align-items: center; margin-bottom: 4px;">
+                    <ui:Label text="Fristenkalender" name="label-titel-fristenkalender" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 255, 255);"/>
+                    <ui:VisualElement name="spacer-titel-fristenkalender" style="flex-grow: 1;"/>
                     <ui:VisualElement name="btn-help-kalender" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="kalender-nav" class="kalender-nav">
@@ -147,13 +147,13 @@
                     <ui:Button text="›" name="btn-next-month" class="btn-cal-nav"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="kalender-weekdays" class="kalender-weekdays">
-                    <ui:Label text="So" class="cal-wd-label"/>
-                    <ui:Label text="Mo" class="cal-wd-label"/>
-                    <ui:Label text="Di" class="cal-wd-label"/>
-                    <ui:Label text="Mi" class="cal-wd-label"/>
-                    <ui:Label text="Do" class="cal-wd-label"/>
-                    <ui:Label text="Fr" class="cal-wd-label"/>
-                    <ui:Label text="Sa" class="cal-wd-label"/>
+                    <ui:Label text="So" name="label-wochentag-so" class="cal-wd-label"/>
+                    <ui:Label text="Mo" name="label-wochentag-mo" class="cal-wd-label"/>
+                    <ui:Label text="Di" name="label-wochentag-di" class="cal-wd-label"/>
+                    <ui:Label text="Mi" name="label-wochentag-mi" class="cal-wd-label"/>
+                    <ui:Label text="Do" name="label-wochentag-do" class="cal-wd-label"/>
+                    <ui:Label text="Fr" name="label-wochentag-fr" class="cal-wd-label"/>
+                    <ui:Label text="Sa" name="label-wochentag-sa" class="cal-wd-label"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="kalender-grid" class="kalender-grid">
                     <ui:Button name="cal-day-0" text="" class="cal-day"/>

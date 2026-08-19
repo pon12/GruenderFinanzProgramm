@@ -252,7 +252,7 @@
     margin: 0 6px;
     background-color: #646464;
     border-color: #646464;
-    border-width: 1px;
+    border-width: 0px;
     border-radius: 6px;
     color: #ffffff;
     font-size: 13px;
@@ -315,6 +315,9 @@
     -unity-text-align: middle-center;
     cursor: link;
     min-height: 32px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 .cal-day:hover {
     background-color: #3A3A3A;
@@ -327,12 +330,47 @@
     border-radius: 6px;
 }
 .cal-day-today:hover {
-    background-color: #6BBF82;
+    background-color: #B3E2C4;
     color: #1E1E1E;
 }
 .cal-day-other-month {
     color: #3A3A3A;
     font-weight: normal;
+}
+
+/* Zahl + Badge innerhalb einer Kalenderzelle (ersetzt den frueheren
+   einfachen Button-Text, damit Platz fuer die A:/R:-Badge ist) */
+.cal-day-zahl {
+    font-size: 13px;
+    font-weight: bold;
+    color: #cccccc;
+    -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+.cal-day:hover .cal-day-zahl {
+    color: #ffffff;
+}
+.cal-day-today .cal-day-zahl {
+    color: #1E1E1E;
+}
+.cal-day-today:hover .cal-day-zahl {
+    color: #1E1E1E;
+}
+.cal-day-other-month .cal-day-zahl {
+    color: #3A3A3A;
+}
+.cal-day-badge {
+    min-height: 12px;
+    margin-top: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    color: #E63946;
+    -unity-text-align: middle-center;
+    padding: 0;
+}
+.cal-day-today .cal-day-badge {
+    color: #7A1620;
 }
 
 /* Leeres Feld (Platzhalter vor/nach dem aktuellen Monat) – komplett unsichtbar,
@@ -368,11 +406,31 @@
     background-color: #505050;
 }
 
+.btn-detail {
+    background-color: #646464;
+    color: #ffffff;
+    border-width: 0px;
+    border-radius: 6px;
+    cursor: link;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+
+.btn-detail:hover {
+    background-color: #8E8D8D;
+    border-width: 0;
+    scale: 1 1;
+}
+
+.btn-detail:active {
+    background-color: #383636;
+}
+
 /* Deadline-Marker: kleiner Punkt unter der Zahl wenn an dem Tag
    ein Angebot/Rechnung fällig ist. Wird per C# als Klasse gesetzt. */
 .cal-day-deadline {
     border-width: 1px;
-    border-color: #E07A2F;
+    border-color: #E63946;
 }
 .cal-day-deadline:hover {
     border-color: #ffffff;

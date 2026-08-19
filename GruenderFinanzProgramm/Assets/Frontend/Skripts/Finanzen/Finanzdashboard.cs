@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
@@ -192,6 +193,10 @@ private void OeffneFinanzen1()
         }
 
         umsatzLabel.text = gesamtumsatz.ToString("N2") + " €";
+        // FIX: Wert war immer einheitlich weiß, unabhängig vom Vorzeichen.
+        umsatzLabel.style.color = gesamtumsatz >= 0
+            ? new StyleColor(new Color(0.502f, 0.812f, 0.584f, 1f))
+            : new StyleColor(new Color(0.902f, 0.224f, 0.275f, 1f));
 
         Debug.Log("[Finanzdashboard] Gesamtumsatz: " + gesamtumsatz);
     }
@@ -242,6 +247,11 @@ private void OeffneFinanzen1()
         float gewinn = einnahmen - ausgaben;
 
         gewinnLabel.text = gewinn.ToString("N2") + " €";
+        // FIX: Wert war immer einheitlich weiß, unabhängig vom Vorzeichen -
+        // ein Verlust sah optisch genauso aus wie ein Gewinn.
+        gewinnLabel.style.color = gewinn >= 0
+            ? new StyleColor(new Color(0.502f, 0.812f, 0.584f, 1f))
+            : new StyleColor(new Color(0.902f, 0.224f, 0.275f, 1f));
 
         Debug.Log(
             $"[Finanzdashboard] Gewinn: {gewinn} € | Einnahmen: {einnahmen} € | Ausgaben: {ausgaben} €"
@@ -280,18 +290,59 @@ private void OeffneFinanzen1()
 
         Debug.Log("Services gefunden: " + services.Count);
 
-        // Nur Top 3
-        int count = 0;
-        foreach (Service service in services)
-        {
-            if (count >= 3) break;
+        // FIX: Vorher wurden einfach die ersten 3 Einträge in DB-Reihenfolge
+        // gezeigt (nicht nach Nutzung sortiert) - der Titel verspricht aber
+        // "deine meistgenutzten Dienstleistungen". Jetzt wird echt gezählt,
+        // wie oft jede Dienstleistung in Angeboten/Rechnungen als Position
+        // vorkommt (Positionstext == Dienstleistungsname), und danach
+        // absteigend sortiert.
+        var nutzungProDienstleistung = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-            Label row = new Label("• " + service.name);
+        var alleAngebote = db.getAllOffers() ?? new List<Offer>();
+        foreach (var angebot in alleAngebote)
+        {
+            var positionen = db.getItemsByOffer(angebot.id);
+            if (positionen == null) continue;
+            foreach (var position in positionen)
+            {
+                if (string.IsNullOrWhiteSpace(position.description)) continue;
+                nutzungProDienstleistung.TryGetValue(position.description, out int bisher);
+                nutzungProDienstleistung[position.description] = bisher + Mathf.Max(position.quantity, 1);
+            }
+        }
+
+        var alleRechnungen = db.getAllInvoices() ?? new List<Invoice>();
+        foreach (var rechnung in alleRechnungen)
+        {
+            var positionen = db.getItemsByInvoice(rechnung.id);
+            if (positionen == null) continue;
+            foreach (var position in positionen)
+            {
+                if (string.IsNullOrWhiteSpace(position.description)) continue;
+                nutzungProDienstleistung.TryGetValue(position.description, out int bisher);
+                nutzungProDienstleistung[position.description] = bisher + Mathf.Max(position.quantity, 1);
+            }
+        }
+
+        int UsageOf(Service s) =>
+            !string.IsNullOrEmpty(s.name) && nutzungProDienstleistung.TryGetValue(s.name, out int n) ? n : 0;
+
+        List<Service> topDrei = services
+            .OrderByDescending(UsageOf)
+            .ThenBy(s => s.id)
+            .Take(3)
+            .ToList();
+
+        foreach (Service service in topDrei)
+        {
+            int nutzung = UsageOf(service);
+            string text = nutzung > 0 ? $"• {service.name} ({nutzung}x)" : $"• {service.name}";
+
+            Label row = new Label(text);
             row.style.color = Color.white;
             row.style.fontSize = 16;
             row.style.marginBottom = 6;
             ranking.Add(row);
-            count++;
         }
 
         if (services.Count == 0)
@@ -598,6 +649,19 @@ private void OeffneFinanzen1()
         ApplyTextStyle(statusLabel, false);
         ApplyTextStyle(countLabel, false);
 
+        // FIX: Vorher waren alle 4 Status-Zeilen einheitlich weiß gefärbt -
+        // keine visuelle Unterscheidung, in welchem Zustand sich ein
+        // Angebot/eine Rechnung befindet. Jetzt farblich abgesetzt.
+        Color statusFarbe = status switch
+        {
+            "Abgelehnt"  => new Color(0.902f, 0.224f, 0.275f, 1f), // Rot
+            "Angenommen" => new Color(0.502f, 0.812f, 0.584f, 1f), // Grün (Marken-Grün)
+            "Versendet"  => new Color(0.180f, 0.702f, 0.400f, 1f), // Kräftigeres, dunkleres Grün
+            _            => Color.white                            // "Entwurf" -> weiß/grau (Standard)
+        };
+        statusLabel.style.color = statusFarbe;
+        countLabel.style.color  = statusFarbe;
+
         row.Add(statusLabel);
         row.Add(countLabel);
 
@@ -631,17 +695,22 @@ private void OeffneFinanzen1()
         Label label = Root.Q<Label>("OffeneRechnungen");
         if (label == null) return;
 
+        // FIX (Chef-Wunsch): "bei offene Rechnung darunter Rechnungen
+        // gesamt wäre vll noch cool" - zusätzliche Gesamtanzahl ergänzt.
+        Label labelGesamt = Root.Q<Label>("RechnungenGesamt");
+
         var db = UserDatabaseAccess.getCurrentUserDatabase();
-        if (db == null) { label.text = "0"; return; }
+        if (db == null) { label.text = "0"; if (labelGesamt != null) labelGesamt.text = "0 Rechnungen gesamt"; return; }
 
         var invoices = db.getAllInvoices();
-        if (invoices == null) { label.text = "0"; return; }
+        if (invoices == null) { label.text = "0"; if (labelGesamt != null) labelGesamt.text = "0 Rechnungen gesamt"; return; }
 
         int count = 0;
         foreach (var r in invoices)
             if (r != null && r.status == "Angenommen") count++;
 
         label.text = count.ToString();
+        if (labelGesamt != null) labelGesamt.text = $"{invoices.Count} Rechnungen gesamt";
     }
 
     // ============================================================

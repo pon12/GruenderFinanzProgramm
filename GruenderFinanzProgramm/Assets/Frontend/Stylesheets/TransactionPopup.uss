@@ -16,6 +16,8 @@
 
 .table-wrapper {
     flex-direction: column;
+    width: 100%;
+    overflow: hidden;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -132,6 +134,30 @@
     flex-grow: 1;
 }
 
+/* Datenzeilen: dezenter Hover + minimaler Rundung, damit es wie
+   ein einheitliches System mit z.B. dem Dienstleistungen-Screen wirkt.
+   Bewusst auf .table-body beschränkt, damit der Header (der ebenfalls
+   die Klasse .row trägt) davon unberührt bleibt. */
+.table-body .row {
+    border-radius: 6px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.table-body .row:hover {
+    background-color: rgb(53, 53, 53);
+}
+
+/* Sortierbare Spaltenköpfe: Hover-Feedback, damit klar ist,
+   dass man draufklicken kann. Aktive Sortierspalte wird per
+   C# (KassenbuchController.AktualisiereSortPfeile) weiß eingefärbt. */
+.row-header .cell {
+    transition-property: color;
+    transition-duration: 0.1s;
+}
+.row-header .cell:hover {
+    color: rgb(255, 255, 255);
+}
+
 /* =====================================================
    POPUP-OVERLAY
    ===================================================== */
@@ -139,8 +165,10 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 1920px;
-    height: 1080px;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.55);
     align-items: center;
     justify-content: center;
@@ -233,13 +261,17 @@
     color: rgb(28, 28, 28);
     margin-right: 8px;
 }
-.btn-primary:hover { background-color: rgb(107, 191, 130); }
+.btn-primary:hover { background-color: rgb(179, 226, 196); }
 
 .btn-secondary {
-    background-color: rgb(80, 80, 80);
-    color: rgb(255, 255, 255);
+    background-color: rgb(100, 100, 100);
 }
-.btn-secondary:hover { background-color: rgb(100, 100, 100); }
+.btn-secondary:hover { background-color: rgb(142, 141, 141); }
+
+.btn-popup-close:hover {
+    background-color: rgba(230, 103, 112, 0.7);
+    
+}
 
 /* =====================================================
    HEADER-ZEILE & JAHRES-DROPDOWN
@@ -285,11 +317,11 @@
     -unity-text-align: middle-center;
 }
 .btn-action-3er.btn-red  { background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); }
-.btn-action-3er.btn-red:hover { background-color: rgb(208, 45, 57); }
+.btn-action-3er.btn-red:hover { background-color: rgb(2229, 103, 112); }
 .btn-action-3er.btn-green { background-color: rgb(128, 207, 149); color: rgb(28, 28, 28); }
-.btn-action-3er.btn-green:hover { background-color: rgb(107, 191, 130); }
+.btn-action-3er.btn-green:hover { background-color: rgb(179, 226, 196); }
 .btn-action-3er.btn-export-finanzamt { background-color: rgb(100, 100, 100); color: rgb(255,255,255); }
-.btn-action-3er.btn-export-finanzamt:hover { background-color: rgb(120, 120, 120); }
+.btn-action-3er.btn-export-finanzamt:hover { background-color: rgb(142, 141, 141); }
 
 /* =====================================================
    KALENDER-WIDGET

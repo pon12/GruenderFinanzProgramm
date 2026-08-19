@@ -5,7 +5,8 @@ using UnityEngine.UIElements;
 public class RechnungController : BelegScreenController
 {
     protected override string BelegTyp      => "Rechnung";
-    protected override string NummernPrefix => "RG-NR";
+    protected override string NummernPrefix =>
+        PlayerPrefs.GetString("settings_rechnr_praefix", "RG-NR");
 
     // Verhindert doppelte Kassenbucheinträge innerhalb einer Session
     private bool _insKassenbuchGebucht = false;
@@ -52,12 +53,10 @@ public class RechnungController : BelegScreenController
     // Trägt den Betrag ins Kassenbuch ein, falls Status "Bezahlt" und noch nicht gebucht.
     protected override void NachSpeichernHook()
     {
-        var statusDropdown = Root.Q<DropdownField>(StatusDropdownName);
-        if (statusDropdown?.value == "Bezahlt" && !_insKassenbuchGebucht)
-        {
-            UebernimmInsKassenbuch();
-            _insKassenbuchGebucht = true;
-        }
+        // UebernimmInsKassenbuch entscheidet jetzt selbst anhand des Status,
+        // ob gebucht, der Betrag aktualisiert oder der Eintrag entfernt wird.
+        UebernimmInsKassenbuch();
+        _insKassenbuchGebucht = true;
     }
 
     protected override void AktualisiereStatusButtons(string status)

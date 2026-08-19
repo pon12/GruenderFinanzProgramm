@@ -33,111 +33,126 @@ public class AngebotController : BelegScreenController
     }
 
     private void WandleLetztesAngebotInRechnungUm()
-{
-    try
     {
-        if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
-            return;
-
-        if (!PflichtfelderGefuellt())
-            return;
-
-        DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
-
-        if (db == null)
+        try
         {
-            FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
-            return;
-        }
+            if (!VoraussetzungsPopup.Pruefen(Root, PruefePflichtdaten()))
+                return;
 
-        _statusDropdown?.SetValueWithoutNotify("Angenommen");
+            if (!PflichtfelderGefuellt())
+                return;
 
-        float netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+            DataBase db = UserDatabaseAccess.getCurrentUserDatabase();
 
-        float rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
-        string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
-
-        float rabatt = 0f;
-
-        if (rabattTyp == "Prozent")
-            rabatt = netto * rabattWert / 100f;
-        else if (rabattTyp == "Festbetrag")
-            rabatt = rabattWert;
-
-        float mwstSatz = HoleMwstSatz();
-        float steuerBasis = netto - rabatt;
-        float steuer = steuerBasis * mwstSatz;
-        float zwischenbetrag = steuerBasis + steuer;
-
-        float skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
-        float skonto = zwischenbetrag * skontoProzent / 100f;
-
-        float finalTotal = zwischenbetrag - skonto;
-
-        Offer offer = new Offer
-        {
-            customerId = _ausgewaehlterKundeId,
-            customerName = _ausgewaehlterKunde,
-            customerAddress = _ausgewaehlterKundeAdresse,
-            companyName = HoleCompanyName(db),
-            companyAddress = HoleCompanyAddress(db),
-            offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
-            date = _datumFeld != null ? _datumFeld.value : System.DateTime.Now.ToString("dd.MM.yyyy"),
-            validUntil = _fristFeld != null ? _fristFeld.value : "",
-            status = "Angenommen",
-            subtotal = netto,
-            discount = rabatt,
-            extraCosts = skonto,
-            tax = steuer,
-            total = finalTotal,
-            notes = _notizenFeld != null ? _notizenFeld.value : "",
-            bookedToCashbook = false,
-            cashbookEntryId = 0,
-            bookingDate = ""
-        };
-
-        int offerId = db.createOffer(offer);
-
-        BelegTransferData.Clear();
-
-        BelegTransferData.hasTransfer = true;
-        BelegTransferData.customerId = _ausgewaehlterKundeId;
-        BelegTransferData.customerName = _ausgewaehlterKunde;
-        BelegTransferData.customerAddress = _ausgewaehlterKundeAdresse;
-        BelegTransferData.date = _datumFeld != null ? _datumFeld.value : "";
-        BelegTransferData.dueDate = _fristFeld != null ? _fristFeld.value : "";
-        BelegTransferData.notes = _notizenFeld != null ? _notizenFeld.value : "";
-        BelegTransferData.rabatt = rabatt;
-        BelegTransferData.skonto = skonto;
-
-        foreach (var zeile in _zeilen.ToList())
-        {
-            OfferItem offerItem = new OfferItem
+            if (db == null)
             {
-                offerId = offerId,
-                articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
-                description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
-                quantity = Mathf.RoundToInt(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0")),
-                unitPrice = ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0")
+                FeedbackPopup.Show(Root, "Keine Datenbank gefunden", FeedbackTyp.Fehler);
+                return;
+            }
+
+            _statusDropdown?.SetValueWithoutNotify("Angenommen");
+
+            double netto = ParseBetrag(_nettoLabel != null ? _nettoLabel.text : "0");
+
+            double rabattWert = ParseBetrag(_rabattWertFeld != null ? _rabattWertFeld.value : "0");
+            string rabattTyp = _rabattTypDropdown != null ? _rabattTypDropdown.value : "Kein Rabatt";
+
+            double rabatt = 0.0;
+
+            if (rabattTyp == "Prozent")
+                rabatt = System.Math.Round(netto * rabattWert / 100.0, 2, System.MidpointRounding.AwayFromZero);
+            else if (rabattTyp == "Festbetrag")
+                rabatt = System.Math.Round(rabattWert, 2, System.MidpointRounding.AwayFromZero);
+
+            double mwstSatz = HoleMwstSatz();
+            double steuerBasis = System.Math.Round(netto - rabatt, 2, System.MidpointRounding.AwayFromZero);
+            double steuer = System.Math.Round(steuerBasis * mwstSatz, 2, System.MidpointRounding.AwayFromZero);
+            double zwischenbetrag = System.Math.Round(steuerBasis + steuer, 2, System.MidpointRounding.AwayFromZero);
+
+            double skontoProzent = ParseBetrag(_skontoWertFeld != null ? _skontoWertFeld.value : "0");
+            double skonto = System.Math.Round(zwischenbetrag * skontoProzent / 100.0, 2, System.MidpointRounding.AwayFromZero);
+
+            double finalTotal = System.Math.Round(zwischenbetrag - skonto, 2, System.MidpointRounding.AwayFromZero);
+
+            Offer offer = new Offer
+            {
+                customerId = _ausgewaehlterKundeId,
+                customerName = _ausgewaehlterKunde,
+                customerAddress = _ausgewaehlterKundeAdresse,
+                companyName = HoleCompanyName(db),
+                companyAddress = HoleCompanyAddress(db),
+                offerNumber = _nummerFeld != null ? _nummerFeld.value : "",
+                date = _datumFeld != null ? _datumFeld.value : System.DateTime.Now.ToString("dd.MM.yyyy"),
+                validUntil = _fristFeld != null ? _fristFeld.value : "",
+                status = "Angenommen",
+                subtotal = netto,
+                discount = rabatt,
+                extraCosts = skonto,
+                tax = steuer,
+                total = finalTotal,
+                notes = _notizenFeld != null ? _notizenFeld.value : "",
+                bookedToCashbook = false,
+                cashbookEntryId = 0,
+                bookingDate = ""
             };
 
-            db.createOfferItem(offerItem);
+            int offerId;
 
-            BelegTransferData.items.Add(new TransferItem
+            if (_istBearbeitung && _bearbeiteId > 0)
             {
-                articleNumber = offerItem.articleNumber,
-                description = offerItem.description,
-                quantity = offerItem.quantity,
-                unitPrice = offerItem.unitPrice
-            });
-        }
+                offer.id = _bearbeiteId;
+                offerId = _bearbeiteId;
+                db.updateOffer(offer);
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Rechnung");
+                var alteItems = db.getItemsByOffer(offerId) ?? new List<OfferItem>();
+                foreach (var altesItem in alteItems)
+                    db.deleteOfferItem(altesItem.id);
+            }
+            else
+            {
+                offerId = db.createOffer(offer);
+            }
+
+            BelegTransferData.Clear();
+
+            BelegTransferData.hasTransfer = true;
+            BelegTransferData.customerId = _ausgewaehlterKundeId;
+            BelegTransferData.customerName = _ausgewaehlterKunde;
+            BelegTransferData.customerAddress = _ausgewaehlterKundeAdresse;
+            BelegTransferData.date = _datumFeld != null ? _datumFeld.value : "";
+            BelegTransferData.dueDate = _fristFeld != null ? _fristFeld.value : "";
+            BelegTransferData.notes = _notizenFeld != null ? _notizenFeld.value : "";
+            BelegTransferData.rabatt = (float)System.Math.Round(rabatt, 2, System.MidpointRounding.AwayFromZero);
+            BelegTransferData.skonto = (float)System.Math.Round(skonto, 2, System.MidpointRounding.AwayFromZero);
+
+            foreach (var zeile in _zeilen.ToList())
+            {
+                OfferItem offerItem = new OfferItem
+                {
+                    offerId = offerId,
+                    articleNumber = zeile.Artikel != null ? zeile.Artikel.text : "",
+                    description = zeile.Beschreibung != null ? zeile.Beschreibung.text : "",
+                    quantity = BegrenzeMenge((int)System.Math.Round(ParseBetrag(zeile.Menge != null ? zeile.Menge.value : "0"), System.MidpointRounding.AwayFromZero)),
+                    unitPrice = BegrenzePreis(ParseBetrag(zeile.Preis != null ? zeile.Preis.text : "0"))
+                };
+
+                db.createOfferItem(offerItem);
+
+                BelegTransferData.items.Add(new TransferItem
+                {
+                    articleNumber = offerItem.articleNumber,
+                    description = offerItem.description,
+                    quantity = offerItem.quantity,
+                    unitPrice = offerItem.unitPrice
+                });
+            }
+
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Rechnung");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[Angebot] Fehler bei Umwandlung: " + e);
+            FeedbackPopup.Show(Root, "Fehler bei Umwandlung", FeedbackTyp.Fehler);
+        }
     }
-    catch (System.Exception e)
-    {
-        Debug.LogError("[Angebot] Fehler bei Umwandlung: " + e);
-        FeedbackPopup.Show(Root, "Fehler bei Umwandlung", FeedbackTyp.Fehler);
-    }
-}
 }

@@ -15,10 +15,12 @@ public static class OfferPdfExporter
         List<string> anhaenge = null
     )
     {
+        string username = GetSafeFolderName(StateManager.Instance.getCurrentUser().username);
+
         string folderPath = Path.Combine(
             Application.persistentDataPath,
             "PDFs",
-            StateManager.Instance.getCurrentUser().username,
+            username,
             "Angebote"
         );
 
@@ -43,7 +45,7 @@ public static class OfferPdfExporter
             );
 
                 doc.AddAuthor("Ventoriq");
-                
+
                 doc.AddTitle("Angebot " + offer.offerNumber);
 
                 doc.Open();
@@ -52,7 +54,7 @@ public static class OfferPdfExporter
 
                 iTextSharp.text.Font titleFont =
                     FontFactory.GetFont(
-                        FontFactory.HELVETICA_BOLD, 
+                        FontFactory.HELVETICA_BOLD,
                         18
                         );
 
@@ -80,13 +82,13 @@ public static class OfferPdfExporter
                     FontFactory.HELVETICA,
                     9
                     );
-                
+
 
 
                 PdfPTable adressen = new PdfPTable(2);
                 adressen.WidthPercentage = 100f;
                 adressen.SetWidths(new float[] { 1f, 1f });
-                
+
                 PdfPCell kundeCell = new PdfPCell();
                 kundeCell.Border = Rectangle.NO_BORDER;
 
@@ -114,7 +116,7 @@ public static class OfferPdfExporter
 
                 adressen.AddCell(kundeCell);
                 adressen.AddCell(firmaCell);
-                
+
                 doc.Add(adressen);
                 doc.Add(new Paragraph(" "));
 
@@ -135,7 +137,7 @@ public static class OfferPdfExporter
 
                 PdfPTable table = new PdfPTable(5);
                 table.WidthPercentage = 100f;
-                table.SetWidths(new float[] { 1.4f, 3.0f, 1f, 1.2f, 1.2f  });
+                table.SetWidths(new float[] { 1.4f, 3.0f, 1f, 1.2f, 1.2f });
 
                 AddHeaderCell(table, "Leistung", headerFont);
                 AddHeaderCell(table, "Beschreibung", headerFont);
@@ -146,17 +148,17 @@ public static class OfferPdfExporter
                 foreach (OfferItem item in items)
                 {
                     AddBodyCell(
-                        table, 
-                        item.articleNumber, 
+                        table,
+                        item.articleNumber,
                         normalFont
                         );
-                    
+
                     AddBodyCell(
-                    table, 
-                    item.description, 
+                    table,
+                    item.description,
                     normalFont
                     );
-                    
+
                     AddBodyCell(
                         table,
                         item.quantity.ToString(),
@@ -195,12 +197,12 @@ public static class OfferPdfExporter
                 double mwst = steuerBasis * mwstSatz;
                 double zwischensumme = steuerBasis + mwst;
                 double gesamt = zwischensumme - skonto;
-                
+
                 PdfPTable totals = new PdfPTable(2);
                 totals.KeepTogether = true;
                 totals.WidthPercentage = 50f;
                 totals.HorizontalAlignment = Element.ALIGN_RIGHT;
-                
+
                 AddBodyCell(totals, "Netto:", normalFont, Element.ALIGN_RIGHT);
                 AddBodyCell(totals, positionenGesamt.ToString("0.00") + " €", normalFont, Element.ALIGN_RIGHT);
 
@@ -314,19 +316,42 @@ public static class OfferPdfExporter
         table.AddCell(cell);
     }
 
-private static void AddFooterCell(
-    PdfPTable table,
-    string text,
-    iTextSharp.text.Font font
-)
-{
-    PdfPCell cell = new PdfPCell(new Phrase(text, font));
-    cell.Border = Rectangle.NO_BORDER;
-    cell.PaddingTop = 6;
-    cell.PaddingRight = 10;
-    cell.HorizontalAlignment = Element.ALIGN_LEFT;
-    table.AddCell(cell);
-}
+    private static void AddFooterCell(
+        PdfPTable table,
+        string text,
+        iTextSharp.text.Font font
+    )
+    {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.Border = Rectangle.NO_BORDER;
+        cell.PaddingTop = 6;
+        cell.PaddingRight = 10;
+        cell.HorizontalAlignment = Element.ALIGN_LEFT;
+        table.AddCell(cell);
+    }
+
+
+    private static string GetSafeFolderName(string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            return "User";
+        }
+
+        string safeName = folderName.Trim();
+
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+        {
+            safeName = safeName.Replace(invalidChar.ToString(), "");
+        }
+
+        if (string.IsNullOrWhiteSpace(safeName))
+        {
+            return "User";
+        }
+
+        return safeName;
+    }
 
 
 }

@@ -121,28 +121,81 @@
     transition-duration: 0.1s;
 }
 
-/* Buttons – gruener Rahmen beim Hovern */
+/* Graue Buttons – heller Hintergrund beim Hovern, kein Rahmen */
 
-.unity-button:hover {
+.btn-grey {
+    background-color: rgb(100, 100, 100);
+    color: rgb(200, 200, 200);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    transition-property: background-color;
+    transition-duration: 0.1s;
+}
+
+.btn-grey:hover {
+    background-color: rgb(142, 141, 141);
+}
+
+.btn-orange {
+    background-color: rgb(255, 165, 60);
+    color: rgb(0, 0, 0);
+    border-width: 0;
+}
+
+.btn-orange:hover {
+    background-color: rgb(243, 192, 132);
+}
+
+.btn-red {
+    background-color: rgb(230, 57, 70);
+    color: rgb(255, 255, 255);
+    border-width: 0;
+}
+
+.btn-red:hover {
+    background-color: rgb(229, 103, 112);
+}
+
+.btn-steuer {
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+}
+
+.btn-steuer:hover {
     border-top-color: rgb(128, 207, 149);
     border-right-color: rgb(128, 207, 149);
     border-bottom-color: rgb(128, 207, 149);
     border-left-color: rgb(128, 207, 149);
-    background-color: rgb(90, 90, 90);
-    transition-property: border-color, background-color;
-    transition-duration: 0.1s;
 }
 
-/* Aktiver Klick */
 
-.unity-button:active {
-    background-color: rgb(60, 60, 60);
-    translate: 0 1px;
+.btn-modus {
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
 }
+
+.btn-modus:hover {
+    border-top-color: rgb(128, 207, 149);
+    border-right-color: rgb(128, 207, 149);
+    border-bottom-color: rgb(128, 207, 149);
+    border-left-color: rgb(128, 207, 149);
+}
+
+
 
 /* Toggle – zweispaltige Zeile: Label links, Checkbox rechts */
 

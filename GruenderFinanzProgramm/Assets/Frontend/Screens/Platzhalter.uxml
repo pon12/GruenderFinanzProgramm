@@ -8,13 +8,13 @@
 
         <ui:VisualElement name="main-content" style="flex-grow: 1; padding-left: 430px; height: 100%; align-items: center; justify-content: center;">
 
-            <ui:VisualElement style="align-items: center; justify-content: center; flex-direction: column;">
+            <ui:VisualElement name="container-hinweis" style="align-items: center; justify-content: center; flex-direction: column;">
 
-                <ui:Label text="🚧" style="font-size: 80px; -unity-text-align: upper-center; margin-bottom: 24px;"/>
+                <ui:Label text="🚧" name="label-icon" style="font-size: 80px; -unity-text-align: upper-center; margin-bottom: 24px;"/>
 
-                <ui:Label text="Dieser Screen ist noch in Arbeit." style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 36px; color: rgb(128, 207, 149); -unity-text-align: upper-center; margin-bottom: 12px;"/>
+                <ui:Label text="Dieser Screen ist noch in Arbeit." name="label-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 36px; color: rgb(128, 207, 149); -unity-text-align: upper-center; margin-bottom: 12px;"/>
 
-                <ui:Label text="Bitte schau später wieder vorbei – wir arbeiten daran!" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 22px; color: rgb(160, 160, 160); -unity-text-align: upper-center;"/>
+                <ui:Label text="Bitte schau später wieder vorbei – wir arbeiten daran!" name="label-untertitel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 22px; color: rgb(160, 160, 160); -unity-text-align: upper-center;"/>
 
             </ui:VisualElement>
 

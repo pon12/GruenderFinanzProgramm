@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Dashboard.unity
     guid: b40c0059fe7b9c64080d6cf0288d72ea
   - enabled: 1
-    path: Assets/Scenes/TestSzenen/Dienstleistungen.unity
+    path: Assets/Scenes/Dienstleistungen.unity
     guid: bedc143777864e94582d010be6e83b36
   - enabled: 1
     path: Assets/Scenes/Kassenbuch.unity
@@ -36,7 +36,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Angebot.unity
     guid: 4d18be9d94918b04486f37264d8f222d
   - enabled: 1
-    path: "Assets/Scenes/Gr\xFCndungspfad.unity"
+    path: "Assets/Scenes/Gr\xFCnderpfad.unity"
     guid: dbd37b72ebe3795418633166cc352807
   - enabled: 1
     path: Assets/Scenes/Rechnung.unity

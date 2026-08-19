@@ -151,6 +151,7 @@
 .erfolg-kachel--erledigt {
     border-color: rgb(128, 207, 149);
     background-color: rgba(128, 207, 149, 0.07);
+    opacity: 1.0;
 }
 .erfolg-kachel--gesperrt {
     opacity: 0.45;
@@ -197,12 +198,14 @@
     color: rgb(20, 20, 20);
     font-size: 9px;
     border-radius: 4px;
+    border-width: 1px;
     padding: 1px 5px;
     margin-left: 6px;
     -unity-text-align: middle-center;
     flex-shrink: 0;
     align-self: flex-start;
     margin-top: 1px;
+    -unity-font-style: bold;
 }
 
 /* Stackable Fortschrittsbalken */

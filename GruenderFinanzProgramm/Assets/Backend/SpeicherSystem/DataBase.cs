@@ -19,6 +19,9 @@ public class DataBase : DatabaseManager
         try { database.Execute("ALTER TABLE Settings ADD COLUMN ueberweisung TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN agb TEXT DEFAULT ''"); } catch { }
         try { database.Execute("ALTER TABLE Settings ADD COLUMN disclaimer TEXT DEFAULT ''"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN liquiditaetsreserveZiel REAL DEFAULT 0"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN monateAnlaufphase INTEGER DEFAULT 6"); } catch { }
+        try { database.Execute("ALTER TABLE Settings ADD COLUMN monatlicherLebensunterhalt REAL DEFAULT -1"); } catch { }
 
         createTable<Ausgaben>();
         createTable<Einkommen>();
@@ -188,7 +191,11 @@ public class DataBase : DatabaseManager
 
     public int createOffer(Offer offer)
     {
-        return insert(offer);
+        // FIX: insert() gibt bei SQLite-net nur die Anzahl eingefügter Zeilen zurück
+        // (praktisch immer 1), nicht die echte Autoincrement-ID. Dadurch bekamen alle
+        // OfferItem-Positionen die falsche offerId zugewiesen und ließen sich später
+        // nicht mehr über getItemsByOffer(angebot.id) wiederfinden.
+        return insertAndGetId(offer);
     }
     public int updateOffer(Offer offer)
     {
@@ -330,9 +337,16 @@ public class DataBase : DatabaseManager
 
     public int createEinkommen(float amount, string description, string datum, string art = "", string kategorie = "")
     {
-        return insert(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
+        // FIX: insert() gab bisher nur die Zeilenanzahl zurück, nicht die echte ID -
+        // dadurch ließ sich ein Kassenbucheintrag nicht mit einer Rechnung verknüpfen.
+        return insertAndGetId(new Einkommen { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
     }
 
+    public int updateEinkommen(Einkommen eintrag)
+    {
+        return update(eintrag);
+    }
+    
     public int createAusgaben(float amount, string description, string datum, string art = "", string kategorie = "")
     {
         return insert(new Ausgaben { Amount = amount, Description = description, Datum = datum, Art = art, Kategorie = kategorie });
@@ -873,7 +887,10 @@ public class DataBase : DatabaseManager
             Begleiter = false,
             emailFirma = "",
             teleponNrFirma = "",
-            websitefrima = ""
+            websitefrima = "",
+            liquiditaetsreserveZiel = 0f,
+            monateAnlaufphase = 6,
+            monatlicherLebensunterhalt = -1f // -1 = "noch nie gesetzt", siehe getMonatlicherLebensunterhalt
         };
 
         insert(settings);
@@ -900,6 +917,53 @@ public class DataBase : DatabaseManager
 
         settings.id = existingSettings.id;
         return update(settings);
+    }
+
+    // Bequeme Zugriffsmethoden für die Ziel-Liquiditätsreserve (manuell
+    // gesetzter Puffer-Betrag, siehe Settings.liquiditaetsreserveZiel).
+    public float getLiquiditaetsreserveZiel(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.liquiditaetsreserveZiel ?? 0f;
+    }
+
+    public void setLiquiditaetsreserveZiel(int userId, float wert)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.liquiditaetsreserveZiel = wert;
+        updateSettingsForUser(settings);
+    }
+
+    // Monate der Anlaufphase (für die Gesamtkapitalbedarf-Formel) - reine
+    // Planungszahl, Default 6 Monate.
+    public int getMonateAnlaufphase(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.monateAnlaufphase ?? 6;
+    }
+
+    public void setMonateAnlaufphase(int userId, int monate)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.monateAnlaufphase = monate;
+        updateSettingsForUser(settings);
+    }
+
+    // Monatlicher privater Lebensunterhalt - reine Planungszahl. -1 bedeutet
+    // "noch nie manuell gesetzt"; der Aufrufer (Finanzen 2) füllt in diesem
+    // Fall mit dem Kassenbuch-Schnitt (Ø monatliche Barentnahme/Privatentnahme)
+    // vor, damit man nicht bei 0 anfängt.
+    public float getMonatlicherLebensunterhaltRoh(int userId)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        return settings?.monatlicherLebensunterhalt ?? -1f;
+    }
+
+    public void setMonatlicherLebensunterhalt(int userId, float wert)
+    {
+        Settings settings = getOrCreateSettingsForUser(userId);
+        settings.monatlicherLebensunterhalt = wert;
+        updateSettingsForUser(settings);
     }
 
     public int deleteSettingsForUser(int userId)

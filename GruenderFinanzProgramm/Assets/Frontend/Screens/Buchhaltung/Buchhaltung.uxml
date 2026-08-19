@@ -1,28 +1,48 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Stylesheets/Helptooltip.uss?fileID=7433441132597879392&amp;guid=93ae44093179d5b4abba4a8128fdc6da&amp;type=3#Helptooltip"/>
     <Style src="project://database/Assets/Frontend/Stylesheets/Buchhaltung.uss?fileID=7433441132597879392&amp;guid=c4b21d31d3241b24c801492892f77c1a&amp;type=3#Buchhaltung"/>
     <ui:VisualElement name="root" style="flex-grow: 1; width: 100%; height: 100%; flex-direction: row;">
-        <ui:VisualElement name="main-content" class="content-area" style="flex-grow: 1; height: 100%; padding-top: 40px; padding-right: 40px; padding-left: 430px; padding-bottom: 40px; background-color: rgb(30, 30, 30);">
-            <ui:VisualElement name="header" style="flex-direction: row; align-items: center; margin-bottom: 24px; flex-shrink: 0;">
+        <ui:VisualElement name="main-content" class="content-area" style="flex-grow: 1; height: 100%; padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 430px; background-color: rgb(30, 30, 30);">
+            <ui:VisualElement name="row-kopfzeile" style="flex-direction: row; align-items: center; margin-bottom: 0;">
                 <ui:Label text="Buchhaltungs-Dashboard" name="screen-title" class="screen-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 36px; color: rgb(255, 255, 255);"/>
-                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; left: 1px; bottom: 13px; right: 3px; top: -10px;"/>
+                <ui:VisualElement name="btn-help-seitentitel" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; margin-left: 8px; bottom: 11px;"/>
             </ui:VisualElement>
-            <ui:ScrollView name="buchhaltung-list-container" style="flex-grow: 1; align-items: flex-start;"/>
-        </ui:VisualElement>
-
-        <ui:VisualElement name="popup-modal-hintergrund" class="popup-overlay popup-hidden">
-            <ui:VisualElement name="popup-fenster" class="popup-window">
-                <ui:VisualElement class="popup-header">
-                    <ui:Label text="Beleg bearbeiten" name="popup-titel" class="popup-title" />
-                    <ui:Button text="✕" name="btn-popup-schliessen" class="popup-close-btn" />
+            <ui:VisualElement name="tabelle-wrapper" class="tabelle-wrapper" style="flex-grow: 1; margin-top: 20px;">
+                <ui:VisualElement name="tabelle-header" class="tabelle-header">
+                    <ui:VisualElement name="col-bezeichnung" class="col-bezeichnung" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Bezeichnung" name="header-bezeichnung" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-left; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-bezeichnung" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; right: 93px; left: -66px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-art" class="col-art" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Art" name="header-art" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-art" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; left: -15px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-erstellt" class="col-erstellt" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Erstellt" name="header-erstellt" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-erstellt" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; left: -9px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-faellig" class="col-faellig" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Fällig" name="header-faellig" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-faellig" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; left: -14px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-status" class="col-status" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Status" name="header-status" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-status" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; left: -30px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-bearbeiten" class="col-bearbeiten" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Bearbeiten" name="header-bearbeiten" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 21px;"/>
+                        <ui:VisualElement name="btn-help-bearbeiten" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-pfad" class="col-pfad" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Pfad" name="header-pfad" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: 11px; right: 34px;"/>
+                        <ui:VisualElement name="btn-help-pfad" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; left: -5px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="col-exportieren" class="col-exportieren" style="flex-direction: row; align-items: center;">
+                        <ui:Label text="Exportieren" name="header-exportieren" class="tabelle-header-zelle" style="flex-grow: 1; -unity-text-align: middle-center; left: -1px;"/>
+                        <ui:VisualElement name="btn-help-exportieren" class="help-icon" style="background-image: url(&quot;project://database/Assets/Frontend/Bilder/Help%20circle.png?fileID=2800000&amp;guid=1ea511ec5bd6a8148ab87a586b001f57&amp;type=3#Help circle&quot;); width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-left: 6px; right: 4px; left: -23px;"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
-                
-                <ui:ScrollView name="popup-content-container" class="popup-content">
-                    <ui:TextField label="Kunde" name="popup-input-kunde" class="popup-field" />
-                    <ui:TextField label="Referenz / Betreff" name="popup-input-referenz" class="popup-field" />
-                    <ui:DropdownField label="Status" name="popup-dropdown-status" class="popup-field" />
-                    
-                    <ui:Button text="Änderungen Speichern" name="btn-popup-speichern" class="popup-save-btn" />
-                </ui:ScrollView>
+                <ui:ScrollView name="buchhaltung-list-container" style="flex-grow: 1; align-items: flex-start;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
