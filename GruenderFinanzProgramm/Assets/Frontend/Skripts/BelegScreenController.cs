@@ -66,6 +66,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected TextField _kundensuche, _nummerFeld, _datumFeld, _fristFeld,
                         _rabattWertFeld, _skontoWertFeld, _notizenFeld;
     protected DropdownField _statusDropdown, _rabattTypDropdown;
+    private bool _dropdownsRegistriert = false;
     private VisualElement _suchErgebnisListe;
     protected string _ausgewaehlterKunde = "";
     protected int _ausgewaehlterKundeId = 0;
@@ -106,6 +107,8 @@ public abstract class BelegScreenController : MonoBehaviour
         Root = uiDocument.rootVisualElement;
 
         SammleElemente();
+        InitialisiereDropdowns();
+
         _zeilen.Clear();
 
         if (_positionenListe != null)
@@ -345,65 +348,14 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void SetzeStandardwerte()
-    {
-        _nummerFeld?.SetValueWithoutNotify(ErzeugeNaechsteNummer());
-        _datumFeld?.SetValueWithoutNotify(DateTime.Now.ToString("dd.MM.yyyy"));
-        _fristFeld?.SetValueWithoutNotify(DateTime.Now.AddDays(14).ToString("dd.MM.yyyy"));
+{
+    _nummerFeld?.SetValueWithoutNotify(ErzeugeNaechsteNummer());
+    _datumFeld?.SetValueWithoutNotify(DateTime.Now.ToString("dd.MM.yyyy"));
+    _fristFeld?.SetValueWithoutNotify(DateTime.Now.AddDays(14).ToString("dd.MM.yyyy"));
 
-        NurDatumzeichen(_datumFeld);
-        NurDatumzeichen(_fristFeld);
-
-        if (_statusDropdown != null)
-        {
-            _statusDropdown.schedule.Execute(() =>
-            {
-                _statusDropdown.choices = new List<string>(StatusOptionen);
-                if (string.IsNullOrEmpty(_statusDropdown.value) ||
-                    !StatusOptionen.Contains(_statusDropdown.value))
-                    _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
-            }).ExecuteLater(50);
-
-            _statusDropdown.schedule.Execute(() =>
-            {
-                if (_statusDropdown.choices == null || _statusDropdown.choices.Count == 0)
-                {
-                    _statusDropdown.choices = new List<string>(StatusOptionen);
-                    _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
-                }
-            }).ExecuteLater(200);
-
-            _statusDropdown.RegisterValueChangedCallback(_ => AktualisiereUmwandelnButton());
-        }
-
-        if (_rabattTypDropdown != null)
-        {
-            var rabattOptionen = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
-
-            _rabattTypDropdown.schedule.Execute(() =>
-            {
-                _rabattTypDropdown.choices = rabattOptionen;
-                if (string.IsNullOrEmpty(_rabattTypDropdown.value) ||
-                    !rabattOptionen.Contains(_rabattTypDropdown.value))
-                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
-            }).ExecuteLater(50);
-
-            _rabattTypDropdown.schedule.Execute(() =>
-            {
-                if (_rabattTypDropdown.choices == null || _rabattTypDropdown.choices.Count == 0)
-                {
-                    _rabattTypDropdown.choices = rabattOptionen;
-                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
-                }
-            }).ExecuteLater(200);
-
-            _rabattTypDropdown.RegisterValueChangedCallback(evt =>
-            {
-                BerechneSummen();
-                AktualisiereRabattLabel(evt.newValue);
-            });
-        }
-    }
-
+    NurDatumzeichen(_datumFeld);
+    NurDatumzeichen(_fristFeld);
+}
     protected void UebernimmTransferDatenFallsVorhanden()
     {
         if (BelegTyp != "Rechnung") return;
@@ -1368,98 +1320,255 @@ public abstract class BelegScreenController : MonoBehaviour
     // ============================================================
 
     private void RegistriereAnhaenge(List<string> vorausgewaehlt = null)
+{
+    _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
+    if (_anhangBereich == null) return;
+
+    _anhangBereich.Clear();
+    _anhangAusgewaehlt.Clear();
+
+    // Nur diese Anhänge dürfen auswählbar sein.
+    // Kontodaten sind immer dabei und deshalb nicht Teil dieser Liste.
+    var anhangTitel = new List<string>
     {
-        _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
-        if (_anhangBereich == null) return;
+        "Zahlungsbedingungen",
+        "AGB",
+        "Disclaimer",
+        "SEPA-Basislastschrift-Mandat",
+        "Widerrufsbelehrung",
+        "Barzahlung",
+        "Überweisung",
+        "Mahnverfahren",
+        "Ratenzahlungsbestimmungen",
+        "Copyright Hinweis",
+        "Lizenzhinweis Einfach",
+        "Lizenzhinweis Erweitert",
+        "Datenschutzerklärung",
+        "Vertraulichkeitserklärung",
+        "Kundenzufriedenheitsumfrage",
+        "Dienstleistungskatalog"
+    };
 
-        _anhangBereich.Clear();
-        _anhangAusgewaehlt.Clear();
+    // ------------------------------------------------------------
+    // ScrollView für die Anhänge
+    // ------------------------------------------------------------
 
-        var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
-        var alleTitel = BelegAnhangController.HoleAlleBezahlweiseTitel();
+    var scrollView = new ScrollView(ScrollViewMode.Vertical);
 
-        foreach (string key in alleTitel)
+    scrollView.style.flexGrow = 1;
+    scrollView.style.flexShrink = 1;
+    scrollView.style.minHeight = 0;
+
+    // Höhe des sichtbaren Bereichs.
+    // Dadurch wächst die Karte nicht mit allen Anhängen mit.
+    scrollView.style.height = 250;
+
+    scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
+    scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+
+    // ------------------------------------------------------------
+    // Kontodaten – IMMER angezeigt, NICHT auswählbar
+    // ------------------------------------------------------------
+
+    var kontoZeile = new VisualElement();
+
+    kontoZeile.style.flexDirection = FlexDirection.Row;
+    kontoZeile.style.alignItems = Align.Center;
+    kontoZeile.style.marginBottom = 4;
+    kontoZeile.style.paddingTop = 4;
+    kontoZeile.style.paddingBottom = 4;
+    kontoZeile.style.paddingLeft = 8;
+    kontoZeile.style.paddingRight = 8;
+
+    kontoZeile.style.borderTopLeftRadius = 6;
+    kontoZeile.style.borderTopRightRadius = 6;
+    kontoZeile.style.borderBottomLeftRadius = 6;
+    kontoZeile.style.borderBottomRightRadius = 6;
+
+    kontoZeile.style.backgroundColor =
+        new Color(55f / 255f, 55f / 255f, 55f / 255f);
+
+    var kontoBox = new VisualElement();
+
+    kontoBox.style.width = 18;
+    kontoBox.style.height = 18;
+    kontoBox.style.flexShrink = 0;
+    kontoBox.style.marginRight = 8;
+
+    kontoBox.style.borderTopLeftRadius = 4;
+    kontoBox.style.borderTopRightRadius = 4;
+    kontoBox.style.borderBottomLeftRadius = 4;
+    kontoBox.style.borderBottomRightRadius = 4;
+
+    kontoBox.style.backgroundColor = Gruen;
+    kontoBox.style.borderTopWidth = 1;
+    kontoBox.style.borderRightWidth = 1;
+    kontoBox.style.borderBottomWidth = 1;
+    kontoBox.style.borderLeftWidth = 1;
+
+    kontoBox.style.borderTopColor = Gruen;
+    kontoBox.style.borderRightColor = Gruen;
+    kontoBox.style.borderBottomColor = Gruen;
+    kontoBox.style.borderLeftColor = Gruen;
+
+    var kontoHaken = new Label("✓");
+
+    kontoHaken.style.fontSize = 11;
+    kontoHaken.style.color =
+        new Color(38f / 255f, 38f / 255f, 38f / 255f);
+    kontoHaken.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+    kontoBox.Add(kontoHaken);
+
+    var kontoLabel = new Label("Kontodaten (IBAN/BIC)");
+
+    kontoLabel.style.fontSize = 12;
+    kontoLabel.style.color = Color.white;
+    kontoLabel.style.flexGrow = 1;
+
+    kontoZeile.Add(kontoBox);
+    kontoZeile.Add(kontoLabel);
+
+    scrollView.Add(kontoZeile);
+
+    // ------------------------------------------------------------
+    // Optionale Anhänge
+    // ------------------------------------------------------------
+
+    foreach (string key in anhangTitel)
+    {
+        bool istVorausgewaehlt =
+            vorausgewaehlt != null &&
+            vorausgewaehlt.Contains(key);
+
+        _anhangAusgewaehlt[key] = istVorausgewaehlt;
+
+        string lokalerKey = key;
+
+        var zeile = new VisualElement();
+
+        zeile.style.flexDirection = FlexDirection.Row;
+        zeile.style.alignItems = Align.Center;
+        zeile.style.marginBottom = 4;
+        zeile.style.paddingTop = 4;
+        zeile.style.paddingBottom = 4;
+        zeile.style.paddingLeft = 8;
+        zeile.style.paddingRight = 8;
+
+        zeile.style.borderTopLeftRadius = 6;
+        zeile.style.borderTopRightRadius = 6;
+        zeile.style.borderBottomLeftRadius = 6;
+        zeile.style.borderBottomRightRadius = 6;
+
+        zeile.style.backgroundColor = istVorausgewaehlt
+            ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
+            : new Color(55f / 255f, 55f / 255f, 55f / 255f);
+
+        // Checkbox
+        var box = new VisualElement();
+
+        box.style.width = 18;
+        box.style.height = 18;
+        box.style.flexShrink = 0;
+        box.style.marginRight = 8;
+
+        box.style.borderTopLeftRadius = 4;
+        box.style.borderTopRightRadius = 4;
+        box.style.borderBottomLeftRadius = 4;
+        box.style.borderBottomRightRadius = 4;
+
+        box.style.borderTopWidth = 1;
+        box.style.borderRightWidth = 1;
+        box.style.borderBottomWidth = 1;
+        box.style.borderLeftWidth = 1;
+
+        box.style.alignItems = Align.Center;
+        box.style.justifyContent = Justify.Center;
+
+        var haken = new Label("");
+
+        haken.style.fontSize = 11;
+        haken.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+        box.Add(haken);
+
+        AktualisiereCheckboxOptik(
+            box,
+            haken,
+            istVorausgewaehlt,
+            true
+        );
+
+        // Text
+        var label = new Label(key);
+
+        label.style.fontSize = 12;
+        label.style.color = Color.white;
+        label.style.flexGrow = 1;
+
+        zeile.Add(box);
+        zeile.Add(label);
+
+        // Klick
+        zeile.RegisterCallback<ClickEvent>(_ =>
         {
-            bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
-            bool istVorausgewaehlt = vorausgewaehlt != null && vorausgewaehlt.Contains(key);
-            _anhangAusgewaehlt[key] = istVorausgewaehlt;
-            string lokalerKey = key;
+            bool neuerWert =
+                !_anhangAusgewaehlt[lokalerKey];
 
-            var zeile = new VisualElement();
-            zeile.style.flexDirection = FlexDirection.Row;
-            zeile.style.alignItems = Align.Center;
-            zeile.style.marginBottom = 4;
-            zeile.style.paddingTop = 4; zeile.style.paddingBottom = 4;
-            zeile.style.paddingLeft = 8; zeile.style.paddingRight = 8;
-            zeile.style.borderTopLeftRadius = 6; zeile.style.borderTopRightRadius = 6;
-            zeile.style.borderBottomLeftRadius = 6; zeile.style.borderBottomRightRadius = 6;
-            zeile.style.backgroundColor = !vorhanden
-                ? new Color(40f / 255f, 40f / 255f, 40f / 255f)
-                : istVorausgewaehlt
-                    ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                    : new Color(55f / 255f, 55f / 255f, 55f / 255f);
+            _anhangAusgewaehlt[lokalerKey] = neuerWert;
 
-            var box = new VisualElement();
-            box.style.width = 18; box.style.height = 18;
-            box.style.flexShrink = 0; box.style.marginRight = 8;
-            box.style.borderTopLeftRadius = 4; box.style.borderTopRightRadius = 4;
-            box.style.borderBottomLeftRadius = 4; box.style.borderBottomRightRadius = 4;
-            box.style.borderTopWidth = 1; box.style.borderRightWidth = 1;
-            box.style.borderBottomWidth = 1; box.style.borderLeftWidth = 1;
-            box.style.alignItems = Align.Center;
-            box.style.justifyContent = Justify.Center;
+            AktualisiereCheckboxOptik(
+                box,
+                haken,
+                neuerWert,
+                true
+            );
 
-            var haken = new Label("");
-            haken.style.fontSize = 11;
-            haken.style.unityTextAlign = TextAnchor.MiddleCenter;
-            box.Add(haken);
+            zeile.style.backgroundColor = neuerWert
+                ? new Color(
+                    128f / 255f,
+                    207f / 255f,
+                    149f / 255f,
+                    0.15f)
+                : new Color(
+                    55f / 255f,
+                    55f / 255f,
+                    55f / 255f);
+        });
 
-            AktualisiereCheckboxOptik(box, haken, istVorausgewaehlt, vorhanden);
-
-            var label = new Label(key);
-            label.style.fontSize = 12;
-            label.style.color = vorhanden ? Color.white : new Color(0.5f, 0.5f, 0.5f);
-            label.style.flexGrow = 1;
-
-            zeile.Add(box);
-            zeile.Add(label);
-
-            if (!vorhanden)
+        // Hover
+        zeile.RegisterCallback<MouseEnterEvent>(_ =>
+        {
+            if (!_anhangAusgewaehlt[lokalerKey])
             {
-                var fehlt = new Label("(nicht im Pool)");
-                fehlt.style.fontSize = 10;
-                fehlt.style.color = new Color(0.4f, 0.4f, 0.4f);
-                fehlt.style.marginLeft = 4;
-                zeile.Add(fehlt);
+                zeile.style.backgroundColor =
+                    new Color(
+                        65f / 255f,
+                        65f / 255f,
+                        65f / 255f);
             }
+        });
 
-            if (vorhanden)
-            {
-                zeile.RegisterCallback<ClickEvent>(_ =>
-                {
-                    bool neuerWert = !_anhangAusgewaehlt[lokalerKey];
-                    _anhangAusgewaehlt[lokalerKey] = neuerWert;
-                    AktualisiereCheckboxOptik(box, haken, neuerWert, true);
-                    zeile.style.backgroundColor = neuerWert
-                        ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                        : new Color(55f / 255f, 55f / 255f, 55f / 255f);
-                });
-                zeile.RegisterCallback<MouseEnterEvent>(_ =>
-                {
-                    if (!_anhangAusgewaehlt[lokalerKey])
-                        zeile.style.backgroundColor = new Color(65f / 255f, 65f / 255f, 65f / 255f);
-                });
-                zeile.RegisterCallback<MouseLeaveEvent>(_ =>
-                {
-                    zeile.style.backgroundColor = _anhangAusgewaehlt[lokalerKey]
-                        ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                        : new Color(55f / 255f, 55f / 255f, 55f / 255f);
-                });
-            }
+        zeile.RegisterCallback<MouseLeaveEvent>(_ =>
+        {
+            zeile.style.backgroundColor =
+                _anhangAusgewaehlt[lokalerKey]
+                ? new Color(
+                    128f / 255f,
+                    207f / 255f,
+                    149f / 255f,
+                    0.15f)
+                : new Color(
+                    55f / 255f,
+                    55f / 255f,
+                    55f / 255f);
+        });
 
-            _anhangBereich.Add(zeile);
-        }
+        scrollView.Add(zeile);
     }
+
+    _anhangBereich.Add(scrollView);
+}
 
     // Ermittelt, welche Anhänge beim Öffnen des Formulars vorausgewählt sein sollen -
     // entweder aus einem über Bearbeiten geladenen Beleg oder aus einer laufenden Session.
@@ -2576,4 +2685,56 @@ public abstract class BelegScreenController : MonoBehaviour
 
         return fehlend;
     }
+
+private void InitialisiereDropdowns()
+{
+    // STATUS
+    if (_statusDropdown != null)
+    {
+        _statusDropdown.choices = new List<string>(StatusOptionen);
+
+        if (string.IsNullOrEmpty(_statusDropdown.value) ||
+            !StatusOptionen.Contains(_statusDropdown.value))
+        {
+            _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
+        }
+
+        if (!_dropdownsRegistriert)
+        {
+            _statusDropdown.RegisterValueChangedCallback(_ =>
+            {
+                AktualisiereUmwandelnButton();
+            });
+        }
+    }
+
+    // RABATT
+    if (_rabattTypDropdown != null)
+    {
+        _rabattTypDropdown.choices = new List<string>
+        {
+            "Kein Rabatt",
+            "Prozent",
+            "Festbetrag"
+        };
+
+        if (string.IsNullOrEmpty(_rabattTypDropdown.value) ||
+            !_rabattTypDropdown.choices.Contains(_rabattTypDropdown.value))
+        {
+            _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
+        }
+
+        if (!_dropdownsRegistriert)
+        {
+            _rabattTypDropdown.RegisterValueChangedCallback(evt =>
+            {
+                BerechneSummen();
+                AktualisiereRabattLabel(evt.newValue);
+            });
+        }
+    }
+
+    _dropdownsRegistriert = true;
+}
+
 }
