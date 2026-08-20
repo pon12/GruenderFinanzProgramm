@@ -46,7 +46,12 @@ public class TutorialManager : MonoBehaviour
     [Header("UI Document")]
     [SerializeField] private UIDocument uiDocument;
 
+    [Header("Settings")]
+    [SerializeField] private float buttonCooldownSekunden = 0.5f;
+
     [Header("Tutorial-Schritte (Reihenfolge = Anzeigereihenfolge)")]
+
+    
     [SerializeField] private List<TutorialSchritt> alleSchritte = new();
 
     [Header("Start Screens (Falls in derselben Szene)")]
@@ -75,6 +80,11 @@ public class TutorialManager : MonoBehaviour
 
     private List<TutorialSchritt> aktiveSchritte = new();
     private int aktuellerIndex = 0;
+    private Coroutine _scrollCoroutine;
+    private Coroutine _sceneCoroutine;
+
+    // Spam-Schutz Guard
+    private bool _isTransitioning = false;
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -153,7 +163,6 @@ public class TutorialManager : MonoBehaviour
 
     private void TutorialStarten(bool lang)
     {
-
         aktiveSchritte = lang
             ? new List<TutorialSchritt>(alleSchritte)
             : alleSchritte.FindAll(s => s.inKurzversion);
@@ -165,12 +174,15 @@ public class TutorialManager : MonoBehaviour
             return;
         }
 
+        StopAllCoroutines();
+        _scrollCoroutine = null;
+        _sceneCoroutine  = null;
         aktuellerIndex = 0;
+        _isTransitioning = false;
+
         SetzeVisible(startDialogWrapper, false);
         SetzeVisible(tutorialModus,      true);
-        StartCoroutine(LadeSceneUndZeigeSchritt());
-
-        
+        StarteSchrittCoroutine();
     }
 
     private void AuswahlSchliessen()
@@ -179,12 +191,27 @@ public class TutorialManager : MonoBehaviour
         SetzeVisible(overlay,            false);
     }
 
+    private void StarteSchrittCoroutine()
+    {
+        // Blockiere Mehrfachaufrufe / Spamming synchron
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+
+        SetzeButtonsAktiv(false);
+
+        if (_scrollCoroutine != null) { StopCoroutine(_scrollCoroutine); _scrollCoroutine = null; }
+        if (_sceneCoroutine  != null) { StopCoroutine(_sceneCoroutine);  _sceneCoroutine  = null; }
+        _sceneCoroutine = StartCoroutine(LadeSceneUndZeigeSchritt());
+    }
+
     private void NaechsterSchritt()
     {
+        if (_isTransitioning) return;
+
         if (aktuellerIndex < aktiveSchritte.Count - 1)
         {
             aktuellerIndex++;
-            StartCoroutine(LadeSceneUndZeigeSchritt());
+            StarteSchrittCoroutine();
         }
         else
         {
@@ -192,231 +219,207 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    private IEnumerator LadeSceneUndZeigeSchritt()
-{
-    var schritt      = aktiveSchritte[aktuellerIndex];
-    string zielScene = schritt.SceneName;
-    string aktScene  = SceneManager.GetActiveScene().name;
-
-    SetzeButtonsAktiv(false);
-    SchliesseAllePopups();
-
-    if (!string.IsNullOrEmpty(zielScene) && zielScene != aktScene)
+    private void VorherigerSchritt()
     {
-        yield return SceneManager.LoadSceneAsync(zielScene);
-        yield return null;
+        if (_isTransitioning) return;
+
+        if (aktuellerIndex > 0)
+        {
+            aktuellerIndex--;
+            StarteSchrittCoroutine();
+        }
     }
 
-    if (!string.IsNullOrEmpty(schritt.GameObjectName))
+    private IEnumerator LadeSceneUndZeigeSchritt()
     {
-        var mainMenu = Object.FindFirstObjectByType<MainMenuManager>();
-        if (mainMenu != null) mainMenu.StopAllCoroutines();
+        var schritt      = aktiveSchritte[aktuellerIndex];
+        string zielScene = schritt.SceneName;
+        string aktScene  = SceneManager.GetActiveScene().name;
 
-        GameObject zielObj = null;
-        if (startScreenObj != null && startScreenObj.name == schritt.GameObjectName) zielObj = startScreenObj;
-        else if (loginScreenObj != null && loginScreenObj.name == schritt.GameObjectName) zielObj = loginScreenObj;
-        else if (registrationScreenObj != null && registrationScreenObj.name == schritt.GameObjectName) zielObj = registrationScreenObj;
+        SetzeButtonsAktiv(false);
+        SchliesseAllePopups();
 
-        if (zielObj == null) zielObj = FindInaktivesGameObject(schritt.GameObjectName);
-
-        if (zielObj != null)
+        if (!string.IsNullOrEmpty(zielScene) && zielScene != aktScene)
         {
-            if (startScreenObj != null) startScreenObj.SetActive(false);
-            if (loginScreenObj != null) loginScreenObj.SetActive(false);
-            if (registrationScreenObj != null) registrationScreenObj.SetActive(false);
-
-            zielObj.SetActive(true);
+            yield return SceneManager.LoadSceneAsync(zielScene);
             yield return null;
         }
-    }
 
-    if (!string.IsNullOrEmpty(schritt.PopupElementName))
-    {
-        ZeigePopupVisualElement(schritt.PopupElementName);
-        yield return null;
-    }
-
-    SchrittAnzeigen();
-
-    // Warten, bis das UI Toolkit die Elemente gezeichnet hat
-    yield return null;
-    yield return null;
-
-    // Scrollen und Highlighten ausführen
-    ZeigeElementMitScroll(schritt.ScrollViewName, schritt.ElementName);
-
-    SetzeButtonsAktiv(true);
-}
-
-private void FokussiereUndHighlighteElement(string elementName)
-{
-    if (string.IsNullOrEmpty(elementName))
-    {
-        SetzeVisible(highlightRahmen, false);
-        return;
-    }
-
-    // Suchen nach dem Element und dessen übergeordneter ScrollView
-    VisualElement targetElement = null;
-    ScrollView parentScrollView = null;
-
-    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-    foreach (var doc in alleDocuments)
-    {
-        if (doc == uiDocument) continue; // Eigenes Overlay-UI ausklammern
-        var root = doc.rootVisualElement;
-        if (root == null) continue;
-
-        var found = root.Q<VisualElement>(elementName);
-        if (found != null && found.resolvedStyle.display != DisplayStyle.None)
+        if (!string.IsNullOrEmpty(schritt.GameObjectName))
         {
-            targetElement = found;
-            // Prüfen, ob das Element in einer ScrollView liegt
-            parentScrollView = targetElement.GetFirstAncestorOfType<ScrollView>();
-            break;
+            var mainMenu = Object.FindFirstObjectByType<MainMenuManager>();
+            if (mainMenu != null) mainMenu.StopAllCoroutines();
+
+            GameObject zielObj = null;
+            if (startScreenObj != null && startScreenObj.name == schritt.GameObjectName) zielObj = startScreenObj;
+            else if (loginScreenObj != null && loginScreenObj.name == schritt.GameObjectName) zielObj = loginScreenObj;
+            else if (registrationScreenObj != null && registrationScreenObj.name == schritt.GameObjectName) zielObj = registrationScreenObj;
+
+            if (zielObj == null) zielObj = FindInaktivesGameObject(schritt.GameObjectName);
+
+            if (zielObj != null)
+            {
+                if (startScreenObj != null) startScreenObj.SetActive(false);
+                if (loginScreenObj != null) loginScreenObj.SetActive(false);
+                if (registrationScreenObj != null) registrationScreenObj.SetActive(false);
+
+                zielObj.SetActive(true);
+                yield return null;
+            }
         }
+
+        if (!string.IsNullOrEmpty(schritt.PopupElementName))
+        {
+            ZeigePopupVisualElement(schritt.PopupElementName);
+            yield return null;
+        }
+
+        SchrittAnzeigen();
+
+        // Warten, bis das UI Toolkit die Elemente gezeichnet hat
+        yield return null;
+        yield return null;
+
+        // Scrollen und Highlighten ausführen
+        ZeigeElementMitScroll(schritt.ScrollViewName, schritt.ElementName);
     }
 
-    if (targetElement == null)
+    private void ZeigeElementMitScroll(string scrollViewName, string elementName)
     {
-        SetzeVisible(highlightRahmen, false);
-        Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
-        return;
-    }
-
-    // Falls das Element in einer ScrollView liegt, automatisch dorthin scrollen!
-    if (parentScrollView != null)
-    {
-        parentScrollView.ScrollTo(targetElement);
-    }
-
-    // Highlight-Rahmen aktivieren und nach dem Layout-Update auf das Element ausrichten
-    SetzeVisible(highlightRahmen, true);
-    highlightRahmen.schedule.Execute(() =>
-    {
-        HighlightPositionieren(elementName);
-    }).ExecuteLater(10); // 10ms Verzögerung sorgt für exakte Ausrichtung nach dem Scroll-Vorgang
-}
-
-private void ZeigeElementMitScroll(string scrollViewName, string elementName)
-{
-    if (string.IsNullOrEmpty(elementName))
-    {
-        SetzeVisible(highlightRahmen, false);
-        return;
-    }
-
-    VisualElement targetElement = null;
-    ScrollView scrollView = null;
-
-    // Suche in allen UI Documents nach den Elementen
-    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-    foreach (var doc in alleDocuments)
-    {
-        if (doc == uiDocument) continue;
-        var root = doc.rootVisualElement;
-        if (root == null) continue;
-
-        if (targetElement == null)
-            targetElement = root.Q<VisualElement>(elementName);
-
-        if (!string.IsNullOrEmpty(scrollViewName) && scrollView == null)
-            scrollView = root.Q<ScrollView>(scrollViewName);
-    }
-
-    if (targetElement == null)
-    {
-        SetzeVisible(highlightRahmen, false);
-        Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
-        return;
-    }
-
-    // Falls eine ScrollView angegeben ist, direkt zum Ziel-Element springen
-    if (scrollView != null)
-    {
-        scrollView.ScrollTo(targetElement);
-    }
-
-    // Rahmen einblenden und nach dem Scroll-Vorgang positionieren
-    SetzeVisible(highlightRahmen, true);
-    highlightRahmen.schedule.Execute(() =>
-    {
-        HighlightPositionieren(elementName);
-    }).ExecuteLater(50); // 50ms Verzögerung stellt sicher, dass die Position nach dem Scrollen stimmt
-}
-
-private void SetzeButtonsAktiv(bool aktiv)
-{
-    weiterButton?.SetEnabled(aktiv);
-    zurueckButton?.SetEnabled(aktiv && aktuellerIndex > 0);
-    beendenButton?.SetEnabled(aktiv);
-}
-
-    private void VorherigerSchritt()
-{
-    if (aktuellerIndex > 0)
-    {
-        aktuellerIndex--;
-        StartCoroutine(LadeSceneUndZeigeSchritt()); // <- Ruft nun ebenfalls den Screen-Wechsel auf
-    }
-}
-
-    private void SchrittAnzeigen()
-{
-    var schritt = aktiveSchritte[aktuellerIndex];
-
-    erklaerungsText.text = schritt.Erklaerung;
-    schrittAnzeige.text  = $"{aktuellerIndex + 1} / {aktiveSchritte.Count}";
-    zurueckButton.SetEnabled(aktuellerIndex > 0);
-    weiterButton.text = aktuellerIndex == aktiveSchritte.Count - 1
-        ? "Fertig"
-        : "Weiter ›";
-
-    // Highlight-Rahmen vorerst ausblenden, bis fokussiert/gescrollt wurde
-    SetzeVisible(highlightRahmen, false);
-}
-
-    private void HighlightPositionieren(string elementName)
-    {
-        var rect = HoleElementPosition(elementName);
-
-        if (rect == null)
+        if (string.IsNullOrEmpty(elementName))
         {
             SetzeVisible(highlightRahmen, false);
-            Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
+            Freigeben();
             return;
         }
 
-        const float Padding = 8f;
-        var r = rect.Value;
+        VisualElement targetElement = null;
+        ScrollView scrollView = null;
 
-        highlightRahmen.style.left   = r.x - Padding;
-        highlightRahmen.style.top    = r.y - Padding;
-        highlightRahmen.style.width  = r.width  + Padding * 2;
-        highlightRahmen.style.height = r.height + Padding * 2;
-    }
-
-    /// Durchsucht alle aktiven UIDocuments in der Scene nach dem Element.
-    private Rect? HoleElementPosition(string elementName)
-    {
-        var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-        foreach (var doc in alleDocuments)
+        foreach (var doc in FindObjectsByType<UIDocument>())
         {
             if (doc == uiDocument) continue;
             var root = doc.rootVisualElement;
             if (root == null) continue;
 
-            var element = root.Q<VisualElement>(elementName);
-            if (element == null) continue;
-            if (element.resolvedStyle.display == DisplayStyle.None) continue;
+            if (targetElement == null)
+                targetElement = root.Q<VisualElement>(elementName);
 
-            return element.worldBound;
+            if (scrollView == null)
+            {
+                if (!string.IsNullOrEmpty(scrollViewName))
+                    scrollView = root.Q<ScrollView>(scrollViewName);
+                else if (targetElement != null)
+                    scrollView = targetElement.GetFirstAncestorOfType<ScrollView>();
+            }
         }
-        return null;
+
+        if (targetElement == null)
+        {
+            SetzeVisible(highlightRahmen, false);
+            Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
+            Freigeben();
+            return;
+        }
+
+        if (_scrollCoroutine != null) StopCoroutine(_scrollCoroutine);
+        _scrollCoroutine = StartCoroutine(ScrollUndHighlight(targetElement, scrollView));
+    }
+
+    private IEnumerator ScrollUndHighlight(VisualElement element, ScrollView scrollView)
+    {
+        // Warten bis das Layout fertig ist (max. 10 Frames – wichtig nach Scene-Wechsel)
+        for (int i = 0; i < 10; i++)
+        {
+            if (element.worldBound.height > 0) break;
+            yield return null;
+        }
+        yield return null; // ein weiterer Frame zur Sicherheit
+
+        // worldBound des Elements vor dem Scroll merken
+        Rect rect = element.worldBound;
+
+        if (scrollView != null)
+        {
+            float altesOffset  = scrollView.scrollOffset.y;
+            float neuesOffset  = rect.y - scrollView.contentContainer.worldBound.y;
+            float maxOffset    = Mathf.Max(0, scrollView.contentContainer.layout.height - scrollView.layout.height);
+            neuesOffset        = Mathf.Clamp(neuesOffset, 0, maxOffset);
+
+            // Highlight-Position rechnerisch verschieben
+            rect = new Rect(rect.x, rect.y + (altesOffset - neuesOffset), rect.width, rect.height);
+
+            scrollView.scrollOffset = new Vector2(scrollView.scrollOffset.x, neuesOffset);
+        }
+
+        SetzeVisible(highlightRahmen, true);
+        HighlightPositionieren(rect, scrollView);
+        
+        // Buttons nach Cooldown freigeben
+        Freigeben();
+    }
+
+    /// Gibt die Interaktion nach vollständigem Laden und Cooldown frei.
+    private void Freigeben()
+    {
+        StartCoroutine(FreigebenVerzoegert());
+    }
+
+    private IEnumerator FreigebenVerzoegert()
+    {
+        yield return new WaitForSeconds(buttonCooldownSekunden);
+
+        _isTransitioning = false;
+        SetzeButtonsAktiv(true);
+    }
+
+    private void SetzeButtonsAktiv(bool aktiv)
+    {
+        weiterButton?.SetEnabled(aktiv);
+        zurueckButton?.SetEnabled(aktiv && aktuellerIndex > 0);
+        beendenButton?.SetEnabled(aktiv);
+    }
+
+    private void SchrittAnzeigen()
+    {
+        var schritt = aktiveSchritte[aktuellerIndex];
+
+        erklaerungsText.text = schritt.Erklaerung;
+        schrittAnzeige.text  = $"{aktuellerIndex + 1} / {aktiveSchritte.Count}";
+        zurueckButton.SetEnabled(aktuellerIndex > 0);
+        weiterButton.text = aktuellerIndex == aktiveSchritte.Count - 1
+            ? "Fertig"
+            : "Weiter ›";
+
+        // Highlight-Rahmen vorerst ausblenden, bis fokussiert/gescrollt wurde
+        SetzeVisible(highlightRahmen, false);
+    }
+
+    private void HighlightPositionieren(Rect r, ScrollView scrollView = null)
+    {
+        const float Padding = 8f;
+
+        // Highlight auf die sichtbaren Grenzen der ScrollView begrenzen
+        if (scrollView != null)
+        {
+            var sv   = scrollView.worldBound;
+            float x      = Mathf.Max(r.x,    sv.x);
+            float y      = Mathf.Max(r.y,    sv.y);
+            float right  = Mathf.Min(r.xMax, sv.xMax);
+            float bottom = Mathf.Min(r.yMax, sv.yMax);
+            r = new Rect(x, y, right - x, bottom - y);
+        }
+
+        highlightRahmen.style.left   = r.x      - Padding;
+        highlightRahmen.style.top    = r.y      - Padding;
+        highlightRahmen.style.width  = r.width  + Padding * 2;
+        highlightRahmen.style.height = r.height + Padding * 2;
     }
 
     private void TutorialSchliessen()
     {
+        _isTransitioning = false;
+
         // 1. Tutorial-UI und Popups ausblenden
         SchliesseAllePopups();
         SetzeVisible(tutorialModus, false);
@@ -480,44 +483,7 @@ private void SetzeButtonsAktiv(bool aktiv)
     {
         alleSchritte = new List<TutorialSchritt>
         {
-            /* ── Login ──────────────────────────────────────────────────────
-            new() {
-                Erklaerung    = "Willkommen bei Ventoriq! Diese kurze Einführung zeigt dir die wichtigsten Funktionen der App.",
-                ElementName   = "",
-                GameObjectName= "startScreenObj",
-                inKurzversion = true
-            },
-            new() {
-                Erklaerung    = "Mit diesem Button erstellst du ein neues Konto und richtest dein Profil ein.",
-                ElementName   = "KontoErstellen",
-                GameObjectName= "loginScreenObj",
-                inKurzversion = true
-            },
-            */
-
-            /* ── Registrierung ──────────────────────────────────────────────
-            new() {
-                Erklaerung    = "Gib hier deinen Profilnamen ein. Dieser wird in der App und auf deinen Dokumenten verwendet.",
-                ElementName   = "Profileingabe",
-                GameObjectName= "registrationScreenObj",
-                inKurzversion = true
-            },
-            new() {
-                Erklaerung    = "Akzeptiere hier die AGB und Datenschutzrichtlinie um fortzufahren.",
-                ElementName   = "Toggle",
-                GameObjectName= "registrationScreenObj",
-                inKurzversion = false
-            },
-            new() {
-                Erklaerung    = "Klicke hier um deinen verschlüsselten Passkey zu entschlüsseln und zu sehen. Notiere ihn sicher!",
-                ElementName   = "btnEntschluesseln",
-                GameObjectName= "registrationScreenObj",
-                inKurzversion = true
-            },
-            */
-
             // ── Dashboard ──────────────────────────────────────────────────
-
             new()
             {
                 Erklaerung    = "Willkommen auf ihrer zentralen Steuerzentrale!",
@@ -531,7 +497,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "Hier sehen sie all ihre wichtigen Geschäftszahlen auf einen Blick – von der Anzahl ihrer Kunden bis hin zum aktuellen Kontostand. Über die direkten Buttons können sie ohne Umwege sofort neue Kunden anlegen, Angebote schreiben oder Rechnungen erstellen",
                 ElementName   = "stats-grid",
                 SceneName     = "Dashboard",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new()
@@ -539,7 +505,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "In diesem Bereich wird ihre finanzielle Entwicklung des gesamten Jahres übersichtlich als Diagramm aufbereitet. Auf der linken Seite sehen sie die Beträge, während die Achse unten ihre Umsätze von Januar bis Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr Geschäft besonders gut läuft.",
                 ElementName   = "kassenbuch-statistik-panel",
                 SceneName     = "Dashboard",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new()
@@ -547,11 +513,10 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "Mit dem Fristenkalender verpassen die garantiert keine wichtigen Termine oder steuerlichen Abgabefristen mehr. Navigieren sie einfach durch die Monate und Jahre, um ihre Fälligkeiten bequem im Voraus zu planen. Ein Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an.",
                 ElementName   = "kalender-panel",
                 SceneName     = "Dashboard",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             // ── Settings ────────────────────────────────────────────────────
-            
             new() {
                 Erklaerung    = "Auf der linken Seite können Sie wichtigen Daten für Sie und Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen.",
                 ElementName   = "col-left",
@@ -565,7 +530,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 ElementName   = "card-steuersaetze",
                 ScrollViewName  = "settings-scroll",
                 SceneName     = "Einstellungen",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -573,7 +538,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 ElementName   = "card-layout",
                 ScrollViewName  = "settings-scroll",
                 SceneName     = "Einstellungen",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -581,7 +546,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 ElementName   = "card-sicherheit",
                 ScrollViewName  = "settings-scroll",
                 SceneName     = "Einstellungen",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -592,8 +557,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = true
             },
             
-            // ── Dokumente ──────────────────────────────────────────────────
-
+            // ── Dokumente ────────────────────────────────────────────────── 10
             new() {
                 Erklaerung    = "Hier sehen sie all ihre Dokumente auf einen Blick.",
                 ElementName   = "Main-Scroll-View",
@@ -604,11 +568,10 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "Mit diesen zwei Buttons können Dukemente hinzugefügt oder gelöscht werden.",
                 ElementName   = "row-alle-loeschen",
                 SceneName     = "Dokument-Screen",
-                inKurzversion = true
+                inKurzversion = false
             },
 
-            // ── Dienstleistungen ───────────────────────────────────────────
-
+            // ── Dienstleistungen ─────────────────────────────────────────── 12
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du alle Dienstleistungen, die du deinen Kunden anbietest. Du kannst neue Leistungen anlegen, bestehende bearbeiten oder löschen. Die hinterlegten Dienstleistungen stehen dir später beim Erstellen von Angeboten und Rechnungen direkt zur Auswahl, damit du sie nicht jedes Mal neu eingeben musst.",
                 ElementName   = "",
@@ -646,13 +609,12 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = false
             },
 
-            // ── Kundendatenbank ────────────────────────────────────────────
-
+            // ── Kundendatenbank ──────────────────────────────────────────── 17
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du all deine Kunden und Kontakte sowie deine eigenen Firmendaten an einem zentralen Ort. Ganz oben findest du deine eigenen Profil- und Unternehmensdaten. Darunter befindet sich die Aktionsleiste, mit der du neue Kunden anlegen kannst, gefolgt von der Übersicht all deiner gespeicherten Kundenkontakte.",
                 ElementName   = "",
                 SceneName     = "KundenDB",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -666,26 +628,25 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "In der Zwischenleiste findest du den Button „Kunde Hinzufügen“. Damit öffnest du ein Formular, um einen neuen Kontakt anzulegen. Rechts daneben siehst du einen Zähler, der dir jederzeit die genaue Anzahl deiner aktuell gespeicherten Kunden anzeigt.",
                 ElementName   = "card-Zwischenbar",
                 SceneName     = "KundenDB",
-                inKurzversion = false
+                inKurzversion = true
             },
             
             new() {
-                Erklaerung    = "Wenn du auf „Kunde Hinzufügen“ klickst, öffnet sich dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie Telefonnummer inklusive Ländervorwahl ein. Klicke anschließend auf „Kunden speichern“, um den neuen Kontakt in der Datenbank abzulegen.",
+                Erklaerung    = "Wenn du auf „Kunde Hinzufügen“ klickst, öffnet sich dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie Telefonnummer inklusive Ländervorwahl ein. Klicke anschließend auf „Kunden speichern“, um den neuen Kontakt in der Datenbank abgelegen.",
                 ElementName   = "Pop-up",
                 PopupElementName = "PopUpKundeerstellen",
                 SceneName     = "KundenDB",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Hier werden all deine angelegten Kunden in einer Übersicht aufgelistet. Jede Kundenkarte zeigt die wichtigsten Kontaktdaten wie Name, Firma, Adresse, E-Mail und Telefonnummer.",
                 ElementName   = "kunden-liste-holder",
                 SceneName     = "KundenDB",
-                inKurzversion = false
+                inKurzversion = true
             },
 
-            // ── Angebot ────────────────────────────────────────────────────
-
+            // ── Angebot ──────────────────────────────────────────────────── 22
             new() {
                 Erklaerung    = "Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote zu erstellen.",
                 ElementName   = "",
@@ -718,13 +679,12 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = false
             },
 
-            // ── Kassenbuch ─────────────────────────────────────────────────
-
+            // ── Kassenbuch ───────────────────────────────────────────────── 28
             new() {
                 Erklaerung    = "Hier behältst du die Finanzen deines Unternehmens im Blick, erfasst Einnahmen und Ausgaben und bereitest deine Daten für die Buchhaltung vor.",
                 ElementName   = "",
                 SceneName     = "Kassenbuch",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -755,7 +715,7 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = false
             },
 
-            // ── Fortschritt ────────────────────────────────────────────────
+            // ── Fortschritt ──────────────────────────────────────────────── 33
             new() {
                 Erklaerung    = "Der Fortschritt-Screen gibt dir einen kombinierten Überblick über deine gesamte Gründungsreise. Er fasst zusammen, wie weit du im Gründerpfad bist und wie viele Pflichtdokumente du bereits ausgefüllt hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist.",
                 ElementName   = "",
@@ -767,30 +727,29 @@ private void SetzeButtonsAktiv(bool aktiv)
                 Erklaerung    = "Hier siehst du jede Gründungsphase einzeln mit einem Mini-Fortschrittsbalken und der Anzahl erledigter Schritte. Eine Phase zeigt ein grünes Häkchen, sobald alle Schritte abgeschlossen sind.",
                 ElementName   = "panel-gruenderpfad",
                 SceneName     = "Fortschritt",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Dieses Panel zeigt dir die nächsten offenen Aufgaben aus deinem Gründerpfad – immer die ersten fünf, die noch nicht erledigt sind. Du erledigst sie direkt im Gründerpfad-Screen.",
                 ElementName   = "panel-naechste-schritte",
                 SceneName     = "Fortschritt",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Hier erscheinen deine zuletzt freigeschalteten Erfolge aus dem Gründerpfad und aus ausgefüllten Dokumenten. Jeder abgeschlossene Schritt und jedes Pflichtdokument kann hier auftauchen.",
                 ElementName   = "panel-letzte-erfolge",
                 SceneName     = "Fortschritt",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             // ── Gründerpfad ────────────────────────────────────────────────
-
             new() {
                 Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
                 ElementName   = "",
                 SceneName     = "Gründerpfad",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -808,12 +767,11 @@ private void SetzeButtonsAktiv(bool aktiv)
             },
 
             // ── Wissensdatenbank ───────────────────────────────────────────
-
             new() {
                 Erklaerung    = "Die Wissensdatenbank ist deine Anlaufstelle für Anleitungen und Erklärungen rund um deine Gründung. Alle Einträge sind in Themenkategorien geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen.",
                 ElementName   = "",
                 SceneName     = "Wissensdatenbank",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -840,12 +798,11 @@ private void SetzeButtonsAktiv(bool aktiv)
             },
 
             // ── Erfolge ────────────────────────────────────────────────────
-
             new() {
                 Erklaerung    = "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften, die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet – durch abgehakte Schritte im Gründerpfad, ausgefüllte Dokumente, angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level.",
                 ElementName   = "",
                 SceneName     = "Erfolge",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -863,12 +820,11 @@ private void SetzeButtonsAktiv(bool aktiv)
             },
 
             // ── Buchhaltung ────────────────────────────────────────────
-
             new() {
                 Erklaerung    = "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens, behältst Fristen sowie Status im Blick und exportierst deine Belege schnell als PDF.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
-                inKurzversion = true
+                inKurzversion = false
             },
 
             new() {
@@ -898,7 +854,6 @@ private void SetzeButtonsAktiv(bool aktiv)
                 SceneName     = "Buchhaltung",
                 inKurzversion = false
             },
-            
         };
 
         Debug.Log($"[TutorialManager] {alleSchritte.Count} Standardschritte eingetragen.");
@@ -913,114 +868,114 @@ private void SetzeButtonsAktiv(bool aktiv)
     }
 
     private GameObject FindInaktivesGameObject(string objName)
-{
-    // 1. Zuerst aktiv suchen
-    var obj = GameObject.Find(objName);
-    if (obj != null) return obj;
-
-    // 2. Durchsuche alle geladenen Szenen inklusive Root-Objekte
-    for (int i = 0; i < SceneManager.sceneCount; i++)
     {
-        var scene = SceneManager.GetSceneAt(i);
-        if (!scene.isLoaded) continue;
+        // 1. Zuerst aktiv suchen
+        var obj = GameObject.Find(objName);
+        if (obj != null) return obj;
 
-        var rootObjects = scene.GetRootGameObjects();
-        foreach (var root in rootObjects)
+        // 2. Durchsuche alle geladenen Szenen inklusive Root-Objekte
+        for (int i = 0; i < SceneManager.sceneCount; i++)
         {
-            var target = FindChildRecursive(root.transform, objName);
-            if (target != null) return target;
-        }
-    }
+            var scene = SceneManager.GetSceneAt(i);
+            if (!scene.isLoaded) continue;
 
-    return null;
-}
-
-private GameObject FindChildRecursive(Transform parent, string name)
-{
-    if (parent.name == name) return parent.gameObject;
-
-    foreach (Transform child in parent)
-    {
-        var result = FindChildRecursive(child, name);
-        if (result != null) return result;
-    }
-    return null;
-}
-
-private void ZeigePopupVisualElement(string popupName)
-{
-    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-    foreach (var doc in alleDocuments)
-    {
-        var root = doc.rootVisualElement;
-        if (root == null) continue;
-
-        var popupEl = root.Q<VisualElement>(popupName);
-        if (popupEl != null)
-        {
-            popupEl.style.display = DisplayStyle.Flex;
-            return;
-        }
-    }
-    Debug.LogWarning($"[TutorialManager] UI Element Popup '{popupName}' wurde nicht gefunden.");
-}
-
-private void SchliesseAllePopups()
-{
-    // 1. Alle UI-Toolkit Popups durchgehen und ausblenden
-    foreach (var schritt in alleSchritte)
-    {
-        if (!string.IsNullOrEmpty(schritt.PopupElementName))
-        {
-            VersteckePopupVisualElement(schritt.PopupElementName);
-        }
-    }
-
-    // 2. Alle GameObject-basierten Popups / Zusatz-Screens ausblenden,
-    // außer wenn sie einer der 3 Haupt-Screens sind (die werden separat verwaltet)
-    foreach (var schritt in alleSchritte)
-    {
-        if (!string.IsNullOrEmpty(schritt.GameObjectName))
-        {
-            // Hauptscreens überspringen, da diese in Step 3 gezielt geschaltet werden
-            if ((startScreenObj != null && schritt.GameObjectName == startScreenObj.name) ||
-                (loginScreenObj != null && schritt.GameObjectName == loginScreenObj.name) ||
-                (registrationScreenObj != null && schritt.GameObjectName == registrationScreenObj.name))
+            var rootObjects = scene.GetRootGameObjects();
+            foreach (var root in rootObjects)
             {
-                continue;
-            }
-
-            var go = FindInaktivesGameObject(schritt.GameObjectName);
-            if (go != null)
-            {
-                go.SetActive(false);
+                var target = FindChildRecursive(root.transform, objName);
+                if (target != null) return target;
             }
         }
+
+        return null;
     }
-}
 
-private void VersteckePopupVisualElement(string popupName)
-{
-    var alleDocuments = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-    foreach (var doc in alleDocuments)
+    private GameObject FindChildRecursive(Transform parent, string name)
     {
-        var root = doc.rootVisualElement;
-        if (root == null) continue;
+        if (parent.name == name) return parent.gameObject;
 
-        var popupEl = root.Q<VisualElement>(popupName);
-        if (popupEl != null)
+        foreach (Transform child in parent)
         {
-            popupEl.style.display = DisplayStyle.None;
+            var result = FindChildRecursive(child, name);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
+    private void ZeigePopupVisualElement(string popupName)
+    {
+        var alleDocuments = FindObjectsByType<UIDocument>();
+        foreach (var doc in alleDocuments)
+        {
+            var root = doc.rootVisualElement;
+            if (root == null) continue;
+
+            var popupEl = root.Q<VisualElement>(popupName);
+            if (popupEl != null)
+            {
+                popupEl.style.display = DisplayStyle.Flex;
+                return;
+            }
+        }
+        Debug.LogWarning($"[TutorialManager] UI Element Popup '{popupName}' wurde nicht gefunden.");
+    }
+
+    private void SchliesseAllePopups()
+    {
+        // 1. Alle UI-Toolkit Popups durchgehen und ausblenden
+        foreach (var schritt in alleSchritte)
+        {
+            if (!string.IsNullOrEmpty(schritt.PopupElementName))
+            {
+                VersteckePopupVisualElement(schritt.PopupElementName);
+            }
+        }
+
+        // 2. Alle GameObject-basierten Popups / Zusatz-Screens ausblenden,
+        // außer wenn sie einer der 3 Haupt-Screens sind (die werden separat verwaltet)
+        foreach (var schritt in alleSchritte)
+        {
+            if (!string.IsNullOrEmpty(schritt.GameObjectName))
+            {
+                // Hauptscreens überspringen, da diese in Step 3 gezielt geschaltet werden
+                if ((startScreenObj != null && schritt.GameObjectName == startScreenObj.name) ||
+                    (loginScreenObj != null && schritt.GameObjectName == loginScreenObj.name) ||
+                    (registrationScreenObj != null && schritt.GameObjectName == registrationScreenObj.name))
+                {
+                    continue;
+                }
+
+                var go = FindInaktivesGameObject(schritt.GameObjectName);
+                if (go != null)
+                {
+                    go.SetActive(false);
+                }
+            }
         }
     }
-}
 
-// ── Public API ───────────────────────────────────────────────────────────
+    private void VersteckePopupVisualElement(string popupName)
+    {
+        var alleDocuments = FindObjectsByType<UIDocument>();
+        foreach (var doc in alleDocuments)
+        {
+            var root = doc.rootVisualElement;
+            if (root == null) continue;
 
-/// <summary>
-/// Prüft beim allerersten App-Start, ob das Tutorial gezeigt werden soll.
-/// </summary>
-public void PruefeErstenAppStart()
+            var popupEl = root.Q<VisualElement>(popupName);
+            if (popupEl != null)
+            {
+                popupEl.style.display = DisplayStyle.None;
+            }
+        }
+    }
+
+    // ── Public API ───────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Prüft beim allerersten App-Start, ob das Tutorial gezeigt werden soll.
+    /// </summary>
+    public void PruefeErstenAppStart()
     {
         const string Key = "ErsterAppStart_TutorialAngezeigt";
 
@@ -1038,8 +993,8 @@ public void PruefeErstenAppStart()
         TutorialAuswahlOeffnen(); 
     }
 
-// Hilfsmethode zum Testen im Unity Inspector
-[ContextMenu("Ersten Start zurücksetzen")]
+    // Hilfsmethode zum Testen im Unity Inspector
+    [ContextMenu("Ersten Start zurücksetzen")]
     public void ResetErsterStart()
     {
         PlayerPrefs.DeleteKey("ErsterAppStart_TutorialAngezeigt");
