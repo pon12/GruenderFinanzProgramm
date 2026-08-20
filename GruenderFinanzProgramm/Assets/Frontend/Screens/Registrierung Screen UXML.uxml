@@ -1,0 +1,78 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Frontend/Sidebar/Register-Screen.uss?fileID=7433441132597879392&amp;guid=305c4b953cf207248af3018763fed611&amp;type=3#Register-Screen"/>
+    <Style src="project://database/Assets/Frontend/Sidebar/Background.uss?fileID=7433441132597879392&amp;guid=e9732cc7f93bcd84490af24dc10b4fbb&amp;type=3#Background"/>
+    <ui:VisualElement name="Background" class="fullscreen-bg" style="background-color: rgb(30, 30, 30);"/>
+    <ui:VisualElement name="container-inhalt" class="container-main">
+        <ui:VisualElement name="row-kopf" class="header-row">
+            <ui:Button text="Zurück" name="btnclose" class="btn-back"/>
+            <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="container-ueberschrift" class="centered-container">
+            <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="container-profilname" class="centered-container">
+            <ui:Label text="Profilname" name="Profilname" class="Profilname"/>
+            <ui:TextField label="" placeholder-text="z.B. Max Mustermann" name="Profileingabe" class="input-profile"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="container-ueberschrift2" class="container-subheading">
+            <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="container-passkey-generieren" class="container-passkey-gen">
+            <ui:Label text="Kein Passwort nötig - Gib deine PIN ein oder lass dir eine starke PIN erstellen" name="text" class="text"/>
+            <ui:Button text="Power-Passkey-generieren" name="btnKeyGenerieren" class="Key-button"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="container-fehler" class="container-error">
+            <ui:Label text="" name="lblError" class="lbl-error"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="row-agb-datenschutz" class="row-agb">
+            <ui:Toggle label="" name="Toggle" class="toggle-agb"/>
+            <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
+            <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2 link-text"/>
+            <ui:Label text=" und die " name="normalerText2" class="text2"/>
+            <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: flex;">
+        <ui:VisualElement name="container-popup-passkey" class="popup-card">
+            <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
+                <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
+                <ui:Button text="✕" name="btnpopupclose" class="btn-popup-close"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="container-passkey-anzeige" class="popup-passkey-display">
+                <ui:VisualElement name="row-passkey" class="popup-row-item">
+                    <ui:Label text="" name="lblPasskey" class="lbl-key-display"/>
+                    <ui:Button text="Copy" name="btnCopyPasskey" class="btn-copy"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="row-recovery" class="popup-row-item popup-row-item-last">
+                    <ui:Label text="" name="lblRecoveryKey" class="lbl-key-display"/>
+                    <ui:Button text="Copy" name="btnCopyRecovery" class="btn-copy"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button text="Entschlüsseln" name="btnEntschluesseln" class="btn-decrypt"/>
+            <ui:Label text="Bitte notiere deinen Passkey und Recovery-Key sicher." name="label-popup-passkey-hinweis" class="popup-hint"/>
+            <ui:Button text="Zur Anmeldung" name="btnZurAnmeldung" class="btn-submit"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="PopUpAGB" class="popup-overlay" style="display: none;">
+        <ui:VisualElement name="container-popup-agb" class="popup-doc-card">
+            <ui:VisualElement name="row-popup-agb-header" class="popup-doc-header">
+                <ui:Label text="AGB" name="label-popup-agb-titel" class="popup-doc-title"/>
+                <ui:Button text="" name="btnAGBclose" class="btn-doc-close"/>
+            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-agb-inhalt" class="popup-doc-content">
+                <ui:Label text="§ 1 Gegenstand und akademischer Rahmen&#10;Die Software „Ventoriq – Dein digitaler Mentor&quot; ist eine modulare Desktop-Anwendung zur Unterstützung von Startup-Gründern. Dieses System entstand als studentisches Projekt im Rahmen des Moduls Wissenschaft und Wirtschaft 1 (WW1) im Sommersemester 2026 an der Hochschule Mittweida (Studiengang Medieninformatik und Interaktives Entertainment).&#10;&#10;§ 2 Nutzungsberechtigung und Zweck&#10;Die Software dient der Reduktion der kognitiven Last in der Gründungsphase durch geführte Prozesse (Guided UI). Die Nutzung ist im aktuellen Entwicklungsstadium (MVP) primär für Pilotgründer und zu Evaluationszwecken im akademischen Rahmen vorgesehen.&#10;&#10;§ 3 Haftungsausschluss und KI-Hinweis&#10;Da es sich um einen Prototypen (Minimum Viable Product) handelt, wird keine Gewähr für die Richtigkeit der berechneten Finanzdaten oder die Vollständigkeit der rechtlichen Hinweise übernommen. Inhalte der Wissensdatenbank sowie Teile der Systemlogik können unter Zuhilfenahme von KI-Technologien generiert worden sein und dienen lediglich der Orientierung. Die Software ersetzt keine professionelle Steuer- oder Rechtsberatung. Die Nutzung erfolgt auf eigene Gefahr.&#10;&#10;§ 4 Lokale Datenspeicherung&#10;Alle Eingaben werden ausschließlich in einer lokalen SQLite-Datenbank auf dem Endgerät des Nutzers gespeichert. Der Nutzer ist für die Sicherung dieser Datenbankdatei (Backup-Funktion unter Einstellungen) selbst verantwortlich." name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="PopUpDatenschutz" class="popup-overlay">
+        <ui:VisualElement name="container-popup-datenschutz" class="popup-doc-card">
+            <ui:VisualElement name="row-popup-datenschutz-header" class="popup-doc-header">
+                <ui:Label text="Datenschutzrichtlinie" name="label-popup-datenschutz-titel" class="popup-doc-title"/>
+                <ui:Button text="" name="btnDatenschutzclose" class="btn-doc-close"/>
+            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-datenschutz-inhalt" class="popup-doc-content">
+                <ui:Label text="Grundsatz der Datensouveränität&#10;Der Schutz deiner Daten hat bei Ventoriq oberste Priorität. Die Software folgt dem Prinzip der lokalen Datenhaltung. Das bedeutet: Sämtliche von dir eingegebenen Unternehmensdaten, Finanztransaktionen und persönlichen Profileinstellungen werden ausschließlich lokal in einer verschlüsselten SQLite-Datenbank auf deinem Rechner gespeichert.&#10;&#10;Keine Cloud-Übertragung&#10;In der vorliegenden MVP-Version erfolgt keine Übertragung deiner Daten an externe Server oder Cloud-Dienste. Es findet keine Analyse deines Nutzerverhaltens durch die Entwickler statt.&#10;&#10;Authentifizierung und Sicherheit&#10;Zum Schutz deines Lokalprofils nutzt Ventoriq ein Passkey-Verfahren. Deine PIN wird nicht im Klartext gespeichert, sondern mittels SHA-256-Hashing verschlüsselt hinterlegt. Ein Zugriff auf deine Daten ist ohne diesen lokalen Schlüssel nicht möglich.&#10;&#10;Auskunfts- und Löschungsrecht&#10;Da alle Daten physisch auf deinem Gerät liegen, hast du die volle Kontrolle. Durch das Löschen der lokalen Datenbankdatei oder die Deinstallation der Anwendung werden alle gespeicherten Informationen unwiderruflich entfernt." name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
