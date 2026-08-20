@@ -266,10 +266,17 @@ public static class OfferPdfExporter
                     footerFont
                 );
 
-                BelegAnhangController.SchreibeAnhaenge(doc, anhaenge, offer.status, "Angebot");
+                // Kontodaten sind immer Bestandteil des Belegs und nicht auswählbar.
+                BelegAnhangController.SchreibeKontodaten(doc);
 
+                // Zuerst nur die Haupt-PDF fertig schreiben. Die ausgewählten
+                // Dokumente werden danach als vollständige PDFs angehängt.
                 doc.Close();
             }
+
+            BelegAnhangController.FuegeDokumentPdfAn(
+                filePath,
+                anhaenge);
 
             Debug.Log("Angebots-PDF gespeichert: " + filePath);
 

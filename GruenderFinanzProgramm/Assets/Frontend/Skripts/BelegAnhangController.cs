@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using iTextSharp.text;
@@ -97,6 +98,60 @@ public static class BelegAnhangController
         }
 
         return ergebnis;
+    }
+
+
+    // ============================================================
+    // KONTODATEN IMMER AUSGEBEN
+    // Kontodaten sind nicht auswählbar, werden aber in jedem
+    // Rechnungs-/Angebots-PDF ausgegeben.
+    // ============================================================
+
+    public static void SchreibeKontodaten(ITextDocument document)
+    {
+        if (document == null)
+            return;
+
+        try
+        {
+            var konto = DocumentDashboard.GetKontodatenFelder();
+
+            ITextFont titelFont = FontFactory.GetFont(
+                FontFactory.HELVETICA_BOLD, 14);
+
+            ITextFont textFont = FontFactory.GetFont(
+                FontFactory.HELVETICA, 10);
+
+            ITextFont feldLabelFont = FontFactory.GetFont(
+                FontFactory.HELVETICA_BOLD, 10);
+
+            document.NewPage();
+            document.Add(new ITextParagraph("Bankverbindung", titelFont));
+            document.Add(new ITextParagraph(" "));
+            document.Add(new Chunk(new LineSeparator()));
+            document.Add(new ITextParagraph(" "));
+
+            SchreibeFeld(document, "Kontoinhaber",
+                HoleDictionaryWert(konto, "kontoinhaber"),
+                textFont, feldLabelFont);
+
+            SchreibeFeld(document, "Kreditinstitut",
+                HoleDictionaryWert(konto, "bank"),
+                textFont, feldLabelFont);
+
+            SchreibeFeld(document, "IBAN",
+                HoleDictionaryWert(konto, "iban"),
+                textFont, feldLabelFont);
+
+            SchreibeFeld(document, "BIC",
+                HoleDictionaryWert(konto, "bic"),
+                textFont, feldLabelFont);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(
+                "[BelegAnhang] Fehler beim Schreiben der Kontodaten: " + e);
+        }
     }
 
 
@@ -280,91 +335,6 @@ public static class BelegAnhangController
                 }
             }
 
-
-            // ========================================================
-            // 2. KONTODATEN
-            //
-            // IMMER ausgeben.
-            // Nicht auswählbar.
-            // Nicht aus Settings lesen.
-            // ========================================================
-
-            {
-                var konto =
-                    DocumentDashboard.GetKontodatenFelder();
-
-
-                document.NewPage();
-
-                document.Add(
-                    new ITextParagraph(
-                        "Bankverbindung",
-                        titelFont
-                    )
-                );
-
-                document.Add(
-                    new ITextParagraph(" ")
-                );
-
-                document.Add(
-                    new Chunk(linie)
-                );
-
-                document.Add(
-                    new ITextParagraph(" ")
-                );
-
-
-                SchreibeFeld(
-                    document,
-                    "Kontoinhaber",
-                    HoleDictionaryWert(
-                        konto,
-                        "kontoinhaber"
-                    ),
-                    textFont,
-                    feldLabelFont
-                );
-
-
-                SchreibeFeld(
-                    document,
-                    "Kreditinstitut",
-                    HoleDictionaryWert(
-                        konto,
-                        "bank"
-                    ),
-                    textFont,
-                    feldLabelFont
-                );
-
-
-                SchreibeFeld(
-                    document,
-                    "IBAN",
-                    HoleDictionaryWert(
-                        konto,
-                        "iban"
-                    ),
-                    textFont,
-                    feldLabelFont
-                );
-
-
-                SchreibeFeld(
-                    document,
-                    "BIC",
-                    HoleDictionaryWert(
-                        konto,
-                        "bic"
-                    ),
-                    textFont,
-                    feldLabelFont
-                );
-            }
-
-
             // ========================================================
             // 3. NORMALE ANHÄNGE
             //
@@ -478,48 +448,41 @@ public static class BelegAnhangController
     // ============================================================
 
     private static DocumentDashboard.DocumentData FindeDokument(
-    List<DocumentDashboard.DocumentData> dokumente,
-    string titel)
-{
-    if (dokumente == null ||
-        string.IsNullOrEmpty(titel))
+        List<DocumentDashboard.DocumentData> dokumente,
+        string titel)
     {
+        if (dokumente == null || string.IsNullOrWhiteSpace(titel))
+            return null;
+
+        // Zuerst exakt nach dem sichtbaren Titel suchen.
+        // Dadurch ist die Kategorie egal und alle Dokumente aus dem
+        // Dokumente-Screen können gefunden werden.
+        var dokument = dokumente.FirstOrDefault(
+            d => d != null && d.title == titel
+        );
+
+        if (dokument != null)
+            return dokument;
+
+        // Bekannte Anzeigenamen -> tatsächliche Dokumenttitel.
+        if (titel == "Datenschutzerklärung")
+        {
+            return dokumente.FirstOrDefault(
+                d => d != null &&
+                     d.title == "Datenschutzerklärung (DSGVO)"
+            );
+        }
+
+        if (titel == "Dienstleistungskatalog")
+        {
+            return dokumente.FirstOrDefault(
+                d => d != null &&
+                     d.title == "Dienstleistungskatalog / Preisliste"
+            );
+        }
+
         return null;
     }
-    var dokument =
-        dokumente.FirstOrDefault(
-            d =>
-                d.category == "Bezahlweise" &&
-                d.title == titel
-        );
-
-    if (dokument != null)
-        return dokument;
-
-
-  
-
-
-    if (titel == "Datenschutzerklärung")
-    {
-        return dokumente.FirstOrDefault(
-            d =>
-                d.category == "Recht & Steuern" &&
-                d.title == "Datenschutzerklärung (DSGVO)"
-        );
-    }
-
-    if (titel == "Dienstleistungskatalog")
-    {
-        return dokumente.FirstOrDefault(
-            d =>
-                d.category == "Marketing & Personal" &&
-                d.title == "Dienstleistungskatalog / Preisliste"
-        );
-    }
-
-    return null;
-}
     // ============================================================
     // PRÜFEN, OB DOKUMENT INHALT HAT
     // ============================================================
@@ -823,4 +786,178 @@ public static class BelegAnhangController
 
         return "";
     }
+public static void FuegeDokumentPdfAn(
+        string zielPdf,
+        List<string> ausgewaehlteAnhaenge)
+    {
+        if (string.IsNullOrWhiteSpace(zielPdf))
+            return;
+
+        if (ausgewaehlteAnhaenge == null ||
+            ausgewaehlteAnhaenge.Count == 0)
+            return;
+
+        string tempPdf = zielPdf + ".base.pdf";
+
+        try
+        {
+            if (!File.Exists(zielPdf))
+            {
+                Debug.LogWarning(
+                    "[BelegAnhang] Haupt-PDF nicht gefunden: " + zielPdf);
+                return;
+            }
+
+            if (File.Exists(tempPdf))
+                File.Delete(tempPdf);
+
+            File.Move(zielPdf, tempPdf);
+
+            var alle = DocumentDashboard.GetSavedDocuments();
+
+            if (alle?.savedDocs == null)
+            {
+                File.Move(tempPdf, zielPdf);
+                return;
+            }
+
+            using (FileStream fs = new FileStream(
+                zielPdf, FileMode.Create, FileAccess.Write))
+            {
+                ITextDocument document = new ITextDocument();
+                PdfCopy copy = new PdfCopy(document, fs);
+                document.Open();
+
+                // --------------------------------------------------
+                // 1. Haupt-PDF (Rechnung / Angebot)
+                // --------------------------------------------------
+                PdfReader mainReader = null;
+
+                try
+                {
+                    mainReader = new PdfReader(tempPdf);
+
+                    for (int page = 1;
+                         page <= mainReader.NumberOfPages;
+                         page++)
+                    {
+                        copy.AddPage(
+                            copy.GetImportedPage(
+                                mainReader,
+                                page
+                            )
+                        );
+                    }
+                }
+                finally
+                {
+                    if (mainReader != null)
+                        mainReader.Close();
+                }
+
+                // --------------------------------------------------
+                // 2. Ausgewählte Dokument-PDFs
+                //    Jedes Dokument kommt als vollständige PDF hinein.
+                // --------------------------------------------------
+                foreach (string titel in ausgewaehlteAnhaenge.Distinct())
+                {
+                    if (string.IsNullOrWhiteSpace(titel))
+                        continue;
+
+                    // Kontodaten sind nicht auswählbar und werden bereits
+                    // im Haupt-PDF ausgegeben.
+                    if (titel == "Kontodaten (IBAN/BIC)")
+                        continue;
+
+                    var dokument = FindeDokument(alle.savedDocs, titel);
+
+                    if (dokument == null)
+                    {
+                        Debug.LogWarning(
+                            "[BelegAnhang] Dokument nicht gefunden: " + titel);
+                        continue;
+                    }
+
+                    // Die echte, bereits für den Dokumente-Screen vorgesehene
+                    // PDF erzeugen bzw. deren Pfad erhalten.
+                    string dokumentPdf =
+                        DokumentPdfGenerator.ErstellePdfFuerDokument(dokument);
+
+                    if (string.IsNullOrWhiteSpace(dokumentPdf))
+                    {
+                        Debug.LogWarning(
+                            "[BelegAnhang] Keine PDF für Dokument: " + titel);
+                        continue;
+                    }
+
+                    if (!File.Exists(dokumentPdf))
+                    {
+                        Debug.LogWarning(
+                            "[BelegAnhang] PDF-Datei nicht gefunden: " +
+                            dokumentPdf);
+                        continue;
+                    }
+
+                    Debug.Log(
+                        "[BelegAnhang] Füge vollständige Dokument-PDF an: " +
+                        titel + " -> " + dokumentPdf);
+
+                    PdfReader dokumentReader = null;
+
+try
+{
+    dokumentReader = new PdfReader(dokumentPdf);
+
+    for (int page = 1;
+         page <= dokumentReader.NumberOfPages;
+         page++)
+    {
+        copy.AddPage(
+            copy.GetImportedPage(
+                dokumentReader,
+                page
+            )
+        );
+    }
+}
+finally
+{
+    if (dokumentReader != null)
+        dokumentReader.Close();
+}
+                }
+
+                document.Close();
+            }
+
+            if (File.Exists(tempPdf))
+                File.Delete(tempPdf);
+
+            Debug.Log(
+                "[BelegAnhang] PDF erfolgreich mit Dokument-PDFs zusammengeführt: " +
+                zielPdf);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(
+                "[BelegAnhang] PDF-Anhänge konnten nicht zusammengeführt werden: " +
+                e);
+
+            try
+            {
+                if (File.Exists(zielPdf))
+                    File.Delete(zielPdf);
+
+                if (File.Exists(tempPdf))
+                    File.Move(tempPdf, zielPdf);
+            }
+            catch (Exception restoreException)
+            {
+                Debug.LogError(
+                    "[BelegAnhang] Wiederherstellung der PDF fehlgeschlagen: " +
+                    restoreException);
+            }
+        }
+    }
+
 }
