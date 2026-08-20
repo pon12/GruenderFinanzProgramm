@@ -6,7 +6,6 @@ using System;
 public class DienstleistungenScreenController : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private VisualTreeAsset popupAsset;
 
     private List<Service> daten = new List<Service>();
     private VisualElement rootElement;
@@ -17,10 +16,17 @@ public class DienstleistungenScreenController : MonoBehaviour
 
     private ScrollView tabelleBody;
     private VisualElement popupOverlay;
-    private int editIndex = -1;
+    private VisualElement popup;
+    private TextField feldTitel;
+    private TextField feldBeschreibung;
+    private DropdownField feldPreismodell;
+    private TextField feldBetrag;
 
-    // Referenz auf den aktuell offenen Popup (für Confirm-Dialog benötigt)
-    private VisualElement currentPopup;
+    private Label fehlerTitel;
+    private Label fehlerBeschreibung;
+    private Label fehlerBetrag;
+
+    private int editIndex = -1;
 
     // Dirty-Flag: true sobald der Nutzer etwas in ein Feld getippt / geändert hat
     private bool _isDirty = false;
@@ -31,6 +37,7 @@ public class DienstleistungenScreenController : MonoBehaviour
         rootElement = root;
         tabelleBody = root.Query<ScrollView>("tabelle-body").First();
         popupOverlay = root.Query<VisualElement>("popup-overlay").First();
+        popup = popupOverlay.Q<VisualElement>("container-popup");
 
         var btnNeu = root.Q<Button>("btn-neu");
         if (btnNeu == null) { Debug.LogError("btn-neu nicht gefunden!"); return; }
@@ -41,9 +48,12 @@ public class DienstleistungenScreenController : MonoBehaviour
             if (evt.target == popupOverlay) VersuchSchliessen();
         });
 
+        InitialisierePopup();
+
         LadeDienstleistungenAusDatenbank();
         TabelleAktualisieren();
         RegistriereHelpTooltips(root);
+        RegistrierePopupTooltips(popup, rootElement);
     }
 
     private void TabelleAktualisieren()
@@ -106,60 +116,58 @@ public class DienstleistungenScreenController : MonoBehaviour
     return label;
 }
 
-    private void OeffnePopup(int index)
+    // Holt Referenzen auf die Popup-Felder, hängt die Fehler-Labels ein und registriert
+    private void InitialisierePopup()
     {
-        editIndex = index;
-        _isDirty = false; // Dirty-Flag zurücksetzen
-        popupOverlay.Clear();
+        feldTitel = popup.Q<TextField>("feld-titel");
+        feldBeschreibung = popup.Q<TextField>("feld-beschreibung");
+        feldPreismodell = popup.Q<DropdownField>("feld-preismodell");
+        feldBetrag = popup.Q<TextField>("feld-betrag");
 
-        var popup = popupAsset.Instantiate();
-        currentPopup = popup; // Referenz für spätere Nutzung im Confirm-Dialog merken
-
-        var d = index >= 0
-            ? daten[index]
-            : new Service { name = "", description = "", priceModel = "Festpreis", price = 0.0 };
-
-        // ---- Felder befüllen (VOR dem Registrieren der Callbacks, damit setValue kein dirty auslöst) ----
-        var feldTitel = popup.Q<TextField>("feld-titel");
-        var feldBeschreibung = popup.Q<TextField>("feld-beschreibung");
-        var feldPreismodell = popup.Q<DropdownField>("feld-preismodell");
-        var feldBetrag = popup.Q<TextField>("feld-betrag");
-
-        feldTitel.value = d.name;
-        feldBeschreibung.value = d.description;
-        feldPreismodell.value = d.priceModel;
-        feldBetrag.value = d.price.ToString("F2");
-
-        // ---- Validierungs-Labels erstellen und direkt nach dem jeweiligen Feld einfügen ----
-        var fehlerTitel = ErstelleFehlerLabel("fehler-titel");
-        var fehlerBeschreibung = ErstelleFehlerLabel("fehler-beschreibung");
-        var fehlerBetrag = ErstelleFehlerLabel("fehler-betrag");
+        fehlerTitel = ErstelleFehlerLabel("fehler-titel");
+        fehlerBeschreibung = ErstelleFehlerLabel("fehler-beschreibung");
+        fehlerBetrag = ErstelleFehlerLabel("fehler-betrag");
         EinfuegenNach(feldTitel, fehlerTitel);
         EinfuegenNach(feldBeschreibung, fehlerBeschreibung);
         EinfuegenNach(feldBetrag, fehlerBetrag);
 
-        // ---- Dirty-Tracking + Live-Validierung: erst NACH dem Setzen der Initialwerte registrieren ----
         feldTitel.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerTitel, ValidiereName(evt.newValue)); });
         feldBeschreibung.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerBeschreibung, ValidiereBeschreibung(evt.newValue)); });
         feldPreismodell.RegisterValueChangedCallback(_ => _isDirty = true);
         feldBetrag.RegisterValueChangedCallback(evt => { _isDirty = true; ZeigeFehler(fehlerBetrag, ValidiereBetrag(evt.newValue)); });
 
-        // ---- X-Button (Schließen oben rechts) ----
         var btnClose = popup.Q<Button>("btn-close-popup");
         if (btnClose != null)
             btnClose.clicked += VersuchSchliessen;
 
-        // ---- Abbrechen-Button ----
         var btnAbbrechen = popup.Q<Button>("btn-abbrechen");
         if (btnAbbrechen != null)
             btnAbbrechen.clicked += VersuchSchliessen;
 
-        // ---- Fertig-Button ----
-        popup.Q<Button>("btn-fertig").clicked += () => SpeichernUndSchliessen(popup);
+        var btnFertig = popup.Q<Button>("btn-fertig");
+        if (btnFertig != null)
+            btnFertig.clicked += () => SpeichernUndSchliessen(popup);
+    }
 
-        popupOverlay.Add(popup);
+    private void OeffnePopup(int index)
+    {
+        editIndex = index;
+        _isDirty = false;
+
+        var d = index >= 0
+            ? daten[index]
+            : new Service { name = "", description = "", priceModel = "Festpreis", price = 0.0 };
+
+        feldTitel.SetValueWithoutNotify(d.name);
+        feldBeschreibung.SetValueWithoutNotify(d.description);
+        feldPreismodell.SetValueWithoutNotify(d.priceModel);
+        feldBetrag.SetValueWithoutNotify(d.price.ToString("F2"));
+
+        ZeigeFehler(fehlerTitel, null);
+        ZeigeFehler(fehlerBeschreibung, null);
+        ZeigeFehler(fehlerBetrag, null);
+
         popupOverlay.style.display = DisplayStyle.Flex;
-        RegistrierePopupTooltips(popup, rootElement);
     }
 
     // Entscheidet, ob direkt geschlossen oder der Confirm-Dialog gezeigt wird
@@ -270,8 +278,8 @@ public class DienstleistungenScreenController : MonoBehaviour
         var btnJa = new Button(() =>
         {
             rootElement.Remove(confirmOverlay);
-            if (currentPopup != null)
-                SpeichernUndSchliessen(currentPopup);
+            if (popup != null)
+                SpeichernUndSchliessen(popup);
         });
         btnJa.text = "Ja";
         btnJa.style.flexGrow = 1;
@@ -415,8 +423,6 @@ public class DienstleistungenScreenController : MonoBehaviour
     private void SchliessPopup()
     {
         popupOverlay.style.display = DisplayStyle.None;
-        popupOverlay.Clear();
-        currentPopup = null;
         editIndex = -1;
         _isDirty = false;
     }
