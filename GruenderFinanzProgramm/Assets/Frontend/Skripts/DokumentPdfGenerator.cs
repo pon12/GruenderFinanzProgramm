@@ -442,44 +442,42 @@ public static class DokumentPdfGenerator
 
     private static string PfadFuer(string dokumentTyp)
 {
-    PassKeyRecord currentUser = StateManager.Instance?.getCurrentUser();
+    PassKeyRecord currentUser =
+        StateManager.Instance?.getCurrentUser();
 
-    if (currentUser == null || string.IsNullOrWhiteSpace(currentUser.userId))
+    if (currentUser == null ||
+        string.IsNullOrWhiteSpace(currentUser.username))
     {
         Debug.LogError(
-            "[DokumentPdfGenerator] Kein eingeloggter Benutzer gefunden."
+            "[DokumentPdfGenerator] Kein aktueller Benutzer gefunden."
         );
 
         return null;
     }
 
-    string rawUserId = currentUser.userId;
+    string username = currentUser.username;
 
-    // Falls die ID z.B. "user_1" lautet
-    if (rawUserId.StartsWith("user_"))
-        rawUserId = rawUserId.Substring("user_".Length);
-
-    // String -> int
-    if (!int.TryParse(rawUserId, out int userId))
+    // Ungültige Zeichen aus dem Benutzernamen entfernen
+    foreach (char c in Path.GetInvalidFileNameChars())
     {
-        Debug.LogError(
-            "[DokumentPdfGenerator] Ungültige User-ID: " +
-            currentUser.userId
-        );
-
-        return null;
+        username = username.Replace(c, '_');
     }
 
-    string ordner = PDFUserFolderSetup.GetUserCategoryFolder(
-        userId,
+    string ordner = Path.Combine(
+        Application.persistentDataPath,
+        "PDFs",
+        username,
         "Dokumente"
     );
 
+    Directory.CreateDirectory(ordner);
+
     return Path.Combine(
         ordner,
-        dokumentTyp + "_" +
-        DateTime.Now.ToString("yyyyMMdd_HHmmss") +
-        ".pdf"
+        dokumentTyp
+        + "_"
+        + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+        + ".pdf"
     );
 }
 
