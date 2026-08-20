@@ -1999,10 +1999,6 @@ public abstract class BelegScreenController : MonoBehaviour
                             : ""),
                         fettFont));
 
-                // Kontodaten sind nicht auswählbar und werden immer
-                // als Bestandteil des Belegs ausgegeben.
-                BelegAnhangController.SchreibeKontodaten(document);
-
                 // Hauptdokument schließen. Die ausgewählten Dokument-PDFs
                 // werden danach als vollständige PDF-Seiten angehängt.
                 document.Close();

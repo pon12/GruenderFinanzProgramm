@@ -266,8 +266,6 @@ public static class OfferPdfExporter
                     footerFont
                 );
 
-                // Kontodaten sind immer Bestandteil des Belegs und nicht auswählbar.
-                BelegAnhangController.SchreibeKontodaten(doc);
 
                 // Zuerst nur die Haupt-PDF fertig schreiben. Die ausgewählten
                 // Dokumente werden danach als vollständige PDFs angehängt.

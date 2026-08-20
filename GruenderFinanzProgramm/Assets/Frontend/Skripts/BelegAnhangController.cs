@@ -101,58 +101,6 @@ public static class BelegAnhangController
     }
 
 
-    // ============================================================
-    // KONTODATEN IMMER AUSGEBEN
-    // Kontodaten sind nicht auswählbar, werden aber in jedem
-    // Rechnungs-/Angebots-PDF ausgegeben.
-    // ============================================================
-
-    public static void SchreibeKontodaten(ITextDocument document)
-    {
-        if (document == null)
-            return;
-
-        try
-        {
-            var konto = DocumentDashboard.GetKontodatenFelder();
-
-            ITextFont titelFont = FontFactory.GetFont(
-                FontFactory.HELVETICA_BOLD, 14);
-
-            ITextFont textFont = FontFactory.GetFont(
-                FontFactory.HELVETICA, 10);
-
-            ITextFont feldLabelFont = FontFactory.GetFont(
-                FontFactory.HELVETICA_BOLD, 10);
-
-            document.NewPage();
-            document.Add(new ITextParagraph("Bankverbindung", titelFont));
-            document.Add(new ITextParagraph(" "));
-            document.Add(new Chunk(new LineSeparator()));
-            document.Add(new ITextParagraph(" "));
-
-            SchreibeFeld(document, "Kontoinhaber",
-                HoleDictionaryWert(konto, "kontoinhaber"),
-                textFont, feldLabelFont);
-
-            SchreibeFeld(document, "Kreditinstitut",
-                HoleDictionaryWert(konto, "bank"),
-                textFont, feldLabelFont);
-
-            SchreibeFeld(document, "IBAN",
-                HoleDictionaryWert(konto, "iban"),
-                textFont, feldLabelFont);
-
-            SchreibeFeld(document, "BIC",
-                HoleDictionaryWert(konto, "bic"),
-                textFont, feldLabelFont);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(
-                "[BelegAnhang] Fehler beim Schreiben der Kontodaten: " + e);
-        }
-    }
 
 
     // ============================================================
