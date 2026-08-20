@@ -672,7 +672,7 @@ private void SetzeButtonsAktiv(bool aktiv)
             new() {
                 Erklaerung    = "Wenn du auf „Kunde Hinzufügen“ klickst, öffnet sich dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie Telefonnummer inklusive Ländervorwahl ein. Klicke anschließend auf „Kunden speichern“, um den neuen Kontakt in der Datenbank abzulegen.",
                 ElementName   = "Pop-up",
-                PopupElementName = "Popupkundeerstellen",
+                PopupElementName = "PopUpKundeerstellen",
                 SceneName     = "KundenDB",
                 inKurzversion = false
             },
@@ -788,7 +788,7 @@ private void SetzeButtonsAktiv(bool aktiv)
 
             new() {
                 Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
-                ElementName   = "panel-letzte-erfolge",
+                ElementName   = "",
                 SceneName     = "Gründerpfad",
                 inKurzversion = true
             },
