@@ -785,10 +785,24 @@ MonoBehaviour:
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: settings-scroll
-  - Erklaerung: "Auf der rechten Seite sind Steuers\xE4tze und Design-Einstellungen
-      zu finden. Sie k\xF6nnen ebenfalls ihren aktuellen Passkey zur\xFCcksetzen
-      oder ihr Konto l\xF6schen"
-    ElementName: col-right
+  - Erklaerung: "Auf der rechten Seite finden sie die Steuers\xE4tze ..."
+    ElementName: card-steuersaetze
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "... den Anzeigemodus und Ihren Pers\xF6nlichen Begleiter, welchen
+      sie ein und ausschalten k\xF6nnen ..."
+    ElementName: card-layout
+    inKurzversion: 1
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "... und die Sicherheitseinstellungen, wo sie Ihren aktuellen Passkey
+      zur\xFCcksetzen k\xF6nnen."
+    ElementName: card-sicherheit
     inKurzversion: 1
     SceneName: Einstellungen
     GameObjectName: 
@@ -802,11 +816,151 @@ MonoBehaviour:
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: settings-scroll
-  - Erklaerung: "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg
-      zur Gr\xFCndung."
+  - Erklaerung: Hier sehen sie all ihre Dokumente auf einen Blick.
+    ElementName: Main-Scroll-View
+    inKurzversion: 1
+    SceneName: Dokument-Screen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Mit diesen zwei Buttons k\xF6nnen Dukemente hinzugef\xFCgt oder
+      gel\xF6scht werden."
+    ElementName: row-alle-loeschen
+    inKurzversion: 1
+    SceneName: Dokument-Screen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Der Fortschritt-Screen gibt dir einen kombinierten \xDCberblick
+      \xFCber deine gesamte Gr\xFCndungsreise. Er fasst zusammen, wie weit du im
+      Gr\xFCnderpfad bist und wie viele Pflichtdokumente du bereits ausgef\xFCllt
+      hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du jede Gr\xFCndungsphase einzeln mit einem Mini-Fortschrittsbalken
+      und der Anzahl erledigter Schritte. Eine Phase zeigt ein gr\xFCnes H\xE4kchen,
+      sobald alle Schritte abgeschlossen sind."
+    ElementName: panel-gruenderpfad
+    inKurzversion: 0
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieses Panel zeigt dir die n\xE4chsten offenen Aufgaben aus deinem
+      Gr\xFCnderpfad \u2013 immer die ersten f\xFCnf, die noch nicht erledigt sind.
+      Du erledigst sie direkt im Gr\xFCnderpfad-Screen."
+    ElementName: panel-naechste-schritte
+    inKurzversion: 0
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier erscheinen deine zuletzt freigeschalteten Erfolge aus dem Gr\xFCnderpfad
+      und aus ausgef\xFCllten Dokumenten. Jeder abgeschlossene Schritt und jedes
+      Pflichtdokument kann hier auftauchen."
+    ElementName: panel-letzte-erfolge
+    inKurzversion: 0
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Der Gr\xFCnderpfad ist deine pers\xF6nliche Roadmap von der Idee
+      bis zur fertigen Gr\xFCndung. Alle wichtigen Schritte sind in Phasen unterteilt
+      \u2013 von der Vorbereitung \xFCber die Anmeldung bis hin zu Finanzen und Betrieb.
+      Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist.
+      Der Fortschritt hier flie\xDFt auch in den Fortschritt-Screen ein."
     ElementName: panel-letzte-erfolge
     inKurzversion: 1
     SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Balken zeigt dir auf einen Blick, wie viele Schritte des
+      Gr\xFCnderpfads du bereits abgehakt hast. Die Prozentzahl rechts aktualisiert
+      sich automatisch jedes Mal, wenn du einen Schritt als erledigt markierst."
+    ElementName: panel-gesamtfortschritt
+    inKurzversion: 0
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du alle Phasen deiner Gr\xFCndung mit ihren einzelnen
+      Schritten. Jede Phase l\xE4sst sich aufklappen. Ein Klick auf die Checkbox
+      links neben einem Schritt markiert ihn als erledigt \u2013 das speichert sich
+      automatisch."
+    ElementName: main-container
+    inKurzversion: 0
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Die Wissensdatenbank ist deine Anlaufstelle f\xFCr Anleitungen und
+      Erkl\xE4rungen rund um deine Gr\xFCndung. Alle Eintr\xE4ge sind in Themenkategorien
+      geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen
+      zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Jede Kachel steht f\xFCr eine Themenkategorie \u2013 zum Beispiel
+      Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel \xF6ffnet die Liste
+      aller Eintr\xE4ge zu diesem Thema."
+    ElementName: Grid-Container
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Nach dem Klick auf eine Kategorie \xF6ffnet sich dieses Popup mit
+      allen Wissenseintr\xE4gen zu dem Thema. Klicke auf einen einzelnen Eintrag,
+      um ihn vollst\xE4ndig zu lesen."
+    ElementName: Detail-Popup-Overlay
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du den vollst\xE4ndigen Text des ausgew\xE4hlten Eintrags.
+      Du kannst scrollen, wenn der Inhalt l\xE4nger ist. Mit Schlie\xDFen kommst
+      du zur\xFCck zur Kategorie\xFCbersicht."
+    ElementName: View-Popup-Overlay
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften,
+      die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet
+      \u2013 durch abgehakte Schritte im Gr\xFCnderpfad, ausgef\xFCllte Dokumente,
+      angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge
+      und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Erfolge
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Balken zeigt, wie viele der verf\xFCgbaren Erfolge du bereits
+      freigeschaltet hast. Die Zahl rechts gibt dir den genauen Stand an."
+    ElementName: panel-gesamtfortschritt
+    inKurzversion: 0
+    SceneName: Erfolge
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Alle Erfolge sind hier nach Kategorien gruppiert \u2013 zum Beispiel
+      Gr\xFCndung, Dokumente, Kunden oder Finanzen. Freigeschaltete Erfolge leuchten
+      auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten
+      Erfolgen siehst du direkt, auf welcher Stufe du gerade bist."
+    ElementName: erfolge-grid
+    inKurzversion: 0
+    SceneName: Erfolge
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
@@ -814,7 +968,7 @@ MonoBehaviour:
       zu erstellen.
     ElementName: 
     inKurzversion: 1
-    SceneName: 
+    SceneName: Angebot
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 

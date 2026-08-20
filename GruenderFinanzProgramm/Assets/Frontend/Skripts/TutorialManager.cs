@@ -607,18 +607,89 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = true
             },
 
-            // ── Fortschritt ────────────────────────────────────────────────
+            // ── Dienstleistungen ───────────────────────────────────────────
+
             new() {
-                Erklaerung    = "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg zur Gründung.",
-                ElementName   = "panel-letzte-erfolge",
-                SceneName     = "Fortschritt",
+                Erklaerung    = "Auf diesem Screen verwaltest du alle Dienstleistungen, die du deinen Kunden anbietest. Du kannst neue Leistungen anlegen, bestehende bearbeiten oder löschen. Die hinterlegten Dienstleistungen stehen dir später beim Erstellen von Angeboten und Rechnungen direkt zur Auswahl, damit du sie nicht jedes Mal neu eingeben musst.",
+                ElementName   = "",
+                SceneName     = "Dienstleistungen",
                 inKurzversion = true
             },
 
+            new() {
+                Erklaerung    = "Hier siehst du alle angelegten Dienstleistungen in einer übersichtlichen Liste. Jede Zeile zeigt dir den Namen, die Beschreibung, die Kategorie und den Preis der Leistung.",
+                ElementName   = "tabelle-wrapper",
+                SceneName     = "Dienstleistungen",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Mit diesem Button legst du eine neue Dienstleistung an. Es öffnet sich ein Formular, in dem du alle relevanten Felder ausfüllst.",
+                ElementName   = "btn-neu",
+                SceneName     = "Dienstleistungen",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Dieses Formular erscheint beim Anlegen und beim Bearbeiten einer Dienstleistung. Du gibst den Namen und eine optionale Beschreibung ein, wählst das Preismodell und trägst den Betrag ein. Pflichtfelder werden rot markiert, wenn sie fehlen oder ungültig sind. Mit Fertig speicherst du, mit Abbrechen verwirfst du die Änderungen.",
+                ElementName   = "container-popup",
+                PopupElementName = "popup-overlay",
+                SceneName     = "Dienstleistungen",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Hier wählst du, wie du die Leistung abrechnest: als Festpreis, Stundensatz oder Pauschalpreis. Diese Angabe erscheint später auch in Angeboten und Rechnungen.",
+                ElementName   = "feld-preismodell",
+                PopupElementName = "popup-overlay",
+                SceneName     = "Dienstleistungen",
+                inKurzversion = false
+            },
+
+            // ── Kundendatenbank ────────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Auf diesem Screen verwaltest du all deine Kunden und Kontakte sowie deine eigenen Firmendaten an einem zentralen Ort. Ganz oben findest du deine eigenen Profil- und Unternehmensdaten. Darunter befindet sich die Aktionsleiste, mit der du neue Kunden anlegen kannst, gefolgt von der Übersicht all deiner gespeicherten Kundenkontakte.",
+                ElementName   = "",
+                SceneName     = "KundenDB",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Im oberen Bereich siehst du die Karte „Lokaler Nutzer“. Hier werden deine eigenen Firmen- und Kontaktdaten (Name, Firma, Adresse, E-Mail und Telefonnummer) angezeigt, die aus deinen Einstellungen geladen werden. Über den Button „Ändern“ gelangst du direkt in die Einstellungen, um deine Unternehmensdaten anzupassen.",
+                ElementName   = "card-Lokaler-Nutzer",
+                SceneName     = "KundenDB",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "In der Zwischenleiste findest du den Button „Kunde Hinzufügen“. Damit öffnest du ein Formular, um einen neuen Kontakt anzulegen. Rechts daneben siehst du einen Zähler, der dir jederzeit die genaue Anzahl deiner aktuell gespeicherten Kunden anzeigt.",
+                ElementName   = "card-Zwischenbar",
+                SceneName     = "KundenDB",
+                inKurzversion = false
+            },
+            
+            new() {
+                Erklaerung    = "Wenn du auf „Kunde Hinzufügen“ klickst, öffnet sich dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie Telefonnummer inklusive Ländervorwahl ein. Klicke anschließend auf „Kunden speichern“, um den neuen Kontakt in der Datenbank abzulegen.",
+                ElementName   = "Pop-up",
+                PopupElementName = "Popupkundeerstellen",
+                SceneName     = "KundenDB",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Hier werden all deine angelegten Kunden in einer Übersicht aufgelistet. Jede Kundenkarte zeigt die wichtigsten Kontaktdaten wie Name, Firma, Adresse, E-Mail und Telefonnummer.",
+                ElementName   = "kunden-liste-holder",
+                SceneName     = "KundenDB",
+                inKurzversion = false
+            },
+
             // ── Angebot ────────────────────────────────────────────────────
+
             new() {
                 Erklaerung    = "Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote zu erstellen.",
                 ElementName   = "",
+                SceneName     = "Angebot",
                 inKurzversion = true
             },
             new() {
@@ -647,41 +718,187 @@ private void SetzeButtonsAktiv(bool aktiv)
                 inKurzversion = false
             },
 
-            // ── Kundendatenbank ────────────────────────────────────────────
+            // ── Kassenbuch ─────────────────────────────────────────────────
+
             new() {
-                Erklaerung    = "Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten erscheint.",
-                ElementName   = "card-Lokaler-Nutzer",
-                inKurzversion = true
-            },
-            new() {
-                Erklaerung    = "Mit diesem Button legst du einen neuen Kunden in deiner Datenbank an.",
-                ElementName   = "btn-add-coustomer",
+                Erklaerung    = "Hier behältst du die Finanzen deines Unternehmens im Blick, erfasst Einnahmen und Ausgaben und bereitest deine Daten für die Buchhaltung vor.",
+                ElementName   = "",
+                SceneName     = "Kassenbuch",
                 inKurzversion = true
             },
 
-            // ── Finanzen ───────────────────────────────────────────────────
             new() {
-                Erklaerung    = "Hier siehst du deine Rentabilitätskennzahlen – Umsatz, Kosten und Gewinn im Überblick.",
-                ElementName   = "panel-rentabilitaet",
-                inKurzversion = true
-            },
-            new() {
-                Erklaerung    = "Dieser Bereich zeigt deine Liquidität zum Geschäftsbeginn – was du zum Start benötigst.",
-                ElementName   = "panel-liquiditaet",
-                inKurzversion = false
-            },
-            new() {
-                Erklaerung    = "Die Liquiditätsplanung gibt dir einen Überblick über Ein- und Ausgaben über die Zeit.",
-                ElementName   = "panel-liquiditaetsplanung",
+                Erklaerung    = "Wähle oben rechts das gewünschte Jahr aus, um deine Einträge zu filtern. Die Anzeige zeigt dir deinen aktuellen Saldo, der aus Einnahmen abzüglich aller Ausgaben automatisch berechnet und live aktualisiert wird.",
+                ElementName   = "dropJahr",
+                SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
 
-            // ── Dokumente ──────────────────────────────────────────────────
             new() {
-                Erklaerung    = "Wähle hier eine Vorlage für dein neues Dokument: Standard-Text, Diagramm oder Checkliste.",
-                ElementName   = "Template-Grid",
+                Erklaerung    = "Über die Buttons fügst du neue Ausgaben oder Einnahmen hinzu. Es öffnet sich ein Fenster, in dem du Betrag, Verwendungszweck, Art und Datum einträgst.",
+                ElementName   = "Buttons",
+                SceneName     = "Kassenbuch",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "In der zentralen Liste siehst du alle Transaktionen auf einen Blick (Einnahmen in Grün, Ausgaben in Rot). Klicke auf die Spaltenköpfe, um die Liste z. B. nach Datum, Betrag oder Typ zu sortieren. Bezahlte Rechnungen werden automatisch eingefügt.",
+                ElementName   = "Tabelle",
+                SceneName     = "Kassenbuch",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Nutze das Export-Menü, um Berichte wie die Einnahmen-Überschuss-Rechnung (EÜR), die GuV oder das Buchungsjournal direkt als PDF zu generieren.",
+                ElementName   = "FinanzExport",
+                SceneName     = "Kassenbuch",
+                inKurzversion = false
+            },
+
+            // ── Fortschritt ────────────────────────────────────────────────
+            new() {
+                Erklaerung    = "Der Fortschritt-Screen gibt dir einen kombinierten Überblick über deine gesamte Gründungsreise. Er fasst zusammen, wie weit du im Gründerpfad bist und wie viele Pflichtdokumente du bereits ausgefüllt hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist.",
+                ElementName   = "",
+                SceneName     = "Fortschritt",
                 inKurzversion = true
             },
+
+            new() {
+                Erklaerung    = "Hier siehst du jede Gründungsphase einzeln mit einem Mini-Fortschrittsbalken und der Anzahl erledigter Schritte. Eine Phase zeigt ein grünes Häkchen, sobald alle Schritte abgeschlossen sind.",
+                ElementName   = "panel-gruenderpfad",
+                SceneName     = "Fortschritt",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Dieses Panel zeigt dir die nächsten offenen Aufgaben aus deinem Gründerpfad – immer die ersten fünf, die noch nicht erledigt sind. Du erledigst sie direkt im Gründerpfad-Screen.",
+                ElementName   = "panel-naechste-schritte",
+                SceneName     = "Fortschritt",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Hier erscheinen deine zuletzt freigeschalteten Erfolge aus dem Gründerpfad und aus ausgefüllten Dokumenten. Jeder abgeschlossene Schritt und jedes Pflichtdokument kann hier auftauchen.",
+                ElementName   = "panel-letzte-erfolge",
+                SceneName     = "Fortschritt",
+                inKurzversion = false
+            },
+
+            // ── Gründerpfad ────────────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
+                ElementName   = "panel-letzte-erfolge",
+                SceneName     = "Gründerpfad",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Dieser Balken zeigt dir auf einen Blick, wie viele Schritte des Gründerpfads du bereits abgehakt hast. Die Prozentzahl rechts aktualisiert sich automatisch jedes Mal, wenn du einen Schritt als erledigt markierst.",
+                ElementName   = "panel-gesamtfortschritt",
+                SceneName     = "Gründerpfad",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Hier siehst du alle Phasen deiner Gründung mit ihren einzelnen Schritten. Jede Phase lässt sich aufklappen. Ein Klick auf die Checkbox links neben einem Schritt markiert ihn als erledigt – das speichert sich automatisch.",
+                ElementName   = "main-container",
+                SceneName     = "Gründerpfad",
+                inKurzversion = false
+            },
+
+            // ── Wissensdatenbank ───────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Die Wissensdatenbank ist deine Anlaufstelle für Anleitungen und Erklärungen rund um deine Gründung. Alle Einträge sind in Themenkategorien geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen.",
+                ElementName   = "",
+                SceneName     = "Wissensdatenbank",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Jede Kachel steht für eine Themenkategorie – zum Beispiel Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel öffnet die Liste aller Einträge zu diesem Thema.",
+                ElementName   = "Grid-Container",
+                SceneName     = "Wissensdatenbank",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Nach dem Klick auf eine Kategorie öffnet sich dieses Popup mit allen Wissenseinträgen zu dem Thema. Klicke auf einen einzelnen Eintrag, um ihn vollständig zu lesen.",
+                ElementName   = "Detail-Menu-Container",
+                PopupElementName = "Detail-Popup-Overlay",
+                SceneName     = "Wissensdatenbank",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Hier siehst du den vollständigen Text des ausgewählten Eintrags. Du kannst scrollen, wenn der Inhalt länger ist. Mit Schließen kommst du zurück zur Kategorieübersicht.",
+                ElementName   = "Detail-List-Container",
+                PopupElementName = "Detail-Popup-Overlay",
+                SceneName     = "Wissensdatenbank",
+                inKurzversion = false
+            },
+
+            // ── Erfolge ────────────────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften, die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet – durch abgehakte Schritte im Gründerpfad, ausgefüllte Dokumente, angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level.",
+                ElementName   = "",
+                SceneName     = "Erfolge",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Dieser Balken zeigt, wie viele der verfügbaren Erfolge du bereits freigeschaltet hast. Die Zahl rechts gibt dir den genauen Stand an.",
+                ElementName   = "panel-gesamtfortschritt",
+                SceneName     = "Erfolge",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Alle Erfolge sind hier nach Kategorien gruppiert – zum Beispiel Gründung, Dokumente, Kunden oder Finanzen. Freigeschaltete Erfolge leuchten auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten Erfolgen siehst du direkt, auf welcher Stufe du gerade bist.",
+                ElementName   = "erfolge-grid",
+                SceneName     = "Erfolge",
+                inKurzversion = false
+            },
+
+            // ── Buchhaltung ────────────────────────────────────────────
+
+            new() {
+                Erklaerung    = "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens, behältst Fristen sowie Status im Blick und exportierst deine Belege schnell als PDF.",
+                ElementName   = "",
+                SceneName     = "Buchhaltung",
+                inKurzversion = true
+            },
+
+            new() {
+                Erklaerung    = "Die Kopfzeile bietet dir den Einstieg in die Übersicht. Durch Klick auf die Spaltenköpfe (z. B. Bezeichnung, Art, Erstellt, Fällig, Status) kannst du die gesamte Liste nach deinen Wünschen sortieren",
+                ElementName   = "tabelle-header",
+                SceneName     = "Buchhaltung",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
+                ElementName   = "",
+                SceneName     = "Buchhaltung",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
+                ElementName   = "",
+                SceneName     = "Buchhaltung",
+                inKurzversion = false
+            },
+
+            new() {
+                Erklaerung    = "Über das Export-Symbol erstellst du im Handumdrehen ein PDF deines Belegs. Das Ordner-Symbol führt dich direkt zum lokalen Speicherort auf deinem System.",
+                ElementName   = "",
+                SceneName     = "Buchhaltung",
+                inKurzversion = false
+            },
+            
         };
 
         Debug.Log($"[TutorialManager] {alleSchritte.Count} Standardschritte eingetragen.");
