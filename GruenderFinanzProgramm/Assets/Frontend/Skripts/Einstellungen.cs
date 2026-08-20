@@ -168,7 +168,11 @@ public class EinstellungenController : MonoBehaviour
     private Button _btnCancelBezahlweise;
 
     private VisualElement _popupCredits;
+
+    private VisualElement _popupUpdateNochNichtDa;
     private Button _btnCloseCredits;
+
+    private Button _btnCloseUpdate;
     private VisualElement _popupMitwirkende;
     private Button _btnCloseMitwirkende;
 
@@ -374,6 +378,8 @@ public class EinstellungenController : MonoBehaviour
         _btnCloseBezahlweise = _root.Q<Button>("btn-close-bezahlweise");
         _btnCancelBezahlweise = _root.Q<Button>("btn-cancel-bezahlweise");
 
+        _popupUpdateNochNichtDa = _root.Q<VisualElement>("popup-updateNochNichtDa");
+        _btnCloseUpdate = _root.Q<Button>("btn-close-update");
         _popupCredits = _root.Q<VisualElement>("popup-credits");
         _btnCloseCredits = _root.Q<Button>("btn-close-credits");
         _popupMitwirkende = _root.Q<VisualElement>("popup-mitwirkende");
@@ -492,6 +498,7 @@ public class EinstellungenController : MonoBehaviour
         if (_btnOpenRechnung != null) _btnOpenRechnung.clicked += () => ShowPopup(_popupRechnung);
         if (_btnOpenBezahlweise != null) _btnOpenBezahlweise.clicked += () => { LadeBezahlweiseAusDokumenten(); LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
         if (_btnOpenCredits != null) _btnOpenCredits.clicked += () => ShowPopup(_popupCredits);
+        if (_btnUpdate != null) _btnUpdate.clicked += () => ShowPopup(_popupUpdateNochNichtDa);
         if (_btnOpenMitwirkende != null) _btnOpenMitwirkende.clicked += () => ShowPopup(_popupMitwirkende);
 
         if (_btnCloseUnternehmen != null) _btnCloseUnternehmen.clicked += () => HidePopup(_popupUnternehmen);
@@ -518,6 +525,7 @@ public class EinstellungenController : MonoBehaviour
         if (_btnBearbeitenBarzahlung != null) _btnBearbeitenBarzahlung.clicked += () => SpringeZuDokument("Barzahlung");
         if (_btnBearbeitenUeberweisung != null) _btnBearbeitenUeberweisung.clicked += () => SpringeZuDokument("Überweisung");
 
+        if (_btnCloseUpdate != null) _btnCloseUpdate.clicked += () => HidePopup(_popupUpdateNochNichtDa);
         if (_btnCloseCredits != null) _btnCloseCredits.clicked += () => HidePopup(_popupCredits);
         if (_btnCloseMitwirkende != null) _btnCloseMitwirkende.clicked += () => HidePopup(_popupMitwirkende);
 
