@@ -34,6 +34,11 @@ public class ExportScreenController : MonoBehaviour
         // Nur bei JSON-Dokumenten gesetzt
         // für den strukturierten PDF-Export
         public DocumentDashboard.DocumentData quelleDokument;
+        // FIX: true, sobald filePath auf einen echten, existierenden
+        // Speicherort zeigt (PDFs aus der DB haben das von Anfang an,
+        // JSON-Dokumente erst nach dem ersten Export). Verhindert, dass
+        // "Ordner oeffnen" vorher das Stammverzeichnis anzeigt.
+        public bool hatEchtenPfad;
     }
 
     // =========================================================
@@ -373,35 +378,17 @@ public class ExportScreenController : MonoBehaviour
 
         foreach (UserPDFDocument pdf in pdfListe)
         {
-            dokListe.Add(
-                new DokumentExportEintrag
-                {
-                    bezeichnung =
-                        pdf.originalFileName,
-
-                    art =
-                        string.IsNullOrEmpty(pdf.category)
-                            ? "Dokument"
-                            : pdf.category,
-
-                    // Bei bereits gespeicherten PDFs
-                    // den tatsächlichen Dateipfad verwenden
-                    filePath =
-                        pdf.filePath,
-
-                    isPDF = true,
-
-                    pdfId = pdf.id,
-
-                    datum =
-                        pdf.uploadedAt.ToString(
-                            "dd.MM.yyyy"
-                        ),
-
-                    datumSort =
-                        pdf.uploadedAt
-                }
-            );
+            dokListe.Add(new DokumentExportEintrag
+            {
+                bezeichnung = pdf.originalFileName,
+                art = string.IsNullOrEmpty(pdf.category) ? "Dokument" : pdf.category,
+                filePath = pdf.filePath,
+                isPDF = true,
+                pdfId = pdf.id,
+                datum = pdf.uploadedAt.ToString("dd.MM.yyyy"),
+                datumSort = pdf.uploadedAt,
+                hatEchtenPfad = true
+            });
         }
 
         Debug.Log(
@@ -465,36 +452,19 @@ public class ExportScreenController : MonoBehaviour
                 }
 
                 dokListe.Add(
-                    new DokumentExportEintrag
-                    {
-                        bezeichnung =
-                            doc.title,
-
-                        art =
-                            doc.category,
-
-                        // NICHT mehr Application.persistentDataPath
-                        //
-                        // Der Ordner-Button öffnet damit:
-                        //
-                        // PDFs/<Username>/Dokumente
-                        filePath =
-                            dokumenteOrdner,
-
-                        isPDF = false,
-
-                        pdfId = -1,
-
-                        datum =
-                            datumAnzeige,
-
-                        datumSort =
-                            datumSort,
-
-                        quelleDokument =
-                            doc
-                    }
-                );
+    new DokumentExportEintrag
+    {
+        bezeichnung = doc.title,
+        art = doc.category,
+        filePath = dokumenteOrdner,
+        isPDF = false,
+        pdfId = -1,
+        datum = datumAnzeige,
+        datumSort = datumSort,
+        quelleDokument = doc,
+        hatEchtenPfad = true
+    }
+);
             }
 
             Debug.Log(
@@ -628,10 +598,14 @@ public class ExportScreenController : MonoBehaviour
 
             if (btnFolder != null)
             {
-                btnFolder.clicked +=
-                    () => OeffneOrdner(
-                        lokalerEintrag.filePath
-                    );
+                // FIX: Solange kein echter Speicherort existiert (JSON-Dokument
+                // vor dem ersten Export), Button deaktivieren statt auf das
+                // Stammverzeichnis zu zeigen.
+                btnFolder.SetEnabled(lokalerEintrag.hatEchtenPfad);
+                btnFolder.tooltip = lokalerEintrag.hatEchtenPfad
+                    ? ""
+                    : "Noch kein Speicherort - erst als PDF exportieren.";
+                btnFolder.clicked += () => OeffneOrdner(lokalerEintrag.filePath);
             }
 
             if (btnExport != null)
