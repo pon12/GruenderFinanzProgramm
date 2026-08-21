@@ -2,7 +2,7 @@
 }
 
 /* ==========================================
-   Generelle Layouts & Container
+   Layout
    ========================================== */
 .fullscreen-bg {
     flex-grow: 1;
@@ -10,168 +10,193 @@
 
 .container-main {
     flex-grow: 1;
-}
-
-.centered-container {
-    flex-grow: 1;
     align-items: center;
     justify-content: center;
-    height: auto;
 }
 
 .header-row {
-    flex-grow: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 130px;
     justify-content: center;
     align-items: center;
     flex-direction: row;
 }
 
 .header-logo {
-    width: 200px;
-    height: 144px;
-    align-self: center;
+    width: 92px;
+    height: 66px;
 }
 
-.container-subheading {
-    flex-grow: 1;
-    align-items: center;
-    justify-content: space-around;
-    height: auto;
-    margin-top: -32px;
-}
-
-.container-passkey-gen {
-    flex-grow: 1;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: auto;
-    margin-top: -48px;
-}
-
-.container-error {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.btn-back {
     position: absolute;
-    right: 0;
-    left: 0;
-    top: 912px;
-}
-
-.lbl-error {
-    font-size: 24px;
-    color: rgb(255, 100, 100);
-}
-
-.row-agb {
-    flex-grow: 1;
-    flex-direction: row;
-    align-items: center;
-    align-self: stretch;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0);
-}
-
-.toggle-agb {
-    width: 48px;
+    right: 32px;
+    top: 32px;
     height: 48px;
-    background-color: rgba(0, 0, 0, 0);
+    padding-left: 22px;
+    padding-right: 22px;
+    font-size: 16px;
+    font-weight: 500;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+.btn-back:hover {
+    background-color: rgb(75, 75, 75);
+}
+.btn-back:active {
+    background-color: rgb(45, 45, 45);
 }
 
 /* ==========================================
-   Typografie & Buttons (Hauptscreen)
+   Haupt-Karte "Konto erstellen"
    ========================================== */
+.registry-card {
+    width: 620px;
+    background-color: rgb(44, 44, 44);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 48px;
+}
+
 .ueberschrift {
     color: rgb(255, 255, 255);
     -unity-text-align: middle-center;
-    font-size: 88px;
-    width: 576px;
-    height: 96px;
+    font-size: 32px;
+    -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+    margin-bottom: 32px;
+}
+
+.field-group {
+    margin-bottom: 28px;
 }
 
 .Profilname {
-    color: rgb(255, 255, 255);
-    -unity-text-align: middle-center;
-    font-size: 48px;
-    width: 336px;
-    height: 56px;
+    color: rgb(170, 170, 170);
+    -unity-text-align: middle-left;
+    font-size: 16px;
+    margin-bottom: 8px;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
+
+.input-profile {
+    width: 100%;
+    height: 56px;
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(50, 50, 50);
+    border-width: 1px;
+    border-color: rgb(74, 74, 74);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.input-profile:focus {
+    border-color: rgb(128, 207, 149);
 }
 
 .Ueberschrift2 {
     color: #80CF95;
     -unity-text-align: middle-center;
-    font-size: 40px;
+    font-size: 19px;
+    -unity-font-style: bold;
     -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+    margin-bottom: 8px;
 }
 
 .text {
-    color: #AEAEAE;
-    -unity-text-align: middle-center;
-    font-size: 24px;
-    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
-}
-
-.text2 {
-    color: #AEAEAE;
-    -unity-text-align: middle-center;
-    font-size: 32px;
-    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
-}
-
-.input-profile {
-    width: 984px;
-    height: 104px;
-    font-size: 32px;
-    color: rgb(255, 255, 255);
-    border-radius: 10px;
-    border-width: 0;
-}
-
-.input-profile:hover {
-    border-color: rgb(128, 207, 149);
-    border-width: 2px;
-}
-
-.btn-back {
-    position: absolute;
-    right: 40px;
-    top: 24px;
-    width: 160px;
-    height: 56px;
-    font-size: 24px;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    color: rgb(255, 255, 255);
-    background-color: rgb(100, 100, 100);
-    border-width: 0;
-    border-radius: 10px;
-}
-.btn-back:hover {
-    background-color: rgb(142, 141, 141);
+    color: rgb(153, 153, 153);
+    -unity-text-align: upper-center;
+    font-size: 16px;
+    white-space: normal;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    margin-bottom: 22px;
 }
 
 .Key-button {
-    width: 480px;
-    height: 96px;
+    width: 100%;
+    height: 56px;
     background-color: rgb(128, 207, 149);
-    font-size: 24px;
-    color: white;
+    font-size: 18px;
+    color: rgb(20, 20, 20);
     -unity-text-align: middle-center;
     -unity-font-style: bold;
-    border-radius: 10px;
     border-width: 0;
-    padding: 8px 16px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-bottom: 6px;
 }
 .Key-button:hover {
     background-color: rgb(179, 226, 196);
 }
+.Key-button:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.container-error {
+    align-items: center;
+    justify-content: center;
+    min-height: 20px;
+}
+
+.lbl-error {
+    font-size: 16px;
+    color: rgb(230, 57, 70);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.row-agb {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.toggle-agb {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    margin-top: 1px;
+}
+
+.text2 {
+    color: rgb(153, 153, 153);
+    -unity-text-align: middle-left;
+    font-size: 16px;
+    white-space: normal;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+}
+
+.link-text {
+    color: #80CF95;
+    -unity-font-style: bold;
+}
+.link-text:hover {
+    color: rgb(179, 226, 196);
+}
 
 /* ==========================================
-   Overlay & Popups
+   Popups (gleicher Stil wie Kassenbuch/Doc-Screen
+   im restlichen Projekt: rgb(38,38,38) / 12px Radius
+   / sichtbarer Rand rgb(55,55,55))
    ========================================== */
 .popup-overlay {
     flex-grow: 1;
@@ -183,27 +208,30 @@
     display: none;
     top: 0;
     left: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.85);
 }
 
 .popup-card {
-    width: 900px;
+    width: 520px;
     background-color: rgb(38, 38, 38);
-    border-radius: 20px;
-    border-color: rgb(128, 207, 149);
-    border-width: 2px;
-    padding: 32px 40px;
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 32px;
 }
 
 .popup-header-row {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .popup-title {
-    font-size: 32px;
+    font-size: 24px;
     color: rgb(255, 255, 255);
     -unity-font-style: bold;
 }
@@ -213,17 +241,26 @@
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
     color: rgb(180, 180, 180);
-    font-size: 24px;
+    font-size: 20px;
     width: 40px;
     height: 40px;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     padding: 0;
+}
+.btn-popup-close:hover {
+    background-color: rgb(55, 55, 55);
 }
 
 .popup-passkey-display {
-    background-color: rgb(70, 70, 70);
-    border-radius: 10px;
-    padding: 16px 24px;
+    background-color: rgb(50, 50, 50);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 16px 20px;
     margin-bottom: 16px;
 }
 
@@ -231,7 +268,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .popup-row-item-last {
@@ -239,118 +276,141 @@
 }
 
 .lbl-key-display {
-    font-size: 24px;
+    font-size: 17px;
     color: rgb(255, 255, 255);
     flex-grow: 1;
     white-space: normal;
 }
 
 .btn-copy {
-    width: 80px;
-    height: 48px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 16px;
-    background-color: rgb(100, 100, 100);
+    width: 76px;
+    height: 38px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 15px;
+    background-color: rgb(70, 70, 70);
     border-width: 0;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     color: #FFFFFF;
 }
-
-/* Hover Zustand (Maus drüber) */
 .btn-copy:hover {
-    background-color: rgb(142, 141, 141);
-    color: rgb(255, 255, 255);
+    background-color: rgb(90, 90, 90);
 }
-
-/* Klick Zustand (Während der Button gedrückt wird) */
 .btn-copy:active {
-    background-color: rgb(56, 54, 54);
-    color: #FFFFFF;
+    background-color: rgb(50, 50, 50);
 }
 
 .btn-decrypt {
-    height: 56px;
-    background-color: rgb(100, 100, 100);
+    height: 50px;
+    background-color: rgb(70, 70, 70);
     color: rgb(255, 255, 255);
-    font-size: 16px;
-    border-radius: 10px;
+    font-size: 17px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     border-width: 0;
     margin-bottom: 16px;
 }
 .btn-decrypt:hover {
-    background-color: rgb(142, 141, 141);
+    background-color: rgb(90, 90, 90);
+}
+.btn-decrypt:active {
+    background-color: rgb(50, 50, 50);
 }
 
 .popup-hint {
     font-size: 16px;
-    color: rgb(160, 160, 160);
+    color: rgb(150, 150, 150);
     -unity-text-align: upper-center;
-    margin-bottom: 24px;
     white-space: normal;
+    margin-bottom: 20px;
 }
 
 .btn-submit {
-    height: 64px;
+    height: 52px;
     background-color: rgb(128, 207, 149);
-    color: rgb(30, 30, 30);
-    font-size: 24px;
+    color: rgb(20, 20, 20);
+    font-size: 17px;
     -unity-font-style: bold;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     border-width: 0;
 }
 .btn-submit:hover {
     background-color: rgb(179, 226, 196);
 }
+.btn-submit:active {
+    background-color: rgb(102, 165, 119);
+}
 
 /* Document Popups (AGB / Datenschutz) */
 .popup-doc-card {
-    flex-grow: 1;
-    width: 560px;
-    height: 1000px;
-    background-color: rgb(56, 56, 56);
-    border-color: rgb(179, 226, 196);
-    border-width: 3px;
-    border-radius: 30px;
+    width: 680px;
+    height: 720px;
+    background-color: rgb(38, 38, 38);
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 32px 36px;
     color: rgb(255, 255, 255);
     align-items: flex-start;
     flex-direction: column;
 }
 
 .popup-doc-header {
-    flex-grow: 1;
     flex-direction: row;
     align-items: center;
-    justify-content: space-around;
-    width: 560px;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 16px;
 }
 
 .popup-doc-title {
-    height: auto;
-    font-size: 32px;
+    font-size: 24px;
+    -unity-font-style: bold;
     -unity-text-align: middle-left;
-    white-space: pre-wrap;
-    width: 456px;
+}
+
+.popup-doc-subtitel {
+    color: rgb(150, 150, 150);
+    font-size: 16px;
+    margin-bottom: 20px;
 }
 
 .btn-doc-close {
-    height: 32px;
-    width: 32px;
+    height: 40px;
+    width: 40px;
     background-image: url("project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&guid=9cd0944736a9a324195ad03398faae90&type=3#close");
-    border-radius: 30px;
-    border-color: rgb(26, 26, 26);
-    border-width: 1px;
-    background-color: rgb(51, 51, 51);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-width: 0;
+    background-color: rgb(50, 50, 50);
+}
+.btn-doc-close:hover {
+    background-color: rgb(65, 65, 65);
 }
 
 .popup-doc-content {
     flex-grow: 1;
+    width: 100%;
+    padding-right: 16px;
 }
 
 .popup-doc-text {
     -unity-text-align: upper-left;
     white-space: normal;
-    font-size: 14px;
-    color: rgb(220, 220, 220);
+    font-size: 17px;
+    color: rgb(210, 210, 210);
     -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }

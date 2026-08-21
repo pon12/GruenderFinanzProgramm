@@ -405,11 +405,11 @@ public class DocumentDashboard : MonoBehaviour
         },
             ["SWOT-Analyse"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Was sind Ihre Wettbewerbsvorteile? (z.B. „Hocheffiziente Architektur“)" },
-            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Wo liegen interne Defizite? (z.B. „Begrenzte Personalressourcen“)" },
-            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Welche Markttrends können Sie nutzen? (z.B. „Wachsender Digitalisierungsbedarf“)" },
-            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Welche Gefahren drohen von außen? (z.B. „Markteintritt großer Wettbewerber“)" },
-            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Welche Kernmaßnahmen leiten Sie aus dieser Analyse ab?" },
+            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Ihre Wettbewerbsvorteile?" },
+            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Ihre internen Defizite?" },
+            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Nutzbare Markttrends?" },
+            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Gefahren von außen?" },
+            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Kernmaßnahmen aus der Analyse?" },
         },
             ["Zielgruppenanalyse"] = new List<FeldDefinition>
         {

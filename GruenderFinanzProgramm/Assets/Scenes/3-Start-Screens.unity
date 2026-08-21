@@ -671,7 +671,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: c6f9a72ca0574e84da0d83542ef1697f, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 988597c96aec454459a83061644b4563, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: 2ad5fbac18f5ce741b129dcfe3ae737a, type: 3}
   m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
@@ -738,6 +738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
   uiDocument: {fileID: 1363661634}
+  buttonCooldownSekunden: 0.2
   alleSchritte:
   - Erklaerung: Willkommen auf ihrer zentralen Steuerzentrale!
     ElementName: 
@@ -751,7 +752,7 @@ MonoBehaviour:
       die direkten Buttons k\xF6nnen sie ohne Umwege sofort neue Kunden anlegen,
       Angebote schreiben oder Rechnungen erstellen"
     ElementName: stats-grid
-    inKurzversion: 1
+    inKurzversion: 0
     SceneName: Dashboard
     GameObjectName: 
     PopupElementName: 
@@ -762,7 +763,7 @@ MonoBehaviour:
       Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr
       Gesch\xE4ft besonders gut l\xE4uft."
     ElementName: kassenbuch-statistik-panel
-    inKurzversion: 1
+    inKurzversion: 0
     SceneName: Dashboard
     GameObjectName: 
     PopupElementName: 
@@ -772,7 +773,7 @@ MonoBehaviour:
       die Monate und Jahre, um ihre F\xE4lligkeiten bequem im Voraus zu planen. Ein
       Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an."
     ElementName: kalender-panel
-    inKurzversion: 1
+    inKurzversion: 0
     SceneName: Dashboard
     GameObjectName: 
     PopupElementName: 
@@ -785,11 +786,25 @@ MonoBehaviour:
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: settings-scroll
-  - Erklaerung: "Auf der rechten Seite sind Steuers\xE4tze und Design-Einstellungen
-      zu finden. Sie k\xF6nnen ebenfalls ihren aktuellen Passkey zur\xFCcksetzen
-      oder ihr Konto l\xF6schen"
-    ElementName: col-right
-    inKurzversion: 1
+  - Erklaerung: "Auf der rechten Seite finden sie die Steuers\xE4tze ..."
+    ElementName: card-steuersaetze
+    inKurzversion: 0
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "... den Anzeigemodus und Ihren Pers\xF6nlichen Begleiter, welchen
+      sie ein und ausschalten k\xF6nnen ..."
+    ElementName: card-layout
+    inKurzversion: 0
+    SceneName: Einstellungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: settings-scroll
+  - Erklaerung: "... und die Sicherheitseinstellungen, wo sie Ihren aktuellen Passkey
+      zur\xFCcksetzen k\xF6nnen."
+    ElementName: card-sicherheit
+    inKurzversion: 0
     SceneName: Einstellungen
     GameObjectName: 
     PopupElementName: 
@@ -802,11 +817,117 @@ MonoBehaviour:
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: settings-scroll
-  - Erklaerung: "Hier sehen sie ihre zuletzt erreichten Meilensteine auf dem Weg
-      zur Gr\xFCndung."
-    ElementName: panel-letzte-erfolge
+  - Erklaerung: Hier sehen sie all ihre Dokumente auf einen Blick.
+    ElementName: Main-Scroll-View
     inKurzversion: 1
-    SceneName: Fortschritt
+    SceneName: Dokument-Screen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Mit diesen zwei Buttons k\xF6nnen Dukemente hinzugef\xFCgt oder
+      gel\xF6scht werden."
+    ElementName: row-alle-loeschen
+    inKurzversion: 0
+    SceneName: Dokument-Screen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Auf diesem Screen verwaltest du alle Dienstleistungen, die du deinen
+      Kunden anbietest. Du kannst neue Leistungen anlegen, bestehende bearbeiten
+      oder l\xF6schen. Die hinterlegten Dienstleistungen stehen dir sp\xE4ter beim
+      Erstellen von Angeboten und Rechnungen direkt zur Auswahl, damit du sie nicht
+      jedes Mal neu eingeben musst."
+    ElementName: 
+    inKurzversion: 1
+    SceneName: Dienstleistungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du alle angelegten Dienstleistungen in einer \xFCbersichtlichen
+      Liste. Jede Zeile zeigt dir den Namen, die Beschreibung, die Kategorie und
+      den Preis der Leistung."
+    ElementName: tabelle-wrapper
+    inKurzversion: 0
+    SceneName: Dienstleistungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Mit diesem Button legst du eine neue Dienstleistung an. Es \xF6ffnet
+      sich ein Formular, in dem du alle relevanten Felder ausf\xFCllst."
+    ElementName: btn-neu
+    inKurzversion: 0
+    SceneName: Dienstleistungen
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieses Formular erscheint beim Anlegen und beim Bearbeiten einer
+      Dienstleistung. Du gibst den Namen und eine optionale Beschreibung ein, w\xE4hlst
+      das Preismodell und tr\xE4gst den Betrag ein. Pflichtfelder werden rot markiert,
+      wenn sie fehlen oder ung\xFCltig sind. Mit Fertig speicherst du, mit Abbrechen
+      verwirfst du die \xC4nderungen."
+    ElementName: container-popup
+    inKurzversion: 0
+    SceneName: Dienstleistungen
+    GameObjectName: 
+    PopupElementName: popup-overlay
+    ScrollViewName: 
+  - Erklaerung: "Hier w\xE4hlst du, wie du die Leistung abrechnest: als Festpreis,
+      Stundensatz oder Pauschalpreis. Diese Angabe erscheint sp\xE4ter auch in Angeboten
+      und Rechnungen."
+    ElementName: feld-preismodell
+    inKurzversion: 0
+    SceneName: Dienstleistungen
+    GameObjectName: 
+    PopupElementName: popup-overlay
+    ScrollViewName: 
+  - Erklaerung: "Auf diesem Screen verwaltest du all deine Kunden und Kontakte sowie
+      deine eigenen Firmendaten an einem zentralen Ort. Ganz oben findest du deine
+      eigenen Profil- und Unternehmensdaten. Darunter befindet sich die Aktionsleiste,
+      mit der du neue Kunden anlegen kannst, gefolgt von der \xDCbersicht all deiner
+      gespeicherten Kundenkontakte."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Im oberen Bereich siehst du die Karte \u201ELokaler Nutzer\u201C.
+      Hier werden deine eigenen Firmen- und Kontaktdaten (Name, Firma, Adresse, E-Mail
+      und Telefonnummer) angezeigt, die aus deinen Einstellungen geladen werden.
+      \xDCber den Button \u201E\xC4ndern\u201C gelangst du direkt in die Einstellungen,
+      um deine Unternehmensdaten anzupassen."
+    ElementName: card-Lokaler-Nutzer
+    inKurzversion: 0
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "In der Zwischenleiste findest du den Button \u201EKunde Hinzuf\xFCgen\u201C.
+      Damit \xF6ffnest du ein Formular, um einen neuen Kontakt anzulegen. Rechts
+      daneben siehst du einen Z\xE4hler, der dir jederzeit die genaue Anzahl deiner
+      aktuell gespeicherten Kunden anzeigt."
+    ElementName: card-Zwischenbar
+    inKurzversion: 1
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Wenn du auf \u201EKunde Hinzuf\xFCgen\u201C klickst, \xF6ffnet sich
+      dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie
+      Telefonnummer inklusive L\xE4ndervorwahl ein. Klicke anschlie\xDFend auf \u201EKunden
+      speichern\u201C, um den neuen Kontakt in der Datenbank abgelegen."
+    ElementName: Pop-up
+    inKurzversion: 1
+    SceneName: KundenDB
+    GameObjectName: 
+    PopupElementName: PopUpKundeerstellen
+    ScrollViewName: 
+  - Erklaerung: "Hier werden all deine angelegten Kunden in einer \xDCbersicht aufgelistet.
+      Jede Kundenkarte zeigt die wichtigsten Kontaktdaten wie Name, Firma, Adresse,
+      E-Mail und Telefonnummer."
+    ElementName: kunden-liste-holder
+    inKurzversion: 1
+    SceneName: KundenDB
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
@@ -814,7 +935,7 @@ MonoBehaviour:
       zu erstellen.
     ElementName: 
     inKurzversion: 1
-    SceneName: 
+    SceneName: Angebot
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
@@ -854,51 +975,225 @@ MonoBehaviour:
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
-  - Erklaerung: Hier siehst du dein eigenes Profil das als Absender auf deinen Dokumenten
-      erscheint.
-    ElementName: card-Lokaler-Nutzer
-    inKurzversion: 1
-    SceneName: 
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewName: 
-  - Erklaerung: Mit diesem Button legst du einen neuen Kunden in deiner Datenbank
-      an.
-    ElementName: btn-add-coustomer
-    inKurzversion: 1
-    SceneName: 
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewName: 
-  - Erklaerung: "Hier siehst du deine Rentabilit\xE4tskennzahlen \u2013 Umsatz, Kosten
-      und Gewinn im \xDCberblick."
-    ElementName: panel-rentabilitaet
-    inKurzversion: 1
-    SceneName: 
-    GameObjectName: 
-    PopupElementName: 
-    ScrollViewName: 
-  - Erklaerung: "Dieser Bereich zeigt deine Liquidit\xE4t zum Gesch\xE4ftsbeginn
-      \u2013 was du zum Start ben\xF6tigst."
-    ElementName: panel-liquiditaet
+  - Erklaerung: "Hier beh\xE4ltst du die Finanzen deines Unternehmens im Blick, erfasst
+      Einnahmen und Ausgaben und bereitest deine Daten f\xFCr die Buchhaltung vor."
+    ElementName: 
     inKurzversion: 0
-    SceneName: 
+    SceneName: Kassenbuch
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
-  - Erklaerung: "Die Liquidit\xE4tsplanung gibt dir einen \xDCberblick \xFCber Ein-
-      und Ausgaben \xFCber die Zeit."
-    ElementName: panel-liquiditaetsplanung
+  - Erklaerung: "W\xE4hle oben rechts das gew\xFCnschte Jahr aus, um deine Eintr\xE4ge
+      zu filtern. Die Anzeige zeigt dir deinen aktuellen Saldo, der aus Einnahmen
+      abz\xFCglich aller Ausgaben automatisch berechnet und live aktualisiert wird."
+    ElementName: dropJahr
     inKurzversion: 0
-    SceneName: 
+    SceneName: Kassenbuch
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 
-  - Erklaerung: "W\xE4hle hier eine Vorlage f\xFCr dein neues Dokument: Standard-Text,
-      Diagramm oder Checkliste."
-    ElementName: Template-Grid
+  - Erklaerung: "\xDCber die Buttons f\xFCgst du neue Ausgaben oder Einnahmen hinzu.
+      Es \xF6ffnet sich ein Fenster, in dem du Betrag, Verwendungszweck, Art und
+      Datum eintr\xE4gst."
+    ElementName: Buttons
+    inKurzversion: 0
+    SceneName: Kassenbuch
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "In der zentralen Liste siehst du alle Transaktionen auf einen Blick
+      (Einnahmen in Gr\xFCn, Ausgaben in Rot). Klicke auf die Spaltenk\xF6pfe, um
+      die Liste z. B. nach Datum, Betrag oder Typ zu sortieren. Bezahlte Rechnungen
+      werden automatisch eingef\xFCgt."
+    ElementName: Tabelle
+    inKurzversion: 0
+    SceneName: Kassenbuch
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Nutze das Export-Men\xFC, um Berichte wie die Einnahmen-\xDCberschuss-Rechnung
+      (E\xDCR), die GuV oder das Buchungsjournal direkt als PDF zu generieren."
+    ElementName: FinanzExport
+    inKurzversion: 0
+    SceneName: Kassenbuch
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Der Fortschritt-Screen gibt dir einen kombinierten \xDCberblick
+      \xFCber deine gesamte Gr\xFCndungsreise. Er fasst zusammen, wie weit du im
+      Gr\xFCnderpfad bist und wie viele Pflichtdokumente du bereits ausgef\xFCllt
+      hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist."
+    ElementName: 
     inKurzversion: 1
-    SceneName: 
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du jede Gr\xFCndungsphase einzeln mit einem Mini-Fortschrittsbalken
+      und der Anzahl erledigter Schritte. Eine Phase zeigt ein gr\xFCnes H\xE4kchen,
+      sobald alle Schritte abgeschlossen sind."
+    ElementName: panel-gruenderpfad
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieses Panel zeigt dir die n\xE4chsten offenen Aufgaben aus deinem
+      Gr\xFCnderpfad \u2013 immer die ersten f\xFCnf, die noch nicht erledigt sind.
+      Du erledigst sie direkt im Gr\xFCnderpfad-Screen."
+    ElementName: panel-naechste-schritte
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier erscheinen deine zuletzt freigeschalteten Erfolge aus dem Gr\xFCnderpfad
+      und aus ausgef\xFCllten Dokumenten. Jeder abgeschlossene Schritt und jedes
+      Pflichtdokument kann hier auftauchen."
+    ElementName: panel-letzte-erfolge
+    inKurzversion: 1
+    SceneName: Fortschritt
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Der Gr\xFCnderpfad ist deine pers\xF6nliche Roadmap von der Idee
+      bis zur fertigen Gr\xFCndung. Alle wichtigen Schritte sind in Phasen unterteilt
+      \u2013 von der Vorbereitung \xFCber die Anmeldung bis hin zu Finanzen und Betrieb.
+      Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist.
+      Der Fortschritt hier flie\xDFt auch in den Fortschritt-Screen ein."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: "Gr\xFCnderpfad"
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Balken zeigt dir auf einen Blick, wie viele Schritte des
+      Gr\xFCnderpfads du bereits abgehakt hast. Die Prozentzahl rechts aktualisiert
+      sich automatisch jedes Mal, wenn du einen Schritt als erledigt markierst."
+    ElementName: panel-gesamtfortschritt
+    inKurzversion: 0
+    SceneName: "Gr\xFCnderpfad"
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du alle Phasen deiner Gr\xFCndung mit ihren einzelnen
+      Schritten. Jede Phase l\xE4sst sich aufklappen. Ein Klick auf die Checkbox
+      links neben einem Schritt markiert ihn als erledigt \u2013 das speichert sich
+      automatisch."
+    ElementName: main-container
+    inKurzversion: 0
+    SceneName: "Gr\xFCnderpfad"
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Die Wissensdatenbank ist deine Anlaufstelle f\xFCr Anleitungen und
+      Erkl\xE4rungen rund um deine Gr\xFCndung. Alle Eintr\xE4ge sind in Themenkategorien
+      geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen
+      zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Jede Kachel steht f\xFCr eine Themenkategorie \u2013 zum Beispiel
+      Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel \xF6ffnet die Liste
+      aller Eintr\xE4ge zu diesem Thema."
+    ElementName: Grid-Container
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Nach dem Klick auf eine Kategorie \xF6ffnet sich dieses Popup mit
+      allen Wissenseintr\xE4gen zu dem Thema. Klicke auf einen einzelnen Eintrag,
+      um ihn vollst\xE4ndig zu lesen."
+    ElementName: Detail-Menu-Container
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: Detail-Popup-Overlay
+    ScrollViewName: 
+  - Erklaerung: "Hier siehst du den vollst\xE4ndigen Text des ausgew\xE4hlten Eintrags.
+      Du kannst scrollen, wenn der Inhalt l\xE4nger ist. Mit Schlie\xDFen kommst
+      du zur\xFCck zur Kategorie\xFCbersicht."
+    ElementName: Detail-List-Container
+    inKurzversion: 0
+    SceneName: Wissensdatenbank
+    GameObjectName: 
+    PopupElementName: Detail-Popup-Overlay
+    ScrollViewName: 
+  - Erklaerung: "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften,
+      die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet
+      \u2013 durch abgehakte Schritte im Gr\xFCnderpfad, ausgef\xFCllte Dokumente,
+      angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge
+      und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Erfolge
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Dieser Balken zeigt, wie viele der verf\xFCgbaren Erfolge du bereits
+      freigeschaltet hast. Die Zahl rechts gibt dir den genauen Stand an."
+    ElementName: panel-gesamtfortschritt
+    inKurzversion: 0
+    SceneName: Erfolge
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Alle Erfolge sind hier nach Kategorien gruppiert \u2013 zum Beispiel
+      Gr\xFCndung, Dokumente, Kunden oder Finanzen. Freigeschaltete Erfolge leuchten
+      auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten
+      Erfolgen siehst du direkt, auf welcher Stufe du gerade bist."
+    ElementName: erfolge-grid
+    inKurzversion: 0
+    SceneName: Erfolge
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens,
+      beh\xE4ltst Fristen sowie Status im Blick und exportierst deine Belege schnell
+      als PDF."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Buchhaltung
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "Die Kopfzeile bietet dir den Einstieg in die \xDCbersicht. Durch
+      Klick auf die Spaltenk\xF6pfe (z. B. Bezeichnung, Art, Erstellt, F\xE4llig,
+      Status) kannst du die gesamte Liste nach deinen W\xFCnschen sortieren"
+    ElementName: tabelle-header
+    inKurzversion: 0
+    SceneName: Buchhaltung
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "\xDCber das Dropdown-Men\xFC in jeder Zeile kannst du den Bearbeitungsstand
+      eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen
+      und aktualisieren."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Buchhaltung
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "\xDCber das Dropdown-Men\xFC in jeder Zeile kannst du den Bearbeitungsstand
+      eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen
+      und aktualisieren."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Buchhaltung
+    GameObjectName: 
+    PopupElementName: 
+    ScrollViewName: 
+  - Erklaerung: "\xDCber das Export-Symbol erstellst du im Handumdrehen ein PDF deines
+      Belegs. Das Ordner-Symbol f\xFChrt dich direkt zum lokalen Speicherort auf
+      deinem System."
+    ElementName: 
+    inKurzversion: 0
+    SceneName: Buchhaltung
     GameObjectName: 
     PopupElementName: 
     ScrollViewName: 

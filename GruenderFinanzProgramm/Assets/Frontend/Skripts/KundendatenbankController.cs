@@ -370,6 +370,24 @@ public class KundendatenbankController : MonoBehaviour
 
         ziel.Clear();
 
+        // FIX: Bisher blieb die Liste bei 0 echten Kunden komplett leer,
+        // ohne jeden Hinweis, was dort einmal auftauchen wird. Jetzt gibt
+        // es stattdessen einen Platzhalter-Hinweistext.
+        if (kundenListe.Count == 0)
+        {
+            var leerHinweis = new Label(
+                "Noch keine Kunden angelegt. Über \u201eKunde Hinzuf\u00fcgen\u201c " +
+                "erscheinen deine Kundendaten hier.");
+            leerHinweis.style.color = new Color(0.56f, 0.56f, 0.56f); // #8E8D8D
+            leerHinweis.style.fontSize = 18;
+            leerHinweis.style.unityTextAlign = TextAnchor.MiddleCenter;
+            leerHinweis.style.marginTop = 24;
+            leerHinweis.style.whiteSpace = WhiteSpace.Normal;
+            ziel.Add(leerHinweis);
+            AppEventManager.KundenAnzahlGeaendert(0);
+            return;
+        }
+
         foreach (var kunde in kundenListe)
         {
             var neueKarte = kundenZeileTemplate.Instantiate();
