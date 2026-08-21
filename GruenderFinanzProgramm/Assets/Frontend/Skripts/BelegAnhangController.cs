@@ -1,240 +1,826 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.draw;
-using Color = UnityEngine.Color;
+
+// Eindeutige Aliase für iTextSharp
+using ITextFont = iTextSharp.text.Font;
+using ITextDocument = iTextSharp.text.Document;
+using ITextParagraph = iTextSharp.text.Paragraph;
 
 public static class BelegAnhangController
 {
-    public static readonly List<string> AnhangSchluessel = new List<string>
-    {
-        "AGB",
-        "Disclaimer",
-        "Barzahlung",
-        "Überweisung"
-    };
+    // ============================================================
+    // AUSWÄHLBARE ANHÄNGE
+    // Kontodaten sind NICHT auswählbar, da sie immer ausgegeben
+    // werden sollen.
+    // ============================================================
 
-    // Titel, die zu einer gemeinsamen "Bezahlweise"-Seite zusammengefasst werden
-    private static readonly HashSet<string> BezahlweiseGruppe = new HashSet<string>
-    {
-        "Barzahlung",
-        "Überweisung"
-    };
-
-    // Gibt alle Titel aus der Bezahlweise-Kategorie zurück
-    public static List<string> HoleAlleBezahlweiseTitel()
-    {
-        var titel = new List<string>();
-        try
+    public static readonly List<string> AnhangSchluessel =
+        new List<string>
         {
-            var alle = DocumentDashboard.GetSavedDocuments();
-            if (alle?.savedDocs == null) return titel;
-            foreach (var doc in alle.savedDocs)
-            {
-                if (doc.category == "Bezahlweise" && !string.IsNullOrEmpty(doc.title))
-                    if (!titel.Contains(doc.title))
-                        titel.Add(doc.title);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("[BelegAnhang] Titel konnten nicht geladen werden: " + e.Message);
-        }
-        return titel;
-    }
+            "Zahlungsbedingungen",
+            "AGB",
+            "Disclaimer",
+            "SEPA-Basislastschrift-Mandat",
+            "Widerrufsbelehrung",
+            "Barzahlung",
+            "Überweisung",
+            "Mahnverfahren",
+            "Ratenzahlungsbestimmungen",
+            "Copyright Hinweis",
+            "Lizenzhinweis Einfach",
+            "Lizenzhinweis Erweitert",
+            "Datenschutzerklärung",
+            "Vertraulichkeitserklärung",
+            "Kundenzufriedenheitsumfrage",
+            "Dienstleistungskatalog"
+        };
 
-    // Prüft, welche Anhänge im Pool vorhanden und mit Inhalt gefüllt sind
+
+    // ============================================================
+    // BEZAHLWEISE
+    // ============================================================
+
+    private static readonly HashSet<string> BezahlweiseGruppe =
+        new HashSet<string>
+        {
+            "Barzahlung",
+            "Überweisung"
+        };
+
+
+    // ============================================================
+    // VERFÜGBARE ANHÄNGE PRÜFEN
+    // ============================================================
+
     public static Dictionary<string, bool> HoleVerfuegbareAnhaenge()
     {
-        var ergebnis = new Dictionary<string, bool>();
+        var ergebnis =
+            new Dictionary<string, bool>();
+
         try
         {
-            var alle = DocumentDashboard.GetSavedDocuments();
-            if (alle?.savedDocs == null) return ergebnis;
+            var alle =
+                DocumentDashboard.GetSavedDocuments();
 
-            foreach (var doc in alle.savedDocs)
+            if (alle == null ||
+                alle.savedDocs == null)
             {
-                if (doc.category != "Bezahlweise") continue;
-                if (string.IsNullOrEmpty(doc.title)) continue;
+                return ergebnis;
+            }
 
-                bool hatInhalt = !string.IsNullOrWhiteSpace(doc.inhalt);
-                bool hatStrukturfelder = doc.strukturFelder != null
-                    && doc.strukturFelder.Count > 0
-                    && doc.strukturFelder.Any(f => !string.IsNullOrWhiteSpace(f.wert));
 
-                ergebnis[doc.title] = hatInhalt || hatStrukturfelder;
+            foreach (string schluessel in AnhangSchluessel)
+            {
+                var dokument =
+                    FindeDokument(
+                        alle.savedDocs,
+                        schluessel
+                    );
+
+                ergebnis[schluessel] =
+                    dokument != null &&
+                    HatDokumentInhalt(dokument);
             }
         }
         catch (Exception e)
         {
-            Debug.LogWarning("[BelegAnhang] Dokumente konnten nicht geladen werden: " + e.Message);
+            Debug.LogWarning(
+                "[BelegAnhang] Fehler beim Prüfen der Anhänge: " +
+                e.Message
+            );
         }
+
         return ergebnis;
     }
 
-    // Schreibt die ausgewählten Anhänge als zusätzliche Seiten in das PDF.
-    // Barzahlung und Überweisung werden auf einer gemeinsamen "Bezahlweise"-Seite zusammengefasst.
-    public static void SchreibeAnhaenge(Document document, List<string> ausgewaehlt, string status = "", string belegTyp = "Rechnung")
+
+    // ============================================================
+    // ANHÄNGE IN PDF SCHREIBEN
+    // ============================================================
+
+    public static void SchreibeAnhaenge(
+        ITextDocument document,
+        List<string> ausgewaehlt,
+        string status = "",
+        string belegTyp = "Rechnung")
     {
-        if (ausgewaehlt == null || ausgewaehlt.Count == 0) return;
+        if (document == null)
+            return;
+
 
         try
         {
-            var alle = DocumentDashboard.GetSavedDocuments();
+            var alle =
+                DocumentDashboard.GetSavedDocuments();
 
-            var titelFont  = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14);
-            var textFont   = FontFactory.GetFont(FontFactory.HELVETICA, 11);
-            var kursivFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 11);
-            var linie      = new LineSeparator();
+            if (alle == null ||
+                alle.savedDocs == null)
+            {
+                Debug.LogWarning(
+                    "[BelegAnhang] Keine Dokumentdaten gefunden."
+                );
 
-            var bezahlweiseAusgewaehlt = ausgewaehlt.Where(k => BezahlweiseGruppe.Contains(k)).ToList();
+                return;
+            }
 
-            var nurFooter = new HashSet<string> { "Kontodaten (IBAN/BIC)", "Zahlungsbedingungen" };
-            var einzelAnhaenge = ausgewaehlt
-                .Where(k => !BezahlweiseGruppe.Contains(k) && !nurFooter.Contains(k))
+
+            // ========================================================
+            // SCHRIFTEN
+            // ========================================================
+
+            ITextFont titelFont =
+                FontFactory.GetFont(
+                    FontFactory.HELVETICA_BOLD,
+                    14
+                );
+
+            ITextFont textFont =
+                FontFactory.GetFont(
+                    FontFactory.HELVETICA,
+                    10
+                );
+
+            ITextFont feldLabelFont =
+                FontFactory.GetFont(
+                    FontFactory.HELVETICA_BOLD,
+                    10
+                );
+
+            LineSeparator linie =
+                new LineSeparator();
+
+
+            // ========================================================
+            // 1. BEZAHLWEISE
+            // ========================================================
+
+            var bezahlweisen =
+                (ausgewaehlt ?? new List<string>())
+                .Where(
+                    x => BezahlweiseGruppe.Contains(x)
+                )
                 .ToList();
 
-            // Kombinierte Bezahlweise-Seite
-            if (bezahlweiseAusgewaehlt.Count > 0)
+
+            if (bezahlweisen.Count > 0)
             {
-                bool hatBar          = bezahlweiseAusgewaehlt.Contains("Barzahlung");
-                bool hatUeberweisung = bezahlweiseAusgewaehlt.Contains("Überweisung");
-                bool istBezahlt      = status == "Bezahlt";
-                bool istAngebot      = belegTyp == "Angebot";
+                document.NewPage();
+
+                document.Add(
+                    new ITextParagraph(
+                        "Bezahlweise",
+                        titelFont
+                    )
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+                document.Add(
+                    new Chunk(linie)
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+
+                bool hatBarzahlung =
+                    bezahlweisen.Contains(
+                        "Barzahlung"
+                    );
+
+                bool hatUeberweisung =
+                    bezahlweisen.Contains(
+                        "Überweisung"
+                    );
+
 
                 string zahlungswege;
-                if (hatBar && hatUeberweisung)
-                    zahlungswege = "Barzahlung oder per Banküberweisung";
-                else if (hatBar)
-                    zahlungswege = "Barzahlung";
-                else
-                    zahlungswege = "Banküberweisung";
 
-                document.NewPage();
-                document.Add(new Paragraph("Bezahlweise", titelFont));
-                document.Add(new Paragraph(" "));
-                document.Add(new Chunk(linie));
-                document.Add(new Paragraph(" "));
-
-                string einleitung;
-                if (istAngebot)
-                    einleitung =
-                        "Die angebotene Leistung kann mit folgenden Zahlungsmitteln beglichen werden: " +
-                        zahlungswege + ". " +
-                        "Bitte teilen Sie uns bei Auftragserteilung Ihre bevorzugte Zahlungsweise mit.";
-                else if (istBezahlt)
-                    einleitung =
-                        "Der Rechnungsbetrag wurde beglichen über: " +
-                        zahlungswege + ". " +
-                        "Vielen Dank für Ihre Zahlung.";
-                else
-                    einleitung =
-                        "Der angegebene Betrag ist innerhalb der angegebenen Zahlungsfrist zu begleichen über: " +
-                        zahlungswege + ". " +
-                        "Bei Fragen stehen wir Ihnen gerne zur Verfügung.";
-
-                document.Add(new Paragraph(einleitung, textFont));
-                document.Add(new Paragraph(" "));
-
-                // Bankverbindung bei Überweisung ausgeben
-                if (hatUeberweisung)
+                if (hatBarzahlung &&
+                    hatUeberweisung)
                 {
-                    string iban           = HoleNutzerPref("settings_iban");
-                    string bic            = HoleNutzerPref("settings_bic");
-                    string kreditinstitut = HoleNutzerPref("settings_kreditinstitut");
-                    string kontoinhaber   = HoleNutzerPref("settings_kontoinhaber");
-
-                    if (string.IsNullOrEmpty(iban))
-                    {
-                        var kontoDok = alle.savedDocs.Find(
-                            d => d.category == "Bezahlweise" && d.title == "Kontodaten (IBAN/BIC)");
-                        if (kontoDok?.strukturFelder != null)
-                        {
-                            iban           = HoleFeld(kontoDok, "iban");
-                            bic            = HoleFeld(kontoDok, "bic");
-                            kreditinstitut = HoleFeld(kontoDok, "bank");
-                            kontoinhaber   = HoleFeld(kontoDok, "kontoinhaber");
-                        }
-                    }
-
-                    document.Add(new Paragraph("Bankverbindung:", titelFont));
-                    document.Add(new Paragraph(" "));
-                    if (!string.IsNullOrEmpty(kreditinstitut))
-                        document.Add(new Paragraph("Kreditinstitut: " + kreditinstitut, textFont));
-                    if (!string.IsNullOrEmpty(iban))
-                        document.Add(new Paragraph("IBAN: " + iban, textFont));
-                    if (!string.IsNullOrEmpty(bic))
-                        document.Add(new Paragraph("BIC: " + bic, textFont));
-                    if (!string.IsNullOrEmpty(kontoinhaber))
-                        document.Add(new Paragraph("Kontoinhaber: " + kontoinhaber, textFont));
-                    document.Add(new Paragraph(" "));
+                    zahlungswege =
+                        "Barzahlung oder Überweisung";
+                }
+                else if (hatBarzahlung)
+                {
+                    zahlungswege =
+                        "Barzahlung";
+                }
+                else
+                {
+                    zahlungswege =
+                        "Überweisung";
                 }
 
-                // Hinweistext aus dem Barzahlung-Dokument
-                if (hatBar)
+
+                document.Add(
+                    new ITextParagraph(
+                        "Zahlungsweise: " +
+                        zahlungswege,
+                        textFont
+                    )
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+
+                // ----------------------------------------------------
+                // BARZAHLUNG
+                // Inhalt kommt aus dem Dokumente-Screen
+                // ----------------------------------------------------
+
+                if (hatBarzahlung)
                 {
-                    var barDok = alle.savedDocs.Find(
-                        d => d.category == "Bezahlweise" && d.title == "Barzahlung");
-                    if (barDok != null && !string.IsNullOrWhiteSpace(barDok.inhalt))
-                    {
-                        document.Add(new Paragraph(barDok.inhalt, kursivFont));
-                        document.Add(new Paragraph(" "));
-                    }
+                    var barDok =
+                        FindeDokument(
+                            alle.savedDocs,
+                            "Barzahlung"
+                        );
+
+                    SchreibeStrukturDokument(
+                        document,
+                        barDok,
+                        textFont,
+                        feldLabelFont
+                    );
+                }
+
+
+                // ----------------------------------------------------
+                // ÜBERWEISUNG
+                // Inhalt kommt aus dem Dokumente-Screen
+                // ----------------------------------------------------
+
+                if (hatUeberweisung)
+                {
+                    var ueberweisungDok =
+                        FindeDokument(
+                            alle.savedDocs,
+                            "Überweisung"
+                        );
+
+                    SchreibeStrukturDokument(
+                        document,
+                        ueberweisungDok,
+                        textFont,
+                        feldLabelFont
+                    );
                 }
             }
 
-            // Einzelne Anhänge (AGB, Disclaimer etc.)
-            foreach (string key in einzelAnhaenge)
-            {
-                var doc = alle.savedDocs.Find(d => d.category == "Bezahlweise" && d.title == key);
-                if (doc == null) continue;
 
-                string inhaltText = HoleInhalt(doc);
-                if (string.IsNullOrWhiteSpace(inhaltText)) continue;
+            // ========================================================
+            // 2. KONTODATEN
+            //
+            // IMMER ausgeben.
+            // Nicht auswählbar.
+            // Nicht aus Settings lesen.
+            // ========================================================
+
+            {
+                var konto =
+                    DocumentDashboard.GetKontodatenFelder();
+
 
                 document.NewPage();
-                document.Add(new Paragraph(key, titelFont));
-                document.Add(new Paragraph(" "));
-                document.Add(new Chunk(linie));
-                document.Add(new Paragraph(" "));
-                document.Add(new Paragraph(inhaltText, textFont));
+
+                document.Add(
+                    new ITextParagraph(
+                        "Bankverbindung",
+                        titelFont
+                    )
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+                document.Add(
+                    new Chunk(linie)
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+
+                SchreibeFeld(
+                    document,
+                    "Kontoinhaber",
+                    HoleDictionaryWert(
+                        konto,
+                        "kontoinhaber"
+                    ),
+                    textFont,
+                    feldLabelFont
+                );
+
+
+                SchreibeFeld(
+                    document,
+                    "Kreditinstitut",
+                    HoleDictionaryWert(
+                        konto,
+                        "bank"
+                    ),
+                    textFont,
+                    feldLabelFont
+                );
+
+
+                SchreibeFeld(
+                    document,
+                    "IBAN",
+                    HoleDictionaryWert(
+                        konto,
+                        "iban"
+                    ),
+                    textFont,
+                    feldLabelFont
+                );
+
+
+                SchreibeFeld(
+                    document,
+                    "BIC",
+                    HoleDictionaryWert(
+                        konto,
+                        "bic"
+                    ),
+                    textFont,
+                    feldLabelFont
+                );
+            }
+
+
+            // ========================================================
+            // 3. NORMALE ANHÄNGE
+            //
+            // AGB, Disclaimer, Zahlungsbedingungen usw.
+            // kommen ausschließlich aus dem Dokumente-Screen.
+            // ========================================================
+
+            var normaleAnhaenge =
+                (ausgewaehlt ?? new List<string>())
+                .Where(
+                    x =>
+                        !BezahlweiseGruppe.Contains(x) &&
+                        x != "Kontodaten (IBAN/BIC)"
+                )
+                .ToList();
+
+
+            foreach (string schluessel in normaleAnhaenge)
+            {
+                var dokument =
+                    FindeDokument(
+                        alle.savedDocs,
+                        schluessel
+                    );
+
+
+                if (dokument == null)
+                {
+                    Debug.LogWarning(
+                        "[BelegAnhang] Dokument nicht gefunden: " +
+                        schluessel
+                    );
+
+                    continue;
+                }
+
+
+                if (!HatDokumentInhalt(dokument))
+                {
+                    Debug.LogWarning(
+                        "[BelegAnhang] Dokument hat keinen Inhalt: " +
+                        schluessel
+                    );
+
+                    continue;
+                }
+
+
+                document.NewPage();
+
+
+                document.Add(
+                    new ITextParagraph(
+                        schluessel,
+                        titelFont
+                    )
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+                document.Add(
+                    new Chunk(linie)
+                );
+
+                document.Add(
+                    new ITextParagraph(" ")
+                );
+
+
+                // ----------------------------------------------------
+                // Strukturierte Dokumente
+                // ----------------------------------------------------
+
+                if (dokument.strukturFelder != null &&
+                    dokument.strukturFelder.Count > 0)
+                {
+                    SchreibeStrukturDokument(
+                        document,
+                        dokument,
+                        textFont,
+                        feldLabelFont
+                    );
+                }
+                else
+                {
+                    // ------------------------------------------------
+                    // Normales Freitext-Dokument
+                    // ------------------------------------------------
+
+                    document.Add(
+                        new ITextParagraph(
+                            dokument.inhalt ?? "",
+                            textFont
+                        )
+                    );
+                }
             }
         }
         catch (Exception e)
         {
-            Debug.LogWarning("[BelegAnhang] PDF-Anhang fehlgeschlagen: " + e.Message);
+            Debug.LogError(
+                "[BelegAnhang] Fehler beim Schreiben der Anhänge: " +
+                e
+            );
         }
     }
+    // ============================================================
+    // DOKUMENT SUCHEN
+    // ============================================================
 
-    // Liest einen PlayerPrefs-Wert nutzerspezifisch aus
-    private static string HoleNutzerPref(string key, string fallback = "")
+    private static DocumentDashboard.DocumentData FindeDokument(
+    List<DocumentDashboard.DocumentData> dokumente,
+    string titel)
+{
+    if (dokumente == null ||
+        string.IsNullOrEmpty(titel))
     {
-        string prefix    = UserDatabaseAccess.getCurrentDatabaseName() ?? "";
-        string nutzerKey = string.IsNullOrEmpty(prefix) ? key : prefix + "_" + key;
-        return PlayerPrefs.GetString(nutzerKey, PlayerPrefs.GetString(key, fallback));
+        return null;
+    }
+    var dokument =
+        dokumente.FirstOrDefault(
+            d =>
+                d.category == "Bezahlweise" &&
+                d.title == titel
+        );
+
+    if (dokument != null)
+        return dokument;
+
+
+  
+
+
+    if (titel == "Datenschutzerklärung")
+    {
+        return dokumente.FirstOrDefault(
+            d =>
+                d.category == "Recht & Steuern" &&
+                d.title == "Datenschutzerklärung (DSGVO)"
+        );
     }
 
-    private static string HoleInhalt(DocumentDashboard.DocumentData doc)
+    if (titel == "Dienstleistungskatalog")
     {
-        if (!string.IsNullOrWhiteSpace(doc.inhalt)) return doc.inhalt;
-        if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
+        return dokumente.FirstOrDefault(
+            d =>
+                d.category == "Marketing & Personal" &&
+                d.title == "Dienstleistungskatalog / Preisliste"
+        );
+    }
+
+    return null;
+}
+    // ============================================================
+    // PRÜFEN, OB DOKUMENT INHALT HAT
+    // ============================================================
+
+    private static bool HatDokumentInhalt(
+        DocumentDashboard.DocumentData dokument)
+    {
+        if (dokument == null)
+            return false;
+
+
+        if (!string.IsNullOrWhiteSpace(
+            dokument.inhalt))
         {
-            var sb = new System.Text.StringBuilder();
-            foreach (var feld in doc.strukturFelder)
-                if (!string.IsNullOrWhiteSpace(feld.wert))
-                    sb.AppendLine(feld.key + ": " + feld.wert);
-            return sb.ToString().Trim();
+            return true;
         }
-        return "";
+
+
+        if (dokument.strukturFelder != null)
+        {
+            return dokument.strukturFelder.Any(
+                f =>
+                    !string.IsNullOrWhiteSpace(
+                        f.wert
+                    )
+            );
+        }
+
+
+        return false;
     }
 
-    private static string HoleFeld(DocumentDashboard.DocumentData doc, string key)
+
+    // ============================================================
+    // STRUKTURIERTES DOKUMENT AUSGEBEN
+    // ============================================================
+
+    private static void SchreibeStrukturDokument(
+        ITextDocument document,
+        DocumentDashboard.DocumentData dokument,
+        ITextFont textFont,
+        ITextFont feldLabelFont)
     {
-        if (doc?.strukturFelder == null) return "";
-        var feld = doc.strukturFelder.Find(f => f.key == key);
-        return feld?.wert ?? "";
+        if (dokument == null)
+            return;
+
+
+        // ------------------------------------------------------------
+        // Strukturfelder
+        // ------------------------------------------------------------
+
+        if (dokument.strukturFelder != null)
+        {
+            foreach (
+                var feld
+                in dokument.strukturFelder)
+            {
+                if (string.IsNullOrWhiteSpace(
+                    feld.wert))
+                {
+                    continue;
+                }
+
+
+                string label =
+                    HoleFeldLabel(
+                        dokument.title,
+                        feld.key
+                    );
+
+
+                SchreibeFeld(
+                    document,
+                    label,
+                    feld.wert,
+                    textFont,
+                    feldLabelFont
+                );
+            }
+        }
+
+
+        // ------------------------------------------------------------
+        // Falls zusätzlich Freitext vorhanden ist
+        // ------------------------------------------------------------
+
+        if (!string.IsNullOrWhiteSpace(
+            dokument.inhalt))
+        {
+            document.Add(
+                new ITextParagraph(
+                    dokument.inhalt ?? "",
+                    textFont
+                )
+            );
+        }
+    }
+
+
+    // ============================================================
+    // EINZELNES FELD AUSGEBEN
+    // ============================================================
+
+    private static void SchreibeFeld(
+        ITextDocument document,
+        string label,
+        string wert,
+        ITextFont textFont,
+        ITextFont feldLabelFont)
+    {
+        if (string.IsNullOrWhiteSpace(wert))
+            return;
+
+
+        ITextParagraph paragraph =
+            new ITextParagraph();
+
+
+        paragraph.Add(
+            new Chunk(
+                label + ": ",
+                feldLabelFont
+            )
+        );
+
+
+        paragraph.Add(
+            new Chunk(
+                wert,
+                textFont
+            )
+        );
+
+
+        document.Add(paragraph);
+
+        document.Add(
+            new ITextParagraph(" ")
+        );
+    }
+
+
+    // ============================================================
+    // LESBARES LABEL FÜR STRUKTURFELD
+    // ============================================================
+
+    private static string HoleFeldLabel(
+        string dokumentTitel,
+        string key)
+    {
+        switch (key)
+        {
+            case "iban":
+                return "IBAN";
+
+            case "bic":
+                return "BIC";
+
+            case "bank":
+                return "Bank";
+
+            case "kontoinhaber":
+                return "Kontoinhaber";
+
+            case "zahlungsfrist":
+                return "Zahlungsfrist";
+
+            case "skontoSatz":
+                return "Skonto-Satz";
+
+            case "skontoZeitraum":
+                return "Skonto-Zeitraum";
+
+            case "verzugszins":
+                return "Verzugszins";
+
+            case "zusatzhinweise":
+                return "Zusatzhinweise";
+
+            case "leistungsbereich":
+                return "Leistungsbereich";
+
+            case "widerrufsfrist":
+                return "Widerrufsfrist";
+
+            case "zahlungsziel":
+                return "Zahlungsziel";
+
+            case "verzugszinssatz":
+                return "Verzugszinssatz";
+
+            case "mahngebuehr":
+                return "Mahngebühr";
+
+            case "abnahmefrist":
+                return "Abnahmefrist";
+
+            case "lizenzmodell":
+                return "Lizenzmodell";
+
+            case "schadensersatzfaktor":
+                return "Schadensersatzfaktor";
+
+            case "ndaDauer":
+                return "NDA-Dauer";
+
+            case "gerichtsstand":
+                return "Gerichtsstand";
+
+            case "geltungsbereich":
+                return "Geltungsbereich";
+
+            case "inhaltlichePruefung":
+                return "Inhaltliche Prüfung";
+
+            case "externeVerweise":
+                return "Externe Verweise";
+
+            case "urheberrechtshinweis":
+                return "Urheberrechtshinweis";
+
+            case "gueltigkeitsbereich":
+                return "Gültigkeitsbereich";
+
+            case "zusatzhinweis":
+                return "Zusatzhinweis";
+
+            case "ausfuehrung":
+                return "Ausführung";
+
+            case "glaeubigerId":
+                return "Gläubiger-Identifikationsnummer";
+
+            case "artZahlung":
+                return "Art der Zahlung";
+
+            case "zusatzangaben":
+                return "Zusatzangaben";
+
+            case "wertersatzklausel":
+                return "Wertersatz-Klausel";
+
+            case "kontakt":
+                return "Kontakt";
+
+            case "vorzeitigesErloeschen":
+                return "Vorzeitiges Erlöschen";
+
+            case "bearbeitungspauschale":
+                return "Bearbeitungspauschale";
+
+            case "intervallMahnstufen":
+                return "Intervall der Mahnstufen";
+
+            case "mindestauftragswert":
+                return "Mindestauftragswert";
+
+            case "maxLaufzeit":
+                return "Max. Laufzeit";
+
+            case "bearbeitungsgebuehr":
+                return "Bearbeitungsgebühr";
+
+            case "schutzumfang":
+                return "Schutzumfang";
+
+            case "referenzklausel":
+                return "Referenzklausel";
+
+            case "zusatzangabe":
+                return "Zusatzangabe";
+
+            case "preisErweiterteNutzung":
+                return "Preis für erweiterte Nutzung";
+
+            default:
+                return key;
+        }
+    }
+
+
+    // ============================================================
+    // DICTIONARY-WERT AUSLESEN
+    // ============================================================
+
+    private static string HoleDictionaryWert(
+        Dictionary<string, string> daten,
+        string key)
+    {
+        if (daten == null)
+            return "";
+
+
+        if (daten.TryGetValue(
+            key,
+            out string wert))
+        {
+            return wert ?? "";
+        }
+
+
+        return "";
     }
 }

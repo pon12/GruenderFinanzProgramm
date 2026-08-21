@@ -62,7 +62,7 @@
 
 .lbl-error {
     font-size: 24px;
-    color: rgb(255, 100, 100);
+    color: rgb(230, 57, 70);
 }
 
 .row-agb {
@@ -127,12 +127,13 @@
     height: 104px;
     font-size: 32px;
     color: rgb(255, 255, 255);
+    background-color: rgb(44, 44, 44);
     border-radius: 10px;
     border-width: 0;
 }
 
-.input-profile:hover {
-    border-color: rgb(128, 207, 149);
+.input-profile:focus {
+    border-color: rgb(80, 80, 80);
     border-width: 2px;
 }
 
@@ -153,6 +154,9 @@
 .btn-back:hover {
     background-color: rgb(142, 141, 141);
 }
+.btn-back:active {
+    background-color: rgb(56, 54, 54);
+}
 
 .Key-button {
     width: 480px;
@@ -168,6 +172,9 @@
 }
 .Key-button:hover {
     background-color: rgb(179, 226, 196);
+}
+.Key-button:active {
+    background-color: rgb(102, 165, 119);
 }
 
 /* ==========================================
@@ -281,6 +288,9 @@
 .btn-decrypt:hover {
     background-color: rgb(142, 141, 141);
 }
+.btn-decrypt:active {
+    background-color: rgb(56, 54, 54);
+}
 
 .popup-hint {
     font-size: 16px;
@@ -302,13 +312,16 @@
 .btn-submit:hover {
     background-color: rgb(179, 226, 196);
 }
+.btn-submit:active {
+    background-color: rgb(102, 165, 119);
+}
 
 /* Document Popups (AGB / Datenschutz) */
 .popup-doc-card {
     flex-grow: 1;
     width: 560px;
     height: 1000px;
-    background-color: rgb(56, 56, 56);
+    background-color: rgb(49, 49, 49);
     border-color: rgb(179, 226, 196);
     border-width: 3px;
     border-radius: 30px;
@@ -349,7 +362,8 @@
 
 .popup-doc-text {
     -unity-text-align: upper-left;
-    white-space: nowrap;
-    width: 560px;
-    height: 1000px;
+    white-space: normal;
+    font-size: 14px;
+    color: rgb(220, 220, 220);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }

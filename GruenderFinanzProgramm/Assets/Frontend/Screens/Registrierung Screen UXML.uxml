@@ -12,7 +12,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="container-profilname" class="centered-container">
             <ui:Label text="Profilname" name="Profilname" class="Profilname"/>
-            <ui:TextField label="" placeholder-text="" name="Profileingabe" class="input-profile"/>
+            <ui:TextField label="" placeholder-text="z.B. Max Mustermann" name="Profileingabe" class="input-profile"/>
         </ui:VisualElement>
         <ui:VisualElement name="container-ueberschrift2" class="container-subheading">
             <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>

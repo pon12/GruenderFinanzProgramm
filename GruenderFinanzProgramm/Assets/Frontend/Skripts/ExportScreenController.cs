@@ -33,6 +33,11 @@ public class ExportScreenController : MonoBehaviour
         // Nur bei JSON-Dokumenten gesetzt - für den strukturierten
         // PDF-Export (siehe DokumentPdfGenerator).
         public DocumentDashboard.DocumentData quelleDokument;
+        // FIX: true, sobald filePath auf einen echten, existierenden
+        // Speicherort zeigt (PDFs aus der DB haben das von Anfang an,
+        // JSON-Dokumente erst nach dem ersten Export). Verhindert, dass
+        // "Ordner oeffnen" vorher das Stammverzeichnis anzeigt.
+        public bool hatEchtenPfad;
     }
 
     // Sortierung (gleiches Muster wie Buchhaltung Screen Controller)
@@ -169,7 +174,8 @@ public class ExportScreenController : MonoBehaviour
                 isPDF       = true,
                 pdfId       = pdf.id,
                 datum       = pdf.uploadedAt.ToString("dd.MM.yyyy"),
-                datumSort   = pdf.uploadedAt
+                datumSort   = pdf.uploadedAt,
+                hatEchtenPfad = true
             });
         }
 
@@ -202,7 +208,8 @@ public class ExportScreenController : MonoBehaviour
                     pdfId       = -1,
                     datum       = datumAnzeige,
                     datumSort   = datumSort,
-                    quelleDokument = doc
+                    quelleDokument = doc,
+                    hatEchtenPfad = false
                 });
             }
 
@@ -256,7 +263,16 @@ public class ExportScreenController : MonoBehaviour
             DokumentExportEintrag lokalerEintrag = eintrag;
 
             if (btnFolder != null)
+            {
+                // FIX: Solange kein echter Speicherort existiert (JSON-Dokument
+                // vor dem ersten Export), Button deaktivieren statt auf das
+                // Stammverzeichnis zu zeigen.
+                btnFolder.SetEnabled(lokalerEintrag.hatEchtenPfad);
+                btnFolder.tooltip = lokalerEintrag.hatEchtenPfad
+                    ? ""
+                    : "Noch kein Speicherort - erst als PDF exportieren.";
                 btnFolder.clicked += () => OeffneOrdner(lokalerEintrag.filePath);
+            }
 
             if (btnExport != null)
                 btnExport.clicked += () => ExportierePDF(lokalerEintrag);
@@ -348,6 +364,17 @@ public class ExportScreenController : MonoBehaviour
             }
 
             Debug.Log("[Export] PDF gespeichert: " + zielPfad);
+
+            // FIX: Vor dem Export zeigte "Ordner oeffnen" bei Dokumenten aus
+            // dem JSON-Speicher immer auf Application.persistentDataPath
+            // (Stammverzeichnis), weil filePath nie auf den tatsaechlichen
+            // Speicherort aktualisiert wurde. Jetzt wird der Eintrag nach
+            // erfolgreichem Export auf den echten Zielpfad gesetzt und die
+            // Liste neu gerendert, damit der Ordner-Button den richtigen Ort
+            // oeffnet.
+            eintrag.filePath     = zielPfad;
+            eintrag.hatEchtenPfad = true;
+            RefreshExportListe();
 
             // Datei direkt oeffnen
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo

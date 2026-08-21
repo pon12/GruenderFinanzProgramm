@@ -405,11 +405,11 @@ public class DocumentDashboard : MonoBehaviour
         },
             ["SWOT-Analyse"] = new List<FeldDefinition>
         {
-            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Was sind Ihre Wettbewerbsvorteile? (z.B. „Hocheffiziente Architektur“)" },
-            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Wo liegen interne Defizite? (z.B. „Begrenzte Personalressourcen“)" },
-            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Welche Markttrends können Sie nutzen? (z.B. „Wachsender Digitalisierungsbedarf“)" },
-            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Welche Gefahren drohen von außen? (z.B. „Markteintritt großer Wettbewerber“)" },
-            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Welche Kernmaßnahmen leiten Sie aus dieser Analyse ab?" },
+            new FeldDefinition { key = "interneStaerken",   label = "Interne Stärken",     placeholder = "Ihre Wettbewerbsvorteile?" },
+            new FeldDefinition { key = "interneSchwaechen", label = "Interne Schwächen",   placeholder = "Ihre internen Defizite?" },
+            new FeldDefinition { key = "externeChancen",    label = "Externe Chancen",     placeholder = "Nutzbare Markttrends?" },
+            new FeldDefinition { key = "externeRisiken",    label = "Externe Risiken",     placeholder = "Gefahren von außen?" },
+            new FeldDefinition { key = "strategischesFazit",label = "Strategisches Fazit", placeholder = "Kernmaßnahmen aus der Analyse?" },
         },
             ["Zielgruppenanalyse"] = new List<FeldDefinition>
         {
@@ -749,7 +749,25 @@ public class DocumentDashboard : MonoBehaviour
         SpawnAllCardsAtStart();
         RegistriereHelpTooltips();
         ButtonHoverController.RegistriereAlle(root);
+
+        // Von einem anderen Screen aus (z.B. Einstellungen -> "Bearbeiten"
+        // bei AGB/Disclaimer/Barzahlung/Überweisung) angefordert: direkt
+        // das Bearbeiten-Popup für ein bestimmtes Dokument öffnen, statt
+        // den Nutzer erst manuell die Karte suchen und anklicken zu lassen.
+        if (!string.IsNullOrEmpty(OeffneDokumentBeimStart))
+        {
+            string gesuchterTitel = OeffneDokumentBeimStart;
+            OeffneDokumentBeimStart = null;
+
+            var zielDoc = speicherDaten.savedDocs.FirstOrDefault(d => d.title == gesuchterTitel);
+            if (zielDoc != null) OpenEditPopup(zielDoc);
+        }
     }
+
+    // Von außen (z.B. EinstellungenController) setzbar: Titel des
+    // Dokuments, dessen Bearbeiten-Popup beim Laden dieses Screens
+    // automatisch geöffnet werden soll.
+    public static string OeffneDokumentBeimStart = null;
 
     // ─────────────────────────────────────────
     // PFLICHTDOKUMENTE SICHERSTELLEN
@@ -1838,17 +1856,114 @@ public class DocumentDashboard : MonoBehaviour
     // STATISCHER ZUGRIFF FÜR EXPORT-SCREEN
     // ─────────────────────────────────────────
 
-    public static string GetSaveFilePath()
-    {
-        return Path.Combine(Application.persistentDataPath, "MyDashboardSave.json");
-    }
+    // ============================================================
+// BENUTZERBEZOGENER DOKUMENT-SPEICHER
+// ============================================================
 
-    public static DocumentSaveData GetSavedDocuments()
+private static string GetCurrentUserFolder()
+{
+    try
     {
-        string path = GetSaveFilePath();
-        if (!File.Exists(path)) return new DocumentSaveData();
-        return JsonUtility.FromJson<DocumentSaveData>(File.ReadAllText(path));
+        // Der aktuell eingeloggte Benutzer wird über den StateManager
+        // bestimmt. Das entspricht eurem bestehenden Login-System.
+        PassKeyRecord currentUser = StateManager.Instance?.getCurrentUser();
+
+        if (currentUser == null || string.IsNullOrWhiteSpace(currentUser.userId))
+        {
+            Debug.LogError(
+                "[DocumentDashboard] Kein eingeloggter Benutzer gefunden."
+            );
+
+            return null;
+        }
+
+        // user_1 -> 1
+        string rawUserId = currentUser.userId;
+
+        if (rawUserId.StartsWith("user_"))
+            rawUserId = rawUserId.Substring("user_".Length);
+
+        // Sicherheitsprüfung:
+        // Nur eine numerische User-ID darf als Ordnername verwendet werden.
+        if (!int.TryParse(rawUserId, out int userId))
+        {
+            Debug.LogError(
+                "[DocumentDashboard] Ungültige User-ID: " +
+                currentUser.userId
+            );
+
+            return null;
+        }
+
+        string folderPath = Path.Combine(
+            Application.persistentDataPath,
+            "Dokumente",
+            "User_" + userId
+        );
+
+        Directory.CreateDirectory(folderPath);
+
+        return folderPath;
     }
+    catch (System.Exception exception)
+    {
+        Debug.LogError(
+            "[DocumentDashboard] Fehler beim Ermitteln des Benutzerordners: " +
+            exception.Message
+        );
+
+        return null;
+    }
+}
+
+public static string GetSaveFilePath()
+{
+    string userFolder = GetCurrentUserFolder();
+
+    if (string.IsNullOrEmpty(userFolder))
+        return null;
+
+    return Path.Combine(
+        userFolder,
+        "MyDashboardSave.json"
+    );
+}
+
+public static DocumentSaveData GetSavedDocuments()
+{
+    string path = GetSaveFilePath();
+
+    if (string.IsNullOrEmpty(path))
+        return new DocumentSaveData();
+
+    try
+    {
+        if (!File.Exists(path))
+            return new DocumentSaveData();
+
+        string json = File.ReadAllText(path);
+
+        if (string.IsNullOrWhiteSpace(json))
+            return new DocumentSaveData();
+
+        DocumentSaveData data =
+            JsonUtility.FromJson<DocumentSaveData>(json);
+
+        if (data == null || data.savedDocs == null)
+            return new DocumentSaveData();
+
+        return data;
+    }
+    catch (System.Exception exception)
+    {
+        Debug.LogError(
+            "[DocumentDashboard] Fehler beim Laden der Dokumentdaten: " +
+            exception.Message
+        );
+
+        return new DocumentSaveData();
+    }
+}
 
     // Liefert die Unternehmensstammdaten als Key-Value-Dictionary.
     // Verwendung: var daten = DocumentDashboard.GetUnternehmenFelder();
@@ -1903,7 +2018,32 @@ public class DocumentDashboard : MonoBehaviour
         var alle = GetSavedDocuments();
         var doc = alle.savedDocs.FirstOrDefault(d =>
             d.category == "Bezahlweise" && d.title == titel);
-        return doc?.inhalt ?? "";
+        if (doc == null) return "";
+
+        // FIX: Las bisher nur doc.inhalt - AGB/Disclaimer/Barzahlung/
+        // Überweisung sind aber längst strukturierte Dokumente (siehe
+        // felderProPflichtDoc), ihre Daten liegen in strukturFelder, nicht
+        // in .inhalt. .inhalt ist bei denen praktisch immer leer -
+        // die Vorschau in den Einstellungen zeigte deshalb nie etwas an,
+        // egal was im Dok-Pool eingetragen wurde.
+        if (!string.IsNullOrWhiteSpace(doc.inhalt)) return doc.inhalt;
+
+        if (doc.strukturFelder != null && doc.strukturFelder.Count > 0)
+        {
+            var ausgefuellte = doc.strukturFelder.Where(f => !string.IsNullOrWhiteSpace(f.wert)).ToList();
+            if (ausgefuellte.Count > 0)
+                return string.Join(" · ", ausgefuellte.Select(f => f.wert));
+        }
+
+        return "";
+    }
+
+    // Prüft, ob für ein Bezahlweise-Dokument überhaupt Daten hinterlegt
+    // sind (egal ob Freitext oder Struktur-Felder) - für den Status
+    // "hinterlegt"/"nicht hinterlegt" in den Einstellungen.
+    public static bool HatBezahlweiseInhalt(string titel)
+    {
+        return !string.IsNullOrWhiteSpace(GetBezahlweiseInhalt(titel));
     }
 
     // ─────────────────────────────────────────
