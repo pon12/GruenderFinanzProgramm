@@ -518,6 +518,36 @@ public static class BelegAnhangController
         );
     }
 
+    // FIX: Diese 5 Anhänge liegen laut Doc-Screen.cs in "Recht & Steuern"
+    // bzw. "Vorlagen & Checklisten", nicht in "Bezahlweise". Ohne diese
+    // Fallbacks wurde FindeDokument für sie immer null, egal was im
+    // DokPool ausgefüllt war - sie landeten nie im Rechnungs-/Angebots-PDF.
+    var rechtSteuernTitel = new HashSet<string>
+    {
+        "Copyright Hinweis",
+        "Lizenzhinweis Einfach",
+        "Lizenzhinweis Erweitert",
+        "Vertraulichkeitserklärung"
+    };
+
+    if (rechtSteuernTitel.Contains(titel))
+    {
+        return dokumente.FirstOrDefault(
+            d =>
+                d.category == "Recht & Steuern" &&
+                d.title == titel
+        );
+    }
+
+    if (titel == "Kundenzufriedenheitsumfrage")
+    {
+        return dokumente.FirstOrDefault(
+            d =>
+                d.category == "Vorlagen & Checklisten" &&
+                d.title == titel
+        );
+    }
+
     return null;
 }
     // ============================================================
