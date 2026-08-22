@@ -1821,93 +1821,221 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void ExportierePDF()
     {
-        if (!PflichtfelderGefuellt()) return;
+        if (!PflichtfelderGefuellt())
+            return;
 
         try
         {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string nummer = _nummerFeld != null ? _nummerFeld.value : BelegTyp;
-            string zielPfad = System.IO.Path.Combine(desktopPath, nummer + "_" + zeitstempel + ".pdf");
+            string desktopPath =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.Desktop);
+
+            string zeitstempel =
+                DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            string nummer =
+                _nummerFeld != null
+                    ? _nummerFeld.value
+                    : BelegTyp;
+
+            string zielPfad =
+                System.IO.Path.Combine(
+                    desktopPath,
+                    nummer + "_" + zeitstempel + ".pdf");
+
+            // Auswahl vor dem using-Block sichern, damit sie auch
+            // nach dem Schließen der Haupt-PDF noch verfügbar ist.
+            List<string> ausgewaehlteAnhaenge =
+                HoleAusgewaehlteAnhaenge();
 
             using (var fs = new System.IO.FileStream(
-                zielPfad, System.IO.FileMode.Create,
-                System.IO.FileAccess.Write, System.IO.FileShare.None))
+                zielPfad,
+                System.IO.FileMode.Create,
+                System.IO.FileAccess.Write,
+                System.IO.FileShare.None))
             {
-                var document = new iTextSharp.text.Document();
-                iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
+                var document =
+                    new iTextSharp.text.Document();
+
+                iTextSharp.text.pdf.PdfWriter.GetInstance(
+                    document,
+                    fs);
+
                 document.Open();
 
-                var titelFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
-                var textFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA, 11);
-                var subFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
-                var fettFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 13);
+                var titelFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_BOLD,
+                        16);
 
-                var linie = new iTextSharp.text.pdf.draw.LineSeparator();
+                var textFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA,
+                        11);
 
-                document.Add(new iTextSharp.text.Paragraph(BelegTyp + "  " + nummer, titelFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Datum: " + (_datumFeld != null ? _datumFeld.value : "") +
-                    "   Kunde: " + _ausgewaehlterKunde, subFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Chunk(linie));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Paragraph("Positionen", titelFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
+                var subFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_OBLIQUE,
+                        9);
+
+                var fettFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_BOLD,
+                        13);
+
+                var linie =
+                    new iTextSharp.text.pdf.draw.LineSeparator();
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        BelegTyp + "  " + nummer,
+                        titelFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Datum: " +
+                        (_datumFeld != null
+                            ? _datumFeld.value
+                            : "") +
+                        "   Kunde: " +
+                        _ausgewaehlterKunde,
+                        subFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Chunk(linie));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Positionen",
+                        titelFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
 
                 foreach (var zeile in _zeilen)
                 {
                     int menge = 1;
-                    int.TryParse(zeile.Menge.value, out menge);
-                    double preis = ParseBetrag(zeile.Preis.text);
-                    double gesamt = Math.Round(menge * preis, 2, MidpointRounding.AwayFromZero);
 
-                    string zeileText = zeile.Artikel.text
-                        + "   " + zeile.Beschreibung.text
-                        + "   Menge: " + menge
-                        + "   " + zeile.Einheit.text
-                        + "   " + FormatBetrag(preis)
-                        + "   Netto: " + FormatBetrag(gesamt);
+                    int.TryParse(
+                        zeile.Menge.value,
+                        out menge);
 
-                    document.Add(new iTextSharp.text.Paragraph(zeileText, textFont));
+                    double preis =
+                        ParseBetrag(
+                            zeile.Preis.text);
+
+                    double gesamt =
+                        Math.Round(
+                            menge * preis,
+                            2,
+                            MidpointRounding.AwayFromZero);
+
+                    string zeileText =
+                        zeile.Artikel.text
+                        + "   "
+                        + zeile.Beschreibung.text
+                        + "   Menge: "
+                        + menge
+                        + "   "
+                        + zeile.Einheit.text
+                        + "   "
+                        + FormatBetrag(preis)
+                        + "   Netto: "
+                        + FormatBetrag(gesamt);
+
+                    document.Add(
+                        new iTextSharp.text.Paragraph(
+                            zeileText,
+                            textFont));
                 }
 
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Chunk(linie));
-                document.Add(new iTextSharp.text.Paragraph(" "));
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
 
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Netto (EUR):       " + (_nettoLabel != null ? _nettoLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Rabatt:            " + (_rabattLabel != null ? _rabattLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Skonto:            " + (_skontoLabel != null ? _skontoLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Gesamtpreis (EUR): " + (_gesamtLabel != null ? _gesamtLabel.text : ""), fettFont));
+                document.Add(
+                    new iTextSharp.text.Chunk(linie));
 
-                BelegAnhangController.SchreibeAnhaenge(document, HoleAusgewaehlteAnhaenge());
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Netto (EUR):       " +
+                        (_nettoLabel != null
+                            ? _nettoLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Rabatt:            " +
+                        (_rabattLabel != null
+                            ? _rabattLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Skonto:            " +
+                        (_skontoLabel != null
+                            ? _skontoLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Gesamtpreis (EUR): " +
+                        (_gesamtLabel != null
+                            ? _gesamtLabel.text
+                            : ""),
+                        fettFont));
+
+                // Hauptdokument schließen. Die ausgewählten Dokument-PDFs
+                // werden danach als vollständige PDF-Seiten angehängt.
                 document.Close();
             }
 
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = zielPfad,
-                UseShellExecute = true
-            });
+            // Vollständige PDFs aus dem Dokumente-Screen an den
+            // bereits erzeugten Beleg anhängen.
+            BelegAnhangController.FuegeDokumentPdfAn(
+                zielPfad,
+                ausgewaehlteAnhaenge);
 
-            FeedbackPopup.Show(Root, "PDF exportiert", FeedbackTyp.Erfolg);
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = zielPfad,
+                    UseShellExecute = true
+                });
+
+            FeedbackPopup.Show(
+                Root,
+                "PDF exportiert",
+                FeedbackTyp.Erfolg);
         }
         catch (Exception e)
         {
-            Debug.LogError("[" + BelegTyp + "] PDF-Export fehlgeschlagen: " + e.Message);
-            FeedbackPopup.Show(Root, "Export fehlgeschlagen", FeedbackTyp.Fehler);
+            Debug.LogError(
+                "[" + BelegTyp +
+                "] PDF-Export fehlgeschlagen: " +
+                e);
+
+            FeedbackPopup.Show(
+                Root,
+                "Export fehlgeschlagen",
+                FeedbackTyp.Fehler);
         }
     }
+
 
     // ============================================================
     // EINGABE-HILFSMETHODEN
