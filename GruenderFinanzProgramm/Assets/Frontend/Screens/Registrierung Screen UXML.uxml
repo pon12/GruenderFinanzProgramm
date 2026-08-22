@@ -29,6 +29,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:Image name="Maskottchen" source="project://database/Assets/Resources/persona_massktichen.png?fileID=2800000&amp;guid=c425c6f5e2169264790ba84611a1a265&amp;type=3#persona_massktichen" scale-mode="ScaleToFit" class="maskottchen" picking-mode="Ignore"/>
     <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">

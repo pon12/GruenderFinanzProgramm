@@ -8,6 +8,14 @@
     flex-grow: 1;
 }
 
+.maskottchen {
+    position: absolute;
+    left: 32px;
+    bottom: 0;
+    width: 480px;
+    height: 684px;
+}
+
 .container-main {
     flex-grow: 1;
     align-items: center;
