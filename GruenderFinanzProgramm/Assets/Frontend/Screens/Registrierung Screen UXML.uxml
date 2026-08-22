@@ -29,7 +29,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:Image name="Maskottchen" source="project://database/Assets/Resources/persona_massktichen.png?fileID=2800000&amp;guid=c425c6f5e2169264790ba84611a1a265&amp;type=3#persona_massktichen" scale-mode="ScaleToFit" class="maskottchen" picking-mode="Ignore"/>
+    <ui:Image name="Maskottchen" source="project://database/Assets/Resources/Begleiter%203.png?fileID=2800000&amp;guid=889832c2d4b254046a5113389a39f67d&amp;type=3#Begleiter 3" scale-mode="ScaleToFit" picking-mode="Ignore" class="maskottchen" style="width: 1920px; height: 1080px; justify-content: flex-start; align-items: stretch; align-content: flex-start; align-self: auto; aspect-ratio: auto; right: auto; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; bottom: -18px; left: -1290px;"/>
     <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
