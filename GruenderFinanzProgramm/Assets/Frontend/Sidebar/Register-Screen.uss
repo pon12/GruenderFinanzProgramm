@@ -38,7 +38,7 @@
     padding-left: 22px;
     padding-right: 22px;
     font-size: 16px;
-    font-weight: 500;
+    -unity-font-style: bold;
     -unity-text-align: middle-center;
     color: rgb(255, 255, 255);
     background-color: rgb(60, 60, 60);
@@ -175,6 +175,34 @@
     height: 22px;
     margin-right: 10px;
     margin-top: 1px;
+    flex-shrink: 0;
+}
+.toggle-agb .unity-toggle__input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+.toggle-agb .unity-toggle__checkmark {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: rgb(70, 70, 70);
+    border-width: 2px;
+    border-color: rgb(100, 100, 100);
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0);
+}
+.toggle-agb:checked .unity-toggle__checkmark {
+    background-color: rgb(128, 207, 149);
+    border-color: rgb(128, 207, 149);
+    -unity-background-image-tint-color: rgb(20, 20, 20);
 }
 
 .text2 {
@@ -387,18 +415,21 @@
 }
 
 .btn-doc-close {
-    height: 40px;
-    width: 40px;
-    background-image: url("project://database/Assets/Frontend/Bilder/close.png?fileID=2800000&guid=9cd0944736a9a324195ad03398faae90&type=3#close");
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    height: 36px;
+    width: 36px;
+    background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    background-color: rgb(50, 50, 50);
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    -unity-text-align: middle-center;
+    padding: 0;
 }
 .btn-doc-close:hover {
-    background-color: rgb(65, 65, 65);
+    background-color: rgb(60, 60, 60);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 .popup-doc-content {

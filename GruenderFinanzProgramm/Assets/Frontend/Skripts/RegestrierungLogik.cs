@@ -143,6 +143,12 @@ public class RegestrierungLogik : MonoBehaviour
 
         if (btnDatenschutzclose != null) btnDatenschutzclose.clicked += OnDatenschutzCloseClicked;
 
+        // FIX: fehlte komplett - dadurch hatte KEIN Button auf dem Screen
+        // den projektweiten Hover-Effekt (grüner Rahmen bei grauen Buttons,
+        // hellere Farbe bei Grün/Rot). Betraf nicht nur den Zurück-Button,
+        // sondern alle Buttons hier (Passkey generieren, Copy, Popup-Schließen, ...).
+        ButtonHoverController.RegistriereAlle(root);
+
         ShowLoginScreen();
     }
 
