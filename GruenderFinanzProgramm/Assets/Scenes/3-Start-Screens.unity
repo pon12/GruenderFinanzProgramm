@@ -738,7 +738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
   uiDocument: {fileID: 1363661634}
-  buttonCooldownSekunden: 0.2
+  buttonCooldownSekunden: 0
   alleSchritte:
   - Erklaerung: Willkommen auf ihrer zentralen Steuerzentrale!
     ElementName: 
@@ -1062,7 +1062,7 @@ MonoBehaviour:
       Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist.
       Der Fortschritt hier flie\xDFt auch in den Fortschritt-Screen ein."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: "Gr\xFCnderpfad"
     GameObjectName: 
     PopupElementName: 
@@ -1091,7 +1091,7 @@ MonoBehaviour:
       geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen
       zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Wissensdatenbank
     GameObjectName: 
     PopupElementName: 
@@ -1100,7 +1100,7 @@ MonoBehaviour:
       Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel \xF6ffnet die Liste
       aller Eintr\xE4ge zu diesem Thema."
     ElementName: Grid-Container
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Wissensdatenbank
     GameObjectName: 
     PopupElementName: 
@@ -1129,7 +1129,7 @@ MonoBehaviour:
       angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge
       und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Erfolge
     GameObjectName: 
     PopupElementName: 
@@ -1147,7 +1147,7 @@ MonoBehaviour:
       auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten
       Erfolgen siehst du direkt, auf welcher Stufe du gerade bist."
     ElementName: erfolge-grid
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Erfolge
     GameObjectName: 
     PopupElementName: 
@@ -1156,7 +1156,7 @@ MonoBehaviour:
       beh\xE4ltst Fristen sowie Status im Blick und exportierst deine Belege schnell
       als PDF."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Buchhaltung
     GameObjectName: 
     PopupElementName: 
@@ -1174,7 +1174,7 @@ MonoBehaviour:
       eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen
       und aktualisieren."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Buchhaltung
     GameObjectName: 
     PopupElementName: 
@@ -1183,7 +1183,7 @@ MonoBehaviour:
       eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen
       und aktualisieren."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Buchhaltung
     GameObjectName: 
     PopupElementName: 
@@ -1192,7 +1192,7 @@ MonoBehaviour:
       Belegs. Das Ordner-Symbol f\xFChrt dich direkt zum lokalen Speicherort auf
       deinem System."
     ElementName: 
-    inKurzversion: 0
+    inKurzversion: 1
     SceneName: Buchhaltung
     GameObjectName: 
     PopupElementName: 

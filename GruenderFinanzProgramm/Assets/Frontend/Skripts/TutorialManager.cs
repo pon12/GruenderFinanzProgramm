@@ -483,7 +483,7 @@ public class TutorialManager : MonoBehaviour
     {
         alleSchritte = new List<TutorialSchritt>
         {
-            // ── Dashboard ──────────────────────────────────────────────────
+            // ── Dashboard ────────────────────────────────────────────────── 
             new()
             {
                 Erklaerung    = "Willkommen auf ihrer zentralen Steuerzentrale!",
@@ -516,7 +516,7 @@ public class TutorialManager : MonoBehaviour
                 inKurzversion = false
             },
 
-            // ── Settings ────────────────────────────────────────────────────
+            // ── Settings ──────────────────────────────────────────────────── 5
             new() {
                 Erklaerung    = "Auf der linken Seite können Sie wichtigen Daten für Sie und Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen.",
                 ElementName   = "col-left",
@@ -744,12 +744,12 @@ public class TutorialManager : MonoBehaviour
                 inKurzversion = true
             },
 
-            // ── Gründerpfad ────────────────────────────────────────────────
+            // ── Gründerpfad ──────────────────────────────────────────────── 37
             new() {
                 Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
                 ElementName   = "",
                 SceneName     = "Gründerpfad",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
@@ -766,19 +766,19 @@ public class TutorialManager : MonoBehaviour
                 inKurzversion = false
             },
 
-            // ── Wissensdatenbank ───────────────────────────────────────────
+            // ── Wissensdatenbank ─────────────────────────────────────────── 40
             new() {
                 Erklaerung    = "Die Wissensdatenbank ist deine Anlaufstelle für Anleitungen und Erklärungen rund um deine Gründung. Alle Einträge sind in Themenkategorien geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen.",
                 ElementName   = "",
                 SceneName     = "Wissensdatenbank",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Jede Kachel steht für eine Themenkategorie – zum Beispiel Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel öffnet die Liste aller Einträge zu diesem Thema.",
                 ElementName   = "Grid-Container",
                 SceneName     = "Wissensdatenbank",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
@@ -797,12 +797,12 @@ public class TutorialManager : MonoBehaviour
                 inKurzversion = false
             },
 
-            // ── Erfolge ────────────────────────────────────────────────────
+            // ── Erfolge ──────────────────────────────────────────────────── 44
             new() {
                 Erklaerung    = "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften, die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet – durch abgehakte Schritte im Gründerpfad, ausgefüllte Dokumente, angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level.",
                 ElementName   = "",
                 SceneName     = "Erfolge",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
@@ -816,15 +816,15 @@ public class TutorialManager : MonoBehaviour
                 Erklaerung    = "Alle Erfolge sind hier nach Kategorien gruppiert – zum Beispiel Gründung, Dokumente, Kunden oder Finanzen. Freigeschaltete Erfolge leuchten auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten Erfolgen siehst du direkt, auf welcher Stufe du gerade bist.",
                 ElementName   = "erfolge-grid",
                 SceneName     = "Erfolge",
-                inKurzversion = false
+                inKurzversion = true
             },
 
-            // ── Buchhaltung ────────────────────────────────────────────
+            // ── Buchhaltung ──────────────────────────────────────────── 47
             new() {
                 Erklaerung    = "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens, behältst Fristen sowie Status im Blick und exportierst deine Belege schnell als PDF.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
@@ -838,21 +838,21 @@ public class TutorialManager : MonoBehaviour
                 Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
-                inKurzversion = false
+                inKurzversion = true
             },
 
             new() {
                 Erklaerung    = "Über das Export-Symbol erstellst du im Handumdrehen ein PDF deines Belegs. Das Ordner-Symbol führt dich direkt zum lokalen Speicherort auf deinem System.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
-                inKurzversion = false
+                inKurzversion = true
             },
         };
 
