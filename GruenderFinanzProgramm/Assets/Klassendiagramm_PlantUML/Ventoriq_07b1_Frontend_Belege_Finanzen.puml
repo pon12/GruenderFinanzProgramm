@@ -1,0 +1,59 @@
+@startuml
+!include Ventoriq_00_Style.puml
+
+title Ventoriq - Frontend: Belege, Kassenbuch und Finanzen
+
+left to right direction
+
+skinparam nodesep 120
+skinparam ranksep 120
+skinparam linetype polyline
+
+package "Frontend Controller" as FRONTEND {
+  class KassenbuchController <<Controller>> {
+    Einnahmen / Ausgaben UI
+  }
+
+  class BelegScreenController <<Controller>> {
+    Angebote / Rechnungen UI
+  }
+
+  class DienstleistungenScreenController <<Controller>> {
+    Dienstleistungen UI
+  }
+
+  class FinanzUI <<Controller>> {
+    Dashboard / Auswertung
+  }
+}
+
+package "Backend Services" as SERVICES {
+  class OfferInvoiceService <<Service>>
+  class FinanceDashboardDataService <<Service>>
+}
+
+package "Datenzugriff" as ACCESS {
+  class UserDatabaseAccess <<Helper>>
+  class DataBase <<SQLite-Fassade>>
+}
+
+KassenbuchController --> UserDatabaseAccess : aktive DB
+BelegScreenController --> UserDatabaseAccess : aktive DB
+DienstleistungenScreenController --> UserDatabaseAccess : aktive DB
+FinanzUI --> UserDatabaseAccess : aktive DB
+
+UserDatabaseAccess --> DataBase : liefert Nutzer-DB
+
+BelegScreenController --> OfferInvoiceService : Beleglogik
+FinanzUI --> FinanceDashboardDataService : Auswertung
+
+OfferInvoiceService ..> DataBase : nutzt Repository
+FinanceDashboardDataService ..> DataBase : liest Finanzdaten
+
+note bottom
+Dieses Diagramm zeigt nur fachliche Frontend-Module für Belege, Kassenbuch,
+Dienstleistungen und Finanz-Auswertung.
+Dokumente und PDF-Export sind in einem separaten Diagramm ausgelagert.
+end note
+
+@enduml
