@@ -8,28 +8,31 @@
             <ui:Button text="Zurück" name="btnclose" class="btn-back" style="height: 68px; width: 192px; background-color: rgb(128, 207, 149); color: rgb(20, 20, 20); -unity-font-style: bold;"/>
             <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo" style="width: 192px; height: 166px; top: 40px;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="registry-card" class="registry-card">
-            <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
-            <ui:VisualElement name="container-profilname" class="field-group">
-                <ui:Label text="Profilname" name="Profilname" class="Profilname"/>
-                <ui:TextField label="" placeholder-text="z.B. Max Mustermann" name="Profileingabe" class="input-profile"/>
+        <ui:VisualElement name="registry-card-wrapper">
+            <ui:Image name="MaskottchenLinks" scale-mode="ScaleToFit" picking-mode="Ignore" class="maskottchen-links"/>
+            <ui:VisualElement name="registry-card" class="registry-card">
+                <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
+                <ui:VisualElement name="container-profilname" class="field-group">
+                    <ui:Label text="Profilname" name="Profilname" class="Profilname"/>
+                    <ui:TextField label="" placeholder-text="z.B. Max Mustermann" name="Profileingabe" class="input-profile"/>
+                </ui:VisualElement>
+                <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>
+                <ui:Label text="Kein Passwort nötig - gib deine PIN ein oder lass dir eine starke PIN erstellen." name="text" class="text"/>
+                <ui:Button text="Power-Passkey generieren" name="btnKeyGenerieren" class="Key-button" style="-unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=e629160c0cdac3f429873482da2890ad&amp;type=3#NotInter-Regular&quot;);"/>
+                <ui:VisualElement name="container-fehler" class="container-error">
+                    <ui:Label text="" name="lblError" class="lbl-error"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="row-agb-datenschutz" class="row-agb" style="align-items: center;">
+                    <ui:Toggle label="" name="Toggle" class="toggle-agb"/>
+                    <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
+                    <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2 link-text"/>
+                    <ui:Label text=" und die " name="normalerText2" class="text2"/>
+                    <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="Sicher mit Passkey" name="Ueberschrift2" class="Ueberschrift2"/>
-            <ui:Label text="Kein Passwort nötig - gib deine PIN ein oder lass dir eine starke PIN erstellen." name="text" class="text"/>
-            <ui:Button text="Power-Passkey generieren" name="btnKeyGenerieren" class="Key-button" style="-unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=e629160c0cdac3f429873482da2890ad&amp;type=3#NotInter-Regular&quot;);"/>
-            <ui:VisualElement name="container-fehler" class="container-error">
-                <ui:Label text="" name="lblError" class="lbl-error"/>
-            </ui:VisualElement>
-            <ui:VisualElement name="row-agb-datenschutz" class="row-agb" style="align-items: center;">
-                <ui:Toggle label="" name="Toggle" class="toggle-agb"/>
-                <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
-                <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2 link-text"/>
-                <ui:Label text=" und die " name="normalerText2" class="text2"/>
-                <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
-            </ui:VisualElement>
+            <ui:Image name="MaskottchenRechts" scale-mode="ScaleToFit" picking-mode="Ignore" class="maskottchen-rechts"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:Image name="Maskottchen" source="project://database/Assets/Resources/Begleiter%203.png?fileID=2800000&amp;guid=889832c2d4b254046a5113389a39f67d&amp;type=3#Begleiter 3" scale-mode="ScaleToFit" picking-mode="Ignore" class="maskottchen" style="width: 1920px; height: 1080px; justify-content: flex-start; align-items: stretch; align-content: flex-start; align-self: auto; aspect-ratio: auto; right: auto; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; bottom: -18px; left: -1290px;"/>
     <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">

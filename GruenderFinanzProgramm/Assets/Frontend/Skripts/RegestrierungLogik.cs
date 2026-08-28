@@ -8,39 +8,39 @@ public class RegestrierungLogik : MonoBehaviour
     private VisualElement screenLogin;
     private VisualElement screenMain;
 
-    private Button        btnKeyGenerieren;
-    private Toggle        toggle;
+    private Button btnKeyGenerieren;
+    private Toggle toggle;
     private VisualElement popuppasskey;
-    private Button        btnclose;
-    private Button        btnpopupclose;
-    private Button        btnZurAnmeldung;
-    private TextField     inputProfileingabe;
-    private Label         lblPasskey;
-    private Label         lblRecoveryKey;
-    private Button        btnCopyPasskey;
-    private Button        btnCopyRecovery;
-    private Button        btnEntschluesseln;
-    private Label         lblError;
+    private Button btnclose;
+    private Button btnpopupclose;
+    private Button btnZurAnmeldung;
+    private TextField inputProfileingabe;
+    private Label lblPasskey;
+    private Label lblRecoveryKey;
+    private Button btnCopyPasskey;
+    private Button btnCopyRecovery;
+    private Button btnEntschluesseln;
+    private Label lblError;
 
     private VisualElement popUpAGB;
-    private Label         text2;
-    private Button        btnAGBclose;
+    private Label text2;
+    private Button btnAGBclose;
 
     private VisualElement popUpDatenschutz;
-    private Label         textDatenschutz;
-    private Button        btnDatenschutzclose;
+    private Label textDatenschutz;
+    private Button btnDatenschutzclose;
 
     private Button btnLoginSubmit;
 
     private readonly string farbeNormal = "#80CF95";
-    private readonly string farbeHover  = "#80CF95";
+    private readonly string farbeHover = "#80CF95";
 
-    public event Action         OnBackToLoginRequested;
+    public event Action OnBackToLoginRequested;
     public event Action<string> OnRegistrationSuccessful;
 
     private AuthService authService;
-    private string      aktuellerPasskey  = "";
-    private bool        istEntschluesselt = false;
+    private string aktuellerPasskey = "";
+    private bool istEntschluesselt = false;
 
     private string FormatiereMitLeerzeichen(string input, int gruppenGroesse = 4)
     {
@@ -64,48 +64,66 @@ public class RegestrierungLogik : MonoBehaviour
         root = uiDocument.rootVisualElement;
 
         screenLogin = root.Q<VisualElement>("LoginScreen");
-        screenMain  = root.Q<VisualElement>("MainScreen");
+        screenMain = root.Q<VisualElement>("MainScreen");
 
-        btnKeyGenerieren   = root.Q<Button>("btnKeyGenerieren");
-        toggle             = root.Q<Toggle>("Toggle");
-        popuppasskey       = root.Q<VisualElement>("popuppasskey");
-        btnclose           = root.Q<Button>("btnclose");
-        btnpopupclose      = root.Q<Button>("btnpopupclose");
-        btnZurAnmeldung    = root.Q<Button>("btnZurAnmeldung");
+        btnKeyGenerieren = root.Q<Button>("btnKeyGenerieren");
+        toggle = root.Q<Toggle>("Toggle");
+        popuppasskey = root.Q<VisualElement>("popuppasskey");
+        btnclose = root.Q<Button>("btnclose");
+        btnpopupclose = root.Q<Button>("btnpopupclose");
+        btnZurAnmeldung = root.Q<Button>("btnZurAnmeldung");
         inputProfileingabe = root.Q<TextField>("Profileingabe");
-        lblPasskey         = root.Q<Label>("lblPasskey");
-        lblRecoveryKey     = root.Q<Label>("lblRecoveryKey");
-        btnCopyPasskey     = root.Q<Button>("btnCopyPasskey");
-        btnCopyRecovery    = root.Q<Button>("btnCopyRecovery");
-        btnEntschluesseln  = root.Q<Button>("btnEntschluesseln");
-        lblError           = root.Q<Label>("lblError");
+        lblPasskey = root.Q<Label>("lblPasskey");
+        lblRecoveryKey = root.Q<Label>("lblRecoveryKey");
+        btnCopyPasskey = root.Q<Button>("btnCopyPasskey");
+        btnCopyRecovery = root.Q<Button>("btnCopyRecovery");
+        btnEntschluesseln = root.Q<Button>("btnEntschluesseln");
+        lblError = root.Q<Label>("lblError");
 
-        popUpAGB            = root.Q<VisualElement>("PopUpAGB");
-        text2               = root.Q<Label>("text2");
-        btnAGBclose         = root.Q<Button>("btnAGBclose");
+        popUpAGB = root.Q<VisualElement>("PopUpAGB");
+        text2 = root.Q<Label>("text2");
+        btnAGBclose = root.Q<Button>("btnAGBclose");
 
-        popUpDatenschutz    = root.Q<VisualElement>("PopUpDatenschutz");
-        textDatenschutz     = root.Q<Label>("textDatenschutz");
+        popUpDatenschutz = root.Q<VisualElement>("PopUpDatenschutz");
+        textDatenschutz = root.Q<Label>("textDatenschutz");
         btnDatenschutzclose = root.Q<Button>("btnDatenschutzclose");
 
         btnLoginSubmit = root.Q<Button>("btnLoginSubmit");
 
         if (inputProfileingabe != null)
         {
+            // Äußeres Feld: Standard-Ränder von Unity entfernen, damit
+            // kein Zwischenraum zur Karte entsteht.
+            inputProfileingabe.style.marginLeft = 0;
+            inputProfileingabe.style.marginRight = 0;
+
+            // Label ist leer, reserviert aber ohne diese Zeile trotzdem Platz.
+            var label = inputProfileingabe.Q(className: "unity-base-field__label");
+            if (label != null)
+            {
+                label.style.display = DisplayStyle.None;
+            }
+
             var input = inputProfileingabe.Q(className: "unity-base-field__input");
             if (input != null)
             {
-                input.style.backgroundColor          = new UnityEngine.Color(70f / 255f, 70f / 255f, 70f / 255f);
-                input.style.color                    = UnityEngine.Color.white;
-                input.style.borderTopLeftRadius      = 12;
-                input.style.borderTopRightRadius     = 12;
-                input.style.borderBottomLeftRadius   = 12;
-                input.style.borderBottomRightRadius  = 12;
-                input.style.borderTopWidth           = 0;
-                input.style.borderRightWidth         = 0;
-                input.style.borderBottomWidth        = 0;
-                input.style.borderLeftWidth          = 0;
-                input.style.paddingLeft              = 20;
+                // flexGrow zwingt das innere Eingabefeld auf die volle
+                // Breite; sonst bleibt links/rechts ein Spalt zur Karte sichtbar.
+                input.style.flexGrow = 1;
+                input.style.marginLeft = 0;
+                input.style.marginRight = 0;
+                input.style.backgroundColor = new UnityEngine.Color(70f / 255f, 70f / 255f, 70f / 255f);
+                input.style.color = UnityEngine.Color.white;
+                input.style.borderTopLeftRadius = 12;
+                input.style.borderTopRightRadius = 12;
+                input.style.borderBottomLeftRadius = 12;
+                input.style.borderBottomRightRadius = 12;
+                input.style.borderTopWidth = 0;
+                input.style.borderRightWidth = 0;
+                input.style.borderBottomWidth = 0;
+                input.style.borderLeftWidth = 0;
+                input.style.paddingLeft = 20;
+                input.style.paddingRight = 20;
             }
         }
 
@@ -113,17 +131,14 @@ public class RegestrierungLogik : MonoBehaviour
         ResetAGBText();
         ResetDatenschutzText();
 
-        if (btnKeyGenerieren  != null) btnKeyGenerieren.clicked  += OnKeyGenerierenClicked;
-        if (btnclose          != null) btnclose.clicked          += OnBackToLoginClicked;
-        if (btnpopupclose     != null) btnpopupclose.clicked     += OnPopupCloseClicked;
-        if (btnZurAnmeldung   != null) btnZurAnmeldung.clicked   += OnZurAnmeldungClicked;
+        if (btnKeyGenerieren != null) btnKeyGenerieren.clicked += OnKeyGenerierenClicked;
+        if (btnclose != null) btnclose.clicked += OnBackToLoginClicked;
+        if (btnpopupclose != null) btnpopupclose.clicked += OnPopupCloseClicked;
+        if (btnZurAnmeldung != null) btnZurAnmeldung.clicked += OnZurAnmeldungClicked;
         if (btnEntschluesseln != null) btnEntschluesseln.clicked += OnEntschluesselnClicked;
-        if (btnLoginSubmit    != null) btnLoginSubmit.clicked    += OnLoginSubmitted;
-        if (btnCopyPasskey     != null) btnCopyPasskey.clicked     += CopyPasskeyToClipboard;
-        if (btnCopyRecovery    != null) btnCopyRecovery.clicked    += CopyRecoveryKeyToClipboard;
-        
-        
-
+        if (btnLoginSubmit != null) btnLoginSubmit.clicked += OnLoginSubmitted;
+        if (btnCopyPasskey != null) btnCopyPasskey.clicked += CopyPasskeyToClipboard;
+        if (btnCopyRecovery != null) btnCopyRecovery.clicked += CopyRecoveryKeyToClipboard;
 
         if (text2 != null)
         {
@@ -143,10 +158,10 @@ public class RegestrierungLogik : MonoBehaviour
 
         if (btnDatenschutzclose != null) btnDatenschutzclose.clicked += OnDatenschutzCloseClicked;
 
-        // FIX: fehlte komplett - dadurch hatte KEIN Button auf dem Screen
-        // den projektweiten Hover-Effekt (grüner Rahmen bei grauen Buttons,
-        // hellere Farbe bei Grün/Rot). Betraf nicht nur den Zurück-Button,
-        // sondern alle Buttons hier (Passkey generieren, Copy, Popup-Schließen, ...).
+        // Ohne diesen Aufruf hätte kein Button auf diesem Screen den
+        // projektweiten Hover-Effekt (grüner Rahmen bei grauen Buttons,
+        // hellere Farbe bei Grün/Rot) – betrifft alle Buttons hier, nicht
+        // nur den Zurück-Button.
         ButtonHoverController.RegistriereAlle(root);
 
         ShowLoginScreen();
@@ -154,8 +169,8 @@ public class RegestrierungLogik : MonoBehaviour
 
     private void OnKeyGenerierenClicked()
     {
-        bool isToggleActive = toggle             != null && toggle.value;
-        bool hasText        = inputProfileingabe != null && !string.IsNullOrWhiteSpace(inputProfileingabe.value);
+        bool isToggleActive = toggle != null && toggle.value;
+        bool hasText = inputProfileingabe != null && !string.IsNullOrWhiteSpace(inputProfileingabe.value);
 
         if (isToggleActive && hasText)
         {
@@ -166,8 +181,8 @@ public class RegestrierungLogik : MonoBehaviour
                 if (lblError != null)
                 {
                     lblError.style.display = DisplayStyle.Flex;
-                    lblError.style.color   = Color.red;
-                    lblError.text          = "Registrierung fehlgeschlagen: Dieser Name existiert bereits!";
+                    lblError.style.color = Color.red;
+                    lblError.text = "Registrierung fehlgeschlagen: Dieser Name existiert bereits!";
                 }
                 return;
             }
@@ -176,7 +191,7 @@ public class RegestrierungLogik : MonoBehaviour
 
             if (popuppasskey != null)
             {
-                aktuellerPasskey  = authService.passkeyGlobal;
+                aktuellerPasskey = authService.passkeyGlobal;
                 istEntschluesselt = false;
                 AktualisierePasskeyAnzeige();
                 popuppasskey.style.display = DisplayStyle.Flex;
@@ -205,14 +220,14 @@ public class RegestrierungLogik : MonoBehaviour
 
         if (istEntschluesselt)
         {
-            lblPasskey.text    = "PassKey: "     + FormatiereMitLeerzeichen(aktuellerPasskey);
+            lblPasskey.text = "PassKey: " + FormatiereMitLeerzeichen(aktuellerPasskey);
             if (lblRecoveryKey != null)
                 lblRecoveryKey.text = "RecoveryKey: " + FormatiereMitLeerzeichen(recoveryKey);
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Verbergen";
         }
         else
         {
-            lblPasskey.text    = "PassKey: "     + new string('*', aktuellerPasskey.Length);
+            lblPasskey.text = "PassKey: " + new string('*', aktuellerPasskey.Length);
             if (lblRecoveryKey != null)
                 lblRecoveryKey.text = "RecoveryKey: " + new string('*', recoveryKey.Length);
             if (btnEntschluesseln != null) btnEntschluesseln.text = "Entschlüsseln";
@@ -223,7 +238,7 @@ public class RegestrierungLogik : MonoBehaviour
     {
         if (lblError == null) return;
         lblError.style.display = DisplayStyle.Flex;
-        lblError.style.color   = Color.red;
+        lblError.style.color = Color.red;
 
         if (!hasText && !isToggleActive)
             lblError.text = "Bitte gib einen Namen ein und akzeptiere die Bedingungen.";
@@ -245,17 +260,17 @@ public class RegestrierungLogik : MonoBehaviour
         OnBackToLoginRequested?.Invoke();
     }
 
-    private void OnLabelClicked(PointerDownEvent evt)            { if (popUpAGB        != null) popUpAGB.style.display        = DisplayStyle.Flex; }
-    private void OnAGBcloseClicked()                             { if (popUpAGB        != null) popUpAGB.style.display        = DisplayStyle.None; }
-    private void OnAGBHoverIn(PointerOverEvent evt)              { if (text2           != null) text2.text           = $"<color={farbeHover}><u>AGB</u></color>"; }
-    private void OnAGBHoverOut(PointerOutEvent evt)              => ResetAGBText();
-    private void ResetAGBText()                                  { if (text2           != null) text2.text           = $"<color={farbeNormal}><u>AGB</u></color>"; }
+    private void OnLabelClicked(PointerDownEvent evt) { if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.Flex; }
+    private void OnAGBcloseClicked() { if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.None; }
+    private void OnAGBHoverIn(PointerOverEvent evt) { if (text2 != null) text2.text = $"<color={farbeHover}><u>AGB</u></color>"; }
+    private void OnAGBHoverOut(PointerOutEvent evt) => ResetAGBText();
+    private void ResetAGBText() { if (text2 != null) text2.text = $"<color={farbeNormal}><u>AGB</u></color>"; }
 
     private void OnDatenschutzLabelClicked(PointerDownEvent evt) { if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.Flex; }
-    private void OnDatenschutzCloseClicked()                     { if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None; }
-    private void OnDatenschutzHoverIn(PointerOverEvent evt)      { if (textDatenschutz  != null) textDatenschutz.text  = $"<color={farbeHover}><u>Datenschutzrichtlinie</u></color>"; }
-    private void OnDatenschutzHoverOut(PointerOutEvent evt)      => ResetDatenschutzText();
-    private void ResetDatenschutzText()                          { if (textDatenschutz  != null) textDatenschutz.text  = $"<color={farbeNormal}><u>Datenschutzrichtlinie</u></color>"; }
+    private void OnDatenschutzCloseClicked() { if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None; }
+    private void OnDatenschutzHoverIn(PointerOverEvent evt) { if (textDatenschutz != null) textDatenschutz.text = $"<color={farbeHover}><u>Datenschutzrichtlinie</u></color>"; }
+    private void OnDatenschutzHoverOut(PointerOutEvent evt) => ResetDatenschutzText();
+    private void ResetDatenschutzText() { if (textDatenschutz != null) textDatenschutz.text = $"<color={farbeNormal}><u>Datenschutzrichtlinie</u></color>"; }
 
     private void OnBackToLoginClicked()
     {
@@ -267,58 +282,59 @@ public class RegestrierungLogik : MonoBehaviour
 
     private void ShowLoginScreen()
     {
-        if (screenLogin      != null) screenLogin.style.display      = DisplayStyle.Flex;
-        if (screenMain       != null) screenMain.style.display       = DisplayStyle.None;
-        if (popuppasskey     != null) popuppasskey.style.display     = DisplayStyle.None;
-        if (popUpAGB         != null) popUpAGB.style.display         = DisplayStyle.None;
+        if (screenLogin != null) screenLogin.style.display = DisplayStyle.Flex;
+        if (screenMain != null) screenMain.style.display = DisplayStyle.None;
+        if (popuppasskey != null) popuppasskey.style.display = DisplayStyle.None;
+        if (popUpAGB != null) popUpAGB.style.display = DisplayStyle.None;
         if (popUpDatenschutz != null) popUpDatenschutz.style.display = DisplayStyle.None;
-        if (lblError         != null) lblError.style.display         = DisplayStyle.None;
+        if (lblError != null) lblError.style.display = DisplayStyle.None;
     }
 
     private void ShowMainScreen()
     {
         if (screenLogin != null) screenLogin.style.display = DisplayStyle.None;
-        if (screenMain  != null) screenMain.style.display  = DisplayStyle.Flex;
+        if (screenMain != null) screenMain.style.display = DisplayStyle.Flex;
     }
 
     private void ValidateUIElements()
     {
-        if (btnKeyGenerieren  == null) Debug.LogError("btnKeyGenerieren fehlt");
+        if (btnKeyGenerieren == null) Debug.LogError("btnKeyGenerieren fehlt");
         if (btnEntschluesseln == null) Debug.LogError("btnEntschluesseln fehlt");
-        if (lblPasskey        == null) Debug.LogError("lblPasskey fehlt");
-        if (lblRecoveryKey    == null) Debug.LogError("lblRecoveryKey fehlt");
-        if (btnZurAnmeldung   == null) Debug.LogError("btnZurAnmeldung fehlt");
+        if (lblPasskey == null) Debug.LogError("lblPasskey fehlt");
+        if (lblRecoveryKey == null) Debug.LogError("lblRecoveryKey fehlt");
+        if (btnZurAnmeldung == null) Debug.LogError("btnZurAnmeldung fehlt");
     }
-    
-    // Copy to Clipboard funktionen
+
+    // Copy-to-Clipboard-Funktionen
     private void CopyPasskeyToClipboard()
     {
-    if (authService == null)
-    {
-        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
-        return;
+        if (authService == null)
+        {
+            UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+            return;
+        }
+        CopyPaste.CopyPasskey(authService.passkeyGlobal);
     }
-    CopyPaste.CopyPasskey(authService.passkeyGlobal);
-    }
-    private void CopyRecoveryKeyToClipboard()   
+
+    private void CopyRecoveryKeyToClipboard()
     {
-    if (authService == null)
-    {
-        UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
-        return;
-    }
-    CopyPaste.CopyRecoveryKey(authService.getRecoveryPassKey());
+        if (authService == null)
+        {
+            UnityEngine.Debug.LogError("[RegestrierungLogik] AuthService fehlt.");
+            return;
+        }
+        CopyPaste.CopyRecoveryKey(authService.getRecoveryPassKey());
     }
 
     private void OnDisable()
     {
-        if (btnKeyGenerieren    != null) btnKeyGenerieren.clicked    -= OnKeyGenerierenClicked;
-        if (btnEntschluesseln   != null) btnEntschluesseln.clicked   -= OnEntschluesselnClicked;
-        if (btnclose            != null) btnclose.clicked            -= OnBackToLoginClicked;
-        if (btnpopupclose       != null) btnpopupclose.clicked       -= OnPopupCloseClicked;
-        if (btnZurAnmeldung     != null) btnZurAnmeldung.clicked     -= OnZurAnmeldungClicked;
-        if (btnLoginSubmit      != null) btnLoginSubmit.clicked      -= OnLoginSubmitted;
-        if (btnAGBclose         != null) btnAGBclose.clicked         -= OnAGBcloseClicked;
+        if (btnKeyGenerieren != null) btnKeyGenerieren.clicked -= OnKeyGenerierenClicked;
+        if (btnEntschluesseln != null) btnEntschluesseln.clicked -= OnEntschluesselnClicked;
+        if (btnclose != null) btnclose.clicked -= OnBackToLoginClicked;
+        if (btnpopupclose != null) btnpopupclose.clicked -= OnPopupCloseClicked;
+        if (btnZurAnmeldung != null) btnZurAnmeldung.clicked -= OnZurAnmeldungClicked;
+        if (btnLoginSubmit != null) btnLoginSubmit.clicked -= OnLoginSubmitted;
+        if (btnAGBclose != null) btnAGBclose.clicked -= OnAGBcloseClicked;
         if (btnDatenschutzclose != null) btnDatenschutzclose.clicked -= OnDatenschutzCloseClicked;
 
         if (text2 != null)
@@ -335,5 +351,4 @@ public class RegestrierungLogik : MonoBehaviour
             textDatenschutz.UnregisterCallback<PointerOutEvent>(OnDatenschutzHoverOut);
         }
     }
-
 }
