@@ -462,7 +462,7 @@ public class KundendatenbankController : MonoBehaviour
             telefon = ZusammengesetzteTelefonnummer(dropdownCreateVorwahl, inputCreateTelefon)
         };
 
-        bool inDB = false;
+        bool tatsaechlichGespeichert = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -479,20 +479,28 @@ public class KundendatenbankController : MonoBehaviour
                     lastUpdated = DateTime.Now
                 };
                 db.createCustomer(bKunde);
-                inDB = true;
+
+                // Nach insertAndGetId() traegt bKunde.id die echte, vom Backend
+                // vergebene ID - 0/unveraendert wuerde auf einen fehlgeschlagenen
+                // Insert hindeuten. Zusaetzlich per getCustomerById gegenpruefen,
+                // dass der Datensatz auch wirklich in der DB angekommen ist.
+                tatsaechlichGespeichert = bKunde.id > 0 && db.getCustomerById(bKunde.id) != null;
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] Speichern fehlgeschlagen: " + e.Message); }
 
-        if (!inDB) kundenListe.Add(uiKunde);
+        if (!tatsaechlichGespeichert) kundenListe.Add(uiKunde);
 
-        if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde hinzugefügt";
-        SetElementVisible(popupGespeichert, true);
+        if (tatsaechlichGespeichert)
+        {
+            if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde hinzugefügt";
+            SetElementVisible(popupGespeichert, true);
+        }
 
         SetElementVisible(popupErstellen, false);
         ClearCreateInputs();
 
-        if (inDB) LadeKundenAusDatenbank();
+        if (tatsaechlichGespeichert) LadeKundenAusDatenbank();
         else RefreshKundenListe();
     }
 
@@ -529,10 +537,7 @@ public class KundendatenbankController : MonoBehaviour
         aktuellBearbeiteterKunde.email = inputEditEmail != null ? inputEditEmail.value : aktuellBearbeiteterKunde.email;
         aktuellBearbeiteterKunde.telefon = ZusammengesetzteTelefonnummer(dropdownEditVorwahl, inputEditTelefon);
 
-        if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde aktualisiert";
-        SetElementVisible(popupGespeichert, true);
-
-        bool inDB = false;
+        bool tatsaechlichAktualisiert = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -547,38 +552,59 @@ public class KundendatenbankController : MonoBehaviour
                 bKunde.phone = aktuellBearbeiteterKunde.telefon;
                 bKunde.lastUpdated = DateTime.Now;
                 db.updateCustomer(bKunde);
-                inDB = true;
+
+                // Nach dem Update erneut aus der DB laden und gegenpruefen,
+                // ob die neuen Werte auch wirklich dort angekommen sind.
+                var geprueft = db.getCustomerById(bKunde.id);
+                tatsaechlichAktualisiert = geprueft != null
+                    && geprueft.name == bKunde.name
+                    && geprueft.phone == bKunde.phone;
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] Update fehlgeschlagen: " + e.Message); }
 
+        if (tatsaechlichAktualisiert)
+        {
+            if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde aktualisiert";
+            SetElementVisible(popupGespeichert, true);
+        }
+
         SetElementVisible(popupBearbeiten, false);
 
-        if (inDB) LadeKundenAusDatenbank();
+        if (tatsaechlichAktualisiert) LadeKundenAusDatenbank();
         else RefreshKundenListe();
     }
 
     private void LoescheKunde(KundeData kunde)
     {
-        bool inDB = false;
+        bool tatsaechlichGeloescht = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db != null)
+            if (db != null && int.TryParse(kunde.id, out int id))
             {
-                db.deleteCustomer(int.Parse(kunde.id));
-                inDB = true;
+                bool vorherVorhanden = db.getCustomerById(id) != null;
+                if (vorherVorhanden)
+                {
+                    db.deleteCustomer(id);
+                    tatsaechlichGeloescht = db.getCustomerById(id) == null;
+                }
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] L\u00f6schen fehlgeschlagen: " + e.Message); }
 
         kundenListe.Remove(kunde);
 
-        if (lblGeloeschtText != null) lblGeloeschtText.text = "Kunde wurde gelöscht";
-        SetElementVisible(popupGeloescht, true);
-
-        if (inDB) LadeKundenAusDatenbank();
-        else RefreshKundenListe();
+        if (tatsaechlichGeloescht)
+        {
+            if (lblGeloeschtText != null) lblGeloeschtText.text = "Kunde wurde gelöscht";
+            SetElementVisible(popupGeloescht, true);
+            LadeKundenAusDatenbank();
+        }
+        else
+        {
+            RefreshKundenListe();
+        }
     }
 
     // ============================================================
