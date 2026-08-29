@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-// ── Datenstuktur für einen Tutorial-Schritt ──────────────────────────────────
+// ── Datenstruktur für einen Tutorial-Schritt ──────────────────────────────────
 [System.Serializable]
 public class TutorialSchritt
 {
@@ -41,8 +41,6 @@ public class TutorialManager : MonoBehaviour
 
     public bool IsTutorialAktiv => tutorialModus != null && tutorialModus.style.display == DisplayStyle.Flex;
 
-    // null = manueller Aufruf aus Einstellungen → navigiert zurück zu Einstellungen
-    // gesetzt = nach Tutorial-Ende zu dieser Scene wechseln
     private string _zielSceneNachTutorial = null;
 
     [Header("UI Document")]
@@ -52,8 +50,6 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private float buttonCooldownSekunden = 0.5f;
 
     [Header("Tutorial-Schritte (Reihenfolge = Anzeigereihenfolge)")]
-
-    
     [SerializeField] private List<TutorialSchritt> alleSchritte = new();
 
     [Header("Start Screens (Falls in derselben Szene)")]
@@ -67,7 +63,6 @@ public class TutorialManager : MonoBehaviour
     private VisualElement startDialogWrapper;
     private VisualElement tutorialModus;
     private VisualElement highlightRahmen;
-    private VisualElement maskottchen;
     private VisualElement erklaerungsBox;
     private Label         erklaerungsText;
     private Label         schrittAnzeige;
@@ -78,7 +73,6 @@ public class TutorialManager : MonoBehaviour
     private Button        kurzButton;
     private Button        keinTutorialButton;
 
-    // Lambda-Referenzen für sauberes Unsubscribe
     private System.Action _onLang;
     private System.Action _onKurz;
 
@@ -87,7 +81,6 @@ public class TutorialManager : MonoBehaviour
     private Coroutine _scrollCoroutine;
     private Coroutine _sceneCoroutine;
 
-    // Spam-Schutz Guard
     private bool _isTransitioning = false;
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
@@ -120,7 +113,6 @@ public class TutorialManager : MonoBehaviour
         startDialogWrapper  = root.Q<VisualElement>("StartDialogWrapper");
         tutorialModus       = root.Q<VisualElement>("TutorialModus");
         highlightRahmen     = root.Q<VisualElement>("HighlightRahmen");
-        maskottchen         = root.Q<VisualElement>("Maskottchen");
         erklaerungsBox      = root.Q<VisualElement>("ErklaerungsBox");
         erklaerungsText     = root.Q<Label>("ErklaerungsText");
         schrittAnzeige      = root.Q<Label>("SchrittAnzeige");
@@ -144,9 +136,6 @@ public class TutorialManager : MonoBehaviour
 
     // ── Public API ───────────────────────────────────────────────────────────
 
-    /// Aufrufen nach erfolgreichem Login.
-    /// Gibt true zurück wenn das Tutorial gestartet wurde (→ Navigation übernimmt der TutorialManager).
-    /// Gibt false zurück wenn Tutorial bereits gesehen wurde (→ Aufrufer navigiert selbst weiter).
     public bool PruefeErstenStart(string nutzername, string zielScene = "Dashboard")
     {
         string schluessel = nutzername + SchluesselSuffix;
@@ -159,8 +148,6 @@ public class TutorialManager : MonoBehaviour
         return true;
     }
 
-    /// In Einstellungen.cs aufrufen:
-    /// TutorialManager.Instance.TutorialAuswahlOeffnen();
     public void TutorialAuswahlOeffnen()
     {
         SetzeVisible(tutorialModus,      false);
@@ -202,7 +189,6 @@ public class TutorialManager : MonoBehaviour
 
     private void StarteSchrittCoroutine()
     {
-        // Blockiere Mehrfachaufrufe / Spamming synchron
         if (_isTransitioning) return;
         _isTransitioning = true;
 
@@ -285,11 +271,9 @@ public class TutorialManager : MonoBehaviour
 
         SchrittAnzeigen();
 
-        // Warten, bis das UI Toolkit die Elemente gezeichnet hat
         yield return null;
         yield return null;
 
-        // Scrollen und Highlighten ausführen
         ZeigeElementMitScroll(schritt.ScrollViewName, schritt.ElementName);
     }
 
@@ -298,7 +282,6 @@ public class TutorialManager : MonoBehaviour
         if (string.IsNullOrEmpty(elementName))
         {
             SetzeVisible(highlightRahmen, false);
-            MaskottchenNebenErklaerungsBox();
             Freigeben();
             return;
         }
@@ -327,7 +310,6 @@ public class TutorialManager : MonoBehaviour
         if (targetElement == null)
         {
             SetzeVisible(highlightRahmen, false);
-            MaskottchenNebenErklaerungsBox();
             Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
             Freigeben();
             return;
@@ -339,15 +321,13 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator ScrollUndHighlight(VisualElement element, ScrollView scrollView)
     {
-        // Warten bis das Layout fertig ist (max. 10 Frames – wichtig nach Scene-Wechsel)
         for (int i = 0; i < 10; i++)
         {
             if (element.worldBound.height > 0) break;
             yield return null;
         }
-        yield return null; // ein weiterer Frame zur Sicherheit
+        yield return null;
 
-        // worldBound des Elements vor dem Scroll merken
         Rect rect = element.worldBound;
 
         if (scrollView != null)
@@ -357,20 +337,17 @@ public class TutorialManager : MonoBehaviour
             float maxOffset    = Mathf.Max(0, scrollView.contentContainer.layout.height - scrollView.layout.height);
             neuesOffset        = Mathf.Clamp(neuesOffset, 0, maxOffset);
 
-            // Highlight-Position rechnerisch verschieben
             rect = new Rect(rect.x, rect.y + (altesOffset - neuesOffset), rect.width, rect.height);
 
             scrollView.scrollOffset = new Vector2(scrollView.scrollOffset.x, neuesOffset);
         }
 
-        SetzeHighlightSichtbar(true);
+        SetzeVisible(highlightRahmen, true);
         HighlightPositionieren(rect, scrollView);
         
-        // Buttons nach Cooldown freigeben
         Freigeben();
     }
 
-    /// Gibt die Interaktion nach vollständigem Laden und Cooldown frei.
     private void Freigeben()
     {
         StartCoroutine(FreigebenVerzoegert());
@@ -402,17 +379,13 @@ public class TutorialManager : MonoBehaviour
             ? "Fertig"
             : "Weiter ›";
 
-        // Highlight-Rahmen und Maskottchen vorerst ausblenden, bis fokussiert/gescrollt wurde
-        SetzeHighlightSichtbar(false);
+        SetzeVisible(highlightRahmen, false);
     }
 
     private void HighlightPositionieren(Rect r, ScrollView scrollView = null)
     {
         const float Padding = 8f;
 
-        // Highlight auf die sichtbaren Grenzen der ScrollView begrenzen.
-        // Das gekürzte Rect ist auch das, was das Maskottchen als Referenz bekommt –
-        // so ist es bei großen / geclippten Elementen immer neben dem sichtbaren Teil.
         if (scrollView != null)
         {
             var sv     = scrollView.worldBound;
@@ -427,66 +400,27 @@ public class TutorialManager : MonoBehaviour
         highlightRahmen.style.top    = r.y      - Padding;
         highlightRahmen.style.width  = r.width  + Padding * 2;
         highlightRahmen.style.height = r.height + Padding * 2;
-
-        MaskottchenPositionieren(r);
-    }
-
-    // Positioniert das Maskottchen 40 px links neben dem sichtbaren Highlight-Bereich,
-    // vertikal zentriert auf den sichtbaren Teil (funktioniert auch bei geclippten Elementen).
-    private void MaskottchenPositionieren(Rect sichtbaresRect)
-    {
-        if (maskottchen == null) return;
-
-        const float Abstand = 40f;
-
-        // Fallback-Größe falls das Layout noch nicht berechnet wurde
-        float breite = maskottchen.layout.width  > 0 ? maskottchen.layout.width  : 100f;
-        float hoehe  = maskottchen.layout.height > 0 ? maskottchen.layout.height : 100f;
-
-        maskottchen.style.left = sichtbaresRect.x - Abstand - breite;
-        maskottchen.style.top  = sichtbaresRect.y + sichtbaresRect.height * 0.5f - hoehe * 0.5f;
-    }
-
-    // Zeigt das Maskottchen links neben der ErklaerungsBox (für Schritte ohne Highlight).
-    private void MaskottchenNebenErklaerungsBox()
-    {
-        if (maskottchen == null || erklaerungsBox == null) return;
-
-        MaskottchenPositionieren(erklaerungsBox.worldBound);
-        SetzeVisible(maskottchen, true);
-    }
-
-    // Schaltet Highlight-Rahmen und Maskottchen gemeinsam ein/aus.
-    private void SetzeHighlightSichtbar(bool sichtbar)
-    {
-        SetzeVisible(highlightRahmen, sichtbar);
-        SetzeVisible(maskottchen,     sichtbar);
     }
 
     private void TutorialSchliessen()
     {
         _isTransitioning = false;
 
-        // 1. Tutorial-UI und Popups ausblenden
         SchliesseAllePopups();
         SetzeVisible(tutorialModus, false);
         SetzeVisible(overlay,       false);
 
-        // 2. Tutorial-Status zurücksetzen
         aktuellerIndex = 0;
         aktiveSchritte.Clear();
 
-        // 3. Navigation nach Tutorial-Ende
         if (_zielSceneNachTutorial != null)
         {
-            // Vom Login gestartet → zur Ziel-Scene (z. B. Dashboard)
             string ziel = _zielSceneNachTutorial;
             _zielSceneNachTutorial = null;
             SceneManager.LoadScene(ziel);
         }
         else
         {
-            // Manueller Aufruf aus Einstellungen → zurück zu Einstellungen
             string einstellungenSzeneName = "Einstellungen";
             if (SceneManager.GetActiveScene().name != einstellungenSzeneName)
                 SceneManager.LoadScene(einstellungenSzeneName);
@@ -511,14 +445,11 @@ public class TutorialManager : MonoBehaviour
 
     // ── Inspector-Helfer ─────────────────────────────────────────────────────
 
-    /// Rechtsklick auf die Komponente → "Standardschritte befüllen"
-    /// Trägt alle Schritte mit Platzhaltertext vor – einfach Texte anpassen.
     [ContextMenu("Standardschritte befüllen")]
     private void StandardschritteBefllen()
     {
         alleSchritte = new List<TutorialSchritt>
         {
-            // ── Dashboard ────────────────────────────────────────────────── 
             new()
             {
                 Erklaerung    = "Willkommen auf ihrer zentralen Steuerzentrale!",
@@ -526,7 +457,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dashboard",
                 inKurzversion = true
             },
-
             new()
             {
                 Erklaerung    = "Hier sehen sie all ihre wichtigen Geschäftszahlen auf einen Blick – von der Anzahl ihrer Kunden bis hin zum aktuellen Kontostand. Über die direkten Buttons können sie ohne Umwege sofort neue Kunden anlegen, Angebote schreiben oder Rechnungen erstellen",
@@ -534,7 +464,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dashboard",
                 inKurzversion = false
             },
-
             new()
             {
                 Erklaerung    = "In diesem Bereich wird ihre finanzielle Entwicklung des gesamten Jahres übersichtlich als Diagramm aufbereitet. Auf der linken Seite sehen sie die Beträge, während die Achse unten ihre Umsätze von Januar bis Dezember abbildet. So erkennen sie auf einen Blick, in welchen Monaten ihr Geschäft besonders gut läuft.",
@@ -542,7 +471,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dashboard",
                 inKurzversion = false
             },
-
             new()
             {
                 Erklaerung    = "Mit dem Fristenkalender verpassen die garantiert keine wichtigen Termine oder steuerlichen Abgabefristen mehr. Navigieren sie einfach durch die Monate und Jahre, um ihre Fälligkeiten bequem im Voraus zu planen. Ein Klick auf den jeweiligen Tag zeigt ihnen sofort alle anstehenden Aufgaben an.",
@@ -550,8 +478,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dashboard",
                 inKurzversion = false
             },
-
-            // ── Settings ──────────────────────────────────────────────────── 5
             new() {
                 Erklaerung    = "Auf der linken Seite können Sie wichtigen Daten für Sie und Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen.",
                 ElementName   = "col-left",
@@ -559,7 +485,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Auf der rechten Seite finden sie die Steuersätze ...",
                 ElementName   = "card-steuersaetze",
@@ -567,7 +492,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "... den Anzeigemodus und Ihren Persönlichen Begleiter, welchen sie ein und ausschalten können ...",
                 ElementName   = "card-layout",
@@ -575,7 +499,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "... und die Sicherheitseinstellungen, wo sie Ihren aktuellen Passkey zurücksetzen können.",
                 ElementName   = "card-sicherheit",
@@ -583,7 +506,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Ganz unten finden Sie den Tutorial-Button – Sie können diese Einführung jederzeit erneut starten.",
                 ElementName   = "card-hilfe",
@@ -591,8 +513,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = true
             },
-            
-            // ── Dokumente ────────────────────────────────────────────────── 10
             new() {
                 Erklaerung    = "Hier sehen sie all ihre Dokumente auf einen Blick.",
                 ElementName   = "Main-Scroll-View",
@@ -605,29 +525,24 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dokument-Screen",
                 inKurzversion = false
             },
-
-            // ── Dienstleistungen ─────────────────────────────────────────── 12
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du alle Dienstleistungen, die du deinen Kunden anbietest. Du kannst neue Leistungen anlegen, bestehende bearbeiten oder löschen. Die hinterlegten Dienstleistungen stehen dir später beim Erstellen von Angeboten und Rechnungen direkt zur Auswahl, damit du sie nicht jedes Mal neu eingeben musst.",
                 ElementName   = "",
                 SceneName     = "Dienstleistungen",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Hier siehst du alle angelegten Dienstleistungen in einer übersichtlichen Liste. Jede Zeile zeigt dir den Namen, die Beschreibung, die Kategorie und den Preis der Leistung.",
                 ElementName   = "tabelle-wrapper",
                 SceneName     = "Dienstleistungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Mit diesem Button legst du eine neue Dienstleistung an. Es öffnet sich ein Formular, in dem du alle relevanten Felder ausfüllst.",
                 ElementName   = "btn-neu",
                 SceneName     = "Dienstleistungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Dieses Formular erscheint beim Anlegen und beim Bearbeiten einer Dienstleistung. Du gibst den Namen und eine optionale Beschreibung ein, wählst das Preismodell und trägst den Betrag ein. Pflichtfelder werden rot markiert, wenn sie fehlen oder ungültig sind. Mit Fertig speicherst du, mit Abbrechen verwirfst du die Änderungen.",
                 ElementName   = "container-popup",
@@ -635,7 +550,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dienstleistungen",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Hier wählst du, wie du die Leistung abrechnest: als Festpreis, Stundensatz oder Pauschalpreis. Diese Angabe erscheint später auch in Angeboten und Rechnungen.",
                 ElementName   = "feld-preismodell",
@@ -643,29 +557,24 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dienstleistungen",
                 inKurzversion = false
             },
-
-            // ── Kundendatenbank ──────────────────────────────────────────── 17
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du all deine Kunden und Kontakte sowie deine eigenen Firmendaten an einem zentralen Ort. Ganz oben findest du deine eigenen Profil- und Unternehmensdaten. Darunter befindet sich die Aktionsleiste, mit der du neue Kunden anlegen kannst, gefolgt von der Übersicht all deiner gespeicherten Kundenkontakte.",
                 ElementName   = "",
                 SceneName     = "KundenDB",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Im oberen Bereich siehst du die Karte „Lokaler Nutzer“. Hier werden deine eigenen Firmen- und Kontaktdaten (Name, Firma, Adresse, E-Mail und Telefonnummer) angezeigt, die aus deinen Einstellungen geladen werden. Über den Button „Ändern“ gelangst du direkt in die Einstellungen, um deine Unternehmensdaten anzupassen.",
                 ElementName   = "card-Lokaler-Nutzer",
                 SceneName     = "KundenDB",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "In der Zwischenleiste findest du den Button „Kunde Hinzufügen“. Damit öffnest du ein Formular, um einen neuen Kontakt anzulegen. Rechts daneben siehst du einen Zähler, der dir jederzeit die genaue Anzahl deiner aktuell gespeicherten Kunden anzeigt.",
                 ElementName   = "card-Zwischenbar",
                 SceneName     = "KundenDB",
                 inKurzversion = true
             },
-            
             new() {
                 Erklaerung    = "Wenn du auf „Kunde Hinzufügen“ klickst, öffnet sich dieses Fenster. Trage hier Vor- und Nachnamen, Firma, Adresse, E-Mail sowie Telefonnummer inklusive Ländervorwahl ein. Klicke anschließend auf „Kunden speichern“, um den neuen Kontakt in der Datenbank abgelegen.",
                 ElementName   = "Pop-up",
@@ -673,15 +582,12 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "KundenDB",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Hier werden all deine angelegten Kunden in einer Übersicht aufgelistet. Jede Kundenkarte zeigt die wichtigsten Kontaktdaten wie Name, Firma, Adresse, E-Mail und Telefonnummer.",
                 ElementName   = "kunden-liste-holder",
                 SceneName     = "KundenDB",
                 inKurzversion = true
             },
-
-            // ── Angebot ──────────────────────────────────────────────────── 22
             new() {
                 Erklaerung    = "Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote zu erstellen.",
                 ElementName   = "",
@@ -691,131 +597,117 @@ public class TutorialManager : MonoBehaviour
             new() {
                 Erklaerung    = "Hier wählst du den Kunden aus dem Ihr das Angebot erstellt oder trägst einen neuen ein.",
                 ElementName   = "card-partner",
+                SceneName     = "Angebot",
                 inKurzversion = true
             },
             new() {
                 Erklaerung    = "Hier pflegst du Angebotsnummer, Datum, Status und Währung.",
                 ElementName   = "card-grunddaten",
+                SceneName     = "Angebot",
                 inKurzversion = false
             },
             new() {
                 Erklaerung    = "Hier kannst du Dateien und Dokumente direkt an das Angebot anhängen.",
                 ElementName   = "card-anhaenge",
+                SceneName     = "Angebot",
                 inKurzversion = false
             },
             new() {
                 Erklaerung    = "Trage hier alle Artikel und Leistungen mit Menge und Preis ein.",
                 ElementName   = "card-positionen",
+                SceneName     = "Angebot",
                 inKurzversion = true
             },
             new() {
                 Erklaerung    = "Hier kannst du Rabatt, Skonto und interne Notizen zum Angebot hinterlegen.",
                 ElementName   = "card-details",
+                SceneName     = "Angebot",
                 inKurzversion = false
             },
-
-            // ── Kassenbuch ───────────────────────────────────────────────── 28
             new() {
                 Erklaerung    = "Hier behältst du die Finanzen deines Unternehmens im Blick, erfasst Einnahmen und Ausgaben und bereitest deine Daten für die Buchhaltung vor.",
                 ElementName   = "",
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Wähle oben rechts das gewünschte Jahr aus, um deine Einträge zu filtern. Die Anzeige zeigt dir deinen aktuellen Saldo, der aus Einnahmen abzüglich aller Ausgaben automatisch berechnet und live aktualisiert wird.",
                 ElementName   = "dropJahr",
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Über die Buttons fügst du neue Ausgaben oder Einnahmen hinzu. Es öffnet sich ein Fenster, in dem du Betrag, Verwendungszweck, Art und Datum einträgst.",
                 ElementName   = "Buttons",
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "In der zentralen Liste siehst du alle Transaktionen auf einen Blick (Einnahmen in Grün, Ausgaben in Rot). Klicke auf die Spaltenköpfe, um die Liste z. B. nach Datum, Betrag oder Typ zu sortieren. Bezahlte Rechnungen werden automatisch eingefügt.",
                 ElementName   = "Tabelle",
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Nutze das Export-Menü, um Berichte wie die Einnahmen-Überschuss-Rechnung (EÜR), die GuV oder das Buchungsjournal direkt als PDF zu generieren.",
                 ElementName   = "FinanzExport",
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
-
-            // ── Fortschritt ──────────────────────────────────────────────── 33
             new() {
                 Erklaerung    = "Der Fortschritt-Screen gibt dir einen kombinierten Überblick über deine gesamte Gründungsreise. Er fasst zusammen, wie weit du im Gründerpfad bist und wie viele Pflichtdokumente du bereits ausgefüllt hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist.",
                 ElementName   = "",
                 SceneName     = "Fortschritt",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Hier siehst du jede Gründungsphase einzeln mit einem Mini-Fortschrittsbalken und der Anzahl erledigter Schritte. Eine Phase zeigt ein grünes Häkchen, sobald alle Schritte abgeschlossen sind.",
                 ElementName   = "panel-gruenderpfad",
                 SceneName     = "Fortschritt",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Dieses Panel zeigt dir die nächsten offenen Aufgaben aus deinem Gründerpfad – immer die ersten fünf, die noch nicht erledigt sind. Du erledigst sie direkt im Gründerpfad-Screen.",
                 ElementName   = "panel-naechste-schritte",
                 SceneName     = "Fortschritt",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Hier erscheinen deine zuletzt freigeschalteten Erfolge aus dem Gründerpfad und aus ausgefüllten Dokumenten. Jeder abgeschlossene Schritt und jedes Pflichtdokument kann hier auftauchen.",
                 ElementName   = "panel-letzte-erfolge",
                 SceneName     = "Fortschritt",
                 inKurzversion = true
             },
-
-            // ── Gründerpfad ──────────────────────────────────────────────── 37
             new() {
                 Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
                 ElementName   = "",
                 SceneName     = "Gründerpfad",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Dieser Balken zeigt dir auf einen Blick, wie viele Schritte des Gründerpfads du bereits abgehakt hast. Die Prozentzahl rechts aktualisiert sich automatisch jedes Mal, wenn du einen Schritt als erledigt markierst.",
                 ElementName   = "panel-gesamtfortschritt",
                 SceneName     = "Gründerpfad",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Hier siehst du alle Phasen deiner Gründung mit ihren einzelnen Schritten. Jede Phase lässt sich aufklappen. Ein Klick auf die Checkbox links neben einem Schritt markiert ihn als erledigt – das speichert sich automatisch.",
                 ElementName   = "main-container",
                 SceneName     = "Gründerpfad",
                 inKurzversion = false
             },
-
-            // ── Wissensdatenbank ─────────────────────────────────────────── 40
             new() {
                 Erklaerung    = "Die Wissensdatenbank ist deine Anlaufstelle für Anleitungen und Erklärungen rund um deine Gründung. Alle Einträge sind in Themenkategorien geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen.",
                 ElementName   = "",
                 SceneName     = "Wissensdatenbank",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Jede Kachel steht für eine Themenkategorie – zum Beispiel Recht, Finanzen oder Marketing. Ein Klick auf eine Kachel öffnet die Liste aller Einträge zu diesem Thema.",
                 ElementName   = "Grid-Container",
                 SceneName     = "Wissensdatenbank",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Nach dem Klick auf eine Kategorie öffnet sich dieses Popup mit allen Wissenseinträgen zu dem Thema. Klicke auf einen einzelnen Eintrag, um ihn vollständig zu lesen.",
                 ElementName   = "Detail-Menu-Container",
@@ -823,7 +715,6 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Wissensdatenbank",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Hier siehst du den vollständigen Text des ausgewählten Eintrags. Du kannst scrollen, wenn der Inhalt länger ist. Mit Schließen kommst du zurück zur Kategorieübersicht.",
                 ElementName   = "Detail-List-Container",
@@ -831,58 +722,48 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Wissensdatenbank",
                 inKurzversion = false
             },
-
-            // ── Erfolge ──────────────────────────────────────────────────── 44
             new() {
                 Erklaerung    = "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften, die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet – durch abgehakte Schritte im Gründerpfad, ausgefüllte Dokumente, angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level.",
                 ElementName   = "",
                 SceneName     = "Erfolge",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Dieser Balken zeigt, wie viele der verfügbaren Erfolge du bereits freigeschaltet hast. Die Zahl rechts gibt dir den genauen Stand an.",
                 ElementName   = "panel-gesamtfortschritt",
                 SceneName     = "Erfolge",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Alle Erfolge sind hier nach Kategorien gruppiert – zum Beispiel Gründung, Dokumente, Kunden oder Finanzen. Freigeschaltete Erfolge leuchten auf, gesperrte erscheinen ausgegraut mit einem Schloss-Symbol. Bei stufenbasierten Erfolgen siehst du direkt, auf welcher Stufe du gerade bist.",
                 ElementName   = "erfolge-grid",
                 SceneName     = "Erfolge",
                 inKurzversion = true
             },
-
-            // ── Buchhaltung ──────────────────────────────────────────── 47
             new() {
                 Erklaerung    = "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens, behältst Fristen sowie Status im Blick und exportierst deine Belege schnell als PDF.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Die Kopfzeile bietet dir den Einstieg in die Übersicht. Durch Klick auf die Spaltenköpfe (z. B. Bezeichnung, Art, Erstellt, Fällig, Status) kannst du die gesamte Liste nach deinen Wünschen sortieren",
                 ElementName   = "tabelle-header",
                 SceneName     = "Buchhaltung",
                 inKurzversion = false
             },
-
             new() {
                 Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Über das Dropdown-Menü in jeder Zeile kannst du den Bearbeitungsstand eines Belegs (z. B. Entwurf, Versendet, Bezahlt oder Storniert) direkt anpassen und aktualisieren.",
                 ElementName   = "",
                 SceneName     = "Buchhaltung",
                 inKurzversion = true
             },
-
             new() {
                 Erklaerung    = "Über das Export-Symbol erstellst du im Handumdrehen ein PDF deines Belegs. Das Ordner-Symbol führt dich direkt zum lokalen Speicherort auf deinem System.",
                 ElementName   = "",
@@ -904,11 +785,9 @@ public class TutorialManager : MonoBehaviour
 
     private GameObject FindInaktivesGameObject(string objName)
     {
-        // 1. Zuerst aktiv suchen
         var obj = GameObject.Find(objName);
         if (obj != null) return obj;
 
-        // 2. Durchsuche alle geladenen Szenen inklusive Root-Objekte
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             var scene = SceneManager.GetSceneAt(i);
@@ -958,7 +837,6 @@ public class TutorialManager : MonoBehaviour
 
     private void SchliesseAllePopups()
     {
-        // 1. Alle UI-Toolkit Popups durchgehen und ausblenden
         foreach (var schritt in alleSchritte)
         {
             if (!string.IsNullOrEmpty(schritt.PopupElementName))
@@ -967,13 +845,10 @@ public class TutorialManager : MonoBehaviour
             }
         }
 
-        // 2. Alle GameObject-basierten Popups / Zusatz-Screens ausblenden,
-        // außer wenn sie einer der 3 Haupt-Screens sind (die werden separat verwaltet)
         foreach (var schritt in alleSchritte)
         {
             if (!string.IsNullOrEmpty(schritt.GameObjectName))
             {
-                // Hauptscreens überspringen, da diese in Step 3 gezielt geschaltet werden
                 if ((startScreenObj != null && schritt.GameObjectName == startScreenObj.name) ||
                     (loginScreenObj != null && schritt.GameObjectName == loginScreenObj.name) ||
                     (registrationScreenObj != null && schritt.GameObjectName == registrationScreenObj.name))
@@ -1007,7 +882,6 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    // Hilfsmethode zum Testen im Unity Inspector
     [ContextMenu("Ersten Start zurücksetzen")]
     public void ResetErsterStart()
     {
