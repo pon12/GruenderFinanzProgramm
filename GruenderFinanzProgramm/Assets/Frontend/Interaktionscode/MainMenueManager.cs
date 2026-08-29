@@ -17,13 +17,7 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
 {
-    // 1. Prüfen, ob das Tutorial beim allerersten Start getriggert werden soll
-    if (TutorialManager.Instance != null)
-    {
-        TutorialManager.Instance.PruefeErstenAppStart();
-    }
-
-    // 2. PRÜFUNG: Wenn das Tutorial läuft, KEINEN automatischen Start-Screen-Fade ausführen!
+    // PRÜFUNG: Wenn das Tutorial läuft, KEINEN automatischen Start-Screen-Fade ausführen!
     bool tutorialAktiv = TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialAktiv;
 
     if (!tutorialAktiv && startScreenObj != null && startScreenObj.activeSelf)

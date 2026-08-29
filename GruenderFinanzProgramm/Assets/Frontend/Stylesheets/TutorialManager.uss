@@ -189,3 +189,12 @@ Button.btn-ghost:active {
     width: auto;
     margin-top: 0px;
 }
+
+.maskottchen {
+    position: absolute;
+    width: 200px;          /* Größe anpassen */
+    height: 200px;
+    background-image: url("project://database/Assets/Resources/Begleiter 4.png"); /* Pfad zum Maskottchen-Bild */
+    background-size: contain;
+    background-repeat: no-repeat;
+}w

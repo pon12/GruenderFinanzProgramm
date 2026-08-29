@@ -141,13 +141,14 @@ public class LoginFlowController : MonoBehaviour
         return;
     }
 
-    // ── Tutorial-Check ──────────────────────────────
+    // Tutorial-Check: gibt true zurück wenn Tutorial gestartet wurde.
+    // In dem Fall übernimmt der TutorialManager die Navigation zum Dashboard.
     if (TutorialManager.Instance != null)
     {
         string nutzername = StateManager.Instance?.getCurrentUser()?.username ?? "default";
-        TutorialManager.Instance.PruefeErstenStart(nutzername);
+        bool tutorialGestartet = TutorialManager.Instance.PruefeErstenStart(nutzername, DASHBOARD_SCENE);
+        if (tutorialGestartet) return;
     }
-    // ────────────────────────────────────────────────
 
     Debug.Log("[Login] Login erfolgreich – lade Dashboard.");
     SceneManager.LoadScene(DASHBOARD_SCENE);

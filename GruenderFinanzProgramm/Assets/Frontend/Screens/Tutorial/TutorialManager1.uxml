@@ -12,6 +12,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="TutorialModus" class="tutorial-modus">
             <ui:VisualElement name="HighlightRahmen" class="highlight-rahmen"/>
+            <ui:VisualElement name="Maskottchen" class="maskottchen"/>
             <ui:VisualElement name="ErklaerungsBox" class="erklaerung-box">
                 <ui:Label name="ErklaerungsText" class="erklaerung-text"/>
                 <ui:VisualElement class="nav-row">

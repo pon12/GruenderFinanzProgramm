@@ -41,7 +41,9 @@ public class TutorialManager : MonoBehaviour
 
     public bool IsTutorialAktiv => tutorialModus != null && tutorialModus.style.display == DisplayStyle.Flex;
 
-    private bool zeigeLoginNachTutorial = false;
+    // null = manueller Aufruf aus Einstellungen → navigiert zurück zu Einstellungen
+    // gesetzt = nach Tutorial-Ende zu dieser Scene wechseln
+    private string _zielSceneNachTutorial = null;
 
     [Header("UI Document")]
     [SerializeField] private UIDocument uiDocument;
@@ -65,6 +67,8 @@ public class TutorialManager : MonoBehaviour
     private VisualElement startDialogWrapper;
     private VisualElement tutorialModus;
     private VisualElement highlightRahmen;
+    private VisualElement maskottchen;
+    private VisualElement erklaerungsBox;
     private Label         erklaerungsText;
     private Label         schrittAnzeige;
     private Button        zurueckButton;
@@ -116,6 +120,8 @@ public class TutorialManager : MonoBehaviour
         startDialogWrapper  = root.Q<VisualElement>("StartDialogWrapper");
         tutorialModus       = root.Q<VisualElement>("TutorialModus");
         highlightRahmen     = root.Q<VisualElement>("HighlightRahmen");
+        maskottchen         = root.Q<VisualElement>("Maskottchen");
+        erklaerungsBox      = root.Q<VisualElement>("ErklaerungsBox");
         erklaerungsText     = root.Q<Label>("ErklaerungsText");
         schrittAnzeige      = root.Q<Label>("SchrittAnzeige");
         zurueckButton       = root.Q<Button>("ZurueckButton");
@@ -138,16 +144,19 @@ public class TutorialManager : MonoBehaviour
 
     // ── Public API ───────────────────────────────────────────────────────────
 
-    /// In LoginScreenController nach erfolgreichem Login aufrufen:
-    /// TutorialManager.Instance.PruefeErstenStart(nutzername);
-    public void PruefeErstenStart(string nutzername)
+    /// Aufrufen nach erfolgreichem Login.
+    /// Gibt true zurück wenn das Tutorial gestartet wurde (→ Navigation übernimmt der TutorialManager).
+    /// Gibt false zurück wenn Tutorial bereits gesehen wurde (→ Aufrufer navigiert selbst weiter).
+    public bool PruefeErstenStart(string nutzername, string zielScene = "Dashboard")
     {
         string schluessel = nutzername + SchluesselSuffix;
-        if (PlayerPrefs.GetInt(schluessel, 0) == 1) return;
+        if (PlayerPrefs.GetInt(schluessel, 0) == 1) return false;
 
         PlayerPrefs.SetInt(schluessel, 1);
         PlayerPrefs.Save();
+        _zielSceneNachTutorial = zielScene;
         TutorialAuswahlOeffnen();
+        return true;
     }
 
     /// In Einstellungen.cs aufrufen:
@@ -289,6 +298,7 @@ public class TutorialManager : MonoBehaviour
         if (string.IsNullOrEmpty(elementName))
         {
             SetzeVisible(highlightRahmen, false);
+            MaskottchenNebenErklaerungsBox();
             Freigeben();
             return;
         }
@@ -317,6 +327,7 @@ public class TutorialManager : MonoBehaviour
         if (targetElement == null)
         {
             SetzeVisible(highlightRahmen, false);
+            MaskottchenNebenErklaerungsBox();
             Debug.LogWarning($"[TutorialManager] Element '{elementName}' nicht gefunden.");
             Freigeben();
             return;
@@ -352,7 +363,7 @@ public class TutorialManager : MonoBehaviour
             scrollView.scrollOffset = new Vector2(scrollView.scrollOffset.x, neuesOffset);
         }
 
-        SetzeVisible(highlightRahmen, true);
+        SetzeHighlightSichtbar(true);
         HighlightPositionieren(rect, scrollView);
         
         // Buttons nach Cooldown freigeben
@@ -391,18 +402,20 @@ public class TutorialManager : MonoBehaviour
             ? "Fertig"
             : "Weiter ›";
 
-        // Highlight-Rahmen vorerst ausblenden, bis fokussiert/gescrollt wurde
-        SetzeVisible(highlightRahmen, false);
+        // Highlight-Rahmen und Maskottchen vorerst ausblenden, bis fokussiert/gescrollt wurde
+        SetzeHighlightSichtbar(false);
     }
 
     private void HighlightPositionieren(Rect r, ScrollView scrollView = null)
     {
         const float Padding = 8f;
 
-        // Highlight auf die sichtbaren Grenzen der ScrollView begrenzen
+        // Highlight auf die sichtbaren Grenzen der ScrollView begrenzen.
+        // Das gekürzte Rect ist auch das, was das Maskottchen als Referenz bekommt –
+        // so ist es bei großen / geclippten Elementen immer neben dem sichtbaren Teil.
         if (scrollView != null)
         {
-            var sv   = scrollView.worldBound;
+            var sv     = scrollView.worldBound;
             float x      = Mathf.Max(r.x,    sv.x);
             float y      = Mathf.Max(r.y,    sv.y);
             float right  = Mathf.Min(r.xMax, sv.xMax);
@@ -414,6 +427,40 @@ public class TutorialManager : MonoBehaviour
         highlightRahmen.style.top    = r.y      - Padding;
         highlightRahmen.style.width  = r.width  + Padding * 2;
         highlightRahmen.style.height = r.height + Padding * 2;
+
+        MaskottchenPositionieren(r);
+    }
+
+    // Positioniert das Maskottchen 40 px links neben dem sichtbaren Highlight-Bereich,
+    // vertikal zentriert auf den sichtbaren Teil (funktioniert auch bei geclippten Elementen).
+    private void MaskottchenPositionieren(Rect sichtbaresRect)
+    {
+        if (maskottchen == null) return;
+
+        const float Abstand = 40f;
+
+        // Fallback-Größe falls das Layout noch nicht berechnet wurde
+        float breite = maskottchen.layout.width  > 0 ? maskottchen.layout.width  : 100f;
+        float hoehe  = maskottchen.layout.height > 0 ? maskottchen.layout.height : 100f;
+
+        maskottchen.style.left = sichtbaresRect.x - Abstand - breite;
+        maskottchen.style.top  = sichtbaresRect.y + sichtbaresRect.height * 0.5f - hoehe * 0.5f;
+    }
+
+    // Zeigt das Maskottchen links neben der ErklaerungsBox (für Schritte ohne Highlight).
+    private void MaskottchenNebenErklaerungsBox()
+    {
+        if (maskottchen == null || erklaerungsBox == null) return;
+
+        MaskottchenPositionieren(erklaerungsBox.worldBound);
+        SetzeVisible(maskottchen, true);
+    }
+
+    // Schaltet Highlight-Rahmen und Maskottchen gemeinsam ein/aus.
+    private void SetzeHighlightSichtbar(bool sichtbar)
+    {
+        SetzeVisible(highlightRahmen, sichtbar);
+        SetzeVisible(maskottchen,     sichtbar);
     }
 
     private void TutorialSchliessen()
@@ -429,32 +476,20 @@ public class TutorialManager : MonoBehaviour
         aktuellerIndex = 0;
         aktiveSchritte.Clear();
 
-        // 3. Ziel-Screen basierend auf dem Modus laden/anzeigen
-        if (zeigeLoginNachTutorial)
+        // 3. Navigation nach Tutorial-Ende
+        if (_zielSceneNachTutorial != null)
         {
-            // Erststart-Fall: Zum Login-Screen im MainMenuManager wechseln
-            zeigeLoginNachTutorial = false; // Zurücksetzen für spätere Durchläufe
-
-            var mainMenu = Object.FindFirstObjectByType<MainMenuManager>();
-            if (mainMenu != null)
-            {
-                mainMenu.ShowLogin();
-            }
-            else
-            {
-                // Falls MainMenuManager in einer anderen Szene liegt
-                UnityEngine.SceneManagement.SceneManager.LoadScene("3-Start-Screens"); // Name deiner Hauptmenü-Szene
-            }
+            // Vom Login gestartet → zur Ziel-Scene (z. B. Dashboard)
+            string ziel = _zielSceneNachTutorial;
+            _zielSceneNachTutorial = null;
+            SceneManager.LoadScene(ziel);
         }
         else
         {
-            // Manueller Durchlauf (z.B. aus den Einstellungen gestartet): Zurück zu den Einstellungen
+            // Manueller Aufruf aus Einstellungen → zurück zu Einstellungen
             string einstellungenSzeneName = "Einstellungen";
-
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != einstellungenSzeneName)
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene(einstellungenSzeneName);
-            }
+            if (SceneManager.GetActiveScene().name != einstellungenSzeneName)
+                SceneManager.LoadScene(einstellungenSzeneName);
         }
     }
 
@@ -914,6 +949,7 @@ public class TutorialManager : MonoBehaviour
             if (popupEl != null)
             {
                 popupEl.style.display = DisplayStyle.Flex;
+                popupEl.style.position = Position.Absolute;
                 return;
             }
         }
@@ -966,31 +1002,9 @@ public class TutorialManager : MonoBehaviour
             if (popupEl != null)
             {
                 popupEl.style.display = DisplayStyle.None;
+                popupEl.style.position = Position.Absolute;
             }
         }
-    }
-
-    // ── Public API ───────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Prüft beim allerersten App-Start, ob das Tutorial gezeigt werden soll.
-    /// </summary>
-    public void PruefeErstenAppStart()
-    {
-        const string Key = "ErsterAppStart_TutorialAngezeigt";
-
-        // Falls die App schon einmal gestartet wurde, abbrechen
-        if (PlayerPrefs.GetInt(Key, 0) == 1) return;
-
-        // Als gestartet markieren und speichern
-        PlayerPrefs.SetInt(Key, 1);
-        PlayerPrefs.Save();
-
-        // Merken: Beim allerersten Start soll danach der Login-Screen kommen!
-        zeigeLoginNachTutorial = true;
-
-        // Tutorial starten
-        TutorialAuswahlOeffnen(); 
     }
 
     // Hilfsmethode zum Testen im Unity Inspector
