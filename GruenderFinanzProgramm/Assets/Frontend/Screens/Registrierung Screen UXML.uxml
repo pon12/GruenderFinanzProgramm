@@ -8,7 +8,7 @@
             <ui:Button text="Zurück" name="btnclose" class="btn-back" style="height: 68px; width: 192px; background-color: rgb(128, 207, 149); color: rgb(20, 20, 20); -unity-font-style: bold;"/>
             <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo" style="width: 192px; height: 166px; top: 40px;"/>
         </ui:VisualElement>
-        <ui:Image name="MaskottchenLinks" source="project://database/Assets/Frontend/Bilder/Maskottchen_Ganzkoerper.png?fileID=2800000&amp;guid=DEINE_GUID_HIER&amp;type=3#Maskottchen_Ganzkoerper" scale-mode="ScaleToFit" picking-mode="Ignore" class="maskottchen-links"/>
+        <ui:VisualElement name="MaskottchenLinks" picking-mode="Ignore" class="maskottchen-links"/>
         <ui:VisualElement name="registry-card" class="registry-card">
             <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
             <ui:VisualElement name="container-profilname" class="field-group">
@@ -34,7 +34,7 @@
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
                 <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
-                <ui:Button text="✕" name="btnpopupclose" class="btn-popup-close"/>
+                <ui:Button name="btnpopupclose" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
             </ui:VisualElement>
             <ui:VisualElement name="container-passkey-anzeige" class="popup-passkey-display">
                 <ui:VisualElement name="row-passkey" class="popup-row-item">
@@ -55,7 +55,7 @@
         <ui:VisualElement name="container-popup-agb" class="popup-doc-card">
             <ui:VisualElement name="row-popup-agb-header" class="popup-doc-header">
                 <ui:Label text="AGB" name="label-popup-agb-titel" class="popup-doc-title"/>
-                <ui:Button text="✕" name="btnAGBclose" class="btn-doc-close"/>
+                <ui:Button name="btnAGBclose" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
             </ui:VisualElement>
             <ui:ScrollView name="container-popup-agb-inhalt" class="popup-doc-content">
                 <ui:Label text="&lt;b&gt;&lt;color=#80CF95&gt;§ 1 Gegenstand und akademischer Rahmen&lt;/color&gt;&lt;/b&gt;&#10;Die Software „Ventoriq – Dein digitaler Mentor&quot; ist eine modulare Desktop-Anwendung zur Unterstützung von Startup-Gründern. Dieses System entstand als studentisches Projekt im Rahmen des Moduls Wissenschaft und Wirtschaft 1 (WW1) im Sommersemester 2026 an der Hochschule Mittweida (Studiengang Medieninformatik und Interaktives Entertainment).&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;§ 2 Nutzungsberechtigung und Zweck&lt;/color&gt;&lt;/b&gt;&#10;Die Software dient der Reduktion der kognitiven Last in der Gründungsphase durch geführte Prozesse (Guided UI). Die Nutzung ist im aktuellen Entwicklungsstadium (MVP) primär für Pilotgründer und zu Evaluationszwecken im akademischen Rahmen vorgesehen.&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;§ 3 Haftungsausschluss und KI-Hinweis&lt;/color&gt;&lt;/b&gt;&#10;Da es sich um einen Prototypen (Minimum Viable Product) handelt, wird keine Gewähr für die Richtigkeit der berechneten Finanzdaten oder die Vollständigkeit der rechtlichen Hinweise übernommen. Inhalte der Wissensdatenbank sowie Teile der Systemlogik können unter Zuhilfenahme von KI-Technologien generiert worden sein und dienen lediglich der Orientierung. Die Software ersetzt keine professionelle Steuer- oder Rechtsberatung. Die Nutzung erfolgt auf eigene Gefahr.&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;§ 4 Lokale Datenspeicherung&lt;/color&gt;&lt;/b&gt;&#10;Alle Eingaben werden ausschließlich in einer lokalen SQLite-Datenbank auf dem Endgerät des Nutzers gespeichert. Der Nutzer ist für die Sicherung dieser Datenbankdatei (Backup-Funktion unter Einstellungen) selbst verantwortlich." name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
@@ -66,7 +66,7 @@
         <ui:VisualElement name="container-popup-datenschutz" class="popup-doc-card">
             <ui:VisualElement name="row-popup-datenschutz-header" class="popup-doc-header">
                 <ui:Label text="Datenschutzrichtlinie" name="label-popup-datenschutz-titel" class="popup-doc-title"/>
-                <ui:Button text="✕" name="btnDatenschutzclose" class="btn-doc-close"/>
+                <ui:Button name="btnDatenschutzclose" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
             </ui:VisualElement>
             <ui:ScrollView name="container-popup-datenschutz-inhalt" class="popup-doc-content">
                 <ui:Label text="&lt;b&gt;&lt;color=#80CF95&gt;Grundsatz der Datensouveränität&lt;/color&gt;&lt;/b&gt;&#10;Der Schutz deiner Daten hat bei Ventoriq oberste Priorität. Die Software folgt dem Prinzip der lokalen Datenhaltung. Das bedeutet: Sämtliche von dir eingegebenen Unternehmensdaten, Finanztransaktionen und persönlichen Profileinstellungen werden ausschließlich lokal in einer verschlüsselten SQLite-Datenbank auf deinem Rechner gespeichert.&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;Keine Cloud-Übertragung&lt;/color&gt;&lt;/b&gt;&#10;In der vorliegenden MVP-Version erfolgt keine Übertragung deiner Daten an externe Server oder Cloud-Dienste. Es findet keine Analyse deines Nutzerverhaltens durch die Entwickler statt.&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;Authentifizierung und Sicherheit&lt;/color&gt;&lt;/b&gt;&#10;Zum Schutz deines Lokalprofils nutzt Ventoriq ein Passkey-Verfahren. Deine PIN wird nicht im Klartext gespeichert, sondern mittels SHA-256-Hashing verschlüsselt hinterlegt. Ein Zugriff auf deine Daten ist ohne diesen lokalen Schlüssel nicht möglich.&#10;&#10;&#10;&lt;b&gt;&lt;color=#80CF95&gt;Auskunfts- und Löschungsrecht&lt;/color&gt;&lt;/b&gt;&#10;Da alle Daten physisch auf deinem Gerät liegen, hast du die volle Kontrolle. Durch das Löschen der lokalen Datenbankdatei oder die Deinstallation der Anwendung werden alle gespeicherten Informationen unwiderruflich entfernt." name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
