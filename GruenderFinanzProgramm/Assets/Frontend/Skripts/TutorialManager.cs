@@ -450,6 +450,9 @@ public class TutorialManager : MonoBehaviour
     {
         alleSchritte = new List<TutorialSchritt>
         {
+
+            // Dashboard
+
             new()
             {
                 Erklaerung    = "Willkommen auf ihrer zentralen Steuerzentrale!",
@@ -478,6 +481,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dashboard",
                 inKurzversion = false
             },
+
+            // Einstellungen
+
             new() {
                 Erklaerung    = "Auf der linken Seite können Sie wichtigen Daten für Sie und Ihr Unternehmen bearbeiten und unten Ihre aktuelle Version der App sehen.",
                 ElementName   = "col-left",
@@ -513,6 +519,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Einstellungen",
                 inKurzversion = true
             },
+
+
+            // Dokumente
             new() {
                 Erklaerung    = "Hier sehen sie all ihre Dokumente auf einen Blick.",
                 ElementName   = "Main-Scroll-View",
@@ -525,6 +534,8 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dokument-Screen",
                 inKurzversion = false
             },
+
+            // Dienstleistungen
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du alle Dienstleistungen, die du deinen Kunden anbietest. Du kannst neue Leistungen anlegen, bestehende bearbeiten oder löschen. Die hinterlegten Dienstleistungen stehen dir später beim Erstellen von Angeboten und Rechnungen direkt zur Auswahl, damit du sie nicht jedes Mal neu eingeben musst.",
                 ElementName   = "",
@@ -557,6 +568,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Dienstleistungen",
                 inKurzversion = false
             },
+
+
+            // KundenDB
             new() {
                 Erklaerung    = "Auf diesem Screen verwaltest du all deine Kunden und Kontakte sowie deine eigenen Firmendaten an einem zentralen Ort. Ganz oben findest du deine eigenen Profil- und Unternehmensdaten. Darunter befindet sich die Aktionsleiste, mit der du neue Kunden anlegen kannst, gefolgt von der Übersicht all deiner gespeicherten Kundenkontakte.",
                 ElementName   = "",
@@ -588,6 +602,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "KundenDB",
                 inKurzversion = true
             },
+
+
+            // Angebot
             new() {
                 Erklaerung    = "Der Angebot-Screen zeigt dir alle Werkzeuge um professionelle Angebote zu erstellen.",
                 ElementName   = "",
@@ -624,6 +641,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Angebot",
                 inKurzversion = false
             },
+
+
+            // Kassenbuch
             new() {
                 Erklaerung    = "Hier behältst du die Finanzen deines Unternehmens im Blick, erfasst Einnahmen und Ausgaben und bereitest deine Daten für die Buchhaltung vor.",
                 ElementName   = "",
@@ -654,6 +674,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Kassenbuch",
                 inKurzversion = false
             },
+
+
+            // Fortschritt
             new() {
                 Erklaerung    = "Der Fortschritt-Screen gibt dir einen kombinierten Überblick über deine gesamte Gründungsreise. Er fasst zusammen, wie weit du im Gründerpfad bist und wie viele Pflichtdokumente du bereits ausgefüllt hast. So siehst du auf einen Blick, was insgesamt noch zu tun ist.",
                 ElementName   = "",
@@ -678,6 +701,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Fortschritt",
                 inKurzversion = true
             },
+
+
+            // Gründerpfad
             new() {
                 Erklaerung    = "Der Gründerpfad ist deine persönliche Roadmap von der Idee bis zur fertigen Gründung. Alle wichtigen Schritte sind in Phasen unterteilt – von der Vorbereitung über die Anmeldung bis hin zu Finanzen und Betrieb. Du hakst Schritte ab, die du erledigt hast, und siehst sofort wie weit du bist. Der Fortschritt hier fließt auch in den Fortschritt-Screen ein.",
                 ElementName   = "",
@@ -696,6 +722,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Gründerpfad",
                 inKurzversion = false
             },
+
+
+            // Wissensdatenbank
             new() {
                 Erklaerung    = "Die Wissensdatenbank ist deine Anlaufstelle für Anleitungen und Erklärungen rund um deine Gründung. Alle Einträge sind in Themenkategorien geordnet. Du kannst dir jeden Eintrag in Ruhe durchlesen und so gezielt Fragen zu Themen wie Rechtsformen, Steuern oder Buchhaltung nachschlagen.",
                 ElementName   = "",
@@ -722,6 +751,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Wissensdatenbank",
                 inKurzversion = false
             },
+
+
+            // Erfolge
             new() {
                 Erklaerung    = "Der Erfolge-Screen zeigt dir alle Meilensteine und Errungenschaften, die du in Ventoriq sammeln kannst. Erfolge werden automatisch freigeschaltet – durch abgehakte Schritte im Gründerpfad, ausgefüllte Dokumente, angelegte Kunden, erstellte Angebote und vieles mehr. Es gibt einmalige Erfolge und stufenbasierte Erfolge mit Bronze-, Silber-, Gold- und Platin-Level.",
                 ElementName   = "",
@@ -740,6 +772,9 @@ public class TutorialManager : MonoBehaviour
                 SceneName     = "Erfolge",
                 inKurzversion = true
             },
+
+
+            // Buchhaltung
             new() {
                 Erklaerung    = "Hier verwaltest du zentral alle Angebote und Rechnungen deines Unternehmens, behältst Fristen sowie Status im Blick und exportierst deine Belege schnell als PDF.",
                 ElementName   = "",

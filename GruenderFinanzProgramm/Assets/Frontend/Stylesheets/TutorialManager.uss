@@ -72,18 +72,19 @@
 /* Bottom Container – richtet Maskottchen & Erklärungsbox horizontal zentriert aus */
 .tutorial-bottom-container {
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    align-items: bottom;
+    justify-content: left;
+    padding-left: 240px;
     width: 100%;
 }
 
 /* Erklärungsbox */
 .erklaerung-box {
     width: 680px;
-    margin-top: 160px;
     background-color: #161B20;
     border-radius: 10px;
     padding: 24px 32px;
+    margin-bottom: 40px;
     border-width: 1px;
     border-color: #323941;
 }
