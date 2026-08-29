@@ -88,7 +88,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="Footer" style="flex-direction: row; justify-content: flex-end;">
-                   <ui:Button text="Abbrechen" name="loeschen-btn-abbrechen" class="btn-grey" style="margin-right: 12px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
+                    <ui:Button text="Abbrechen" name="create-btn-abbrechen" class="btn-grey" style="margin-right: 12px;"/>
                     <ui:Button text="Kunden speichern" name="create-btn-speichern" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -156,7 +156,7 @@
                 </ui:VisualElement>
                 <ui:Label name="label-loeschen-hinweis" text="Möchtest du diesen Kunden wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden." style="font-size: 15px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 28px;"/>
                 <ui:VisualElement name="row-popup-loeschen-footer" style="flex-direction: row; justify-content: flex-end;">
-                    <ui:Button text="Abbrechen" name="loeschen-btn-abbrechen" style="margin-right: 12px; background-color: rgb(60, 60, 60); color: rgb(255, 255, 255); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
+                    <ui:Button text="Abbrechen" name="loeschen-btn-abbrechen" class="btn-grey" style="margin-right: 12px;"/>
                     <ui:Button text="Löschen" name="loeschen-btn-bestaetigen" style="background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); border-width: 2px; border-color: rgb(230, 57, 70); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
             </ui:VisualElement>
