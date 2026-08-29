@@ -30,6 +30,9 @@ public class KundendatenbankController : MonoBehaviour
     private VisualElement popupGespeichert;
     private Label lblGespeichertText;
     private Button btnCloseGespeichert;
+    private VisualElement popupLoeschenBestaetigen;
+    private Button btnLoeschenAbbrechen, btnLoeschenBestaetigen, btnLoeschenClose;
+    private KundeData kundeZumLoeschen;
 
     // Inputs Erstellen-Popup
     private TextField inputCreateVorname, inputCreateNachname, inputCreateFirma;
@@ -70,6 +73,10 @@ public class KundendatenbankController : MonoBehaviour
         popupGespeichert = root.Q<VisualElement>("popup-kunde-gespeichert");
         lblGespeichertText = popupGespeichert?.Q<Label>("label-kunde-gespeichert-text");
         btnCloseGespeichert = popupGespeichert?.Q<Button>("btn-close-kunde-gespeichert");
+        popupLoeschenBestaetigen = root.Q<VisualElement>("PopUpKundeLoeschenBestaetigen");
+        btnLoeschenAbbrechen = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-abbrechen");
+        btnLoeschenBestaetigen = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-bestaetigen");
+        btnLoeschenClose = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-close");
 
         AssignPopupElements();
 
@@ -84,6 +91,7 @@ public class KundendatenbankController : MonoBehaviour
         SetElementVisible(popupBearbeiten, false);
         SetElementVisible(popupGeloescht, false);
         SetElementVisible(popupGespeichert, false);
+        SetElementVisible(popupLoeschenBestaetigen, false);
 
         RegisterEvents();
         LadeKundenAusDatenbank();
@@ -292,6 +300,26 @@ public class KundendatenbankController : MonoBehaviour
         if (btnCloseGespeichert != null)
             btnCloseGespeichert.clicked += () => SetElementVisible(popupGespeichert, false);
 
+        if (btnLoeschenAbbrechen != null)
+            btnLoeschenAbbrechen.clicked += () =>
+            {
+                kundeZumLoeschen = null;
+                SetElementVisible(popupLoeschenBestaetigen, false);
+            };
+        if (btnLoeschenClose != null)
+            btnLoeschenClose.clicked += () =>
+            {
+                kundeZumLoeschen = null;
+                SetElementVisible(popupLoeschenBestaetigen, false);
+            };
+        if (btnLoeschenBestaetigen != null)
+            btnLoeschenBestaetigen.clicked += () =>
+            {
+                SetElementVisible(popupLoeschenBestaetigen, false);
+                if (kundeZumLoeschen != null) LoescheKunde(kundeZumLoeschen);
+                kundeZumLoeschen = null;
+            };
+
         // FIX: Öffnete vorher das "Kunde bearbeiten"-Popup mit leeren
         // Feldern (aktuellBearbeiteterKunde = null) - beim Speichern wäre
         // das als NEUER Kunde in der KDB gelandet, statt die eigenen
@@ -427,7 +455,7 @@ public class KundendatenbankController : MonoBehaviour
                 adresseLabel.text = $"{kunde.strasse}, {kunde.plz} {kunde.ort}".Trim();
 
             if (btnAendern != null) btnAendern.clicked += () => OeffneBearbeitenPopup(kunde);
-            if (btnLoeschen != null) btnLoeschen.clicked += () => LoescheKunde(kunde);
+            if (btnLoeschen != null) btnLoeschen.clicked += () => OeffneLoeschenBestaetigenPopup(kunde);
 
             // Help-Icon in der Karte registrieren (Template-Icon)
             var helpIcon = neueKarte.Q<VisualElement>("btn-help-kundenkarte");
@@ -573,6 +601,12 @@ public class KundendatenbankController : MonoBehaviour
 
         if (tatsaechlichAktualisiert) LadeKundenAusDatenbank();
         else RefreshKundenListe();
+    }
+
+    private void OeffneLoeschenBestaetigenPopup(KundeData kunde)
+    {
+        kundeZumLoeschen = kunde;
+        SetElementVisible(popupLoeschenBestaetigen, true);
     }
 
     private void LoescheKunde(KundeData kunde)
