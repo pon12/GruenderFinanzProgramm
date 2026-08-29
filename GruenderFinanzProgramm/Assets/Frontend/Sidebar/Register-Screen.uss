@@ -5,22 +5,476 @@
     flex-grow: 1;
 }
 
-.maskottchen-links {
-    position: absolute;
-    left: -555px;
-    top: -76px;
-    width: 460px;
-    height: 646px;
-    background-image: url("project://database/Assets/Frontend/Bilder/Maskottchen_Ganzkoerper.png?fileID=2800000&guid=5ab3986fbb190bc4d88c0cb5bb44b5ea&type=3#Maskottchen_Ganzkoerper");
+:root {
 }
 
-.maskottchen-rechts {
+.fullscreen-bg {
+    flex-grow: 1;
+}
+
+.maskottchen-links {
     position: absolute;
-    left: 715px;
-    top: -76px;
-    width: 460px;
-    height: 646px;
-    background-image: url("project://database/Assets/Frontend/Bilder/Maskottchen_Ganzkoerper_gespiegelt.png?fileID=2800000&guid=252564e3094407a4bb7bcb5f89cdd558&type=3#Maskottchen_Ganzkoerper_gespiegelt");
+    left: 114px;
+    bottom: -20px;
+    width: 400px;
+    height: 400px;
+    background-image: url("project://database/Assets/Resources/Begleiter 3.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.container-main {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 130px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.header-logo {
+    width: 92px;
+    height: 66px;
+}
+
+.btn-back {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+    height: 48px;
+    padding-left: 22px;
+    padding-right: 22px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+    border-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-back:hover {
+    background-color: rgb(75, 75, 75);
+}
+
+.btn-back:active {
+    background-color: rgb(45, 45, 45);
+}
+
+.registry-card {
+    width: 620px;
+    background-color: rgb(44, 44, 44);
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 48px;
+}
+
+.ueberschrift {
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    font-size: 32px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+    margin-bottom: 32px;
+}
+
+.field-group {
+    margin-bottom: 28px;
+}
+
+.Profilname {
+    color: rgb(170, 170, 170);
+    -unity-text-align: middle-left;
+    font-size: 16px;
+    margin-bottom: 8px;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+}
+
+.input-profile {
+    width: 100%;
+    height: 56px;
+}
+
+.input-profile > .unity-base-field__label {
+    display: none;
+}
+
+.input-profile > .unity-base-field__input {
+    flex-grow: 1;
+    margin: 0;
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(70, 70, 70);
+    border-width: 1px;
+    border-color: rgb(74, 74, 74);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.input-profile:focus > .unity-base-field__input {
+    border-color: rgb(128, 207, 149);
+}
+
+.Ueberschrift2 {
+    color: rgb(128, 207, 149);
+    -unity-text-align: middle-center;
+    font-size: 19px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Frontend/Fonts/Poppins-Bold.ttf?fileID=12800000&guid=bd89cb14730400b4bbcff7e0926565fc&type=3#Poppins-Bold");
+    margin-bottom: 8px;
+}
+
+.text {
+    color: rgb(153, 153, 153);
+    -unity-text-align: upper-center;
+    font-size: 16px;
+    white-space: normal;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+    margin-bottom: 22px;
+}
+
+.Key-button {
+    width: 100%;
+    height: 56px;
+    background-color: rgb(128, 207, 149);
+    font-size: 18px;
+    color: rgb(20, 20, 20);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    border-width: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-bottom: 6px;
+}
+
+.Key-button:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+.Key-button:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.container-error {
+    align-items: center;
+    justify-content: center;
+    min-height: 20px;
+}
+
+.lbl-error {
+    font-size: 16px;
+    color: rgb(230, 57, 70);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.row-agb {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.toggle-agb {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.toggle-agb .unity-toggle__input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.toggle-agb .unity-toggle__checkmark {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: rgb(70, 70, 70);
+    border-width: 2px;
+    border-color: rgb(100, 100, 100);
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0);
+}
+
+.toggle-agb:checked .unity-toggle__checkmark {
+    background-color: rgb(128, 207, 149);
+    border-color: rgb(128, 207, 149);
+    -unity-background-image-tint-color: rgb(20, 20, 20);
+}
+
+.text2 {
+    color: rgb(153, 153, 153);
+    -unity-text-align: middle-left;
+    font-size: 16px;
+    white-space: normal;
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
+}
+
+.link-text {
+    color: rgb(128, 207, 149);
+    -unity-font-style: bold;
+}
+
+.link-text:hover {
+    color: rgb(179, 226, 196);
+}
+
+.popup-overlay {
+    flex-grow: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+}
+
+.popup-card {
+    width: 520px;
+    background-color: rgb(38, 38, 38);
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 32px;
+}
+
+.popup-header-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.popup-title {
+    font-size: 24px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.btn-popup-close {
+    -unity-text-align: middle-center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: rgb(180, 180, 180);
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 0;
+}
+
+.btn-popup-close:hover {
+    background-color: rgb(55, 55, 55);
+}
+
+.popup-passkey-display {
+    background-color: rgb(50, 50, 50);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+.popup-row-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.popup-row-item-last {
+    margin-bottom: 0;
+}
+
+.lbl-key-display {
+    font-size: 17px;
+    color: rgb(255, 255, 255);
+    flex-grow: 1;
+    white-space: normal;
+}
+
+.btn-copy {
+    width: 76px;
+    height: 38px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 15px;
+    background-color: rgb(70, 70, 70);
+    border-width: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: rgb(255, 255, 255);
+}
+
+.btn-copy:hover {
+    background-color: rgb(90, 90, 90);
+}
+
+.btn-copy:active {
+    background-color: rgb(50, 50, 50);
+}
+
+.btn-decrypt {
+    height: 50px;
+    background-color: rgb(70, 70, 70);
+    color: rgb(255, 255, 255);
+    font-size: 17px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-width: 0;
+    margin-bottom: 16px;
+}
+
+.btn-decrypt:hover {
+    background-color: rgb(90, 90, 90);
+}
+
+.btn-decrypt:active {
+    background-color: rgb(50, 50, 50);
+}
+
+.popup-hint {
+    font-size: 16px;
+    color: rgb(150, 150, 150);
+    -unity-text-align: upper-center;
+    white-space: normal;
+    margin-bottom: 20px;
+}
+
+.btn-submit {
+    height: 52px;
+    background-color: rgb(128, 207, 149);
+    color: rgb(20, 20, 20);
+    font-size: 17px;
+    -unity-font-style: bold;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-width: 0;
+}
+
+.btn-submit:hover {
+    background-color: rgb(179, 226, 196);
+}
+
+.btn-submit:active {
+    background-color: rgb(102, 165, 119);
+}
+
+.popup-doc-card {
+    width: 680px;
+    height: 720px;
+    background-color: rgb(38, 38, 38);
+    border-width: 1px;
+    border-color: rgb(55, 55, 55);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    padding: 32px 36px;
+    color: rgb(255, 255, 255);
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.popup-doc-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.popup-doc-title {
+    font-size: 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}
+
+.popup-doc-subtitel {
+    color: rgb(150, 150, 150);
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.btn-doc-close {
+    height: 36px;
+    width: 36px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    -unity-text-align: middle-center;
+    padding: 0;
+}
+
+.btn-doc-close:hover {
+    background-color: rgb(60, 60, 60);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.popup-doc-content {
+    flex-grow: 1;
+    width: 100%;
+    padding-right: 16px;
+}
+
+.popup-doc-text {
+    -unity-text-align: upper-left;
+    white-space: normal;
+    font-size: 17px;
+    color: rgb(210, 210, 210);
+    -unity-font-definition: url("project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&guid=208850aa048ae4a4a897f2e5fb1d9380&type=3#Poppins-Regular");
 }
 
 .container-main {

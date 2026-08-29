@@ -24,6 +24,12 @@ public class KundendatenbankController : MonoBehaviour
     [Header("Popups")]
     private VisualElement popupErstellen;
     private VisualElement popupBearbeiten;
+    private VisualElement popupGeloescht;
+    private Label lblGeloeschtText;
+    private Button btnCloseGeloescht;
+    private VisualElement popupGespeichert;
+    private Label lblGespeichertText;
+    private Button btnCloseGespeichert;
 
     // Inputs Erstellen-Popup
     private TextField inputCreateVorname, inputCreateNachname, inputCreateFirma;
@@ -58,6 +64,12 @@ public class KundendatenbankController : MonoBehaviour
 
         popupErstellen = root.Q<VisualElement>("PopUpKundeerstellen");
         popupBearbeiten = root.Q<VisualElement>("PopUpKundenbearbeiten");
+        popupGeloescht = root.Q<VisualElement>("popup-kunde-geloescht");
+        lblGeloeschtText = popupGeloescht?.Q<Label>("label-kunde-geloescht-text");
+        btnCloseGeloescht = popupGeloescht?.Q<Button>("btn-close-kunde-geloescht");
+        popupGespeichert = root.Q<VisualElement>("popup-kunde-gespeichert");
+        lblGespeichertText = popupGespeichert?.Q<Label>("label-kunde-gespeichert-text");
+        btnCloseGespeichert = popupGespeichert?.Q<Button>("btn-close-kunde-gespeichert");
 
         AssignPopupElements();
 
@@ -70,6 +82,8 @@ public class KundendatenbankController : MonoBehaviour
 
         SetElementVisible(popupErstellen, false);
         SetElementVisible(popupBearbeiten, false);
+        SetElementVisible(popupGeloescht, false);
+        SetElementVisible(popupGespeichert, false);
 
         RegisterEvents();
         LadeKundenAusDatenbank();
@@ -273,6 +287,11 @@ public class KundendatenbankController : MonoBehaviour
         if (btnEditSpeichern != null)
             btnEditSpeichern.clicked += SpeichereBearbeitetenKunden;
 
+        if (btnCloseGeloescht != null)
+            btnCloseGeloescht.clicked += () => SetElementVisible(popupGeloescht, false);
+        if (btnCloseGespeichert != null)
+            btnCloseGespeichert.clicked += () => SetElementVisible(popupGespeichert, false);
+
         // FIX: Öffnete vorher das "Kunde bearbeiten"-Popup mit leeren
         // Feldern (aktuellBearbeiteterKunde = null) - beim Speichern wäre
         // das als NEUER Kunde in der KDB gelandet, statt die eigenen
@@ -467,6 +486,9 @@ public class KundendatenbankController : MonoBehaviour
 
         if (!inDB) kundenListe.Add(uiKunde);
 
+        if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde hinzugefügt";
+        SetElementVisible(popupGespeichert, true);
+
         SetElementVisible(popupErstellen, false);
         ClearCreateInputs();
 
@@ -506,6 +528,9 @@ public class KundendatenbankController : MonoBehaviour
         aktuellBearbeiteterKunde.ort = inputEditOrt != null ? inputEditOrt.value : aktuellBearbeiteterKunde.ort;
         aktuellBearbeiteterKunde.email = inputEditEmail != null ? inputEditEmail.value : aktuellBearbeiteterKunde.email;
         aktuellBearbeiteterKunde.telefon = ZusammengesetzteTelefonnummer(dropdownEditVorwahl, inputEditTelefon);
+
+        if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde aktualisiert";
+        SetElementVisible(popupGespeichert, true);
 
         bool inDB = false;
         try
@@ -548,6 +573,9 @@ public class KundendatenbankController : MonoBehaviour
         catch (Exception e) { Debug.LogWarning("[KDB] L\u00f6schen fehlgeschlagen: " + e.Message); }
 
         kundenListe.Remove(kunde);
+
+        if (lblGeloeschtText != null) lblGeloeschtText.text = "Kunde wurde gelöscht";
+        SetElementVisible(popupGeloescht, true);
 
         if (inDB) LadeKundenAusDatenbank();
         else RefreshKundenListe();
