@@ -7,20 +7,11 @@
 
 .maskottchen-links {
     position: absolute;
-    left: -555px;
-    top: -76px;
+    left: 114px;
+    bottom: -20px;
     width: 460px;
     height: 646px;
-    background-image: url("project://database/Assets/Frontend/Bilder/Maskottchen_Ganzkoerper.png?fileID=2800000&guid=5ab3986fbb190bc4d88c0cb5bb44b5ea&type=3#Maskottchen_Ganzkoerper");
-}
-
-.maskottchen-rechts {
-    position: absolute;
-    left: 715px;
-    top: -76px;
-    width: 460px;
-    height: 646px;
-    background-image: url("project://database/Assets/Frontend/Bilder/Maskottchen_Ganzkoerper_gespiegelt.png?fileID=2800000&guid=252564e3094407a4bb7bcb5f89cdd558&type=3#Maskottchen_Ganzkoerper_gespiegelt");
+    background-image: resource("Begleiter 3");
 }
 
 .container-main {
