@@ -4,8 +4,8 @@
     <ui:VisualElement name="Background" class="fullscreen-bg" style="background-color: rgb(30, 30, 30);"/>
     <ui:VisualElement name="container-inhalt" class="container-main">
         <ui:VisualElement name="row-kopf" class="header-row">
-            <ui:Button text="Zurück" name="btnclose" class="btn-back"/>
-            <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo"/>
+            <ui:Button text="Zurück" name="btnclose" class="btn-back" style="height: 58px;"/>
+            <ui:Image name="Logo" source="project://database/Assets/Frontend/Bilder/logo_o_bg.png?fileID=2800000&amp;guid=7fbf2c99bf70f7a4eb47bbcd95b5e7a5&amp;type=3#logo_o_bg" class="header-logo" style="width: 192px; height: 166px; margin-top: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; aspect-ratio: auto; flex-grow: 0; flex-shrink: 1; top: 40px;"/>
         </ui:VisualElement>
         <ui:VisualElement name="container-ueberschrift" class="centered-container">
             <ui:Label text="Konto erstellen" name="Ueberschrift" class="ueberschrift"/>
@@ -24,15 +24,15 @@
         <ui:VisualElement name="container-fehler" class="container-error">
             <ui:Label text="" name="lblError" class="lbl-error"/>
         </ui:VisualElement>
-        <ui:VisualElement name="row-agb-datenschutz" class="row-agb">
+        <ui:VisualElement name="row-agb-datenschutz" class="row-agb" style="align-items: center;">
             <ui:Toggle label="" name="Toggle" class="toggle-agb"/>
-            <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2"/>
+            <ui:Label text="Ich akzeptiere die " name="normalerText" class="text2" style="justify-content: flex-start; align-items: stretch; align-content: flex-start;"/>
             <ui:Label text="AGB" name="text2" selectable="true" focusable="true" class="text2 link-text"/>
             <ui:Label text=" und die " name="normalerText2" class="text2"/>
             <ui:Label text="Datenschutzrichtlinie" name="textDatenschutz" selectable="true" focusable="true" class="text2 link-text"/>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: flex;">
+    <ui:VisualElement picking-mode="Position" name="popuppasskey" class="popup-overlay" style="display: none;">
         <ui:VisualElement name="container-popup-passkey" class="popup-card">
             <ui:VisualElement name="row-popup-passkey-header" class="popup-header-row">
                 <ui:Label text="Dein Power-Passkey" name="label-popup-passkey-titel" class="popup-title"/>
@@ -59,9 +59,9 @@
                 <ui:Label text="AGB" name="label-popup-agb-titel" class="popup-doc-title"/>
                 <ui:Button text="" name="btnAGBclose" class="btn-doc-close"/>
             </ui:VisualElement>
-            <ui:VisualElement name="container-popup-agb-inhalt" class="popup-doc-content">
-                <ui:Label text="§ 1 Geltungsbereich&#10;Diese Nutzungsbedingungen gelten für die Nutzung der Software Ventoriq durch registrierte Nutzerinnen und Nutzer. Mit der Registrierung erkennst du diese Bedingungen an.&#10;&#10;§ 2 Leistungsbeschreibung&#10;Ventoriq unterstützt Gründerinnen und Gründer bei der Verwaltung von Kunden, Angeboten, Rechnungen, Kassenbuch und Gründungsdokumenten. Die Software befindet sich im Status eines Prototypen (Minimum Viable Product). Die Nutzung erfolgt auf eigenes Risiko.&#10;&#10;§ 3 Haftungsausschluss&#10;Eine Haftung für Schäden, die aus der Nutzung der bereitgestellten Kalkulationen, Vorlagen oder generierten Dokumente resultieren, wird im gesetzlich zulässigen Rahmen ausgeschlossen. Die von Ventoriq erzeugten Dokumente (z. B. Verträge, Rechnungen, Formulare) ersetzen keine rechtliche oder steuerliche Beratung.&#10;&#10;§ 4 Nutzerkonto &amp; Zugangsdaten&#10;Du bist verpflichtet, deinen Passkey vertraulich zu behandeln und vor dem Zugriff Dritter zu schützen. Für Aktivitäten, die unter deinem Konto stattfinden, bist du verantwortlich.&#10;&#10;§ 5 Datenspeicherung&#10;Alle innerhalb von Ventoriq erfassten Daten werden ausschließlich lokal in einer verschlüsselten SQLite-Instanz auf deinem Endgerät gespeichert. Es findet keine Übertragung an Cloud-Dienste oder externe Server statt.&#10;&#10;§ 6 Änderungen&#10;Diese Bedingungen können bei Weiterentwicklung der Software angepasst werden. Wesentliche Änderungen werden in der Anwendung kenntlich gemacht.&#10;&#10;§ 7 Schlussbestimmungen&#10;Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt." name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
-            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-agb-inhalt" class="popup-doc-content">
+                <ui:Label text="§ 1 Gegenstand und akademischer Rahmen&#10;Die Software „Ventoriq – Dein digitaler Mentor&quot; ist eine modulare Desktop-Anwendung zur Unterstützung von Startup-Gründern. Dieses System entstand als studentisches Projekt im Rahmen des Moduls Wissenschaft und Wirtschaft 1 (WW1) im Sommersemester 2026 an der Hochschule Mittweida (Studiengang Medieninformatik und Interaktives Entertainment).&#10;&#10;§ 2 Nutzungsberechtigung und Zweck&#10;Die Software dient der Reduktion der kognitiven Last in der Gründungsphase durch geführte Prozesse (Guided UI). Die Nutzung ist im aktuellen Entwicklungsstadium (MVP) primär für Pilotgründer und zu Evaluationszwecken im akademischen Rahmen vorgesehen.&#10;&#10;§ 3 Haftungsausschluss und KI-Hinweis&#10;Da es sich um einen Prototypen (Minimum Viable Product) handelt, wird keine Gewähr für die Richtigkeit der berechneten Finanzdaten oder die Vollständigkeit der rechtlichen Hinweise übernommen. Inhalte der Wissensdatenbank sowie Teile der Systemlogik können unter Zuhilfenahme von KI-Technologien generiert worden sein und dienen lediglich der Orientierung. Die Software ersetzt keine professionelle Steuer- oder Rechtsberatung. Die Nutzung erfolgt auf eigene Gefahr.&#10;&#10;§ 4 Lokale Datenspeicherung&#10;Alle Eingaben werden ausschließlich in einer lokalen SQLite-Datenbank auf dem Endgerät des Nutzers gespeichert. Der Nutzer ist für die Sicherung dieser Datenbankdatei (Backup-Funktion unter Einstellungen) selbst verantwortlich." name="label-popup-agb-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="PopUpDatenschutz" class="popup-overlay">
@@ -70,9 +70,9 @@
                 <ui:Label text="Datenschutzrichtlinie" name="label-popup-datenschutz-titel" class="popup-doc-title"/>
                 <ui:Button text="" name="btnDatenschutzclose" class="btn-doc-close"/>
             </ui:VisualElement>
-            <ui:VisualElement name="container-popup-datenschutz-inhalt" class="popup-doc-content">
-                <ui:Label text="§ 1 Verantwortliche Stelle&#10;Verantwortlich für die Datenverarbeitung im Rahmen der Nutzung von Ventoriq bist du selbst als Nutzer bzw. Betreiber der Software auf deinem eigenen Endgerät.&#10;&#10;§ 2 Welche Daten werden erfasst&#10;Bei der Registrierung werden dein gewählter Profilname sowie ein sicherer Hash deines Passkeys gespeichert (kein Klartext-Passwort). Zusätzlich erfasst die Software im laufenden Betrieb die von dir eingegebenen Geschäftsdaten (Kunden, Rechnungen, Angebote, Kassenbuch, Dokumente).&#10;&#10;§ 3 Lokale Datenverarbeitung&#10;Sämtliche Daten werden ausschließlich lokal in einer verschlüsselten SQLite-Datenbank auf deinem Endgerät gespeichert. Es findet keine Übertragung an Ventoriq, an Cloud-Dienste oder an sonstige Dritte statt.&#10;&#10;§ 4 Sicherheit&#10;Zugangsdaten werden mittels moderner Hashing-Verfahren (SHA-256) gesichert. Für den Schutz deines Geräts und deiner Zugangsdaten bist du selbst verantwortlich.&#10;&#10;§ 5 Weitergabe an Dritte&#10;Eine Weitergabe deiner Daten an Dritte findet nicht statt, da keine Datenübertragung außerhalb deines Endgeräts erfolgt.&#10;&#10;§ 6 Deine Rechte&#10;Da alle Daten lokal bei dir liegen, hast du jederzeit vollen Zugriff, kannst sie einsehen, exportieren, korrigieren oder vollständig löschen (z. B. über die Backup- und Löschfunktionen in den Einstellungen).&#10;&#10;§ 7 Änderungen dieser Erklärung&#10;Diese Datenschutzerklärung kann bei Weiterentwicklung der Software angepasst werden." name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
-            </ui:VisualElement>
+            <ui:ScrollView name="container-popup-datenschutz-inhalt" class="popup-doc-content">
+                <ui:Label text="Grundsatz der Datensouveränität&#10;Der Schutz deiner Daten hat bei Ventoriq oberste Priorität. Die Software folgt dem Prinzip der lokalen Datenhaltung. Das bedeutet: Sämtliche von dir eingegebenen Unternehmensdaten, Finanztransaktionen und persönlichen Profileinstellungen werden ausschließlich lokal in einer verschlüsselten SQLite-Datenbank auf deinem Rechner gespeichert.&#10;&#10;Keine Cloud-Übertragung&#10;In der vorliegenden MVP-Version erfolgt keine Übertragung deiner Daten an externe Server oder Cloud-Dienste. Es findet keine Analyse deines Nutzerverhaltens durch die Entwickler statt.&#10;&#10;Authentifizierung und Sicherheit&#10;Zum Schutz deines Lokalprofils nutzt Ventoriq ein Passkey-Verfahren. Deine PIN wird nicht im Klartext gespeichert, sondern mittels SHA-256-Hashing verschlüsselt hinterlegt. Ein Zugriff auf deine Daten ist ohne diesen lokalen Schlüssel nicht möglich.&#10;&#10;Auskunfts- und Löschungsrecht&#10;Da alle Daten physisch auf deinem Gerät liegen, hast du die volle Kontrolle. Durch das Löschen der lokalen Datenbankdatei oder die Deinstallation der Anwendung werden alle gespeicherten Informationen unwiderruflich entfernt." name="label-popup-datenschutz-text" enable-rich-text="true" class="popup-doc-text"/>
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

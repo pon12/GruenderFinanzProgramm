@@ -4,9 +4,9 @@ using UnityEngine.UIElements;
 
 public static class ButtonHoverController
 {
-    private static readonly Color RandGruen      = new Color(128f / 255f, 207f / 255f, 149f / 255f);
-    private static readonly Color GruenHell      = new Color(160f / 255f, 220f / 255f, 175f / 255f);
-    private static readonly Color RotHell        = new Color(240f / 255f, 100f / 255f, 110f / 255f);
+    private static readonly Color RandGruen = new Color(128f / 255f, 207f / 255f, 149f / 255f);
+    private static readonly Color GruenHell = new Color(160f / 255f, 220f / 255f, 175f / 255f);
+    private static readonly Color RotHell = new Color(240f / 255f, 100f / 255f, 110f / 255f);
 
     private static readonly string[] BereitsPerCssGestyltePraefixe =
     {
@@ -22,8 +22,8 @@ public static class ButtonHoverController
         "btn-red",
         "btn-steuer",
         "btn-modus",
-        ".btn-danger-pop-up",
-        ".btn-danger"
+        "btn-danger-pop-up",
+        "btn-danger"
     };
 
     private static bool HatEigenesCssHover(Button btn)
@@ -34,10 +34,10 @@ public static class ButtonHoverController
     {
         root.Query<Button>().ForEach(btn =>
         {
-            if      (btn.ClassListContains("btn-hover-outline"))   RegistriereRahmen(btn);
-            else if (btn.ClassListContains("btn-hover-green"))     RegistriereHintergrund(btn, GruenHell);
+            if (btn.ClassListContains("btn-hover-outline")) RegistriereRahmen(btn);
+            else if (btn.ClassListContains("btn-hover-green")) RegistriereHintergrund(btn, GruenHell);
             else if (btn.ClassListContains("btn-hover-darkgreen")) RegistriereHintergrund(btn, GruenHell);
-            else if (btn.ClassListContains("btn-hover-red"))       RegistriereHintergrund(btn, RotHell);
+            else if (btn.ClassListContains("btn-hover-red")) RegistriereHintergrund(btn, RotHell);
         });
     }
 
@@ -69,26 +69,26 @@ public static class ButtonHoverController
 
             toggle.RegisterCallback<MouseEnterEvent>(_ =>
             {
-                checkmark.style.borderTopColor    = RandGruen;
-                checkmark.style.borderRightColor  = RandGruen;
+                checkmark.style.borderTopColor = RandGruen;
+                checkmark.style.borderRightColor = RandGruen;
                 checkmark.style.borderBottomColor = RandGruen;
-                checkmark.style.borderLeftColor   = RandGruen;
-                checkmark.style.borderTopWidth    = 2;
-                checkmark.style.borderRightWidth  = 2;
+                checkmark.style.borderLeftColor = RandGruen;
+                checkmark.style.borderTopWidth = 2;
+                checkmark.style.borderRightWidth = 2;
                 checkmark.style.borderBottomWidth = 2;
-                checkmark.style.borderLeftWidth   = 2;
+                checkmark.style.borderLeftWidth = 2;
             });
 
             toggle.RegisterCallback<MouseLeaveEvent>(_ =>
             {
-                checkmark.style.borderTopColor    = StyleKeyword.Null;
-                checkmark.style.borderRightColor  = StyleKeyword.Null;
+                checkmark.style.borderTopColor = StyleKeyword.Null;
+                checkmark.style.borderRightColor = StyleKeyword.Null;
                 checkmark.style.borderBottomColor = StyleKeyword.Null;
-                checkmark.style.borderLeftColor   = StyleKeyword.Null;
-                checkmark.style.borderTopWidth    = StyleKeyword.Null;
-                checkmark.style.borderRightWidth  = StyleKeyword.Null;
+                checkmark.style.borderLeftColor = StyleKeyword.Null;
+                checkmark.style.borderTopWidth = StyleKeyword.Null;
+                checkmark.style.borderRightWidth = StyleKeyword.Null;
                 checkmark.style.borderBottomWidth = StyleKeyword.Null;
-                checkmark.style.borderLeftWidth   = StyleKeyword.Null;
+                checkmark.style.borderLeftWidth = StyleKeyword.Null;
             });
         });
     }
@@ -98,29 +98,29 @@ public static class ButtonHoverController
     // beim Hover nur die Farbe ändert und nicht die Layoutgröße.
     private static void RegistriereRahmen(Button btn)
     {
-        btn.style.borderTopWidth    = 2;
-        btn.style.borderRightWidth  = 2;
+        btn.style.borderTopWidth = 2;
+        btn.style.borderRightWidth = 2;
         btn.style.borderBottomWidth = 2;
-        btn.style.borderLeftWidth   = 2;
-        btn.style.borderTopColor    = Color.clear;
-        btn.style.borderRightColor  = Color.clear;
+        btn.style.borderLeftWidth = 2;
+        btn.style.borderTopColor = Color.clear;
+        btn.style.borderRightColor = Color.clear;
         btn.style.borderBottomColor = Color.clear;
-        btn.style.borderLeftColor   = Color.clear;
+        btn.style.borderLeftColor = Color.clear;
 
         btn.RegisterCallback<MouseEnterEvent>(_ =>
         {
-            btn.style.borderTopColor    = RandGruen;
-            btn.style.borderRightColor  = RandGruen;
+            btn.style.borderTopColor = RandGruen;
+            btn.style.borderRightColor = RandGruen;
             btn.style.borderBottomColor = RandGruen;
-            btn.style.borderLeftColor   = RandGruen;
+            btn.style.borderLeftColor = RandGruen;
         });
 
         btn.RegisterCallback<MouseLeaveEvent>(_ =>
         {
-            btn.style.borderTopColor    = Color.clear;
-            btn.style.borderRightColor  = Color.clear;
+            btn.style.borderTopColor = Color.clear;
+            btn.style.borderRightColor = Color.clear;
             btn.style.borderBottomColor = Color.clear;
-            btn.style.borderLeftColor   = Color.clear;
+            btn.style.borderLeftColor = Color.clear;
         });
     }
 

@@ -47,10 +47,6 @@ public class EinstellungenController : MonoBehaviour
     private const string PREF_UST_RECHNUNG = "settings_ust_rechnung";
     private const string PREF_AUTO_NUMMER = "settings_auto_nummer";
     private const string PREF_IBAN_RECHNUNG = "settings_iban_rechnung";
-    private const string PREF_AGB = "settings_agb";
-    private const string PREF_DISCLAIMER = "settings_disclaimer";
-    private const string PREF_BARZAHLUNG = "settings_barzahlung";
-    private const string PREF_UEBERWEISUNG = "settings_ueberweisung";
 
     // ═══════════════════════════════════════════════════════════
     // FELD-LIMITS
@@ -156,20 +152,27 @@ public class EinstellungenController : MonoBehaviour
     private Button _btnSaveRechnung;
 
     private VisualElement _popupBezahlweise;
-    private TextField _inputAgb;
-    private TextField _inputDisclaimer;
-    private TextField _inputBarzahlung;
-    private TextField _inputUeberweisung;
+    private Label _vorschauAgb;
+    private Label _vorschauDisclaimer;
+    private Label _vorschauBarzahlung;
+    private Label _vorschauUeberweisung;
+    private Button _btnBearbeitenAgb;
+    private Button _btnBearbeitenDisclaimer;
+    private Button _btnBearbeitenBarzahlung;
+    private Button _btnBearbeitenUeberweisung;
     private Label _labelStatusAgb;
     private Label _labelStatusDisclaimer;
     private Label _labelStatusBar;
     private Label _labelStatusUeberweisung;
     private Button _btnCloseBezahlweise;
     private Button _btnCancelBezahlweise;
-    private Button _btnSaveBezahlweise;
 
     private VisualElement _popupCredits;
+
+    private VisualElement _popupUpdateNochNichtDa;
     private Button _btnCloseCredits;
+
+    private Button _btnCloseUpdate;
     private VisualElement _popupMitwirkende;
     private Button _btnCloseMitwirkende;
 
@@ -360,18 +363,23 @@ public class EinstellungenController : MonoBehaviour
         _btnSaveRechnung = _root.Q<Button>("btn-save-rechnung");
 
         _popupBezahlweise = _root.Q<VisualElement>("popup-bezahlweise");
-        _inputAgb = _root.Q<TextField>("input-agb");
-        _inputDisclaimer = _root.Q<TextField>("input-disclaimer");
-        _inputBarzahlung = _root.Q<TextField>("input-barzahlung");
-        _inputUeberweisung = _root.Q<TextField>("input-ueberweisung");
+        _vorschauAgb = _root.Q<Label>("label-vorschau-agb");
+        _vorschauDisclaimer = _root.Q<Label>("label-vorschau-disclaimer");
+        _vorschauBarzahlung = _root.Q<Label>("label-vorschau-barzahlung");
+        _vorschauUeberweisung = _root.Q<Label>("label-vorschau-ueberweisung");
+        _btnBearbeitenAgb = _root.Q<Button>("btn-bearbeiten-agb");
+        _btnBearbeitenDisclaimer = _root.Q<Button>("btn-bearbeiten-disclaimer");
+        _btnBearbeitenBarzahlung = _root.Q<Button>("btn-bearbeiten-barzahlung");
+        _btnBearbeitenUeberweisung = _root.Q<Button>("btn-bearbeiten-ueberweisung");
         _labelStatusAgb = _root.Q<Label>("label-status-agb");
         _labelStatusDisclaimer = _root.Q<Label>("label-status-disclaimer");
         _labelStatusBar = _root.Q<Label>("label-status-bar");
         _labelStatusUeberweisung = _root.Q<Label>("label-status-ueberweisung");
         _btnCloseBezahlweise = _root.Q<Button>("btn-close-bezahlweise");
         _btnCancelBezahlweise = _root.Q<Button>("btn-cancel-bezahlweise");
-        _btnSaveBezahlweise = _root.Q<Button>("btn-save-bezahlweise");
 
+        _popupUpdateNochNichtDa = _root.Q<VisualElement>("popup-updateNochNichtDa");
+        _btnCloseUpdate = _root.Q<Button>("btn-close-update");
         _popupCredits = _root.Q<VisualElement>("popup-credits");
         _btnCloseCredits = _root.Q<Button>("btn-close-credits");
         _popupMitwirkende = _root.Q<VisualElement>("popup-mitwirkende");
@@ -490,6 +498,7 @@ public class EinstellungenController : MonoBehaviour
         if (_btnOpenRechnung != null) _btnOpenRechnung.clicked += () => ShowPopup(_popupRechnung);
         if (_btnOpenBezahlweise != null) _btnOpenBezahlweise.clicked += () => { LadeBezahlweiseAusDokumenten(); LoadBezahlweiseStatus(); ShowPopup(_popupBezahlweise); };
         if (_btnOpenCredits != null) _btnOpenCredits.clicked += () => ShowPopup(_popupCredits);
+        if (_btnUpdate != null) _btnUpdate.clicked += () => ShowPopup(_popupUpdateNochNichtDa);
         if (_btnOpenMitwirkende != null) _btnOpenMitwirkende.clicked += () => ShowPopup(_popupMitwirkende);
 
         if (_btnCloseUnternehmen != null) _btnCloseUnternehmen.clicked += () => HidePopup(_popupUnternehmen);
@@ -506,8 +515,17 @@ public class EinstellungenController : MonoBehaviour
 
         if (_btnCloseBezahlweise != null) _btnCloseBezahlweise.clicked += () => HidePopup(_popupBezahlweise);
         if (_btnCancelBezahlweise != null) _btnCancelBezahlweise.clicked += () => HidePopup(_popupBezahlweise);
-        if (_btnSaveBezahlweise != null) _btnSaveBezahlweise.clicked += SaveBezahlweisePopup;
 
+        // Diese vier Dokumente werden nicht mehr direkt in den
+        // Einstellungen bearbeitet, sondern nur noch als Vorschau
+        // angezeigt - "Bearbeiten" springt zum Dok-Pool und öffnet dort
+        // direkt das Bearbeiten-Popup für das jeweilige Dokument.
+        if (_btnBearbeitenAgb != null) _btnBearbeitenAgb.clicked += () => SpringeZuDokument("AGB");
+        if (_btnBearbeitenDisclaimer != null) _btnBearbeitenDisclaimer.clicked += () => SpringeZuDokument("Disclaimer");
+        if (_btnBearbeitenBarzahlung != null) _btnBearbeitenBarzahlung.clicked += () => SpringeZuDokument("Barzahlung");
+        if (_btnBearbeitenUeberweisung != null) _btnBearbeitenUeberweisung.clicked += () => SpringeZuDokument("Überweisung");
+
+        if (_btnCloseUpdate != null) _btnCloseUpdate.clicked += () => HidePopup(_popupUpdateNochNichtDa);
         if (_btnCloseCredits != null) _btnCloseCredits.clicked += () => HidePopup(_popupCredits);
         if (_btnCloseMitwirkende != null) _btnCloseMitwirkende.clicked += () => HidePopup(_popupMitwirkende);
 
@@ -717,46 +735,40 @@ public class EinstellungenController : MonoBehaviour
         UpdateModeButtons(isDark);
 
         if (_toggleBegleiter != null) _toggleBegleiter.value = PlayerPrefs.GetInt(_pref(PREF_BEGLEITER), 1) == 1;
-
-        SetField(_inputAgb, PREF_AGB, "");
-        SetField(_inputDisclaimer, PREF_DISCLAIMER, "");
-        SetField(_inputBarzahlung, PREF_BARZAHLUNG, "");
-        SetField(_inputUeberweisung, PREF_UEBERWEISUNG, "");
     }
 
+    // Zeigt die echten Inhalte aus dem Dok-Pool an (nur Vorschau, nicht
+    // editierbar) - ersetzt die frühere Zwischenspeicherung über
+    // PlayerPrefs, die ohnehin nur eine verzögerte Kopie war.
     private void LadeBezahlweiseAusDokumenten()
     {
-        var mapping = new Dictionary<string, (string pref, TextField feld)>
-        {
-            { "AGB",              (PREF_AGB,         _inputAgb)          },
-            { "Disclaimer",       (PREF_DISCLAIMER,  _inputDisclaimer)   },
-            { "Barzahlung",       (PREF_BARZAHLUNG,  _inputBarzahlung)   },
-            { "\u00dcberweisung", (PREF_UEBERWEISUNG,_inputUeberweisung) },
-        };
+        SetzeVorschau(_vorschauAgb, "AGB");
+        SetzeVorschau(_vorschauDisclaimer, "Disclaimer");
+        SetzeVorschau(_vorschauBarzahlung, "Barzahlung");
+        SetzeVorschau(_vorschauUeberweisung, "\u00dcberweisung");
+    }
 
-        bool geaendert = false;
-        foreach (var kvp in mapping)
-        {
-            string inhalt = DocumentDashboard.GetBezahlweiseInhalt(kvp.Key);
-            if (string.IsNullOrEmpty(inhalt)) continue;
-
-            string bisheriger = PlayerPrefs.GetString(_pref(kvp.Value.pref), "");
-            if (inhalt == bisheriger) continue;
-
-            PlayerPrefs.SetString(_pref(kvp.Value.pref), inhalt);
-            if (kvp.Value.feld != null) kvp.Value.feld.SetValueWithoutNotify(inhalt);
-            geaendert = true;
-        }
-
-        if (geaendert) PlayerPrefs.Save();
+    private void SetzeVorschau(Label label, string dokumentTitel)
+    {
+        if (label == null) return;
+        string inhalt = DocumentDashboard.GetBezahlweiseInhalt(dokumentTitel);
+        label.text = string.IsNullOrWhiteSpace(inhalt) ? "Keine Angaben hinterlegt." : inhalt;
     }
 
     private void LoadBezahlweiseStatus()
     {
-        SetStatusLabel(_labelStatusAgb, PlayerPrefs.GetString(_pref(PREF_AGB), ""));
-        SetStatusLabel(_labelStatusDisclaimer, PlayerPrefs.GetString(_pref(PREF_DISCLAIMER), ""));
-        SetStatusLabel(_labelStatusBar, PlayerPrefs.GetString(_pref(PREF_BARZAHLUNG), ""));
-        SetStatusLabel(_labelStatusUeberweisung, PlayerPrefs.GetString(_pref(PREF_UEBERWEISUNG), ""));
+        SetStatusLabel(_labelStatusAgb, DocumentDashboard.HatBezahlweiseInhalt("AGB") ? "hinterlegt" : "");
+        SetStatusLabel(_labelStatusDisclaimer, DocumentDashboard.HatBezahlweiseInhalt("Disclaimer") ? "hinterlegt" : "");
+        SetStatusLabel(_labelStatusBar, DocumentDashboard.HatBezahlweiseInhalt("Barzahlung") ? "hinterlegt" : "");
+        SetStatusLabel(_labelStatusUeberweisung, DocumentDashboard.HatBezahlweiseInhalt("\u00dcberweisung") ? "hinterlegt" : "");
+    }
+
+    // Springt zum Dok-Pool und öffnet dort direkt das Bearbeiten-Popup
+    // für das angegebene Dokument.
+    private void SpringeZuDokument(string dokumentTitel)
+    {
+        DocumentDashboard.OeffneDokumentBeimStart = dokumentTitel;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Dokument-Screen");
     }
 
     private void SetStatusLabel(Label label, string inhalt)
@@ -853,11 +865,6 @@ public class EinstellungenController : MonoBehaviour
 
         if (_toggleBegleiter != null) PlayerPrefs.SetInt(_pref(PREF_BEGLEITER), _toggleBegleiter.value ? 1 : 0);
 
-        SaveField(PREF_AGB, _inputAgb);
-        SaveField(PREF_DISCLAIMER, _inputDisclaimer);
-        SaveField(PREF_BARZAHLUNG, _inputBarzahlung);
-        SaveField(PREF_UEBERWEISUNG, _inputUeberweisung);
-
         PlayerPrefs.Save();
     }
 
@@ -903,19 +910,6 @@ public class EinstellungenController : MonoBehaviour
         ShowGespeichertPopup();
     }
 
-    private void SaveBezahlweisePopup()
-    {
-        SaveField(PREF_AGB, _inputAgb);
-        SaveField(PREF_DISCLAIMER, _inputDisclaimer);
-        SaveField(PREF_BARZAHLUNG, _inputBarzahlung);
-        SaveField(PREF_UEBERWEISUNG, _inputUeberweisung);
-        PlayerPrefs.Save();
-        LoadBezahlweiseStatus();
-        SyncBezahlweiseToDokumente();
-        HidePopup(_popupBezahlweise);
-        ShowGespeichertPopup();
-    }
-
     // ═══════════════════════════════════════════════════════════
     // DOKUMENT-SYNCHRONISATION
     // ═══════════════════════════════════════════════════════════
@@ -924,7 +918,6 @@ public class EinstellungenController : MonoBehaviour
     {
         SyncUnternehmenToDokumente();
         SyncBankToDokumente();
-        SyncBezahlweiseToDokumente();
     }
 
     private void SyncUnternehmenToDokumente()
@@ -993,32 +986,6 @@ public class EinstellungenController : MonoBehaviour
                 $"IBAN: {_inputIban?.value ?? ""}\n" +
                 $"BIC: {_inputBic?.value ?? ""}\n" +
                 $"Kreditinstitut: {_inputKreditinstitut?.value ?? ""}";
-        }
-
-        System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
-    }
-
-    private void SyncBezahlweiseToDokumente()
-    {
-        string path = DocumentDashboard.GetSaveFilePath();
-        if (!System.IO.File.Exists(path)) return;
-
-        var saveData = DocumentDashboard.GetSavedDocuments();
-        if (saveData?.savedDocs == null) return;
-
-        var mapping = new Dictionary<string, string>
-        {
-            { "AGB",              _inputAgb?.value          ?? "" },
-            { "Disclaimer",       _inputDisclaimer?.value   ?? "" },
-            { "Barzahlung",       _inputBarzahlung?.value   ?? "" },
-            { "\u00dcberweisung", _inputUeberweisung?.value ?? "" },
-        };
-
-        foreach (var doc in saveData.savedDocs)
-        {
-            if (doc.category != "Bezahlweise") continue;
-            if (mapping.TryGetValue(doc.title, out string wert))
-                doc.inhalt = wert;
         }
 
         System.IO.File.WriteAllText(path, JsonUtility.ToJson(saveData, true));
@@ -1252,8 +1219,10 @@ public class EinstellungenController : MonoBehaviour
             "und Standardtexte f\u00fcr Kopf- und Fu\u00dfzeile ein.");
 
         HelpTooltip.Registriere(_root, "btn-help-bezahlweise",
-            "Verwalte hier Dokumente, die als Anh\u00e4nge an Rechnungen angeh\u00e4ngt werden: " +
-            "AGB, Disclaimer, Barzahlungs- und \u00dcberweisungshinweis.");
+            "Vorschau der Dokumente, die als Anh\u00e4nge an Rechnungen angeh\u00e4ngt werden " +
+            "k\u00f6nnen: AGB, Disclaimer, Barzahlungs- und \u00dcberweisungshinweis. " +
+            "Bearbeitet werden sie im Dokumenten-Screen - \u00fcber \u201eBearbeiten\u201c " +
+            "springst du direkt dorthin.");
 
         HelpTooltip.Registriere(_root, "btn-help-version",
             "Zeigt die aktuell installierte Programmversion. " +

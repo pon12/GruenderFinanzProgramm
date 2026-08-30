@@ -66,6 +66,7 @@ public abstract class BelegScreenController : MonoBehaviour
     protected TextField _kundensuche, _nummerFeld, _datumFeld, _fristFeld,
                         _rabattWertFeld, _skontoWertFeld, _notizenFeld;
     protected DropdownField _statusDropdown, _rabattTypDropdown;
+    private bool _dropdownsRegistriert = false;
     private VisualElement _suchErgebnisListe;
     protected string _ausgewaehlterKunde = "";
     protected int _ausgewaehlterKundeId = 0;
@@ -106,6 +107,8 @@ public abstract class BelegScreenController : MonoBehaviour
         Root = uiDocument.rootVisualElement;
 
         SammleElemente();
+        InitialisiereDropdowns();
+
         _zeilen.Clear();
 
         if (_positionenListe != null)
@@ -345,65 +348,14 @@ public abstract class BelegScreenController : MonoBehaviour
     }
 
     private void SetzeStandardwerte()
-    {
-        _nummerFeld?.SetValueWithoutNotify(ErzeugeNaechsteNummer());
-        _datumFeld?.SetValueWithoutNotify(DateTime.Now.ToString("dd.MM.yyyy"));
-        _fristFeld?.SetValueWithoutNotify(DateTime.Now.AddDays(14).ToString("dd.MM.yyyy"));
+{
+    _nummerFeld?.SetValueWithoutNotify(ErzeugeNaechsteNummer());
+    _datumFeld?.SetValueWithoutNotify(DateTime.Now.ToString("dd.MM.yyyy"));
+    _fristFeld?.SetValueWithoutNotify(DateTime.Now.AddDays(14).ToString("dd.MM.yyyy"));
 
-        NurDatumzeichen(_datumFeld);
-        NurDatumzeichen(_fristFeld);
-
-        if (_statusDropdown != null)
-        {
-            _statusDropdown.schedule.Execute(() =>
-            {
-                _statusDropdown.choices = new List<string>(StatusOptionen);
-                if (string.IsNullOrEmpty(_statusDropdown.value) ||
-                    !StatusOptionen.Contains(_statusDropdown.value))
-                    _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
-            }).ExecuteLater(50);
-
-            _statusDropdown.schedule.Execute(() =>
-            {
-                if (_statusDropdown.choices == null || _statusDropdown.choices.Count == 0)
-                {
-                    _statusDropdown.choices = new List<string>(StatusOptionen);
-                    _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
-                }
-            }).ExecuteLater(200);
-
-            _statusDropdown.RegisterValueChangedCallback(_ => AktualisiereUmwandelnButton());
-        }
-
-        if (_rabattTypDropdown != null)
-        {
-            var rabattOptionen = new List<string> { "Kein Rabatt", "Prozent", "Festbetrag" };
-
-            _rabattTypDropdown.schedule.Execute(() =>
-            {
-                _rabattTypDropdown.choices = rabattOptionen;
-                if (string.IsNullOrEmpty(_rabattTypDropdown.value) ||
-                    !rabattOptionen.Contains(_rabattTypDropdown.value))
-                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
-            }).ExecuteLater(50);
-
-            _rabattTypDropdown.schedule.Execute(() =>
-            {
-                if (_rabattTypDropdown.choices == null || _rabattTypDropdown.choices.Count == 0)
-                {
-                    _rabattTypDropdown.choices = rabattOptionen;
-                    _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
-                }
-            }).ExecuteLater(200);
-
-            _rabattTypDropdown.RegisterValueChangedCallback(evt =>
-            {
-                BerechneSummen();
-                AktualisiereRabattLabel(evt.newValue);
-            });
-        }
-    }
-
+    NurDatumzeichen(_datumFeld);
+    NurDatumzeichen(_fristFeld);
+}
     protected void UebernimmTransferDatenFallsVorhanden()
     {
         if (BelegTyp != "Rechnung") return;
@@ -1368,98 +1320,191 @@ public abstract class BelegScreenController : MonoBehaviour
     // ============================================================
 
     private void RegistriereAnhaenge(List<string> vorausgewaehlt = null)
+{
+    _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
+    if (_anhangBereich == null) return;
+
+    _anhangBereich.Clear();
+    _anhangAusgewaehlt.Clear();
+
+    // Nur diese Anhänge dürfen auswählbar sein.
+    var anhangTitel = new List<string>
     {
-        _anhangBereich = Root.Q<VisualElement>("anhaenge-inhalt");
-        if (_anhangBereich == null) return;
+        "Zahlungsbedingungen",
+        "AGB",
+        "Disclaimer",
+        "SEPA-Basislastschrift-Mandat",
+        "Widerrufsbelehrung",
+        "Barzahlung",
+        "Überweisung",
+        "Mahnverfahren",
+        "Ratenzahlungsbestimmungen",
+        "Copyright Hinweis",
+        "Lizenzhinweis Einfach",
+        "Lizenzhinweis Erweitert",
+        "Datenschutzerklärung",
+        "Vertraulichkeitserklärung",
+        "Kundenzufriedenheitsumfrage",
+        "Dienstleistungskatalog"
+    };
 
-        _anhangBereich.Clear();
-        _anhangAusgewaehlt.Clear();
+    // ------------------------------------------------------------
+    // ScrollView für die Anhänge
+    // ------------------------------------------------------------
 
-        var verfuegbar = BelegAnhangController.HoleVerfuegbareAnhaenge();
-        var alleTitel = BelegAnhangController.HoleAlleBezahlweiseTitel();
+    var scrollView = new ScrollView(ScrollViewMode.Vertical);
 
-        foreach (string key in alleTitel)
+    scrollView.style.flexGrow = 1;
+    scrollView.style.flexShrink = 1;
+    scrollView.style.minHeight = 0;
+
+    // Höhe des sichtbaren Bereichs.
+    // Dadurch wächst die Karte nicht mit allen Anhängen mit.
+    scrollView.style.height = 250;
+
+    scrollView.verticalScrollerVisibility = ScrollerVisibility.Auto;
+    scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+
+    
+
+    // ------------------------------------------------------------
+    // Optionale Anhänge
+    // ------------------------------------------------------------
+
+    foreach (string key in anhangTitel)
+    {
+        bool istVorausgewaehlt =
+            vorausgewaehlt != null &&
+            vorausgewaehlt.Contains(key);
+
+        _anhangAusgewaehlt[key] = istVorausgewaehlt;
+
+        string lokalerKey = key;
+
+        var zeile = new VisualElement();
+
+        zeile.style.flexDirection = FlexDirection.Row;
+        zeile.style.alignItems = Align.Center;
+        zeile.style.marginBottom = 4;
+        zeile.style.paddingTop = 4;
+        zeile.style.paddingBottom = 4;
+        zeile.style.paddingLeft = 8;
+        zeile.style.paddingRight = 8;
+
+        zeile.style.borderTopLeftRadius = 6;
+        zeile.style.borderTopRightRadius = 6;
+        zeile.style.borderBottomLeftRadius = 6;
+        zeile.style.borderBottomRightRadius = 6;
+
+        zeile.style.backgroundColor = istVorausgewaehlt
+            ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
+            : new Color(55f / 255f, 55f / 255f, 55f / 255f);
+
+        // Checkbox
+        var box = new VisualElement();
+
+        box.style.width = 18;
+        box.style.height = 18;
+        box.style.flexShrink = 0;
+        box.style.marginRight = 8;
+
+        box.style.borderTopLeftRadius = 4;
+        box.style.borderTopRightRadius = 4;
+        box.style.borderBottomLeftRadius = 4;
+        box.style.borderBottomRightRadius = 4;
+
+        box.style.borderTopWidth = 1;
+        box.style.borderRightWidth = 1;
+        box.style.borderBottomWidth = 1;
+        box.style.borderLeftWidth = 1;
+
+        box.style.alignItems = Align.Center;
+        box.style.justifyContent = Justify.Center;
+
+        var haken = new Label("");
+
+        haken.style.fontSize = 11;
+        haken.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+        box.Add(haken);
+
+        AktualisiereCheckboxOptik(
+            box,
+            haken,
+            istVorausgewaehlt,
+            true
+        );
+
+        // Text
+        var label = new Label(key);
+
+        label.style.fontSize = 12;
+        label.style.color = Color.white;
+        label.style.flexGrow = 1;
+
+        zeile.Add(box);
+        zeile.Add(label);
+
+        // Klick
+        zeile.RegisterCallback<ClickEvent>(_ =>
         {
-            bool vorhanden = verfuegbar.ContainsKey(key) && verfuegbar[key];
-            bool istVorausgewaehlt = vorausgewaehlt != null && vorausgewaehlt.Contains(key);
-            _anhangAusgewaehlt[key] = istVorausgewaehlt;
-            string lokalerKey = key;
+            bool neuerWert =
+                !_anhangAusgewaehlt[lokalerKey];
 
-            var zeile = new VisualElement();
-            zeile.style.flexDirection = FlexDirection.Row;
-            zeile.style.alignItems = Align.Center;
-            zeile.style.marginBottom = 4;
-            zeile.style.paddingTop = 4; zeile.style.paddingBottom = 4;
-            zeile.style.paddingLeft = 8; zeile.style.paddingRight = 8;
-            zeile.style.borderTopLeftRadius = 6; zeile.style.borderTopRightRadius = 6;
-            zeile.style.borderBottomLeftRadius = 6; zeile.style.borderBottomRightRadius = 6;
-            zeile.style.backgroundColor = !vorhanden
-                ? new Color(40f / 255f, 40f / 255f, 40f / 255f)
-                : istVorausgewaehlt
-                    ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                    : new Color(55f / 255f, 55f / 255f, 55f / 255f);
+            _anhangAusgewaehlt[lokalerKey] = neuerWert;
 
-            var box = new VisualElement();
-            box.style.width = 18; box.style.height = 18;
-            box.style.flexShrink = 0; box.style.marginRight = 8;
-            box.style.borderTopLeftRadius = 4; box.style.borderTopRightRadius = 4;
-            box.style.borderBottomLeftRadius = 4; box.style.borderBottomRightRadius = 4;
-            box.style.borderTopWidth = 1; box.style.borderRightWidth = 1;
-            box.style.borderBottomWidth = 1; box.style.borderLeftWidth = 1;
-            box.style.alignItems = Align.Center;
-            box.style.justifyContent = Justify.Center;
+            AktualisiereCheckboxOptik(
+                box,
+                haken,
+                neuerWert,
+                true
+            );
 
-            var haken = new Label("");
-            haken.style.fontSize = 11;
-            haken.style.unityTextAlign = TextAnchor.MiddleCenter;
-            box.Add(haken);
+            zeile.style.backgroundColor = neuerWert
+                ? new Color(
+                    128f / 255f,
+                    207f / 255f,
+                    149f / 255f,
+                    0.15f)
+                : new Color(
+                    55f / 255f,
+                    55f / 255f,
+                    55f / 255f);
+        });
 
-            AktualisiereCheckboxOptik(box, haken, istVorausgewaehlt, vorhanden);
-
-            var label = new Label(key);
-            label.style.fontSize = 12;
-            label.style.color = vorhanden ? Color.white : new Color(0.5f, 0.5f, 0.5f);
-            label.style.flexGrow = 1;
-
-            zeile.Add(box);
-            zeile.Add(label);
-
-            if (!vorhanden)
+        // Hover
+        zeile.RegisterCallback<MouseEnterEvent>(_ =>
+        {
+            if (!_anhangAusgewaehlt[lokalerKey])
             {
-                var fehlt = new Label("(nicht im Pool)");
-                fehlt.style.fontSize = 10;
-                fehlt.style.color = new Color(0.4f, 0.4f, 0.4f);
-                fehlt.style.marginLeft = 4;
-                zeile.Add(fehlt);
+                zeile.style.backgroundColor =
+                    new Color(
+                        65f / 255f,
+                        65f / 255f,
+                        65f / 255f);
             }
+        });
 
-            if (vorhanden)
-            {
-                zeile.RegisterCallback<ClickEvent>(_ =>
-                {
-                    bool neuerWert = !_anhangAusgewaehlt[lokalerKey];
-                    _anhangAusgewaehlt[lokalerKey] = neuerWert;
-                    AktualisiereCheckboxOptik(box, haken, neuerWert, true);
-                    zeile.style.backgroundColor = neuerWert
-                        ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                        : new Color(55f / 255f, 55f / 255f, 55f / 255f);
-                });
-                zeile.RegisterCallback<MouseEnterEvent>(_ =>
-                {
-                    if (!_anhangAusgewaehlt[lokalerKey])
-                        zeile.style.backgroundColor = new Color(65f / 255f, 65f / 255f, 65f / 255f);
-                });
-                zeile.RegisterCallback<MouseLeaveEvent>(_ =>
-                {
-                    zeile.style.backgroundColor = _anhangAusgewaehlt[lokalerKey]
-                        ? new Color(128f / 255f, 207f / 255f, 149f / 255f, 0.15f)
-                        : new Color(55f / 255f, 55f / 255f, 55f / 255f);
-                });
-            }
+        zeile.RegisterCallback<MouseLeaveEvent>(_ =>
+        {
+            zeile.style.backgroundColor =
+                _anhangAusgewaehlt[lokalerKey]
+                ? new Color(
+                    128f / 255f,
+                    207f / 255f,
+                    149f / 255f,
+                    0.15f)
+                : new Color(
+                    55f / 255f,
+                    55f / 255f,
+                    55f / 255f);
+        });
 
-            _anhangBereich.Add(zeile);
-        }
+        scrollView.Add(zeile);
     }
+
+    _anhangBereich.Add(scrollView);
+}
 
     // Ermittelt, welche Anhänge beim Öffnen des Formulars vorausgewählt sein sollen -
     // entweder aus einem über Bearbeiten geladenen Beleg oder aus einer laufenden Session.
@@ -1776,93 +1821,221 @@ public abstract class BelegScreenController : MonoBehaviour
 
     private void ExportierePDF()
     {
-        if (!PflichtfelderGefuellt()) return;
+        if (!PflichtfelderGefuellt())
+            return;
 
         try
         {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string zeitstempel = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string nummer = _nummerFeld != null ? _nummerFeld.value : BelegTyp;
-            string zielPfad = System.IO.Path.Combine(desktopPath, nummer + "_" + zeitstempel + ".pdf");
+            string desktopPath =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.Desktop);
+
+            string zeitstempel =
+                DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            string nummer =
+                _nummerFeld != null
+                    ? _nummerFeld.value
+                    : BelegTyp;
+
+            string zielPfad =
+                System.IO.Path.Combine(
+                    desktopPath,
+                    nummer + "_" + zeitstempel + ".pdf");
+
+            // Auswahl vor dem using-Block sichern, damit sie auch
+            // nach dem Schließen der Haupt-PDF noch verfügbar ist.
+            List<string> ausgewaehlteAnhaenge =
+                HoleAusgewaehlteAnhaenge();
 
             using (var fs = new System.IO.FileStream(
-                zielPfad, System.IO.FileMode.Create,
-                System.IO.FileAccess.Write, System.IO.FileShare.None))
+                zielPfad,
+                System.IO.FileMode.Create,
+                System.IO.FileAccess.Write,
+                System.IO.FileShare.None))
             {
-                var document = new iTextSharp.text.Document();
-                iTextSharp.text.pdf.PdfWriter.GetInstance(document, fs);
+                var document =
+                    new iTextSharp.text.Document();
+
+                iTextSharp.text.pdf.PdfWriter.GetInstance(
+                    document,
+                    fs);
+
                 document.Open();
 
-                var titelFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 16);
-                var textFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA, 11);
-                var subFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_OBLIQUE, 9);
-                var fettFont = iTextSharp.text.FontFactory.GetFont(
-                    iTextSharp.text.FontFactory.HELVETICA_BOLD, 13);
+                var titelFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_BOLD,
+                        16);
 
-                var linie = new iTextSharp.text.pdf.draw.LineSeparator();
+                var textFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA,
+                        11);
 
-                document.Add(new iTextSharp.text.Paragraph(BelegTyp + "  " + nummer, titelFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Datum: " + (_datumFeld != null ? _datumFeld.value : "") +
-                    "   Kunde: " + _ausgewaehlterKunde, subFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Chunk(linie));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Paragraph("Positionen", titelFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
+                var subFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_OBLIQUE,
+                        9);
+
+                var fettFont =
+                    iTextSharp.text.FontFactory.GetFont(
+                        iTextSharp.text.FontFactory.HELVETICA_BOLD,
+                        13);
+
+                var linie =
+                    new iTextSharp.text.pdf.draw.LineSeparator();
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        BelegTyp + "  " + nummer,
+                        titelFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Datum: " +
+                        (_datumFeld != null
+                            ? _datumFeld.value
+                            : "") +
+                        "   Kunde: " +
+                        _ausgewaehlterKunde,
+                        subFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Chunk(linie));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Positionen",
+                        titelFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
 
                 foreach (var zeile in _zeilen)
                 {
                     int menge = 1;
-                    int.TryParse(zeile.Menge.value, out menge);
-                    double preis = ParseBetrag(zeile.Preis.text);
-                    double gesamt = Math.Round(menge * preis, 2, MidpointRounding.AwayFromZero);
 
-                    string zeileText = zeile.Artikel.text
-                        + "   " + zeile.Beschreibung.text
-                        + "   Menge: " + menge
-                        + "   " + zeile.Einheit.text
-                        + "   " + FormatBetrag(preis)
-                        + "   Netto: " + FormatBetrag(gesamt);
+                    int.TryParse(
+                        zeile.Menge.value,
+                        out menge);
 
-                    document.Add(new iTextSharp.text.Paragraph(zeileText, textFont));
+                    double preis =
+                        ParseBetrag(
+                            zeile.Preis.text);
+
+                    double gesamt =
+                        Math.Round(
+                            menge * preis,
+                            2,
+                            MidpointRounding.AwayFromZero);
+
+                    string zeileText =
+                        zeile.Artikel.text
+                        + "   "
+                        + zeile.Beschreibung.text
+                        + "   Menge: "
+                        + menge
+                        + "   "
+                        + zeile.Einheit.text
+                        + "   "
+                        + FormatBetrag(preis)
+                        + "   Netto: "
+                        + FormatBetrag(gesamt);
+
+                    document.Add(
+                        new iTextSharp.text.Paragraph(
+                            zeileText,
+                            textFont));
                 }
 
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Chunk(linie));
-                document.Add(new iTextSharp.text.Paragraph(" "));
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
 
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Netto (EUR):       " + (_nettoLabel != null ? _nettoLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Rabatt:            " + (_rabattLabel != null ? _rabattLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Skonto:            " + (_skontoLabel != null ? _skontoLabel.text : ""), textFont));
-                document.Add(new iTextSharp.text.Paragraph(" "));
-                document.Add(new iTextSharp.text.Paragraph(
-                    "Gesamtpreis (EUR): " + (_gesamtLabel != null ? _gesamtLabel.text : ""), fettFont));
+                document.Add(
+                    new iTextSharp.text.Chunk(linie));
 
-                BelegAnhangController.SchreibeAnhaenge(document, HoleAusgewaehlteAnhaenge());
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Netto (EUR):       " +
+                        (_nettoLabel != null
+                            ? _nettoLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Rabatt:            " +
+                        (_rabattLabel != null
+                            ? _rabattLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Skonto:            " +
+                        (_skontoLabel != null
+                            ? _skontoLabel.text
+                            : ""),
+                        textFont));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(" "));
+
+                document.Add(
+                    new iTextSharp.text.Paragraph(
+                        "Gesamtpreis (EUR): " +
+                        (_gesamtLabel != null
+                            ? _gesamtLabel.text
+                            : ""),
+                        fettFont));
+
+                // Hauptdokument schließen. Die ausgewählten Dokument-PDFs
+                // werden danach als vollständige PDF-Seiten angehängt.
                 document.Close();
             }
 
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = zielPfad,
-                UseShellExecute = true
-            });
+            // Vollständige PDFs aus dem Dokumente-Screen an den
+            // bereits erzeugten Beleg anhängen.
+            BelegAnhangController.FuegeDokumentPdfAn(
+                zielPfad,
+                ausgewaehlteAnhaenge);
 
-            FeedbackPopup.Show(Root, "PDF exportiert", FeedbackTyp.Erfolg);
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = zielPfad,
+                    UseShellExecute = true
+                });
+
+            FeedbackPopup.Show(
+                Root,
+                "PDF exportiert",
+                FeedbackTyp.Erfolg);
         }
         catch (Exception e)
         {
-            Debug.LogError("[" + BelegTyp + "] PDF-Export fehlgeschlagen: " + e.Message);
-            FeedbackPopup.Show(Root, "Export fehlgeschlagen", FeedbackTyp.Fehler);
+            Debug.LogError(
+                "[" + BelegTyp +
+                "] PDF-Export fehlgeschlagen: " +
+                e);
+
+            FeedbackPopup.Show(
+                Root,
+                "Export fehlgeschlagen",
+                FeedbackTyp.Fehler);
         }
     }
+
 
     // ============================================================
     // EINGABE-HILFSMETHODEN
@@ -2576,4 +2749,56 @@ public abstract class BelegScreenController : MonoBehaviour
 
         return fehlend;
     }
+
+private void InitialisiereDropdowns()
+{
+    // STATUS
+    if (_statusDropdown != null)
+    {
+        _statusDropdown.choices = new List<string>(StatusOptionen);
+
+        if (string.IsNullOrEmpty(_statusDropdown.value) ||
+            !StatusOptionen.Contains(_statusDropdown.value))
+        {
+            _statusDropdown.SetValueWithoutNotify(StatusOptionen[0]);
+        }
+
+        if (!_dropdownsRegistriert)
+        {
+            _statusDropdown.RegisterValueChangedCallback(_ =>
+            {
+                AktualisiereUmwandelnButton();
+            });
+        }
+    }
+
+    // RABATT
+    if (_rabattTypDropdown != null)
+    {
+        _rabattTypDropdown.choices = new List<string>
+        {
+            "Kein Rabatt",
+            "Prozent",
+            "Festbetrag"
+        };
+
+        if (string.IsNullOrEmpty(_rabattTypDropdown.value) ||
+            !_rabattTypDropdown.choices.Contains(_rabattTypDropdown.value))
+        {
+            _rabattTypDropdown.SetValueWithoutNotify("Kein Rabatt");
+        }
+
+        if (!_dropdownsRegistriert)
+        {
+            _rabattTypDropdown.RegisterValueChangedCallback(evt =>
+            {
+                BerechneSummen();
+                AktualisiereRabattLabel(evt.newValue);
+            });
+        }
+    }
+
+    _dropdownsRegistriert = true;
+}
+
 }

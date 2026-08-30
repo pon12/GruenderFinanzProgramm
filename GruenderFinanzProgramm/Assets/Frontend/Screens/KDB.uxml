@@ -38,7 +38,7 @@
                 <ui:VisualElement name="kunden-liste-holder" style="flex-grow: 1;"/>
             </ui:ScrollView>
         </ui:VisualElement>
-        <ui:VisualElement name="PopUpKundeerstellen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
+        <ui:VisualElement name="PopUpKundeerstellen" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
             <ui:VisualElement name="Pop-up" style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 720px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
                 <ui:VisualElement name="Header" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 28px;">
                     <ui:Label text="Neuen Kunden / Kontakt anlegen" name="label-popup-create-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
@@ -48,41 +48,41 @@
                     <ui:VisualElement name="row-create-name" style="flex-direction: row; margin-bottom: 14px;">
                         <ui:VisualElement name="feld-gruppe-create-vorname" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="Vorname" name="label-feld-create-vorname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="create-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Max" name="create-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-create-nachname" style="flex: 1;">
                             <ui:Label text="Nachname" name="label-feld-create-nachname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="create-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Mustermann" name="create-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="feld-gruppe-create-firma" style="margin-bottom: 14px;">
                         <ui:Label text="Firmenbezeichnung" name="label-feld-create-firma" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField label="" placeholder-text="" name="create-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        <ui:TextField label="" placeholder-text="z.B. Mustermann GmbH" name="create-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="feld-gruppe-create-strasse" style="margin-bottom: 14px;">
                         <ui:Label text="Straße &amp; Hausnummer" name="label-feld-create-strasse" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField label="" placeholder-text="" name="create-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        <ui:TextField label="" placeholder-text="z.B. Musterstraße 1" name="create-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="row-create-plz-ort" style="flex-direction: row; margin-bottom: 14px;">
                         <ui:VisualElement name="feld-gruppe-create-plz" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="PLZ" name="label-feld-create-plz" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="create-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. 12345" name="create-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-create-ort" style="flex: 2;">
                             <ui:Label text="Ort" name="label-feld-create-ort" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="create-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Musterstadt" name="create-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="row-create-email-telefon" style="flex-direction: row; margin-bottom: 28px;">
                         <ui:VisualElement name="feld-gruppe-create-email" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="E-Mail-Adresse" name="label-feld-create-email" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="create-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. max@mustermann.de" name="create-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-create-telefon" style="flex: 1;">
                             <ui:Label text="Telefonnummer" name="label-feld-create-telefon" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                             <ui:VisualElement name="telefon-wrapper-create" style="flex-direction: row;">
                                 <ui:DropdownField name="create-vorwahl" class="dark-input" style="width: 100px; height: 40px; flex-shrink: 0; margin-right: 8px;"/>
-                                <ui:TextField label="" placeholder-text="" name="create-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
+                                <ui:TextField label="" placeholder-text="z.B. 0151 23456789" name="create-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -103,41 +103,41 @@
                     <ui:VisualElement name="row-edit-name" style="flex-direction: row; margin-bottom: 14px;">
                         <ui:VisualElement name="feld-gruppe-edit-vorname" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="Vorname" name="label-feld-edit-vorname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Max" name="edit-vorname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-edit-nachname" style="flex: 1;">
                             <ui:Label text="Nachname" name="label-feld-edit-nachname" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Mustermann" name="edit-nachname" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="feld-gruppe-edit-firma" style="margin-bottom: 14px;">
                         <ui:Label text="Firmenbezeichnung" name="label-feld-edit-firma" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        <ui:TextField label="" placeholder-text="z.B. Mustermann GmbH" name="edit-firma" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="feld-gruppe-edit-strasse" style="margin-bottom: 14px;">
                         <ui:Label text="Straße &amp; Hausnummer" name="label-feld-edit-strasse" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                        <ui:TextField label="" placeholder-text="" name="edit-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                        <ui:TextField label="" placeholder-text="z.B. Musterstraße 1" name="edit-strasse" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                     </ui:VisualElement>
                     <ui:VisualElement name="row-edit-plz-ort" style="flex-direction: row; margin-bottom: 14px;">
                         <ui:VisualElement name="feld-gruppe-edit-plz" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="PLZ" name="label-feld-edit-plz" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. 12345" name="edit-plz" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-edit-ort" style="flex: 2;">
                             <ui:Label text="Ort" name="label-feld-edit-ort" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. Musterstadt" name="edit-ort" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="row-edit-email-telefon" style="flex-direction: row; margin-bottom: 28px;">
                         <ui:VisualElement name="feld-gruppe-edit-email" style="flex: 1; margin-right: 8px;">
                             <ui:Label text="E-Mail-Adresse" name="label-feld-edit-email" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
-                            <ui:TextField label="" placeholder-text="" name="edit-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
+                            <ui:TextField label="" placeholder-text="z.B. max@mustermann.de" name="edit-email" class="dark-input" style="height: 40px; width: 100%; flex-shrink: 0;"/>
                         </ui:VisualElement>
                         <ui:VisualElement name="feld-gruppe-edit-telefon" style="flex: 1;">
                             <ui:Label text="Telefonnummer" name="label-feld-edit-telefon" style="font-size: 13px; color: rgb(160, 160, 160); margin-bottom: 6px;"/>
                             <ui:VisualElement name="telefon-wrapper-edit" style="flex-direction: row;">
                                 <ui:DropdownField name="edit-vorwahl" class="dark-input" style="width: 100px; height: 40px; flex-shrink: 0; margin-right: 8px;"/>
-                                <ui:TextField label="" placeholder-text="" name="edit-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
+                                <ui:TextField label="" placeholder-text="z.B. 0151 23456789" name="edit-telefon" class="dark-input" style="flex-grow: 1; flex-basis: 0; min-width: 0; height: 40px;"/>
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -146,6 +146,33 @@
                     <ui:Button text="Abbrechen" name="edit-btn-abbrechen" class="btn-red" style="margin-right: 12px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px;"/>
                     <ui:Button text="Speichern" name="edit-btn-speichern" style="background-color: rgb(128, 207, 149); color: rgb(0, 0, 0); border-width: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
                 </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="PopUpKundeLoeschenBestaetigen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center;">
+            <ui:VisualElement name="container-popup-loeschen-bestaetigen" style="background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; padding: 40px; width: 480px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(230, 57, 70); border-right-color: rgb(230, 57, 70); border-bottom-color: rgb(230, 57, 70); border-left-color: rgb(230, 57, 70);">
+                <ui:VisualElement name="row-popup-loeschen-header" style="flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <ui:Label text="Kunde löschen" name="label-popup-loeschen-titel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;); font-size: 26px; color: rgb(255, 255, 255);"/>
+                    <ui:Button name="loeschen-btn-close" text="✕" style="background-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); border-width: 0; font-size: 18px; width: 36px; height: 36px;"/>
+                </ui:VisualElement>
+                <ui:Label name="label-loeschen-hinweis" text="Möchtest du diesen Kunden wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden." style="font-size: 15px; color: rgb(200, 200, 200); white-space: normal; margin-bottom: 28px;"/>
+                <ui:VisualElement name="row-popup-loeschen-footer" style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button text="Abbrechen" name="loeschen-btn-abbrechen" class="btn-grey" style="margin-right: 12px;"/>
+                    <ui:Button text="Löschen" name="loeschen-btn-bestaetigen" style="background-color: rgb(230, 57, 70); color: rgb(255, 255, 255); border-width: 2px; border-color: rgb(230, 57, 70); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; padding-left: 24px; padding-right: 24px; font-size: 16px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Bold.ttf?fileID=12800000&amp;guid=3621564315749d341aeb8593daa0ea7f&amp;type=3#Poppins-Bold&quot;);"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="popup-kunde-geloescht" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
+            <ui:VisualElement name="container-popup-kunde-geloescht" style="width: 520px; height: 240px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; align-items: center; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(230, 57, 70); border-right-color: rgb(230, 57, 70); border-bottom-color: rgb(230, 57, 70); border-left-color: rgb(230, 57, 70);">
+                <ui:Button name="btn-close-kunde-geloescht" text="✕" style="position: absolute; top: 8px; right: 10px; height: 28px; width: 28px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); font-size: 16px;"/>
+                <ui:Label text="✕" name="icon-x-kunde-geloescht" style="font-size: 48px; color: rgb(230, 57, 70); -unity-font-style: bold; margin-bottom: 12px;"/>
+                <ui:Label name="label-kunde-geloescht-text" text="Kunde wurde gelöscht" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 20px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="popup-kunde-gespeichert" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
+            <ui:VisualElement name="container-popup-kunde-gespeichert" style="width: 520px; height: 240px; background-color: rgb(38, 38, 38); border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px; align-items: center; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-color: rgb(128, 207, 149); border-right-color: rgb(128, 207, 149); border-bottom-color: rgb(128, 207, 149); border-left-color: rgb(128, 207, 149);">
+                <ui:Button name="btn-close-kunde-gespeichert" text="✕" style="position: absolute; top: 8px; right: 10px; height: 28px; width: 28px; background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); color: rgb(255, 255, 255); font-size: 16px;"/>
+                <ui:Image name="icon-check-kunde-gespeichert" source="project://database/Assets/Frontend/Resources/Icons/check%20gr%C3%BCn.png?fileID=2800000&amp;guid=5ee28540816675a44ba9981abb41c351&amp;type=3#check grün" style="width: 70px; height: 70px; margin-bottom: 20px;"/>
+                <ui:Label name="label-kunde-gespeichert-text" text="Kunde wurde gespeichert" style="color: rgb(255, 255, 255); -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Poppins-Regular.ttf?fileID=12800000&amp;guid=208850aa048ae4a4a897f2e5fb1d9380&amp;type=3#Poppins-Regular&quot;); font-size: 20px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

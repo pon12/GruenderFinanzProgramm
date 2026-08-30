@@ -24,6 +24,15 @@ public class KundendatenbankController : MonoBehaviour
     [Header("Popups")]
     private VisualElement popupErstellen;
     private VisualElement popupBearbeiten;
+    private VisualElement popupGeloescht;
+    private Label lblGeloeschtText;
+    private Button btnCloseGeloescht;
+    private VisualElement popupGespeichert;
+    private Label lblGespeichertText;
+    private Button btnCloseGespeichert;
+    private VisualElement popupLoeschenBestaetigen;
+    private Button btnLoeschenAbbrechen, btnLoeschenBestaetigen, btnLoeschenClose;
+    private KundeData kundeZumLoeschen;
 
     // Inputs Erstellen-Popup
     private TextField inputCreateVorname, inputCreateNachname, inputCreateFirma;
@@ -58,6 +67,16 @@ public class KundendatenbankController : MonoBehaviour
 
         popupErstellen = root.Q<VisualElement>("PopUpKundeerstellen");
         popupBearbeiten = root.Q<VisualElement>("PopUpKundenbearbeiten");
+        popupGeloescht = root.Q<VisualElement>("popup-kunde-geloescht");
+        lblGeloeschtText = popupGeloescht?.Q<Label>("label-kunde-geloescht-text");
+        btnCloseGeloescht = popupGeloescht?.Q<Button>("btn-close-kunde-geloescht");
+        popupGespeichert = root.Q<VisualElement>("popup-kunde-gespeichert");
+        lblGespeichertText = popupGespeichert?.Q<Label>("label-kunde-gespeichert-text");
+        btnCloseGespeichert = popupGespeichert?.Q<Button>("btn-close-kunde-gespeichert");
+        popupLoeschenBestaetigen = root.Q<VisualElement>("PopUpKundeLoeschenBestaetigen");
+        btnLoeschenAbbrechen = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-abbrechen");
+        btnLoeschenBestaetigen = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-bestaetigen");
+        btnLoeschenClose = popupLoeschenBestaetigen?.Q<Button>("loeschen-btn-close");
 
         AssignPopupElements();
 
@@ -70,6 +89,9 @@ public class KundendatenbankController : MonoBehaviour
 
         SetElementVisible(popupErstellen, false);
         SetElementVisible(popupBearbeiten, false);
+        SetElementVisible(popupGeloescht, false);
+        SetElementVisible(popupGespeichert, false);
+        SetElementVisible(popupLoeschenBestaetigen, false);
 
         RegisterEvents();
         LadeKundenAusDatenbank();
@@ -273,6 +295,31 @@ public class KundendatenbankController : MonoBehaviour
         if (btnEditSpeichern != null)
             btnEditSpeichern.clicked += SpeichereBearbeitetenKunden;
 
+        if (btnCloseGeloescht != null)
+            btnCloseGeloescht.clicked += () => SetElementVisible(popupGeloescht, false);
+        if (btnCloseGespeichert != null)
+            btnCloseGespeichert.clicked += () => SetElementVisible(popupGespeichert, false);
+
+        if (btnLoeschenAbbrechen != null)
+            btnLoeschenAbbrechen.clicked += () =>
+            {
+                kundeZumLoeschen = null;
+                SetElementVisible(popupLoeschenBestaetigen, false);
+            };
+        if (btnLoeschenClose != null)
+            btnLoeschenClose.clicked += () =>
+            {
+                kundeZumLoeschen = null;
+                SetElementVisible(popupLoeschenBestaetigen, false);
+            };
+        if (btnLoeschenBestaetigen != null)
+            btnLoeschenBestaetigen.clicked += () =>
+            {
+                SetElementVisible(popupLoeschenBestaetigen, false);
+                if (kundeZumLoeschen != null) LoescheKunde(kundeZumLoeschen);
+                kundeZumLoeschen = null;
+            };
+
         // FIX: Öffnete vorher das "Kunde bearbeiten"-Popup mit leeren
         // Feldern (aktuellBearbeiteterKunde = null) - beim Speichern wäre
         // das als NEUER Kunde in der KDB gelandet, statt die eigenen
@@ -370,6 +417,24 @@ public class KundendatenbankController : MonoBehaviour
 
         ziel.Clear();
 
+        // FIX: Bisher blieb die Liste bei 0 echten Kunden komplett leer,
+        // ohne jeden Hinweis, was dort einmal auftauchen wird. Jetzt gibt
+        // es stattdessen einen Platzhalter-Hinweistext.
+        if (kundenListe.Count == 0)
+        {
+            var leerHinweis = new Label(
+                "Noch keine Kunden angelegt. Über \u201eKunde Hinzuf\u00fcgen\u201c " +
+                "erscheinen deine Kundendaten hier.");
+            leerHinweis.style.color = new Color(0.56f, 0.56f, 0.56f); // #8E8D8D
+            leerHinweis.style.fontSize = 18;
+            leerHinweis.style.unityTextAlign = TextAnchor.MiddleCenter;
+            leerHinweis.style.marginTop = 24;
+            leerHinweis.style.whiteSpace = WhiteSpace.Normal;
+            ziel.Add(leerHinweis);
+            AppEventManager.KundenAnzahlGeaendert(0);
+            return;
+        }
+
         foreach (var kunde in kundenListe)
         {
             var neueKarte = kundenZeileTemplate.Instantiate();
@@ -390,7 +455,7 @@ public class KundendatenbankController : MonoBehaviour
                 adresseLabel.text = $"{kunde.strasse}, {kunde.plz} {kunde.ort}".Trim();
 
             if (btnAendern != null) btnAendern.clicked += () => OeffneBearbeitenPopup(kunde);
-            if (btnLoeschen != null) btnLoeschen.clicked += () => LoescheKunde(kunde);
+            if (btnLoeschen != null) btnLoeschen.clicked += () => OeffneLoeschenBestaetigenPopup(kunde);
 
             // Help-Icon in der Karte registrieren (Template-Icon)
             var helpIcon = neueKarte.Q<VisualElement>("btn-help-kundenkarte");
@@ -425,7 +490,7 @@ public class KundendatenbankController : MonoBehaviour
             telefon = ZusammengesetzteTelefonnummer(dropdownCreateVorwahl, inputCreateTelefon)
         };
 
-        bool inDB = false;
+        bool tatsaechlichGespeichert = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -442,17 +507,28 @@ public class KundendatenbankController : MonoBehaviour
                     lastUpdated = DateTime.Now
                 };
                 db.createCustomer(bKunde);
-                inDB = true;
+
+                // Nach insertAndGetId() traegt bKunde.id die echte, vom Backend
+                // vergebene ID - 0/unveraendert wuerde auf einen fehlgeschlagenen
+                // Insert hindeuten. Zusaetzlich per getCustomerById gegenpruefen,
+                // dass der Datensatz auch wirklich in der DB angekommen ist.
+                tatsaechlichGespeichert = bKunde.id > 0 && db.getCustomerById(bKunde.id) != null;
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] Speichern fehlgeschlagen: " + e.Message); }
 
-        if (!inDB) kundenListe.Add(uiKunde);
+        if (!tatsaechlichGespeichert) kundenListe.Add(uiKunde);
+
+        if (tatsaechlichGespeichert)
+        {
+            if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde hinzugefügt";
+            SetElementVisible(popupGespeichert, true);
+        }
 
         SetElementVisible(popupErstellen, false);
         ClearCreateInputs();
 
-        if (inDB) LadeKundenAusDatenbank();
+        if (tatsaechlichGespeichert) LadeKundenAusDatenbank();
         else RefreshKundenListe();
     }
 
@@ -489,7 +565,7 @@ public class KundendatenbankController : MonoBehaviour
         aktuellBearbeiteterKunde.email = inputEditEmail != null ? inputEditEmail.value : aktuellBearbeiteterKunde.email;
         aktuellBearbeiteterKunde.telefon = ZusammengesetzteTelefonnummer(dropdownEditVorwahl, inputEditTelefon);
 
-        bool inDB = false;
+        bool tatsaechlichAktualisiert = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
@@ -504,35 +580,65 @@ public class KundendatenbankController : MonoBehaviour
                 bKunde.phone = aktuellBearbeiteterKunde.telefon;
                 bKunde.lastUpdated = DateTime.Now;
                 db.updateCustomer(bKunde);
-                inDB = true;
+
+                // Nach dem Update erneut aus der DB laden und gegenpruefen,
+                // ob die neuen Werte auch wirklich dort angekommen sind.
+                var geprueft = db.getCustomerById(bKunde.id);
+                tatsaechlichAktualisiert = geprueft != null
+                    && geprueft.name == bKunde.name
+                    && geprueft.phone == bKunde.phone;
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] Update fehlgeschlagen: " + e.Message); }
 
+        if (tatsaechlichAktualisiert)
+        {
+            if (lblGespeichertText != null) lblGespeichertText.text = "Kunde wurde aktualisiert";
+            SetElementVisible(popupGespeichert, true);
+        }
+
         SetElementVisible(popupBearbeiten, false);
 
-        if (inDB) LadeKundenAusDatenbank();
+        if (tatsaechlichAktualisiert) LadeKundenAusDatenbank();
         else RefreshKundenListe();
+    }
+
+    private void OeffneLoeschenBestaetigenPopup(KundeData kunde)
+    {
+        kundeZumLoeschen = kunde;
+        SetElementVisible(popupLoeschenBestaetigen, true);
     }
 
     private void LoescheKunde(KundeData kunde)
     {
-        bool inDB = false;
+        bool tatsaechlichGeloescht = false;
         try
         {
             var db = UserDatabaseAccess.getCurrentUserDatabase();
-            if (db != null)
+            if (db != null && int.TryParse(kunde.id, out int id))
             {
-                db.deleteCustomer(int.Parse(kunde.id));
-                inDB = true;
+                bool vorherVorhanden = db.getCustomerById(id) != null;
+                if (vorherVorhanden)
+                {
+                    db.deleteCustomer(id);
+                    tatsaechlichGeloescht = db.getCustomerById(id) == null;
+                }
             }
         }
         catch (Exception e) { Debug.LogWarning("[KDB] L\u00f6schen fehlgeschlagen: " + e.Message); }
 
         kundenListe.Remove(kunde);
 
-        if (inDB) LadeKundenAusDatenbank();
-        else RefreshKundenListe();
+        if (tatsaechlichGeloescht)
+        {
+            if (lblGeloeschtText != null) lblGeloeschtText.text = "Kunde wurde gelöscht";
+            SetElementVisible(popupGeloescht, true);
+            LadeKundenAusDatenbank();
+        }
+        else
+        {
+            RefreshKundenListe();
+        }
     }
 
     // ============================================================

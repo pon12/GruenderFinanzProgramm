@@ -1,0 +1,115 @@
+@startuml
+!include Ventoriq_00_Style.puml
+
+title Ventoriq - Dokumente und PDF-Verwaltung
+
+left to right direction
+
+skinparam nodesep 80
+skinparam ranksep 80
+skinparam linetype ortho
+
+package "PDF-Export" {
+
+  abstract class PDFExporter <<base exporter>> {
+    + ErstellePDFDateien()
+    + RegistrierePDFMetadaten()
+  }
+
+  class OfferPdfExporter
+  class InvoicePdfExporter
+  class TextDocumentPdfExporter
+}
+
+package "Dokumenten-Services" {
+
+  class TextDocumentService <<static service>> {
+    + CreateTextDocument()
+    + ReadTextDocument()
+    + UpdateTextDocument()
+    + DeleteTextDocument()
+  }
+
+  class PDFStorage <<static service>> {
+    + SavePDF()
+    + RegisterExistingPDF()
+    + ExportPDFById()
+    + DeletePDFById()
+    + GetPDFsForUser()
+  }
+
+  class TextDocumentParser <<static parser>> {
+    + ParseTextDocument()
+    + ReadPlainText()
+  }
+
+  class ParsedTextDocument <<DTO>> {
+    + documentType
+    + title
+    + plainText
+    + bodyLines
+  }
+}
+
+package "Dokument-Metadaten" {
+
+  entity TextDocumentMeta {
+    + id
+    + userId
+    + title
+    + storedFileName
+    + filePath
+    + documentType
+    + createdAt
+    + lastUpdated
+  }
+
+  entity UserPDFDocument {
+    + id
+    + userId
+    + originalFileName
+    + storedFileName
+    + filePath
+    + category
+    + uploadedAt
+  }
+}
+
+package "Persistenz" {
+
+  class DataBase <<Repository / SQLite-Fassade>> {
+    + TextDocumentMeta CRUD
+    + UserPDFDocument CRUD
+  }
+
+  class "Dateisystem\nApplication.persistentDataPath" as Dateisystem {
+    TextDocuments/User_<id>/
+    PDF Kategorie-Ordner
+  }
+}
+
+OfferPdfExporter --|> PDFExporter
+InvoicePdfExporter --|> PDFExporter
+TextDocumentPdfExporter --|> PDFExporter
+
+PDFExporter --> DataBase : registriert Metadaten
+PDFExporter --> Dateisystem : schreibt PDF
+
+TextDocumentService --> TextDocumentMeta : verwaltet
+TextDocumentService --> DataBase : speichert Metadaten
+TextDocumentService --> Dateisystem : speichert Textdatei
+
+PDFStorage --> UserPDFDocument : verwaltet
+PDFStorage --> DataBase : speichert Metadaten
+PDFStorage --> Dateisystem : speichert PDF
+
+TextDocumentParser --> Dateisystem : liest Textdatei
+TextDocumentParser --> ParsedTextDocument : erzeugt DTO
+
+note bottom
+Dieses Diagramm zeigt nur Dokumente und PDF-Verwaltung.
+Belege wie Offer und Invoice werden hier bewusst nicht modelliert,
+damit die Pfeile kurz bleiben und die Verantwortlichkeiten klar lesbar sind.
+end note
+
+@enduml

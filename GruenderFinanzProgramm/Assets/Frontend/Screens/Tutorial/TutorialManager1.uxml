@@ -12,15 +12,18 @@
         </ui:VisualElement>
         <ui:VisualElement name="TutorialModus" class="tutorial-modus">
             <ui:VisualElement name="HighlightRahmen" class="highlight-rahmen"/>
-            <ui:VisualElement name="ErklaerungsBox" class="erklaerung-box">
-                <ui:Label name="ErklaerungsText" class="erklaerung-text"/>
-                <ui:VisualElement class="nav-row">
-                    <ui:Button name="ZurueckButton" text="‹ Zurück" class="btn btn-ghost"/>
-                    <ui:Label name="SchrittAnzeige" text="1 / 1" class="schritt-anzeige"/>
-                    <ui:Button name="WeiterButton" text="Weiter ›" class="btn btn-primary"/>
+            <ui:VisualElement class="tutorial-bottom-container">
+                <ui:VisualElement name="Maskottchen" class="maskottchen"/>
+                <ui:VisualElement name="ErklaerungsBox" class="erklaerung-box">
+                    <ui:Label name="ErklaerungsText" class="erklaerung-text"/>
+                    <ui:VisualElement class="nav-row">
+                        <ui:Button name="ZurueckButton" text="‹ Zurück" class="btn btn-ghost"/>
+                        <ui:Label name="SchrittAnzeige" text="1 / 1" class="schritt-anzeige"/>
+                        <ui:Button name="WeiterButton" text="Weiter ›" class="btn btn-primary"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button name="BeendenButton" text="✕ Beenden" class="btn-beenden"/>
+            <ui:Button name="BeendenButton" text="Beenden" class="btn-beenden"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

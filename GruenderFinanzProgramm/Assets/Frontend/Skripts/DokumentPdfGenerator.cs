@@ -441,15 +441,45 @@ public static class DokumentPdfGenerator
     }
 
     private static string PfadFuer(string dokumentTyp)
-    {
-        string username = "unbekannt";
-        try { username = StateManager.Instance?.getCurrentUser()?.username ?? "unbekannt"; } catch { }
-        foreach (char c in Path.GetInvalidFileNameChars()) username = username.Replace(c, '_');
+{
+    PassKeyRecord currentUser =
+        StateManager.Instance?.getCurrentUser();
 
-        string ordner = Path.Combine(Application.persistentDataPath, "PDFs", username, "Dokumente");
-        Directory.CreateDirectory(ordner);
-        return Path.Combine(ordner, dokumentTyp + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".pdf");
+    if (currentUser == null ||
+        string.IsNullOrWhiteSpace(currentUser.username))
+    {
+        Debug.LogError(
+            "[DokumentPdfGenerator] Kein aktueller Benutzer gefunden."
+        );
+
+        return null;
     }
+
+    string username = currentUser.username;
+
+    // Ungültige Zeichen aus dem Benutzernamen entfernen
+    foreach (char c in Path.GetInvalidFileNameChars())
+    {
+        username = username.Replace(c, '_');
+    }
+
+    string ordner = Path.Combine(
+        Application.persistentDataPath,
+        "PDFs",
+        username,
+        "Dokumente"
+    );
+
+    Directory.CreateDirectory(ordner);
+
+    return Path.Combine(
+        ordner,
+        dokumentTyp
+        + "_"
+        + DateTime.Now.ToString("yyyyMMdd_HHmmss")
+        + ".pdf"
+    );
+}
 
     // ─────────────────────────────────────────
     // GRÜNDUNGSURKUNDE
